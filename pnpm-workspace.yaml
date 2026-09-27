@@ -1,0 +1,10 @@
+packages:
+  - packages/*
+  - docs
+
+catalog:
+  vue: ^3.5.43
+
+# vue-demi's postinstall only switches between Vue 2 and 3; the docs need neither.
+allowBuilds:
+  vue-demi: false

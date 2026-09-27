@@ -1,0 +1,127 @@
+/*
+ * Design tokens of the styled kit: a green accent over sage neutrals, in light and dark. The kit's
+ * components and table theme read only these variables, so a new palette is a new copy of this file.
+ * Dark mode follows the `dark` class on the root, as VitePress sets it.
+ */
+:root {
+	--ui-bg: #ffffff;
+	--ui-bg-subtle: #f7f9f8;
+	--ui-bg-muted: #eef1f0;
+	--ui-bg-hover: #e6e9e8;
+	--ui-border: #dfe2e0;
+	--ui-border-strong: #cbcfcd;
+	--ui-fg: #1a211e;
+	--ui-fg-muted: #5f6563;
+	--ui-fg-subtle: #868e8b;
+
+	--ui-accent: #30a46c;
+	--ui-accent-hover: #2b9a66;
+	--ui-accent-fg: #ffffff;
+	--ui-accent-soft: #e6f6eb;
+	--ui-accent-soft-hover: #d6f1df;
+	--ui-accent-line: #8eceaa;
+	--ui-accent-text: #218358;
+
+	--ui-up: #218358;
+	--ui-up-soft: rgb(48 164 108 / 22%);
+	--ui-down: #ce2c31;
+	--ui-down-soft: rgb(229 72 77 / 20%);
+	--ui-warn: #ab6400;
+	--ui-warn-soft: #fff4d5;
+	--ui-info: #0d74ce;
+	--ui-info-soft: #e6f4fe;
+
+	--ui-radius: 10px;
+	--ui-radius-sm: 7px;
+	--ui-radius-xs: 5px;
+	--ui-shadow-sm: 0 1px 2px rgb(16 24 20 / 6%);
+	--ui-shadow: 0 1px 2px rgb(16 24 20 / 5%), 0 4px 14px rgb(16 24 20 / 7%);
+	--ui-shadow-lg: 0 20px 48px -12px rgb(12 40 26 / 28%), 0 2px 6px rgb(16 24 20 / 8%);
+	--ui-ring: 0 0 0 3px rgb(48 164 108 / 28%);
+
+	--ui-font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	--ui-font-mono: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, Consolas, monospace;
+
+	--ui-violet: #6e56cf;
+	--ui-violet-soft: #f4f0fe;
+}
+
+.dark {
+	--ui-bg: #111413;
+	--ui-bg-subtle: #171a19;
+	--ui-bg-muted: #202221;
+	--ui-bg-hover: #272a29;
+	--ui-border: #2e3130;
+	--ui-border-strong: #444947;
+	--ui-fg: #eceeed;
+	--ui-fg-muted: #adb5b2;
+	--ui-fg-subtle: #717d79;
+
+	--ui-accent: #30a46c;
+	--ui-accent-hover: #33b074;
+	--ui-accent-fg: #ffffff;
+	--ui-accent-soft: #132d21;
+	--ui-accent-soft-hover: #113b29;
+	--ui-accent-line: #28684a;
+	--ui-accent-text: #3dd68c;
+
+	--ui-up: #3dd68c;
+	--ui-up-soft: rgb(61 214 140 / 18%);
+	--ui-down: #ff9592;
+	--ui-down-soft: rgb(255 149 146 / 16%);
+	--ui-warn: #ffca16;
+	--ui-warn-soft: #2c2106;
+	--ui-info: #70b8ff;
+	--ui-info-soft: #0d2847;
+
+	--ui-shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
+	--ui-shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 14px rgb(0 0 0 / 30%);
+	--ui-shadow-lg: 0 20px 48px -12px rgb(0 0 0 / 60%), 0 2px 6px rgb(0 0 0 / 30%);
+	--ui-ring: 0 0 0 3px rgb(61 214 140 / 28%);
+
+	--ui-violet: #baa7ff;
+	--ui-violet-soft: #1f1a3a;
+}
+
+/* The utilities the kit and the demos share. */
+.ui-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	height: 100%;
+	min-height: 0;
+}
+
+.ui-visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.ui-muted {
+	color: var(--ui-fg-muted);
+}
+
+.tone-up {
+	color: var(--ui-up);
+}
+
+.tone-down {
+	color: var(--ui-down);
+}
+
+/* How the kit's popovers (selects, menus) appear. */
+@keyframes ui-pop-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px) scale(0.98);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}

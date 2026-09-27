@@ -1,0 +1,134 @@
+/* The frame of the site: the navigation bar, the sidebar, the outline and the glow behind the page. */
+
+/* The scrollbar keeps its room when it comes and goes, and when a dialog locks the page: nothing shifts. */
+html {
+	-webkit-tap-highlight-color: rgb(128 128 128 / 50%);
+	scrollbar-gutter: stable;
+}
+
+.VPSidebar {
+	scrollbar-gutter: stable;
+}
+
+body {
+	font-synthesis-weight: none;
+	text-rendering: optimizeLegibility;
+}
+
+::selection {
+	background: rgb(22 163 74 / 25%);
+}
+
+:focus-visible {
+	outline-color: var(--vp-c-brand-1);
+}
+
+/* A soft green glow behind the top of every page, as Reka UI has. */
+.VPContent {
+	position: relative;
+	isolation: isolate;
+}
+
+.VPContent::before {
+	position: absolute;
+	inset: 0 0 auto;
+	z-index: -1;
+	height: 560px;
+	background:
+		radial-gradient(40% 60% at 72% -8%, var(--site-glow-1), transparent 70%),
+		radial-gradient(30% 50% at 28% -12%, var(--site-glow-2), transparent 70%);
+	content: '';
+	pointer-events: none;
+}
+
+/* The navigation bar: clear over the glow at the top, frosted once the page scrolls under it. */
+.VPNavBar:not(.home.top) .content-body,
+.VPNavBar:not(.home.top) .divider-line {
+	-webkit-backdrop-filter: saturate(160%) blur(12px);
+	backdrop-filter: saturate(160%) blur(12px);
+}
+
+.VPNavBar .title {
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.VPNavBarTitle .title::after {
+	margin-inline-start: 8px;
+	padding: 1px 7px;
+	border: 1px solid var(--vp-c-brand-soft);
+	border-radius: 999px;
+	background: var(--vp-c-brand-soft);
+	color: var(--vp-c-brand-1);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 18px;
+	content: 'table';
+}
+
+.VPNavBarMenuLink {
+	font-weight: 600 !important;
+}
+
+/* The sidebar: items as rounded rows, the active one tinted with the primary. */
+.VPSidebar .VPSidebarItem.level-0 > .item > .text,
+.VPSidebar .VPSidebarItem.level-0 > .item .link > .text {
+	padding-inline-start: 12px;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+}
+
+.VPSidebar .VPSidebarItem.level-1 > .item {
+	margin-block: 1px;
+	border-radius: 8px;
+	transition: background-color 0.2s;
+}
+
+.VPSidebar .VPSidebarItem.level-1 > .item > .link > .text {
+	padding: 6px 12px;
+	line-height: 1.5;
+}
+
+.VPSidebar .VPSidebarItem.level-1:not(.is-active) > .item:hover {
+	background: var(--vp-c-bg-soft);
+}
+
+.VPSidebar .VPSidebarItem.level-1.is-active > .item {
+	background: var(--vp-c-brand-soft);
+}
+
+.VPSidebar .VPSidebarItem.level-1.is-active > .item > .link > .text {
+	font-weight: 600;
+}
+
+/* The outline: the active heading in the primary. */
+.VPDocAsideOutline .outline-title {
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.VPDocAsideOutline .outline-link.active {
+	font-weight: 600;
+}
+
+/* The section of the page above its title, as Reka UI shows it. */
+.site-section-label {
+	margin-block-end: 8px;
+	color: var(--vp-c-brand-1);
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.VPDocFooter .pager-link {
+	border-radius: 12px;
+	transition: border-color 0.2s, background-color 0.2s;
+}
+
+.VPDocFooter .pager-link:hover {
+	background: var(--vp-c-bg-soft);
+}
+
+.VPFooter {
+	border-top-color: var(--vp-c-divider) !important;
+}

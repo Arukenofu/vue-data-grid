@@ -1,0 +1,31 @@
+{
+  "name": "@vue-stack/docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "typecheck": "vue-tsc --project tsconfig.json"
+  },
+  "dependencies": {
+    "@internationalized/date": "^3.12.4",
+    "@vue-stack/drag-and-drop": "workspace:*",
+    "@vue-stack/table": "workspace:*",
+    "animejs": "^4.5.0",
+    "gsap": "^3.15.0",
+    "motion": "^13.4.4",
+    "reka-ui": "^2.10.5",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "1.2.136",
+    "@iconify-json/radix-icons": "^1.2.6",
+    "@types/node": "^24.13.6",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "typescript": "~5.9.3",
+    "unplugin-icons": "^24.0.0",
+    "vitepress": "2.0.0-alpha.20",
+    "vue-tsc": "^3.3.11"
+  }
+}

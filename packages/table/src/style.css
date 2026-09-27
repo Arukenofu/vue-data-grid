@@ -1,0 +1,642 @@
+/*
+ * Structural styles of @vue-stack/table: what a table needs to work, on the attributes the core and
+ * `useTableProps` put on its elements. The core's inline styles give the geometry of a cell (its
+ * width, grow factor and pinning); this file lays the parts out around it. Every rule is wrapped in
+ * :where(), so it has no specificity and any rule of yours wins.
+ *
+ * The look comes from theme variables, each with a default on system colours, so the table follows
+ * light and dark mode with no theme at all:
+ *
+ *   --tc-background           body rows and cells of pinned columns, which must hide what moves under them
+ *   --tc-foreground           text
+ *   --tc-head-background      the header and the footer
+ *   --tc-pinned-background    pinned cells of the body; --tc-background by default
+ *   --tc-selected-background  cells of a selected row, opaque for the same reason
+ *   --tc-line-color, --tc-line-width   lines under rows and at the edges of pinned columns
+ *   --tc-cell-padding         the density: padding of every cell
+ *   --tc-focus-ring           the outline of a focused cell or table
+ *   --tc-resize-handle-width  the grab area of a column resize handle
+ *   --tc-group-row-height     a group row of the header; headers of columns without a group span it
+ *   --tc-tree-indent          the indent of a tree cell per level
+ *   --tc-drop-color           the line of the place a dragged row or column goes to
+ *   --tc-range-background     the tint of a cell in a range; translucent, the cell shows through
+ *   --tc-range-border         the outline of a cell range
+ *   --tc-error-color          the error of an editor's draft
+ *   --tc-fill-handle-color, --tc-fill-handle-size   the fill handle at the corner of a range
+ *   --tc-editor-list-max-height   the list of `selectEditor`, which also keeps to the room in view
+ *   --tc-editor-text-max-height   a text area of `textEditor({ multiline: true })`, growing with its text
+ *
+ * Layers over the body: pinned cells 1 (`--tc-pinned-z-index`, from the core's inline style), lines
+ * and insets 2, the cell being edited 3, the footer 3 and the header 4, the loading bar 4.
+ */
+
+/*
+ * The scroll container of both axes, the engine's `root`: a column of the header, the body, the states
+ * and the footer, none of which shrinks, so that the row of an empty table can take the height left.
+ */
+:where([data-tc-part='table']) {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+	color: var(--tc-foreground, CanvasText);
+}
+
+:where([data-tc-part='table'] > *) {
+	flex: none;
+}
+
+:where([data-tc-part='table']:focus-visible) {
+	outline: var(--tc-focus-ring, 2px solid Highlight);
+	outline-offset: -2px;
+}
+
+/*
+ * The header and the footer stick to the edges of the scroll container, above the body, its pinned
+ * cells and the cell being edited, and are as wide as the rows so that their background scrolls along.
+ */
+:where([data-tc-part='head'], [data-tc-part='foot']) {
+	position: sticky;
+	z-index: 3;
+	width: max-content;
+	min-width: 100%;
+	background: var(--tc-head-background, var(--tc-background, Canvas));
+}
+
+:where([data-tc-part='head']) {
+	inset-block-start: 0;
+	z-index: 4;
+}
+
+:where([data-tc-part='foot']) {
+	inset-block-end: 0;
+}
+
+/* The body holds the positioned rows: its height is `totalSize` of the row window. */
+:where([data-tc-part='body']) {
+	position: relative;
+}
+
+/* A row is a flex line of cells, at least as wide as the table, and as wide as its columns beyond. */
+:where([data-tc-part='row']) {
+	position: relative;
+	display: flex;
+	width: max-content;
+	min-width: 100%;
+}
+
+:where([data-tc-part='body'][data-tc-row-layout='positioned'] > [data-tc-part='row']) {
+	position: absolute;
+	inset-inline-start: 0;
+}
+
+/*
+ * A body row is opaque: a row that slides over others, as rows do when a group opens or closes under
+ * `useTableMotion`, hides them rather than mixing its text with theirs.
+ */
+:where([data-tc-part='body'] > [data-tc-part='row']) {
+	background: var(--tc-background, Canvas);
+}
+
+/*
+ * The line under a row belongs to the row rather than to its cells, so that cells moving on their
+ * own, as the columns of a drag or of `useTableMotion` do, leave it whole. It lies over the cells,
+ * pinned and inset ones included, and takes no room.
+ */
+:where([data-tc-part='row'])::after {
+	position: absolute;
+	inset-inline: 0;
+	inset-block-end: 0;
+	z-index: 2;
+	height: var(--tc-line-width, 1px);
+	background: var(--tc-line-color, color-mix(in srgb, CanvasText 15%, Canvas));
+	content: '';
+	pointer-events: none;
+}
+
+/*
+ * The line under a group row belongs to its groups, so that an empty cell above a column without a
+ * group has none, and the column's header can take its place.
+ */
+:where([data-tc-part='head'] > [data-tc-part='row']:not(:nth-last-child(1 of [data-tc-part='row'])))::after {
+	content: none;
+}
+
+:where([data-tc-part='head'] [data-tc-group]) {
+	box-shadow: inset 0 calc(-1 * var(--tc-line-width, 1px)) 0 var(--tc-line-color, color-mix(in srgb, CanvasText 15%, Canvas));
+}
+
+/*
+ * A header whose column has no group in the rows right above it, `data-tc-rowspan` rows of it, reaches
+ * up over their empty cells, with its label and resize handle. It needs the height of a group row:
+ * without `--tc-group-row-height` the header stays in its row.
+ */
+:where([data-tc-part='head'] > [data-tc-part='row']:not(:nth-last-child(1 of [data-tc-part='row']))) {
+	height: var(--tc-group-row-height);
+}
+
+:where([data-tc-part='head'] [data-tc-rowspan='2']) {
+	margin-block-start: calc(-1 * var(--tc-group-row-height));
+}
+
+:where([data-tc-part='head'] [data-tc-rowspan='3']) {
+	margin-block-start: calc(-2 * var(--tc-group-row-height));
+}
+
+:where([data-tc-part='head'] [data-tc-rowspan='4']) {
+	margin-block-start: calc(-3 * var(--tc-group-row-height));
+}
+
+/*
+ * Column cells, header cells and group cells: content in a row, centred across, clipped at the edges.
+ * A cell's width comes from its column, never from its content: the row is as wide as its content,
+ * so without the containment a long text would widen the `flex` cell of its own row alone, and the
+ * columns would stop lining up from row to row.
+ */
+:where([data-tc-column], [data-tc-columns]) {
+	position: relative;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	overflow: hidden;
+	padding: var(--tc-cell-padding, 0 8px);
+	contain: inline-size;
+}
+
+/* The text a part renders in a cell by default: one line, cut with an ellipsis. */
+:where([data-tc-part='cell-text']) {
+	overflow: hidden;
+	min-width: 0;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* A column's `align`, which the core puts in `data-tc-align` when it is not the default `left`. */
+:where([data-tc-column][data-tc-align='center']) {
+	justify-content: center;
+}
+
+:where([data-tc-column][data-tc-align='right']) {
+	justify-content: flex-end;
+}
+
+/* Pinned cells are opaque: the cells scrolling under them must not show through. */
+:where([data-tc-part='row'] > [data-tc-pinned]) {
+	background: var(--tc-pinned-background, var(--tc-background, Canvas));
+}
+
+:where([data-tc-part='head'] [data-tc-pinned], [data-tc-part='foot'] [data-tc-pinned]) {
+	background: var(--tc-head-background, var(--tc-background, Canvas));
+}
+
+:where([data-tc-pinned='start']) {
+	border-inline-end: var(--tc-line-width, 1px) solid var(--tc-line-color, color-mix(in srgb, CanvasText 15%, Canvas));
+}
+
+:where([data-tc-pinned='end']) {
+	border-inline-start: var(--tc-line-width, 1px) solid var(--tc-line-color, color-mix(in srgb, CanvasText 15%, Canvas));
+}
+
+:where([data-tc-part='row'][aria-selected='true'] > [data-tc-column]) {
+	background: var(--tc-selected-background, color-mix(in srgb, Highlight 18%, Canvas));
+}
+
+/*
+ * A cell in a cell range is tinted over its own background, whatever that is, by a layer the pointer
+ * passes through. Cells rather than the ranges carry the tint, so ranges that overlap never tint a
+ * cell twice. The focused cell, the active cell of a spreadsheet, and the cell being edited stay clear.
+ */
+:where([data-tc-column][aria-selected='true']:not(:focus, [data-tc-state='editing']))::before {
+	position: absolute;
+	inset: 0;
+	background: var(--tc-range-background, color-mix(in srgb, Highlight 12%, transparent));
+	content: '';
+	pointer-events: none;
+}
+
+/* The focused cell of a table with cell ranges shows its outline after a click too, as the active cell of a spreadsheet does. */
+:where([data-tc-column][aria-selected]:focus) {
+	outline: var(--tc-focus-ring, 2px solid Highlight);
+	outline-offset: -2px;
+}
+
+/*
+ * The outline of a cell range, a rectangle of `useCellRanges().rects`: a row across the table at the
+ * rows of the range, laid out as the rows under it, which the pointer passes through. Its pieces
+ * follow the cells: the one in the middle goes under pinned cells as they do, a pinned one stays over
+ * them. A range changes the outline without a render of any cell.
+ */
+:where([data-tc-part='range']) {
+	position: absolute;
+	inset-inline-start: 0;
+	display: flex;
+	width: max-content;
+	min-width: 100%;
+	pointer-events: none;
+}
+
+/* A piece carries `data-tc-columns` for resizing to reach it, but is not a cell: nothing clips its handle. */
+:where([data-tc-part='range-cell']) {
+	position: relative;
+	overflow: visible;
+	padding: 0;
+	box-sizing: border-box;
+	border: var(--tc-range-border, 1px solid Highlight);
+}
+
+/* A range cut by a pin is one outline: no border where a piece goes on into the next one. */
+:where([data-tc-part='range-cell'][data-tc-continues~='start']) {
+	border-inline-start: none;
+}
+
+:where([data-tc-part='range-cell'][data-tc-continues~='end']) {
+	border-inline-end: none;
+}
+
+/* The range a fill reaches while its handle is dragged: dashed. */
+:where([data-tc-part='range'][data-tc-state='fill'] > [data-tc-part='range-cell']) {
+	border-style: dashed;
+}
+
+/*
+ * The fill handle: a square centred on the end corner of the range, which the pointer takes. It is
+ * placed from inside the range's 1px outline, and stays under the header and the footer.
+ */
+:where([data-tc-part='fill-handle']) {
+	position: absolute;
+	inset-block-end: calc(var(--tc-fill-handle-size, 8px) / -2 - 1px);
+	inset-inline-end: calc(var(--tc-fill-handle-size, 8px) / -2 - 1px);
+	z-index: 3;
+	box-sizing: border-box;
+	width: var(--tc-fill-handle-size, 8px);
+	height: var(--tc-fill-handle-size, 8px);
+	border: 1px solid var(--tc-background, Canvas);
+	background: var(--tc-fill-handle-color, Highlight);
+	cursor: crosshair;
+	pointer-events: auto;
+	touch-action: none;
+}
+
+/*
+ * A cell being edited: its editor fills it, above the rows, the pinned cells and the ranges around,
+ * and what hangs out of it, the error of the draft, a list or a text area, lies over the rows below,
+ * so the cell lets it out. A pinned cell rises through the core's `--tc-pinned-z-index`.
+ */
+:where([data-tc-column][data-tc-state='editing']) {
+	--tc-pinned-z-index: 3;
+
+	z-index: 3;
+	overflow: visible;
+}
+
+:where([data-tc-part='editor']) {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+	height: 100%;
+	margin: 0;
+	font: inherit;
+	color: inherit;
+}
+
+/* An editor keeps to the column's `align`, as the text of the cell does. */
+:where([data-tc-column][data-tc-align='center'] > [data-tc-part='editor']) {
+	text-align: center;
+}
+
+:where([data-tc-column][data-tc-align='right'] > [data-tc-part='editor']) {
+	text-align: end;
+}
+
+:where([data-tc-part='editor'][aria-invalid='true']) {
+	outline: 2px solid var(--tc-error-color, #d93025);
+	outline-offset: -2px;
+}
+
+/* A text area of several lines grows down over the rows below from the top of its cell. */
+:where(textarea[data-tc-part='editor']) {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline: 0;
+	height: auto;
+	min-height: 100%;
+	max-height: var(--tc-editor-text-max-height, 12em);
+	field-sizing: content;
+	resize: none;
+	background: var(--tc-background, Canvas);
+}
+
+:where([data-tc-part='editor-error']) {
+	position: absolute;
+	inset-block-start: 100%;
+	inset-inline-start: 0;
+	z-index: 1;
+	width: max-content;
+	max-width: max(100%, 16em);
+	padding: 2px 6px;
+	background: var(--tc-error-color, #d93025);
+	color: #fff;
+	font-size: 0.85em;
+	pointer-events: none;
+}
+
+/* The error of a column aligned to the end hangs from that edge, where its values are. */
+:where([data-tc-column][data-tc-align='right'] > [data-tc-part='editor-error']) {
+	inset-inline: auto 0;
+}
+
+/*
+ * The list of `selectEditor`: under the cell, or above it with `data-tc-side='top'`, from the start
+ * edge, or the end one with `data-tc-align='end'`. It keeps to the room in view: `selectEditor` caps
+ * `--tc-editor-list-max-height` with it. The error of the draft goes to the other side.
+ */
+:where([data-tc-part='editor-list']) {
+	position: absolute;
+	inset-block-start: 100%;
+	inset-inline-start: 0;
+	z-index: 1;
+	box-sizing: border-box;
+	min-width: 100%;
+	max-width: max(100%, 20em);
+	max-height: var(--tc-editor-list-max-height, 16em);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	border: var(--tc-line-width, 1px) solid var(--tc-line-color, color-mix(in srgb, CanvasText 15%, Canvas));
+	background: var(--tc-background, Canvas);
+	color: var(--tc-foreground, CanvasText);
+}
+
+:where([data-tc-part='editor-list'][data-tc-side='top']) {
+	inset-block: auto 100%;
+}
+
+:where([data-tc-part='editor-list'][data-tc-align='end']) {
+	inset-inline: auto 0;
+}
+
+:where([data-tc-part='editor-list'][data-tc-side='bottom'] ~ [data-tc-part='editor-error']) {
+	inset-block: auto 100%;
+}
+
+:where([data-tc-part='editor-option'], [data-tc-part='editor-empty']) {
+	overflow: hidden;
+	padding: var(--tc-cell-padding, 0 8px);
+	line-height: 2;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+:where([data-tc-part='editor-option']) {
+	cursor: default;
+}
+
+:where([data-tc-part='editor-option'][aria-selected='true']) {
+	background: var(--tc-selected-background, color-mix(in srgb, Highlight 18%, Canvas));
+}
+
+:where([data-tc-part='editor-option'][aria-disabled='true'], [data-tc-part='editor-empty']) {
+	opacity: 0.6;
+}
+
+/* The checkbox of `checkboxCell()`. */
+:where([data-tc-part='cell-checkbox']) {
+	flex: none;
+	margin: 0;
+}
+
+:where([data-tc-column]:focus-visible, [data-tc-group]:focus-visible) {
+	outline: var(--tc-focus-ring, 2px solid Highlight);
+	outline-offset: -2px;
+}
+
+/*
+ * A cell in an inset of the row, `insets.start` or `insets.end` of the engine: as wide as the inset,
+ * and stuck to its edge before the pinned columns.
+ */
+:where([data-tc-inset]) {
+	position: sticky;
+	z-index: 2;
+	box-sizing: border-box;
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	background: var(--tc-pinned-background, var(--tc-background, Canvas));
+}
+
+:where([data-tc-inset='start']) {
+	inset-inline-start: 0;
+	width: var(--tc-inset-start);
+	border-inline-end: var(--tc-line-width, 1px) solid var(--tc-line-color, color-mix(in srgb, CanvasText 15%, Canvas));
+}
+
+:where([data-tc-inset='end']) {
+	inset-inline-end: 0;
+	width: var(--tc-inset-end);
+	border-inline-start: var(--tc-line-width, 1px) solid var(--tc-line-color, color-mix(in srgb, CanvasText 15%, Canvas));
+}
+
+:where([data-tc-part='head'] [data-tc-inset], [data-tc-part='foot'] [data-tc-inset]) {
+	background: var(--tc-head-background, var(--tc-background, Canvas));
+}
+
+/*
+ * The grab area of a resize handle, inside the cell at its end edge, so the cell can keep clipping
+ * its content. `touch-action` keeps a finger drag from scrolling the table. No `z-index`: the handle
+ * of a column scrolled under a pinned one must stay under it too, and pinned cells are on level 1.
+ */
+:where([data-tc-part='resize-handle']) {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: 0;
+	width: var(--tc-resize-handle-width, 8px);
+	cursor: col-resize;
+	touch-action: none;
+}
+
+/* A column pinned to the end grows towards the start: its edge to drag is the start one. */
+:where([data-tc-pinned='end'] > [data-tc-part='resize-handle']) {
+	inset-inline: 0 auto;
+}
+
+/* The sort mark keeps its room while the column is unsorted, so sorting never cuts the label. */
+:where([data-tc-part='sort-indicator']) {
+	flex: none;
+	min-width: 1.25em;
+	margin-inline-start: 4px;
+}
+
+/* The indent of a tree cell: its level, from `--tc-level`, times `--tc-tree-indent`. */
+:where([data-tc-part='tree-indent']) {
+	flex: none;
+	width: calc(var(--tc-level, 0) * var(--tc-tree-indent, 16px));
+}
+
+/* The toggle of a group row of the tree, and the room a leaf keeps in its place. */
+:where([data-tc-part='tree-toggle']) {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	padding: 0;
+	border: none;
+	background: none;
+	color: inherit;
+	font: inherit;
+}
+
+:where(button[data-tc-part='tree-toggle']) {
+	cursor: pointer;
+}
+
+/* The live region of the announcer: read by screen readers, never seen. */
+:where([data-tc-part='announcer']) {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/*
+ * The row of an empty table: as wide as the viewport, stuck to the start edge, and as tall as the
+ * height the header, the footer and the loading bar leave, with its content in the middle.
+ */
+:where([data-tc-part='table'] > [data-tc-part='empty']) {
+	flex: 1 0 auto;
+}
+
+:where([data-tc-part='empty']) {
+	position: sticky;
+	inset-inline-start: 0;
+	display: flex;
+}
+
+:where([data-tc-part='empty-cell']) {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	justify-content: center;
+	padding: 24px 8px;
+}
+
+/*
+ * The loading bar: stuck to the bottom of the table over the rows, right above the footer, whose
+ * height `TableLoading` puts in `inset-block-end`. It is last in the flow before the footer, so at the
+ * end of the rows it takes its own place and covers none of them.
+ */
+:where([data-tc-part='loading']) {
+	position: sticky;
+	inset-inline-start: 0;
+	inset-block-end: 0;
+	z-index: 4;
+	display: flex;
+	justify-content: center;
+	padding: 4px 8px;
+	background: var(--tc-head-background, var(--tc-background, Canvas));
+}
+
+/*
+ * Dragging, with @vue-stack/table/drag-and-drop. The line of the place a dragged row goes to: at the
+ * level of the place in a tree, and around a row a drop goes inside. The package positions the
+ * element; this draws it.
+ */
+:where([data-tc-part='body'] [data-drop-indicator], [data-tc-part='head'] [data-drop-indicator]) {
+	z-index: 4;
+	pointer-events: none;
+}
+
+:where([data-tc-part='body'] [data-drop-indicator])::before {
+	position: absolute;
+	inset-inline: calc(var(--drop-level, 0) * var(--tc-tree-indent, 16px)) 0;
+	top: -1px;
+	height: 2px;
+	background: var(--tc-drop-color, Highlight);
+	content: '';
+}
+
+:where([data-tc-part='body'] [data-drop-indicator='inside'])::before {
+	inset: 0;
+	height: auto;
+	background: none;
+	outline: 2px solid var(--tc-drop-color, Highlight);
+	outline-offset: -2px;
+}
+
+/* Between the column headers the line stands upright. */
+:where([data-tc-part='head'] [data-drop-indicator])::before {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: -1px;
+	width: 2px;
+	background: var(--tc-drop-color, Highlight);
+	content: '';
+}
+
+/* The row or the header being dragged stays in place, faded. */
+:where([data-tc-part='row'][data-drag-source], [data-tc-column][data-drag-source]) {
+	opacity: 0.5;
+}
+
+/* The drag handle of a row: a bare grip button. */
+:where([data-tc-part='drag-handle']) {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: none;
+	color: inherit;
+	font: inherit;
+	cursor: grab;
+}
+
+:where([data-tc-part='drag-handle'][data-tc-disabled]) {
+	cursor: default;
+	opacity: 0.4;
+}
+
+/*
+ * The message of `TableDragOverlay` over the part of the body in view, which it measures into the
+ * `--tc-view-*`, `--tc-head-height` and `--tc-foot-height` variables. It lets the pointer through, so
+ * the drag goes on under it. Restyle it into a banner or a badge with the same variables.
+ */
+:where([data-tc-part='drag-overlay']) {
+	position: absolute;
+	top: calc(var(--tc-view-top, 0px) + var(--tc-head-height, 0px));
+	left: var(--tc-view-left, 0px);
+	z-index: 5;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--tc-view-width, 100%);
+	height: calc(var(--tc-view-height, 100%) - var(--tc-head-height, 0px) - var(--tc-foot-height, 0px));
+	outline: 2px dashed var(--tc-drop-color, Highlight);
+	outline-offset: -4px;
+	pointer-events: none;
+}
+
+:where([data-tc-part='drag-overlay'][data-tc-state='over']) {
+	outline-style: solid;
+}
+
+:where([data-tc-part='drag-overlay'][data-tc-state='idle']) {
+	display: none;
+}
+
+/*
+ * The ghost under the pointer, when a `TableDragPreview` has no content of its own. It lives outside
+ * the table, so the theme variables of the table do not reach it: style it on its own.
+ */
+:where([data-tc-part='drag-preview']) {
+	padding: 6px 10px;
+	border: 1px solid color-mix(in srgb, CanvasText 15%, Canvas);
+	border-radius: 6px;
+	background: Canvas;
+	box-shadow: 0 6px 16px rgb(0 0 0 / 15%);
+	color: CanvasText;
+}

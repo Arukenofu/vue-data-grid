@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@vue-stack/flip": ["../flip/src/index.ts"]
+    }
+  },
+  "include": ["src", "tests", "vite.config.ts"]
+}

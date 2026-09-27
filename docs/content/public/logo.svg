@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+	<defs>
+		<linearGradient id="logo-fill" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#12a594" />
+			<stop offset="1" stop-color="#30a46c" />
+		</linearGradient>
+	</defs>
+	<rect x="4" y="4" width="56" height="56" rx="16" fill="url(#logo-fill)" />
+	<rect x="14" y="16" width="36" height="8" rx="3" fill="#fff" />
+	<rect x="14" y="28" width="10" height="6" rx="2" fill="#fff" fill-opacity=".9" />
+	<rect x="27" y="28" width="23" height="6" rx="2" fill="#fff" fill-opacity=".55" />
+	<rect x="14" y="38" width="10" height="6" rx="2" fill="#fff" fill-opacity=".9" />
+	<rect x="27" y="38" width="23" height="6" rx="2" fill="#fff" fill-opacity=".55" />
+</svg>

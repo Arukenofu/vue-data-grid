@@ -1,0 +1,49 @@
+{
+  "name": "@vue-stack/drag-and-drop",
+  "version": "0.0.0",
+  "description": "Drag and drop for Vue lists and trees: pointer, touch and keyboard, virtualization-safe, no re-renders during a gesture.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "keywords": [
+    "vue",
+    "drag-and-drop",
+    "sortable",
+    "tree",
+    "accessibility"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./vapor": {
+      "types": "./dist/vapor.d.ts",
+      "default": "./dist/vapor.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && tsc --project tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --project tsconfig.json",
+    "lint:package": "publint"
+  },
+  "dependencies": {
+    "@vue-stack/flip": "workspace:^"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "vue": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

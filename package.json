@@ -1,0 +1,30 @@
+{
+  "name": "@vue-stack/workspace",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "pnpm --recursive --filter \"./packages/**\" --filter ./docs run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "docs": "pnpm --filter @vue-stack/docs dev",
+    "typecheck": "pnpm --recursive --filter \"./packages/**\" --filter ./docs run typecheck",
+    "lint": "oxlint",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@vitest/browser-playwright": "5.0.1",
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^20.14.5",
+    "oxlint": "^1.85.0",
+    "playwright": "^1.63.0",
+    "publint": "^0.3.24",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1",
+    "vue": "catalog:"
+  }
+}

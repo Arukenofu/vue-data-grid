@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-console": "error",
+    "no-var": "error",
+    "eqeqeq": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/ban-ts-comment": "error",
+    "import/no-default-export": "error"
+  },
+  "overrides": [
+    {
+      "files": ["**/tests/**", "**/*.spec.ts"],
+      "rules": {
+        "typescript/no-non-null-assertion": "off"
+      }
+    },
+    {
+      "files": ["**/vite.config.ts", "**/vitest.config.ts", "**/vitest.*.config.ts", "docs/.vitepress/config.ts", "docs/.vitepress/theme/index.ts"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "**/dist/**"
+  ]
+}

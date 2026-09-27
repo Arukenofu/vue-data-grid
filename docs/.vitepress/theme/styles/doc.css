@@ -1,0 +1,160 @@
+/* The prose of a page: headings, inline code, code blocks, tables and callouts. */
+
+.vp-doc h1 {
+	font-size: 2.4rem;
+	font-weight: 800;
+	line-height: 1.15;
+	letter-spacing: -0.025em;
+}
+
+.vp-doc h2 {
+	margin-block: 56px 16px;
+	padding-block-start: 0;
+	border-block-start: none;
+	font-size: 1.6rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.vp-doc h3 {
+	margin-block-start: 36px;
+	font-size: 1.2rem;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+}
+
+.vp-doc h4 {
+	margin-block-start: 28px;
+	font-size: 1rem;
+	font-weight: 650;
+}
+
+.vp-doc p,
+.vp-doc li {
+	line-height: 1.75;
+}
+
+.vp-doc strong {
+	font-weight: 650;
+}
+
+.vp-doc a {
+	font-weight: 500;
+	text-decoration: underline;
+	text-decoration-color: rgb(22 163 74 / 35%);
+	text-underline-offset: 3px;
+	transition: text-decoration-color 0.2s, color 0.2s;
+}
+
+.vp-doc a:hover {
+	text-decoration-color: currentColor;
+}
+
+.vp-doc a > code {
+	color: inherit;
+}
+
+/* Inline code: a small chip. */
+.vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code {
+	padding: 2px 6px;
+	border-radius: 6px;
+	background: var(--site-muted);
+	font-size: 0.85em;
+	font-weight: 500;
+}
+
+.vp-doc :is(h1, h2, h3, h4) > code {
+	padding: 1px 6px;
+	border-radius: 6px;
+	background: var(--site-muted);
+	font-size: 0.9em;
+}
+
+/* Code blocks: near-black in both themes. */
+.vp-doc div[class*='language-'] {
+	margin-block: 20px;
+	border: 1px solid var(--site-code-border);
+	border-radius: 12px;
+}
+
+.vp-doc div[class*='language-'] pre {
+	padding-block: 18px;
+}
+
+.vp-doc div[class*='language-'] > span.lang {
+	top: 6px;
+	right: 14px;
+	font-weight: 500;
+}
+
+@media (max-width: 639px) {
+	.vp-doc > div > div[class*='language-'] {
+		margin-inline: 0;
+		border-radius: 12px;
+	}
+}
+
+/* Tables of the prose. */
+.vp-doc table {
+	border-collapse: separate;
+	border-spacing: 0;
+	overflow: auto;
+	border: 1px solid var(--vp-c-divider);
+	border-radius: 12px;
+}
+
+.vp-doc tr {
+	border-top: none;
+	background: transparent !important;
+}
+
+.vp-doc th,
+.vp-doc td {
+	border: none;
+	border-block-start: 1px solid var(--vp-c-divider);
+	padding: 10px 16px;
+	font-size: 14px;
+	line-height: 1.6;
+	vertical-align: top;
+}
+
+.vp-doc thead th {
+	border-block-start: none;
+	background: var(--vp-c-bg-alt);
+	color: var(--vp-c-text-1);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+/* Callouts. */
+.vp-doc .custom-block {
+	border-radius: 12px;
+	padding: 16px 20px;
+}
+
+.vp-doc .custom-block p {
+	line-height: 1.7;
+}
+
+.vp-doc .custom-block.tip {
+	border: 1px solid rgb(22 163 74 / 20%);
+}
+
+kbd {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.75em;
+	height: 1.75em;
+	padding-inline: 6px;
+	border: 1px solid var(--vp-c-divider);
+	border-block-end-width: 2px;
+	border-radius: 6px;
+	background: var(--vp-c-bg-alt);
+	color: var(--vp-c-text-1);
+	font-family: var(--vp-font-family-base);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+}

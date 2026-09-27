@@ -1,0 +1,46 @@
+{
+  "name": "@vue-stack/table-core",
+  "version": "0.0.0",
+  "description": "Headless table core for Vue: column model, row and column windows, CSS-variable geometry, row pipeline.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "keywords": [
+    "vue",
+    "table",
+    "data-grid",
+    "headless",
+    "virtual-scroll"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "default": "./dist/internals.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && tsc --project tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --project tsconfig.json",
+    "lint:package": "publint"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "vue": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+*.tsbuildinfo
+*.tgz
+
+# Tests
+coverage/
+.vitest/
+
+# Tool caches
+.cache/
+docs/.vitepress/cache/
+*.timestamp-*.mjs
+
+# Logs
+*.log
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local-only project notes and AI tooling
+CLAUDE.md
+.claude/
+PLAN.md
+output/

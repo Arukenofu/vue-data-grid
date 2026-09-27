@@ -1,0 +1,156 @@
+/* Shared pieces of the site's own components. */
+
+.site-switch {
+	position: relative;
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	width: 36px;
+	height: 20px;
+	padding: 2px;
+	border-radius: 999px;
+	background: rgb(22 163 74 / 45%);
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.site-switch[data-state='checked'] {
+	background: var(--site-green-1);
+}
+
+.site-switch-thumb {
+	display: block;
+	width: 16px;
+	height: 16px;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+	transition: translate 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.site-switch-thumb[data-state='checked'] {
+	translate: 16px 0;
+}
+
+/* Demos render outside the prose styles, as in an app: a minimal reset of their own. */
+.site-demo-surface :where(*, *::before, *::after) {
+	box-sizing: border-box;
+}
+
+.site-demo-surface :where(button, input, select, textarea) {
+	font: inherit;
+	color: inherit;
+}
+
+.site-demo-surface {
+	color: var(--vp-c-text-1);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+/* Wide pages: examples take the width the outline leaves. */
+.site-wide .VPDoc .content-container {
+	max-width: none !important;
+}
+
+/* A column for the content wide enough for a table, and still a comfortable line for the prose. */
+@media (min-width: 60rem) {
+	.VPContent .VPDoc {
+		padding-inline: 1.5rem;
+	}
+
+	.VPContent .VPDoc .content {
+		padding-inline: 1.5rem;
+	}
+}
+
+@media (min-width: 80rem) {
+	.VPContent .VPDoc.has-aside .content-container {
+		max-width: 48rem;
+	}
+
+	.VPContent .VPDoc .content {
+		padding-inline: 0.5rem 1.5rem;
+	}
+
+	.VPContent .VPDoc .aside {
+		max-width: 13.5rem;
+		padding-left: 1rem;
+	}
+
+	.VPContent .VPDoc .aside-container,
+	.VPContent .VPDoc .aside-curtain {
+		width: 12.5rem;
+	}
+}
+
+/* Reference tables: props, options, slots, events, data attributes, CSS variables, keys. */
+.vp-doc .site-api table {
+	display: table;
+	width: 100%;
+	margin-block: 16px 24px;
+	table-layout: fixed;
+}
+
+.vp-doc .site-api th.site-api-name {
+	width: 30%;
+}
+
+.vp-doc .site-api th.site-api-default {
+	width: 22%;
+}
+
+.vp-doc .site-api td {
+	overflow-wrap: anywhere;
+}
+
+.vp-doc .site-api .site-api-key {
+	background: var(--vp-c-brand-soft);
+	color: var(--vp-c-brand-1);
+	font-weight: 600;
+}
+
+.vp-doc .site-api .site-api-value {
+	display: inline-block;
+	max-width: 100%;
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+
+.vp-doc .site-api .site-api-values {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.vp-doc .site-api .site-api-description {
+	margin: 6px 0 0;
+	color: var(--vp-c-text-2);
+	font-size: 13.5px;
+	line-height: 1.6;
+}
+
+.vp-doc .site-api .site-api-text {
+	color: var(--vp-c-text-2);
+}
+
+.vp-doc .site-api .site-api-none {
+	color: var(--vp-c-text-3);
+}
+
+.site-api-shortcuts {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.site-api-shortcut {
+	display: inline-flex;
+	gap: 3px;
+}
+
+.site-api-or {
+	color: var(--vp-c-text-3);
+	font-size: 12px;
+}

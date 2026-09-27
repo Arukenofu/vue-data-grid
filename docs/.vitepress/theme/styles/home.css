@@ -1,0 +1,54 @@
+/* The sections of the home page. */
+
+.home-section {
+	margin-block-start: 112px;
+	padding-inline: 24px;
+	text-align: center;
+}
+
+.home-eyebrow {
+	margin: 0 0 12px;
+	color: var(--vp-c-brand-1);
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.home-heading {
+	max-width: 720px;
+	margin: 0 auto;
+	font-size: clamp(1.9rem, 4vw, 2.75rem);
+	font-weight: 800;
+	line-height: 1.12;
+	letter-spacing: -0.035em;
+}
+
+.home-subheading {
+	max-width: 600px;
+	margin: 18px auto 0;
+	color: var(--vp-c-text-2);
+	font-size: 1.05rem;
+	line-height: 1.7;
+}
+
+/*
+ * With scripts on, the hero waits hidden for its entrance from the first paint, rather than showing
+ * and hiding again. If the entrance never runs, it shows after a moment all the same.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	html.js .home-hero [data-reveal] {
+		visibility: hidden;
+		opacity: 0;
+		translate: none;
+		transform: translateY(24px);
+		animation: home-reveal-fallback 0s 2.5s forwards;
+	}
+}
+
+@keyframes home-reveal-fallback {
+	to {
+		visibility: visible;
+		opacity: 1;
+		transform: none;
+	}
+}

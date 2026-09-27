@@ -1,0 +1,97 @@
+/*
+ * The palette of the site, after Reka UI's: a green primary, warm cards, and near-black code in both
+ * themes. VitePress reads its own `--vp-*` variables; the components of the site read `--site-*`.
+ */
+
+:root {
+	--site-green-1: #16a34a;
+	--site-green-2: #15803d;
+	--site-teal: #12a594;
+	--site-grass: #30a46c;
+	--site-card: #f8f8f6;
+	--site-muted: #efeeea;
+	--site-border: #e4e4e7;
+	--site-code: #1c1917;
+	--site-code-border: #2a2725;
+	--site-code-tab: #a8a29e;
+	--site-glow-1: rgb(16 185 129 / 18%);
+	--site-glow-2: rgb(20 184 166 / 14%);
+	--site-shadow: 0 1px 2px rgb(24 24 27 / 5%), 0 12px 32px -12px rgb(24 24 27 / 18%);
+
+	--vp-font-family-base: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+
+	--vp-c-bg: #ffffff;
+	--vp-c-bg-alt: var(--site-card);
+	--vp-c-bg-elv: #ffffff;
+	--vp-c-bg-soft: #f4f4f2;
+	--vp-c-divider: var(--site-border);
+	--vp-c-gutter: var(--site-border);
+	--vp-c-border: #d4d4d8;
+	--vp-c-text-1: #09090b;
+	--vp-c-text-2: #71717a;
+	--vp-c-text-3: #a1a1aa;
+
+	--vp-c-brand-1: var(--site-green-1);
+	--vp-c-brand-2: var(--site-green-2);
+	--vp-c-brand-3: var(--site-green-1);
+	--vp-c-brand-soft: rgb(22 163 74 / 12%);
+
+	--vp-c-tip-1: var(--vp-c-brand-1);
+	--vp-c-tip-2: var(--vp-c-brand-2);
+	--vp-c-tip-3: var(--vp-c-brand-3);
+	--vp-c-tip-soft: var(--vp-c-brand-soft);
+
+	--vp-button-brand-bg: var(--site-green-1);
+	--vp-button-brand-hover-bg: var(--site-green-2);
+	--vp-button-brand-active-bg: var(--site-green-2);
+
+	--vp-code-bg: var(--site-muted);
+	--vp-code-color: var(--vp-c-text-1);
+	--vp-code-block-bg: var(--site-code);
+	--vp-code-block-color: #dbd7ca;
+	--vp-code-copy-code-bg: #292524;
+	--vp-code-copy-code-hover-bg: #3a3431;
+	--vp-code-copy-code-border-color: #3a3431;
+	--vp-code-copy-code-hover-border-color: #57534e;
+	--vp-code-lang-color: #a8a29e;
+	--vp-code-line-highlight-color: rgb(255 255 255 / 8%);
+
+	--vp-nav-bg-color: rgb(255 255 255 / 85%);
+	--vp-sidebar-bg-color: var(--vp-c-bg);
+	--vp-local-search-highlight-bg: var(--vp-c-brand-1);
+
+	--vp-layout-max-width: 1440px;
+}
+
+.dark {
+	--site-card: #1c1917;
+	--site-muted: #262626;
+	--site-border: #27272a;
+	--site-code: #151311;
+	--site-code-border: #262626;
+	--site-glow-1: rgb(16 185 129 / 16%);
+	--site-glow-2: rgb(20 184 166 / 10%);
+	--site-shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 16px 40px -16px rgb(0 0 0 / 60%);
+
+	--vp-c-bg: #0b0f0c;
+	--vp-c-bg-alt: #0e130f;
+	--vp-c-bg-elv: #151a16;
+	--vp-c-bg-soft: #171c18;
+	--vp-c-divider: var(--site-border);
+	--vp-c-gutter: #0b0f0c;
+	--vp-c-border: #3f3f46;
+	--vp-c-text-1: #f2f2f2;
+	--vp-c-text-2: #9ca3a1;
+	--vp-c-text-3: #6b7270;
+
+	--vp-c-brand-1: #56d799;
+	--vp-c-brand-2: #3fca87;
+	--vp-c-brand-3: #16a34a;
+	--vp-c-brand-soft: rgb(86 215 153 / 12%);
+
+	--vp-button-brand-bg: #16a34a;
+	--vp-button-brand-hover-bg: #15803d;
+
+	--vp-code-bg: #1f1f1f;
+	--vp-nav-bg-color: rgb(11 15 12 / 80%);
+}
