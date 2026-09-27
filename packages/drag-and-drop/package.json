@@ -1,5 +1,5 @@
 {
-  "name": "@vue-stack/drag-and-drop",
+  "name": "@vue-data-grid/drag-and-drop",
   "version": "0.0.0",
   "description": "Drag and drop for Vue lists and trees: pointer, touch and keyboard, virtualization-safe, no re-renders during a gesture.",
   "license": "MIT",
@@ -35,7 +35,7 @@
     "lint:package": "publint"
   },
   "dependencies": {
-    "@vue-stack/flip": "workspace:^"
+    "@vue-data-grid/flip": "workspace:^"
   },
   "peerDependencies": {
     "vue": "^3.5.0"

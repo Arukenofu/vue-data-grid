@@ -3,7 +3,7 @@
 	the interface from the table's `messages`, so they sit inside `TableRoot`.
 -->
 <script setup lang="ts">
-import { TableEmpty, TableLoading, useTableMessagesContext } from '@vue-stack/table';
+import { TableEmpty, TableLoading, useTableMessagesContext } from 'vue-data-grid';
 import IconLoaderCircle from '~icons/lucide/loader-circle';
 import IconSearchX from '~icons/lucide/search-x';
 

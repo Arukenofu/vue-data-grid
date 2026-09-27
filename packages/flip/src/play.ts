@@ -26,7 +26,7 @@ interface Run extends SharedRun {
  * transitions, so that a new one cuts the running one short rather than playing on top of it. The
  * key names the version of `SharedRun`, so that copies that disagree on it keep apart.
  */
-const RUNS: unique symbol = Symbol.for('@vue-stack/flip/runs@1');
+const RUNS: unique symbol = Symbol.for('@vue-data-grid/flip/runs@1');
 
 type Registry = typeof globalThis & { [RUNS]?: WeakMap<Element, SharedRun> };
 

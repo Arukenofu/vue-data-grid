@@ -1,4 +1,4 @@
-import type { CellEditor } from '@vue-stack/table';
+import type { CellEditor } from 'vue-data-grid';
 import { h } from 'vue';
 
 import DateEditor from './DateEditor.vue';

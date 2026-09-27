@@ -11,7 +11,7 @@ import {
 	treeColumn,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { h, shallowRef } from 'vue';
 
 import { UiBadge, UiDataTable, UiToggleGroup, UiToolbar } from '@/ui';

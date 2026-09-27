@@ -13,7 +13,7 @@ import {
 	TableRow,
 	TableSortIndicator,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconReset from '~icons/lucide/rotate-ccw';
 
 import { type Person, people } from '@/data/people';

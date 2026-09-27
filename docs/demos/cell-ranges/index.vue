@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { clipboard, defineColumn, defineColumns, downloadCsv, navigation, ranges, toCsv, useDataTable } from '@vue-stack/table';
+import { clipboard, defineColumn, defineColumns, downloadCsv, navigation, ranges, toCsv, useDataTable } from 'vue-data-grid';
 import IconCopy from '~icons/lucide/copy';
 import IconDownload from '~icons/lucide/download';
 import { computed, shallowRef } from 'vue';

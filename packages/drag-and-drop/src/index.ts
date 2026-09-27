@@ -1,4 +1,4 @@
-export * from '@vue-stack/flip';
+export * from '@vue-data-grid/flip';
 export type { DragAnnouncement, DragAnnouncements } from './announcer';
 export type { DragAutoScroll } from './auto-scroll';
 export { DEFAULT_ANNOUNCEMENTS } from './announcer';

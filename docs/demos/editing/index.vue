@@ -13,7 +13,7 @@ import {
 	ranges,
 	selectEditor,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconRedo from '~icons/lucide/redo-2';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconUndo from '~icons/lucide/undo-2';

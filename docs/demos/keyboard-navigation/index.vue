@@ -7,7 +7,7 @@ import {
 	selectionColumn,
 	sorting,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { computed, h, shallowRef } from 'vue';
 
 import { type BadgeTone, UiBadge, UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';

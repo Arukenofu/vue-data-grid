@@ -26,8 +26,8 @@ toggle of a tree, and a handle to drag rows by.
 ## Anatomy
 
 ```ts
-import { rowNumberColumn, selectionColumn, treeColumn } from '@vue-stack/table';
-import { dragHandleColumn } from '@vue-stack/table/drag-and-drop';
+import { rowNumberColumn, selectionColumn, treeColumn } from 'vue-data-grid';
+import { dragHandleColumn } from 'vue-data-grid/drag-and-drop';
 
 const columns = defineColumns({
 	drag: dragHandleColumn(),
@@ -92,7 +92,7 @@ treeColumn(column: ColumnInput<TRow, TValue>): ColumnInput<TRow, TValue>
 ### dragHandleColumn
 
 The column of drag handles: a [`TableDragHandle`](/components/row-drag) in every cell and an empty
-header. Pinned to the start by default, 32 px wide. Import it from `@vue-stack/table/drag-and-drop`.
+header. Pinned to the start by default, 32 px wide. Import it from `vue-data-grid/drag-and-drop`.
 
 ```ts
 dragHandleColumn(options?: ServiceColumnOptions): ColumnInput<TRow, null>
@@ -169,7 +169,7 @@ const columns = defineColumns({
 The demo reorders the tree with `moveRow`, which puts the row under its new parent:
 
 ```ts
-import { moveRow } from '@vue-stack/table';
+import { moveRow } from 'vue-data-grid';
 
 function drop({ key, parent, index }: TableRowDropEvent<unknown>) {
 	const row = rows.value.find(item => item.id === key);

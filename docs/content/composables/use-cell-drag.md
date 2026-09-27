@@ -23,7 +23,7 @@ Start the drag from a press on a cell; the rest follows the pointer on the windo
 released.
 
 ```ts
-import { readGridPosition, useCellDrag } from '@vue-stack/table';
+import { readGridPosition, useCellDrag } from 'vue-data-grid';
 
 const drag = useCellDrag(table, {
 	getColumns: () => ['name', 'role', 'team'],

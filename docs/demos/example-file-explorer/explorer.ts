@@ -1,4 +1,4 @@
-import type { TableSort } from '@vue-stack/table';
+import type { TableSort } from 'vue-data-grid';
 
 import type { FileEntry, FileKind } from '@/data/files';
 

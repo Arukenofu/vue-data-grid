@@ -17,7 +17,7 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconMinus from '~icons/lucide/minus';
 import IconPlus from '~icons/lucide/plus';
 import { h } from 'vue';

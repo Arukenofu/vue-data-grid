@@ -15,7 +15,7 @@ else, in any state.
 
 ## Two layers
 
-**The structural styles** come with the package, in `@vue-stack/table/style.css`. They hold what a
+**The structural styles** come with the package, in `vue-data-grid/style.css`. They hold what a
 table needs to work and nothing that is a matter of taste:
 
 - the table is a scroll container, and the header and the footer stick to its edges;
@@ -29,7 +29,7 @@ Every rule is wrapped in `:where()`, which gives it zero specificity: a single c
 over any of them, with no `!important` and no fight. Import the file once:
 
 ```ts
-import '@vue-stack/table/style.css';
+import 'vue-data-grid/style.css';
 ```
 
 **Your theme** is everything else: colours, fonts, spacing, borders, hover states, icons. The demo

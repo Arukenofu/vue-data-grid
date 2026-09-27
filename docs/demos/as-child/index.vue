@@ -18,7 +18,7 @@ import {
 	TableSelectionCheckbox,
 	TableSortIndicator,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconArrowDown from '~icons/lucide/arrow-down';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconCheck from '~icons/lucide/check';

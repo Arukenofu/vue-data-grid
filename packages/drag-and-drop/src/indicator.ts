@@ -1,4 +1,4 @@
-import { captureLayout, type MotionEngine, stopMotion } from '@vue-stack/flip';
+import { captureLayout, type MotionEngine, stopMotion } from '@vue-data-grid/flip';
 
 import {
 	type DragAxis,

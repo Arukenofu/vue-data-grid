@@ -18,8 +18,8 @@ the reset puts it back. The pinned Symbol column is not `movable` and stays wher
 ## Usage
 
 ```ts
-import { useDataTable } from '@vue-stack/table';
-import { useTableColumnDrag } from '@vue-stack/table/drag-and-drop';
+import { useDataTable } from 'vue-data-grid';
+import { useTableColumnDrag } from 'vue-data-grid/drag-and-drop';
 
 const column = defineColumn<Stock>({ movable: true });
 

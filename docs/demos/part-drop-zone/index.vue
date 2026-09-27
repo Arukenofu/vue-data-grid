@@ -11,14 +11,14 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import {
 	TableDragPreview,
 	TableDropZone,
 	type TableDropZoneEvent,
 	type TableRowDropEvent,
 	TableRowDrag,
-} from '@vue-stack/table/drag-and-drop';
+} from 'vue-data-grid/drag-and-drop';
 import IconFile from '~icons/lucide/file';
 import IconStar from '~icons/lucide/star';
 import IconTrash from '~icons/lucide/trash-2';

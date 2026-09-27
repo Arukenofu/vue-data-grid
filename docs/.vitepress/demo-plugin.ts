@@ -82,7 +82,7 @@ function addImports(state: StateCore, names: ReadonlySet<string>) {
  * highlighted source of each of its files, for the Preview and the Code of the `Demo` component.
  */
 export function demoPlugin(md: MarkdownRenderer) {
-	md.core.ruler.after('inline', 'vue-stack-demo', (state) => {
+	md.core.ruler.after('inline', 'vue-data-grid-demo', (state) => {
 		const names = new Set<string>();
 
 		state.tokens = state.tokens.flatMap((token) => {

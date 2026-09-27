@@ -18,6 +18,6 @@ walks through how it works.
 ## How to read them
 
 Every example is a component you could drop into an app. The table itself comes from the parts and
-composables of `@vue-stack/table`; the buttons, selects and badges come from the small kit these docs
+composables of `vue-data-grid`; the buttons, selects and badges come from the small kit these docs
 use, which stands in for your own design system. When a piece of an example is new to you, the link
 next to it leads to the guide that explains it.

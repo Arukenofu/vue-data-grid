@@ -8,7 +8,7 @@ import {
 	selectionColumn,
 	useCellDrag,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 
 import { createPeople, type Person } from '@/data/people';
 import { UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';

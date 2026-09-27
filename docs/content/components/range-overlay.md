@@ -35,7 +35,7 @@ import {
 	TableFillPreview,
 	TableRangeOverlay,
 	TableRow,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 </script>
 
 <template>
@@ -55,7 +55,7 @@ The overlay draws the ranges of the `ranges` feature; the handle and the preview
 feature, which writes through the `editing` feature:
 
 ```ts
-import { editing, fill, navigation, ranges, useDataTable } from '@vue-stack/table';
+import { editing, fill, navigation, ranges, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,

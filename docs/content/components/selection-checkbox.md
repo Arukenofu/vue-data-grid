@@ -28,7 +28,7 @@ default, or the checkbox of your own design system.
 
 ```vue
 <script setup lang="ts">
-import { TableSelectAllCheckbox, TableSelectionCheckbox } from '@vue-stack/table';
+import { TableSelectAllCheckbox, TableSelectionCheckbox } from 'vue-data-grid';
 </script>
 
 <template>
@@ -43,7 +43,7 @@ and a row's box in each cell. Place them yourself when you want them anywhere el
 look.
 
 ```ts
-import { selection, selectionColumn, useDataTable } from '@vue-stack/table';
+import { selection, selectionColumn, useDataTable } from 'vue-data-grid';
 
 const columns = defineColumns({
 	select: selectionColumn(),

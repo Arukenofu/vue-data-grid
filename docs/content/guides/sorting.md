@@ -41,7 +41,7 @@ own.
 The `sorting` feature sorts the rows on the client by the current sort:
 
 ```ts
-import { sorting, useDataTable } from '@vue-stack/table';
+import { sorting, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,

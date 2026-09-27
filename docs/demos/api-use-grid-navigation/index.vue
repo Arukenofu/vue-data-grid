@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, selection, selectionColumn, useDataTable } from '@vue-stack/table';
+import { defineColumn, defineColumns, navigation, selection, selectionColumn, useDataTable } from 'vue-data-grid';
 import { computed, h, shallowRef } from 'vue';
 
 import { type Task, tasks } from '@/data/tasks';

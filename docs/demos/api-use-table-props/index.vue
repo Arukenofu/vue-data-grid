@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, getCellText, sorting, useDataTable, useHeaderCell } from '@vue-stack/table';
+import { defineColumn, defineColumns, getCellText, sorting, useDataTable, useHeaderCell } from 'vue-data-grid';
 
 import { type Task, tasks } from '@/data/tasks';
 

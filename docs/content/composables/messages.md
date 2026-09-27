@@ -14,7 +14,7 @@ what it announces to screen readers. English by default; give <code>TableRoot</c
 
 ```vue
 <script setup lang="ts">
-import type { TableMessages } from '@vue-stack/table';
+import type { TableMessages } from 'vue-data-grid';
 
 const messages: Partial<TableMessages> = {
 	empty: 'Nothing here yet',
@@ -62,7 +62,7 @@ The English defaults, frozen. Use them to build a full set of your own, or to ca
 a table:
 
 ```ts
-import { DEFAULT_MESSAGES } from '@vue-stack/table';
+import { DEFAULT_MESSAGES } from 'vue-data-grid';
 
 DEFAULT_MESSAGES.sorted([{ label: 'Price', direction: 'desc' }]);
 // 'Sorted by Price descending'
@@ -74,7 +74,7 @@ A part inside `TableRoot` reads the messages of its table from the context, the 
 built-in parts do; outside a table it gets the defaults:
 
 ```ts
-import { useTableMessagesContext } from '@vue-stack/table';
+import { useTableMessagesContext } from 'vue-data-grid';
 
 const messages = useTableMessagesContext();
 
@@ -101,7 +101,7 @@ const messages: Partial<TableMessages> = {
 
 ### Drag announcements
 
-Dragging speaks through `@vue-stack/drag-and-drop`, whose words are the `announcements` of
+Dragging speaks through `@vue-data-grid/drag-and-drop`, whose words are the `announcements` of
 `TableRowDrag` and `TableColumnDrag`, next to these messages.
 
 ## Accessibility

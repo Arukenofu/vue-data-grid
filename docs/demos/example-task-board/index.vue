@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { moveRow } from '@vue-stack/table';
-import { TableDropZone } from '@vue-stack/table/drag-and-drop';
+import { moveRow } from 'vue-data-grid';
+import { TableDropZone } from 'vue-data-grid/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
 import IconArchiveRestore from '~icons/lucide/archive-restore';
 import { computed, shallowRef } from 'vue';

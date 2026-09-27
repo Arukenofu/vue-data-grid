@@ -29,7 +29,7 @@ to every part inside it.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableHeader, TableRoot, useDataTable } from '@vue-stack/table';
+import { TableBody, TableHeader, TableRoot, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 </script>

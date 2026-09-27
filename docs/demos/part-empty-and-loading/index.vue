@@ -12,7 +12,7 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconLoaderCircle from '~icons/lucide/loader-circle';
 import IconRefreshCw from '~icons/lucide/refresh-cw';
 import IconSearchX from '~icons/lucide/search-x';

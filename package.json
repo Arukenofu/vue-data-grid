@@ -1,5 +1,5 @@
 {
-  "name": "@vue-stack/workspace",
+  "name": "@vue-data-grid/workspace",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.5.1",
@@ -10,7 +10,7 @@
     "build": "pnpm --recursive --filter \"./packages/**\" --filter ./docs run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "docs": "pnpm --filter @vue-stack/docs dev",
+    "docs": "pnpm --filter @vue-data-grid/docs dev",
     "typecheck": "pnpm --recursive --filter \"./packages/**\" --filter ./docs run typecheck",
     "lint": "oxlint",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"

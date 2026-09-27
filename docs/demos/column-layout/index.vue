@@ -6,7 +6,7 @@ import {
 	localStorageStore,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconArrowLeftRight from '~icons/lucide/arrow-left-right';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconUnfoldHorizontal from '~icons/lucide/unfold-horizontal';
@@ -36,7 +36,7 @@ const table = useDataTable({
 	rows: people,
 	rowKey: 'id',
 	rowHeight: 40,
-	persist: localStorageStore('vue-stack-docs:column-layout'),
+	persist: localStorageStore('vue-data-grid-docs:column-layout'),
 });
 
 useTableMotion(table);

@@ -16,7 +16,7 @@ plays.
 ## Usage
 
 ```ts
-import { useDataTable, useTableMotion } from '@vue-stack/table';
+import { useDataTable, useTableMotion } from 'vue-data-grid';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 
@@ -64,7 +64,7 @@ columns and their widths need only the `root`.
 
 An engine is a function of a transition: `{ kind, moves, enters, leaves, context, signal }`. Every
 element is already in its final state when the engine is called; a move should look as if it came
-from `x`, `y` pixels away. These come from `@vue-stack/table`:
+from `x`, `y` pixels away. These come from `vue-data-grid`:
 
 <ReturnsTable
 	:data="[
@@ -83,7 +83,7 @@ drag parts.
 ### GSAP
 
 ```ts
-import { defineMotionEngine } from '@vue-stack/table';
+import { defineMotionEngine } from 'vue-data-grid';
 import { gsap } from 'gsap';
 
 export const gsapEngine = defineMotionEngine({
@@ -97,7 +97,7 @@ export const gsapEngine = defineMotionEngine({
 ### Motion
 
 ```ts
-import { defineMotionEngine } from '@vue-stack/table';
+import { defineMotionEngine } from 'vue-data-grid';
 import { animate } from 'motion';
 
 export const motionEngine = defineMotionEngine({
@@ -110,7 +110,7 @@ export const motionEngine = defineMotionEngine({
 ### anime.js
 
 ```ts
-import { defineMotionEngine } from '@vue-stack/table';
+import { defineMotionEngine } from 'vue-data-grid';
 import { animate } from 'animejs';
 
 export const animeEngine = defineMotionEngine({

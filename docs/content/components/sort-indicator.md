@@ -28,7 +28,7 @@ among the columns that sort.
 
 ```vue
 <script setup lang="ts">
-import { TableHeaderCell, TableHeaderContent, TableSortIndicator } from '@vue-stack/table';
+import { TableHeaderCell, TableHeaderContent, TableSortIndicator } from 'vue-data-grid';
 </script>
 
 <template>

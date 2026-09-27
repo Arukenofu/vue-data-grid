@@ -29,7 +29,7 @@ it to fit the column to its content.
 
 ```vue
 <script setup lang="ts">
-import { TableHeaderCell, TableHeaderContent, TableResizeHandle } from '@vue-stack/table';
+import { TableHeaderCell, TableHeaderContent, TableResizeHandle } from 'vue-data-grid';
 </script>
 
 <template>
@@ -101,7 +101,7 @@ The same autosize a double click runs is a function, and the scope stretches col
 the view:
 
 ```ts
-import { autosizeColumns } from '@vue-stack/table';
+import { autosizeColumns } from 'vue-data-grid';
 
 autosizeColumns(table.scope);
 table.scope.fitColumns();
@@ -118,7 +118,7 @@ reset of the layout, can glide instead: `useTableMotion` animates every change o
 layout, frame by frame through CSS variables, without rendering a row. The demo above does just this:
 
 ```ts
-import { useTableMotion } from '@vue-stack/table';
+import { useTableMotion } from 'vue-data-grid';
 
 useTableMotion(table);
 ```

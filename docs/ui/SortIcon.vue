@@ -1,6 +1,6 @@
 <!-- The sort state of a column as an icon, and its place in a multi-sort. -->
 <script setup lang="ts">
-import type { SortDirection } from '@vue-stack/table';
+import type { SortDirection } from 'vue-data-grid';
 import IconArrowDown from '~icons/lucide/arrow-down';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconChevronsUpDown from '~icons/lucide/chevrons-up-down';

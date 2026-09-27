@@ -36,7 +36,7 @@ import {
 	TableHeader,
 	TableHeaderCell,
 	TableHeaderRow,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 </script>
 
 <template>
@@ -57,7 +57,7 @@ import {
 Groups are declared next to the columns, with `defineColumnGroups`, and passed to `useDataTable`:
 
 ```ts
-import { defineColumnGroups, useDataTable } from '@vue-stack/table';
+import { defineColumnGroups, useDataTable } from 'vue-data-grid';
 
 const groups = defineColumnGroups({
 	item: { label: 'Product', children: ['product', 'category'] },

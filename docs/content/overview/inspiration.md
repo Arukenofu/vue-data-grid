@@ -62,7 +62,7 @@ yours from the first line.
 [TanStack Table](https://tanstack.com/table) made headless tables mainstream, and showed how far a
 table's logic can go without any markup:
 
-- **Headless logic.** The core of this library, `@vue-stack/table-core`, holds no markup at all, as
+- **Headless logic.** The core of this library, `@vue-data-grid/core`, holds no markup at all, as
   TanStack Table holds none: columns, rows, sorting, grouping and windows are data and functions.
 - **Features as plugins.** TanStack Table's row models are opted into one by one; features here are
   functions passed to `useDataTable`, and what is not used is not bundled.
@@ -83,7 +83,7 @@ it is built for Vue's reactivity, so a change wakes one row rather than the tabl
   table patterns, and for every key.
 - Spreadsheets, Excel and Google Sheets, for how ranges, the fill handle and editing should feel.
 - The [FLIP technique](https://aerotwist.com/blog/flip-your-animations/) of Paul Lewis, which
-  `@vue-stack/flip` is built on, and [GSAP](https://gsap.com) and [Motion](https://motion.dev),
+  `@vue-data-grid/flip` is built on, and [GSAP](https://gsap.com) and [Motion](https://motion.dev),
   whose engines plug into it.
 - [VitePress](https://vitepress.dev), which this site is made with.
 

@@ -1,4 +1,4 @@
-import type { MotionEngine } from '@vue-stack/flip';
+import type { MotionEngine } from '@vue-data-grid/flip';
 
 import { createEdgeScroll, type DragAutoScroll, type EdgeScroll, getEdgeSpeed, scrollBy, stepEdgeScroll } from './auto-scroll';
 import { createDragGhost, type DragGhost, type DragGhostContent, type DragLanding } from './ghost';

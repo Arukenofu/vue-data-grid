@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type DateValue, parseDate } from '@internationalized/date';
-import type { EditorContext } from '@vue-stack/table';
+import type { EditorContext } from 'vue-data-grid';
 import IconCalendar from '~icons/lucide/calendar';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';

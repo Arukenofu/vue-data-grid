@@ -10,7 +10,7 @@ import {
 	ranges,
 	toCsv,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { computed, onBeforeUnmount, shallowRef } from 'vue';
 
 import { createSales, type Sale } from '@/data/sales';

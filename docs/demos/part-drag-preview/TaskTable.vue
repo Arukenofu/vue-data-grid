@@ -10,8 +10,8 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from '@vue-stack/table';
-import { TableDragOverlay, TableDragPreview, type TableRowDropEvent, TableRowDrag } from '@vue-stack/table/drag-and-drop';
+} from 'vue-data-grid';
+import { TableDragOverlay, TableDragPreview, type TableRowDropEvent, TableRowDrag } from 'vue-data-grid/drag-and-drop';
 import { h } from 'vue';
 
 import type { Priority, Task } from '@/data/tasks';

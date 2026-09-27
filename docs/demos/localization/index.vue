@@ -7,7 +7,7 @@ import {
 	selectionColumn,
 	sorting,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { computed, shallowRef } from 'vue';
 
 import { type Person, people } from '@/data/people';

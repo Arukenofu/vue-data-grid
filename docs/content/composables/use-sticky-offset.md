@@ -17,7 +17,7 @@ when something else sticks to the top or the bottom of the table.
 ## Usage
 
 ```ts
-import { useStickyOffset, useTableEngine } from '@vue-stack/table';
+import { useStickyOffset, useTableEngine } from 'vue-data-grid';
 import { shallowRef } from 'vue';
 
 const root = shallowRef<HTMLElement | null>(null);

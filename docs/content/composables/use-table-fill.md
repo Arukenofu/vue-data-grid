@@ -20,7 +20,7 @@ instead.
 ## Usage
 
 ```ts
-import { editing, fill, navigation, ranges, useDataTable } from '@vue-stack/table';
+import { editing, fill, navigation, ranges, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,

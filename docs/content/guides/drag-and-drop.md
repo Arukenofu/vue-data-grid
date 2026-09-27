@@ -19,11 +19,11 @@ the arrows move the track, <kbd>Space</kbd> drops it, <kbd>Escape</kbd> puts it 
 
 ## Installation
 
-Dragging lives in its own entry point, `@vue-stack/table/drag-and-drop`, on top of the
-`@vue-stack/drag-and-drop` package. It is an optional peer dependency, so a table that never drags
+Dragging lives in its own entry point, `vue-data-grid/drag-and-drop`, on top of the
+`@vue-data-grid/drag-and-drop` package. It is an optional peer dependency, so a table that never drags
 never downloads it. Install it next to the table:
 
-<InstallTabs packages="@vue-stack/drag-and-drop" />
+<InstallTabs packages="@vue-data-grid/drag-and-drop" />
 
 ## Reordering rows
 
@@ -33,8 +33,8 @@ tells you where, as a key, a parent and an index. Moving the row in your data is
 
 ```vue
 <script setup lang="ts">
-import { moveRow, TableBody, TableCells, TableRoot, TableRow, useDataTable } from '@vue-stack/table';
-import { type TableRowDropEvent, TableRowDrag } from '@vue-stack/table/drag-and-drop';
+import { moveRow, TableBody, TableCells, TableRoot, TableRow, useDataTable } from 'vue-data-grid';
+import { type TableRowDropEvent, TableRowDrag } from 'vue-data-grid/drag-and-drop';
 
 const playlist = shallowRef(tracks);
 
@@ -77,7 +77,7 @@ their clicks. With `handle`, a drag starts only on a `TableDragHandle`, which is
 also drags with the keyboard. `dragHandleColumn()` is a ready column of handles:
 
 ```ts
-import { dragHandleColumn } from '@vue-stack/table/drag-and-drop';
+import { dragHandleColumn } from 'vue-data-grid/drag-and-drop';
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),

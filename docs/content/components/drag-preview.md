@@ -28,7 +28,7 @@ that says a row can be dropped on it.
 
 ```vue
 <script setup lang="ts">
-import { TableDragOverlay, TableDragPreview, TableRowDrag } from '@vue-stack/table/drag-and-drop';
+import { TableDragOverlay, TableDragPreview, TableRowDrag } from 'vue-data-grid/drag-and-drop';
 </script>
 
 <template>

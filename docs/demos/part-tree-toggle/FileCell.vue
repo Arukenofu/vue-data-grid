@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type RowNode, TableTreeToggle } from '@vue-stack/table';
+import { type RowNode, TableTreeToggle } from 'vue-data-grid';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconFileArchive from '~icons/lucide/file-archive';
 import IconFileCode from '~icons/lucide/file-code';

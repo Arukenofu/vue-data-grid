@@ -1,4 +1,4 @@
-import { captureLayout, type MotionEngine, playMotion } from '@vue-stack/flip';
+import { captureLayout, type MotionEngine, playMotion } from '@vue-data-grid/flip';
 
 import { measureLayout } from './layout';
 import { DRAG_GHOST_ATTRIBUTE, DRAG_LANDING_ATTRIBUTE, type DragPoint, type DragRect } from './model';

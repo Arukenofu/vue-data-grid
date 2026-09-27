@@ -12,7 +12,7 @@ import {
 	TableRow,
 	tree,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { h, shallowRef } from 'vue';
 
 import { type FileEntry, files, formatSize } from '@/data/files';

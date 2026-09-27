@@ -1,12 +1,12 @@
-# @vue-stack/flip
+# @vue-data-grid/flip
 
 Pluggable FLIP transitions. A list changes the DOM, measures what moved, came and went, and hands
 it to an **engine**, a plain function, that decides how it looks: the Web Animations API, GSAP,
-anime.js, Motion, CSS classes, or nothing. It is what `@vue-stack/table` and
-`@vue-stack/drag-and-drop` animate with, and both re-export it.
+anime.js, Motion, CSS classes, or nothing. It is what `vue-data-grid` and
+`@vue-data-grid/drag-and-drop` animate with, and both re-export it.
 
 ```sh
-pnpm add @vue-stack/flip
+pnpm add @vue-data-grid/flip
 ```
 
 No dependencies, Vue included. ESM-only and free of side effects.
@@ -65,7 +65,7 @@ farther than a screen away are left out, a transition that is cut short stops ev
 the transition ends once they have all finished.
 
 ```ts
-import { defineMotionEngine, fadeIn, slide } from "@vue-stack/flip";
+import { defineMotionEngine, fadeIn, slide } from "@vue-data-grid/flip";
 
 const cascade = defineMotionEngine({
 	move: (move, index) => slide(move, { duration: 300, delay: index * 20 }),
@@ -80,7 +80,7 @@ hidden. Each takes the timing of `Element.animate`, and waits at its start durin
 An engine on a library returns its animations and says how they stop:
 
 ```ts
-import { defineMotionEngine } from "@vue-stack/flip";
+import { defineMotionEngine } from "@vue-data-grid/flip";
 import gsap from "gsap";
 
 const engine = defineMotionEngine({
@@ -114,7 +114,7 @@ change, and cuts short the transitions they are in. After the change, `animate` 
 and plays what moved and what came with an engine:
 
 ```ts
-import { captureLayout, webAnimations } from "@vue-stack/flip";
+import { captureLayout, webAnimations } from "@vue-data-grid/flip";
 
 const engine = webAnimations();
 

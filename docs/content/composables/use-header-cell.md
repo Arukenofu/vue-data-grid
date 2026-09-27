@@ -20,7 +20,7 @@ them. Tab to a header and press <kbd>Enter</kbd> to sort.
 
 ```vue
 <script setup lang="ts">
-import { useHeaderCell } from '@vue-stack/table';
+import { useHeaderCell } from 'vue-data-grid';
 
 const header = useHeaderCell(table.scope, { resizeStep: 24 });
 </script>

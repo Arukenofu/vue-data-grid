@@ -1,4 +1,4 @@
-import { prefersReducedMotion } from '@vue-stack/table';
+import { prefersReducedMotion } from 'vue-data-grid';
 import { nextTick, onScopeDispose, type Ref, watch } from 'vue';
 
 export type HeightMotion = (element: HTMLElement, from: number, to: number) => (() => void) | undefined;

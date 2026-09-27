@@ -35,7 +35,7 @@ import {
 	TableHeaderRow,
 	TableResizeHandle,
 	TableSortIndicator,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 </script>
 
 <template>

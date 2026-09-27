@@ -29,7 +29,7 @@ compute over its rows.
 
 ```vue
 <script setup lang="ts">
-import { TableFooter, TableFooterCell, TableFooterRow } from '@vue-stack/table';
+import { TableFooter, TableFooterCell, TableFooterRow } from 'vue-data-grid';
 </script>
 
 <template>

@@ -24,7 +24,7 @@ table has `:announce="false"`, so the region of the demo is the only one.
 
 ```vue
 <script setup lang="ts">
-import { useTableAnnouncer } from '@vue-stack/table';
+import { useTableAnnouncer } from 'vue-data-grid';
 
 const { message, announce } = useTableAnnouncer(table);
 

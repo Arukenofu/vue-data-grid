@@ -14,7 +14,7 @@ import {
 	TableRow,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 
 import { type Person, people } from '@/data/people';
 import { UiButton, UiToolbar } from '@/ui';

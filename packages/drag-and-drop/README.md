@@ -1,4 +1,4 @@
-# @vue-stack/drag-and-drop
+# @vue-data-grid/drag-and-drop
 
 Drag and drop for Vue lists and trees: with a mouse, a finger or the keyboard. Nothing re-renders
 during a gesture: the source and the target get attributes, items may make room through their
@@ -6,18 +6,18 @@ during a gesture: the source and the target get attributes, items may make room 
 unmount and mount again in the middle of a drag, so it works under a virtual window.
 
 ```sh
-pnpm add @vue-stack/drag-and-drop vue
+pnpm add @vue-data-grid/drag-and-drop vue
 ```
 
 Vue 3.5 or later is a peer dependency; Vapor components of Vue 3.6 are supported (see
 [Vapor](#vue-36-vapor)). The package is ESM-only and free of side effects, and depends only on
-`@vue-stack/flip`, the engines of its movement, not on `@vue-stack/table-core`.
+`@vue-data-grid/flip`, the engines of its movement, not on `@vue-data-grid/core`.
 
 ## A sortable list
 
 ```vue
 <script setup lang="ts">
-import { useDragList, vDragItem } from '@vue-stack/drag-and-drop';
+import { useDragList, vDragItem } from '@vue-data-grid/drag-and-drop';
 import { shallowRef, useTemplateRef } from 'vue';
 
 const tasks = shallowRef([{ id: 'a', title: 'Write' }, { id: 'b', title: 'Review' }, { id: 'c', title: 'Ship' }]);
@@ -134,7 +134,7 @@ pointer over its body cells.
 ## Movement
 
 The list does not animate anything itself: it changes the DOM, measures what moved, and hands it
-to an engine of [`@vue-stack/flip`](../flip/README.md), which this package re-exports. The
+to an engine of [`@vue-data-grid/flip`](../flip/README.md), which this package re-exports. The
 engine is `motion`: `webAnimations()` by default, one of your own on GSAP, anime.js or Motion, or
 `false` for none. Each transition says what it is by its `kind`:
 
@@ -146,7 +146,7 @@ engine is `motion`: `webAnimations()` by default, one of your own on GSAP, anime
 | `'ghost'` | the ghost landing on its item as a move, or leaving as a leave |
 
 ```ts
-import { type MotionEngine, useDragList, webAnimations } from '@vue-stack/drag-and-drop';
+import { type MotionEngine, useDragList, webAnimations } from '@vue-data-grid/drag-and-drop';
 
 const slide = webAnimations({ duration: 250 });
 
@@ -174,7 +174,7 @@ The list positions the items of the gap, the line and the ghost by `translate`: 
 them by `transform`, or layers over `translate` with `composite: 'add'`, as `webAnimations()`
 does; a `transition` stays yours. Under a virtual window an item that mounts in the middle of a
 gesture takes its place at once. An element is in one transition at a time: a new change of it
-cuts the running one short, whoever started it, `@vue-stack/table` included, and carries on from
+cuts the running one short, whoever started it, `vue-data-grid` included, and carries on from
 where the element is drawn.
 
 While a landing ghost flies, its item has `[data-drag-landing]`: for a ghost that looks like the item, hide
@@ -232,7 +232,7 @@ useDragList({
 ```
 
 `autoScroll: false` scrolls nothing. The settings are those of `useAutoScroll` in
-`@vue-stack/table`, for gestures of your own.
+`vue-data-grid`, for gestures of your own.
 
 `handle`, `ignore`, `touchDelay`, `keyboard`, `stepKeys` and `announcements` may be refs or
 getters, as `indicator`, `group`, `bounds` and `settle` may, and `motion` a ref: each is read when
@@ -320,14 +320,14 @@ A Vapor component takes directives as functions rather than objects with hooks, 
 comes from its own entry, under the same name:
 
 ```ts
-import { vDragItem } from '@vue-stack/drag-and-drop/vapor';
+import { vDragItem } from '@vue-data-grid/drag-and-drop/vapor';
 ```
 
 Templates keep `v-drag-item="{ list, key }"`, and `useDragList` and the rest work in both kinds of
 components. `useDragPreviewRenderer` renders Vue content into the ghost for components with a
 virtual DOM only: in a Vapor component, fill the ghost in `preview.render` yourself.
 
-## With `@vue-stack/table-core`
+## With `@vue-data-grid/core`
 
 Columns: `index` of the drop means what `scope.moveColumnTo(name, index)` expects.
 

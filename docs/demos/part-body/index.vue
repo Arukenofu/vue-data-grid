@@ -10,7 +10,7 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { computed, h, shallowRef } from 'vue';
 
 import { type Task, type TaskStatus, tasks } from '@/data/tasks';

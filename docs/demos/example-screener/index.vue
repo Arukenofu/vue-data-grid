@@ -8,7 +8,7 @@ import {
 	useCellChanges,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconPause from '~icons/lucide/pause';
 import IconPlay from '~icons/lucide/play';
 import { computed, h, ref, shallowRef } from 'vue';

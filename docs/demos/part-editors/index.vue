@@ -17,7 +17,7 @@ import {
 	TableRow,
 	textEditor,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconPencil from '~icons/lucide/pencil';
 import { shallowRef } from 'vue';
 

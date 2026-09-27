@@ -1,7 +1,7 @@
 /*
  * The look of a table in the styled kit. Put `ui-table` on the table element (the scroll container,
  * `TableRoot` or an element with `getGridProps()`). How the table works comes from
- * @vue-stack/table/style.css; this file only sets its theme variables and styles the attributes the
+ * vue-data-grid/style.css; this file only sets its theme variables and styles the attributes the
  * package puts on its parts, so tables of parts and tables of hand-written markup look the same.
  */
 .ui-table {

@@ -1,4 +1,4 @@
-import { defineMotionEngine } from '@vue-stack/table';
+import { defineMotionEngine } from 'vue-data-grid';
 import { gsap } from 'gsap';
 
 import type { HeightMotion } from './height';

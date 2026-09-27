@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, sorting, useDataTable } from '@vue-stack/table';
+import { defineColumn, defineColumns, navigation, sorting, useDataTable } from 'vue-data-grid';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import IconArrowUpToLine from '~icons/lucide/arrow-up-to-line';
 import IconLocate from '~icons/lucide/locate';

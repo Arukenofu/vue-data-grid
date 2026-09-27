@@ -1,4 +1,4 @@
-import { createRowKeyResolver, type RowsTable, type TableRowsFeature, useTableSorting } from '@vue-stack/table';
+import { createRowKeyResolver, type RowsTable, type TableRowsFeature, useTableSorting } from 'vue-data-grid';
 import { computed, type Ref } from 'vue';
 
 export function starredFirst(starred: Readonly<Ref<ReadonlySet<string>>>) {

@@ -23,7 +23,7 @@ to select them all.
 Navigation is a feature, like sorting. Add it to the table and nothing else changes in the markup:
 
 ```ts
-import { navigation, useDataTable } from '@vue-stack/table';
+import { navigation, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,

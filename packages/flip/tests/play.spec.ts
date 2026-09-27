@@ -117,7 +117,7 @@ describe('playMotion', () => {
 		const { engine } = createEngine();
 		const stop = vi.fn();
 		const registry = globalThis as typeof globalThis & { [key: symbol]: WeakMap<Element, unknown> | undefined };
-		const key = Symbol.for('@vue-stack/flip/runs@1');
+		const key = Symbol.for('@vue-data-grid/flip/runs@1');
 
 		registry[key] ??= new WeakMap();
 		registry[key].set(element, { moves: [element], stop });

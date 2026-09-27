@@ -8,14 +8,14 @@ import {
 	TableCells,
 	TableRow,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import {
 	dragHandleColumn,
 	type DragIndicator,
 	TableDragPreview,
 	type TableRowDropEvent,
 	TableRowDrag,
-} from '@vue-stack/table/drag-and-drop';
+} from 'vue-data-grid/drag-and-drop';
 import IconMusic from '~icons/lucide/music';
 import { computed, shallowRef } from 'vue';
 

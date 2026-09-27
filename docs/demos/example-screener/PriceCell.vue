@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CellChange } from '@vue-stack/table';
+import type { CellChange } from 'vue-data-grid';
 
 defineProps<{
 	text: string;

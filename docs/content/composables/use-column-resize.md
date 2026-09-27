@@ -21,7 +21,7 @@ last puts the declared widths back; `useTableMotion` animates both.
 
 ```vue
 <script setup lang="ts">
-import { useColumnResize } from '@vue-stack/table';
+import { useColumnResize } from 'vue-data-grid';
 
 const resize = useColumnResize(table.scope, { step: 10 });
 </script>
@@ -89,7 +89,7 @@ const columns = defineColumns({
 `useTableMotion` animates them.
 
 ```ts
-import { autosizeColumns } from '@vue-stack/table';
+import { autosizeColumns } from 'vue-data-grid';
 
 autosizeColumns(table.scope);
 table.scope.fitColumns();

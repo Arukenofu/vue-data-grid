@@ -38,7 +38,7 @@ of them would waste most of the work. `useRowStream` collects them and applies t
 animation frame:
 
 ```ts
-import { useDataTable, useRowStream } from '@vue-stack/table';
+import { useDataTable, useRowStream } from 'vue-data-grid';
 
 const stream = useRowStream({ rows: initialStocks, rowKey: 'id' });
 
@@ -76,7 +76,7 @@ is wasteful when three rows of a thousand changed, so the sorting feature can re
 that arrived as new objects and put them into their places among the others:
 
 ```ts
-import { sorting } from '@vue-stack/table';
+import { sorting } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,
@@ -99,7 +99,7 @@ changed at all.
 direction:
 
 ```ts
-import { useCellChanges } from '@vue-stack/table';
+import { useCellChanges } from 'vue-data-grid';
 
 const changes = useCellChanges(table.scope, { duration: 900, columns: ['price', 'change'] });
 ```

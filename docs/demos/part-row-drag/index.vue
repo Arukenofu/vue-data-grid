@@ -12,7 +12,7 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import {
 	type DragIndicator,
 	TableDragHandle,
@@ -20,7 +20,7 @@ import {
 	type TableRowDropEvent,
 	type TableRowDropTarget,
 	TableRowDrag,
-} from '@vue-stack/table/drag-and-drop';
+} from 'vue-data-grid/drag-and-drop';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 import IconLock from '~icons/lucide/lock';
 import IconMusic from '~icons/lucide/music';

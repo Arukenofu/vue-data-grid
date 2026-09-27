@@ -19,7 +19,7 @@ and the window renders every row.
 ## Usage
 
 ```ts
-import { defineColumn, defineColumns, selection, sorting, useDataTable } from '@vue-stack/table';
+import { defineColumn, defineColumns, selection, sorting, useDataTable } from 'vue-data-grid';
 
 const column = defineColumn<Person>({ sortable: true });
 
@@ -211,7 +211,7 @@ watch(sort, async (next) => {
 after mount, so the server-rendered markup still matches the first render.
 
 ```ts
-import { localStorageStore, useDataTable } from '@vue-stack/table';
+import { localStorageStore, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,
@@ -244,7 +244,7 @@ A component that renders any table of people takes a `DataTable<Person>`: every 
 be `undefined` there. Name the handles it needs in the second parameter.
 
 ```ts
-import type { DataTable, TableSelectionFeature } from '@vue-stack/table';
+import type { DataTable, TableSelectionFeature } from 'vue-data-grid';
 
 defineProps<{
 	table: DataTable<Person, { selection: TableSelectionFeature }>;

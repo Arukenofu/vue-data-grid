@@ -12,19 +12,19 @@ function resolvePath(path: string) {
  * site and its tests need no build of the packages.
  */
 export const aliases: Alias[] = [
-	{ find: /^@vue-stack\/table\/drag-and-drop$/, replacement: resolvePath('../../packages/table/src/drag-and-drop.ts') },
-	{ find: /^@vue-stack\/table\/style\.css$/, replacement: resolvePath('../../packages/table/src/style.css') },
-	{ find: /^@vue-stack\/table$/, replacement: resolvePath('../../packages/table/src/index.ts') },
-	{ find: /^@vue-stack\/table-core$/, replacement: resolvePath('../../packages/table-core/src/index.ts') },
-	{ find: /^@vue-stack\/drag-and-drop$/, replacement: resolvePath('../../packages/drag-and-drop/src/index.ts') },
-	{ find: /^@vue-stack\/flip$/, replacement: resolvePath('../../packages/flip/src/index.ts') },
+	{ find: /^vue-data-grid\/drag-and-drop$/, replacement: resolvePath('../../packages/vue-data-grid/src/drag-and-drop.ts') },
+	{ find: /^vue-data-grid\/style\.css$/, replacement: resolvePath('../../packages/vue-data-grid/src/style.css') },
+	{ find: /^vue-data-grid$/, replacement: resolvePath('../../packages/vue-data-grid/src/index.ts') },
+	{ find: /^@vue-data-grid\/core$/, replacement: resolvePath('../../packages/core/src/index.ts') },
+	{ find: /^@vue-data-grid\/drag-and-drop$/, replacement: resolvePath('../../packages/drag-and-drop/src/index.ts') },
+	{ find: /^@vue-data-grid\/flip$/, replacement: resolvePath('../../packages/flip/src/index.ts') },
 	{ find: /^@\//, replacement: resolvePath('../') },
 ];
 
 /** The packages check `__DEV__`, which their own build replaces: on in development, off in the built site. */
 export function devFlag(): Plugin {
 	return {
-		name: 'vue-stack-dev-flag',
+		name: 'vue-data-grid-dev-flag',
 		config: (_config, { command }) => ({ define: { __DEV__: JSON.stringify(command === 'serve') } }),
 	};
 }

@@ -16,7 +16,7 @@ import {
 	TableHeaderRow,
 	TableResizeHandle,
 	TableSortIndicator,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
 

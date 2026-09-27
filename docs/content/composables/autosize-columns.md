@@ -19,7 +19,7 @@ gets its room too. The widths animate because the table has `useTableMotion`.
 ## Usage
 
 ```ts
-import { autosizeColumns } from '@vue-stack/table';
+import { autosizeColumns } from 'vue-data-grid';
 
 autosizeColumns(table.scope);
 autosizeColumns(table.scope, ['name', 'email']);
@@ -65,7 +65,7 @@ What `autosizeColumns` measures with: the content widths of columns from their r
 body and footer cells, as a `Map` by name, without writing anything.
 
 ```ts
-import { measureColumnsContent } from '@vue-stack/table';
+import { measureColumnsContent } from 'vue-data-grid';
 
 const widths = measureColumnsContent(table.root.value, ['name', 'email']);
 

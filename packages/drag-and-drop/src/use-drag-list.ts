@@ -1,4 +1,4 @@
-import { captureLayout, type MotionEngine, webAnimations } from '@vue-stack/flip';
+import { captureLayout, type MotionEngine, webAnimations } from '@vue-data-grid/flip';
 import { type MaybeRef, type MaybeRefOrGetter, nextTick, onScopeDispose, shallowReadonly, shallowRef, toValue, unref, watch } from 'vue';
 
 import {

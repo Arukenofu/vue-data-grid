@@ -11,7 +11,7 @@ export default defineConfig(({ command }) => ({
 	// Tests run the sources of the packages it depends on; the build leaves them external.
 	resolve: {
 		alias: command === 'serve'
-			? [{ find: /^@vue-stack\/flip$/, replacement: fileURLToPath(new URL('../flip/src/index.ts', import.meta.url)) }]
+			? [{ find: /^@vue-data-grid\/flip$/, replacement: fileURLToPath(new URL('../flip/src/index.ts', import.meta.url)) }]
 			: [],
 	},
 	build: {

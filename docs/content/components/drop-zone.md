@@ -27,7 +27,7 @@ favourites, a folder in a sidebar, a column chooser.
 
 ```vue
 <script setup lang="ts">
-import { TableDropZone, TableRowDrag } from '@vue-stack/table/drag-and-drop';
+import { TableDropZone, TableRowDrag } from 'vue-data-grid/drag-and-drop';
 </script>
 
 <template>

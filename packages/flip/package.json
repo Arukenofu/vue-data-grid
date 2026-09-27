@@ -1,5 +1,5 @@
 {
-  "name": "@vue-stack/flip",
+  "name": "@vue-data-grid/flip",
   "version": "0.0.0",
   "description": "Pluggable FLIP transitions: measure elements before a DOM change, and let any animation engine play what moved, came and went.",
   "license": "MIT",

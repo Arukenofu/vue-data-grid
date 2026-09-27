@@ -19,14 +19,14 @@ the dragged one would land.
 
 ## Usage
 
-Import it from the `drag-and-drop` entry, which needs `@vue-stack/drag-and-drop` installed next to the
+Import it from the `drag-and-drop` entry, which needs `@vue-data-grid/drag-and-drop` installed next to the
 table:
 
-<InstallTabs packages="@vue-stack/table @vue-stack/drag-and-drop" />
+<InstallTabs packages="vue-data-grid @vue-data-grid/drag-and-drop" />
 
 ```ts
-import { moveRow } from '@vue-stack/table';
-import { dragHandleColumn, useTableRowDrag } from '@vue-stack/table/drag-and-drop';
+import { moveRow } from 'vue-data-grid';
+import { dragHandleColumn, useTableRowDrag } from 'vue-data-grid/drag-and-drop';
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),

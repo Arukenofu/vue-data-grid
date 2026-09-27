@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, rowNumberColumn, sorting, useDataTable } from '@vue-stack/table';
+import { defineColumn, defineColumns, rowNumberColumn, sorting, useDataTable } from 'vue-data-grid';
 
 import { type Person, people } from '@/data/people';
 import { UiDataTable, UiToolbar } from '@/ui';

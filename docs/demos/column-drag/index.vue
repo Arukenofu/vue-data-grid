@@ -9,8 +9,8 @@ import {
 	TableRow,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
-import { type DragIndicator, TableColumnDrag, TableDragPreview } from '@vue-stack/table/drag-and-drop';
+} from 'vue-data-grid';
+import { type DragIndicator, TableColumnDrag, TableDragPreview } from 'vue-data-grid/drag-and-drop';
 import IconColumns from '~icons/lucide/columns-3';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import { computed, shallowRef } from 'vue';

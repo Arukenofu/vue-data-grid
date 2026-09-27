@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { grouping, navigation, tree, useDataTable, useTableMotion } from '@vue-stack/table';
+import { grouping, navigation, tree, useDataTable, useTableMotion } from 'vue-data-grid';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
 import IconUnfoldVertical from '~icons/lucide/unfold-vertical';
 import { computed, ref, shallowRef, watch } from 'vue';

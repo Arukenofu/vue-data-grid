@@ -28,7 +28,7 @@ beside it, so their text lines up.
 
 ```vue
 <script setup lang="ts">
-import { TableTreeToggle } from '@vue-stack/table';
+import { TableTreeToggle } from 'vue-data-grid';
 </script>
 
 <template>
@@ -40,7 +40,7 @@ The toggle needs the `tree` feature, which turns the rows into a tree by a paren
 of children:
 
 ```ts
-import { tree, useDataTable } from '@vue-stack/table';
+import { tree, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,

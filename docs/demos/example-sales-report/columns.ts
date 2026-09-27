@@ -1,4 +1,4 @@
-import { defineColumn, defineColumnGroups, defineColumns, treeColumn } from '@vue-stack/table';
+import { defineColumn, defineColumnGroups, defineColumns, treeColumn } from 'vue-data-grid';
 import { h } from 'vue';
 
 import MarginCell from './MarginCell.vue';

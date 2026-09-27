@@ -28,7 +28,7 @@ valid for assistive technology while they are there.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableEmpty, TableFooter, TableLoading, TableRoot } from '@vue-stack/table';
+import { TableBody, TableEmpty, TableFooter, TableLoading, TableRoot } from 'vue-data-grid';
 </script>
 
 <template>

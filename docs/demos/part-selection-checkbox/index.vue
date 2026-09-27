@@ -15,7 +15,7 @@ import {
 	TableSelectAllCheckbox,
 	TableSelectionCheckbox,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconCheck from '~icons/lucide/check';
 import IconMinus from '~icons/lucide/minus';
 import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';

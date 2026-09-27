@@ -1,5 +1,5 @@
 <!--
-	The kit's table: the parts of @vue-stack/table in the kit's look. It takes the table object of
+	The kit's table: the parts of vue-data-grid in the kit's look. It takes the table object of
 	`useDataTable`, so what the table can do (sorting, selection, a tree, the keyboard) is decided where
 	the table is assembled, and this component only renders it: the header with icons, the body, the
 	empty and loading states, with `footer` the footer, and cell ranges with the `ranges` feature and
@@ -21,7 +21,7 @@ import {
 	TableRangeOverlay,
 	TableRoot,
 	TableRow,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 
 import DataTableHeader from './DataTableHeader.vue';
 import TableStates from './TableStates.vue';

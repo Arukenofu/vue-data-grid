@@ -6,11 +6,11 @@
     "types": ["node", "vite/client", "unplugin-icons/types/vue"],
     "paths": {
       "@/*": ["./*"],
-      "@vue-stack/table": ["../packages/table/src/index.ts"],
-      "@vue-stack/table/drag-and-drop": ["../packages/table/src/drag-and-drop.ts"],
-      "@vue-stack/table-core": ["../packages/table-core/src/index.ts"],
-      "@vue-stack/drag-and-drop": ["../packages/drag-and-drop/src/index.ts"],
-      "@vue-stack/flip": ["../packages/flip/src/index.ts"]
+      "vue-data-grid": ["../packages/vue-data-grid/src/index.ts"],
+      "vue-data-grid/drag-and-drop": ["../packages/vue-data-grid/src/drag-and-drop.ts"],
+      "@vue-data-grid/core": ["../packages/core/src/index.ts"],
+      "@vue-data-grid/drag-and-drop": ["../packages/drag-and-drop/src/index.ts"],
+      "@vue-data-grid/flip": ["../packages/flip/src/index.ts"]
     }
   },
   "include": [
@@ -23,6 +23,6 @@
     "ui/**/*.vue",
     "tests/**/*.ts",
     "vitest.config.ts",
-    "../packages/table/src/env.d.ts"
+    "../packages/vue-data-grid/src/env.d.ts"
   ]
 }

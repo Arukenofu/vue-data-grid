@@ -18,7 +18,7 @@ a label, a width, an alignment, and how to render its cells when plain text is n
 row is, and infers its value type from the function you give it:
 
 ```ts
-import { defineColumn, defineColumns } from '@vue-stack/table';
+import { defineColumn, defineColumns } from 'vue-data-grid';
 
 const column = defineColumn<Invoice>();
 

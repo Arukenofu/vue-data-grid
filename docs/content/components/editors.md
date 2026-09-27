@@ -30,7 +30,7 @@ An editor belongs to a column, next to what makes the column editable: `editable
 that returns the row with the new value.
 
 ```ts
-import { defineColumn, defineColumns, numberField, selectEditor } from '@vue-stack/table';
+import { defineColumn, defineColumns, numberField, selectEditor } from 'vue-data-grid';
 
 const column = defineColumn<Product>({ editable: true });
 
@@ -56,7 +56,7 @@ The table edits with the `editing` feature, which hands every commit to you: wri
 and save it wherever they live.
 
 ```ts
-import { editing, navigation, useDataTable } from '@vue-stack/table';
+import { editing, navigation, useDataTable } from 'vue-data-grid';
 
 const rows = shallowRef(products);
 
@@ -211,7 +211,7 @@ An editor is a function of its context that renders the field. Bind `inputProps`
 that takes input: it brings focus, the keys, the commit on blur and the accessible name.
 
 ```ts
-import type { CellEditor } from '@vue-stack/table';
+import type { CellEditor } from 'vue-data-grid';
 import { h } from 'vue';
 
 function ratingEditor(): CellEditor<Product, number> {
@@ -240,7 +240,7 @@ of Reka UI: a field of segments, and a calendar that opens with it. It is a comp
 and the editor is a function that renders it:
 
 ```ts
-import type { CellEditor } from '@vue-stack/table';
+import type { CellEditor } from 'vue-data-grid';
 import { h } from 'vue';
 
 import DateEditor from './DateEditor.vue';

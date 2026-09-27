@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, tree, treeColumn, useDataTable } from '@vue-stack/table';
+import { defineColumn, defineColumns, navigation, tree, treeColumn, useDataTable } from 'vue-data-grid';
 import IconChevronsDownUp from '~icons/lucide/chevrons-down-up';
 import IconChevronsUpDown from '~icons/lucide/chevrons-up-down';
 import { h, shallowRef } from 'vue';

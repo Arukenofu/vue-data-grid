@@ -8,14 +8,14 @@ import {
 	TableRow,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import {
 	dragHandleColumn,
 	TableDragOverlay,
 	TableDragPreview,
 	TableRowDrag,
 	type TableRowDropEvent,
-} from '@vue-stack/table/drag-and-drop';
+} from 'vue-data-grid/drag-and-drop';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import { computed, h } from 'vue';
 

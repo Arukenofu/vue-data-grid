@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TableSelectionCheckbox } from '@vue-stack/table';
+import { TableSelectionCheckbox } from 'vue-data-grid';
 import IconStar from '~icons/lucide/star';
 
 defineProps<{

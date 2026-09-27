@@ -1,18 +1,18 @@
-# @vue-stack/docs
+# @vue-data-grid/docs
 
-The documentation site of `@vue-stack/table`: guides, the reference of every part and composable,
+The documentation site of `vue-data-grid`: guides, the reference of every part and composable,
 and live demos with their source. Built with VitePress, in the manner of the Reka UI docs. Private,
 never published.
 
 ```sh
 pnpm docs                                   # the dev server, from the repository root
-pnpm --filter @vue-stack/docs build         # the static site; fails on dead links
+pnpm --filter @vue-data-grid/docs build         # the static site; fails on dead links
 pnpm vitest run --project docs              # mounts every demo, fails on any warning
-pnpm --filter @vue-stack/docs typecheck     # vue-tsc over the theme, the kit and the demos
+pnpm --filter @vue-data-grid/docs typecheck     # vue-tsc over the theme, the kit and the demos
 ```
 
-The demos import the packages by their public names, `@vue-stack/table` and
-`@vue-stack/table/drag-and-drop`, and get their sources through the aliases of
+The demos import the packages by their public names, `vue-data-grid` and
+`vue-data-grid/drag-and-drop`, and get their sources through the aliases of
 `.vitepress/aliases.ts`: no build of the packages is needed.
 
 ## Layout

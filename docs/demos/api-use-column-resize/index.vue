@@ -13,7 +13,7 @@ import {
 	useColumnResize,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 
 import { type Stock, stocks } from '@/data/stocks';
 import { UiButton, UiToolbar } from '@/ui';

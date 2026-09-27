@@ -14,7 +14,7 @@ import {
 	TableRow,
 	TableSortIndicator,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconActivity from '~icons/lucide/activity';
 import IconBuilding from '~icons/lucide/building-2';
 import IconChartLine from '~icons/lucide/chart-line';

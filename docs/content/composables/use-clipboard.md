@@ -20,7 +20,7 @@ their columns through each column's `parse`.
 ## Usage
 
 ```ts
-import { clipboard, editing, navigation, ranges, useDataTable } from '@vue-stack/table';
+import { clipboard, editing, navigation, ranges, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,
@@ -69,7 +69,7 @@ The feature is the one owner of the `copy`, `cut` and `paste` events of the tabl
 with a byte order mark, so Excel reads UTF-8 correctly. Make the text with `toCsv` of the core:
 
 ```ts
-import { downloadCsv, toCsv } from '@vue-stack/table';
+import { downloadCsv, toCsv } from 'vue-data-grid';
 
 function download() {
 	const columns = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));

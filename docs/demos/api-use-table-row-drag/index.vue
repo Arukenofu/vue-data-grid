@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, moveRow, useDataTable, useTableMotion } from '@vue-stack/table';
-import { dragHandleColumn, TableDragPreview, useTableRowDrag } from '@vue-stack/table/drag-and-drop';
+import { defineColumn, defineColumns, moveRow, useDataTable, useTableMotion } from 'vue-data-grid';
+import { dragHandleColumn, TableDragPreview, useTableRowDrag } from 'vue-data-grid/drag-and-drop';
 import { computed, shallowRef } from 'vue';
 
 import { UiDataTable, UiToolbar } from '@/ui';

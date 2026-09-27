@@ -13,7 +13,7 @@ export type DragItemVaporDirective = (
 
 /**
  * `v-drag-item` for Vapor components of Vue 3.6, where directives are functions rather than objects
- * with hooks. Import it from `@vue-stack/drag-and-drop/vapor` under the same name, so templates keep
+ * with hooks. Import it from `@vue-data-grid/drag-and-drop/vapor` under the same name, so templates keep
  * `v-drag-item="{ list, key }"`.
  */
 export const vDragItemVapor: DragItemVaporDirective = (element, value) => {

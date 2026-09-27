@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, moveRow, useDataTable, useTableMotion } from '@vue-stack/table';
-import { TableDropZone, type TableDropZoneEvent, type TableRowDropEvent } from '@vue-stack/table/drag-and-drop';
+import { defineColumn, defineColumns, moveRow, useDataTable, useTableMotion } from 'vue-data-grid';
+import { TableDropZone, type TableDropZoneEvent, type TableRowDropEvent } from 'vue-data-grid/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
 import { computed, h, shallowRef } from 'vue';
 

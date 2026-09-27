@@ -1,7 +1,7 @@
 import { effectScope, nextTick, shallowRef } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type MotionEngine, type MotionTransition, playMotion } from '@vue-stack/flip';
+import { type MotionEngine, type MotionTransition, playMotion } from '@vue-data-grid/flip';
 
 import type { DragTree } from '../src/drop-position';
 import {

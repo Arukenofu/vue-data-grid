@@ -18,7 +18,7 @@ and a cell of it that is not a column cell with its key:
 
 ```vue
 <script setup lang="ts">
-import { getGridCellAttributes, getGridRowAttributes } from '@vue-stack/table';
+import { getGridCellAttributes, getGridRowAttributes } from 'vue-data-grid';
 </script>
 
 <template>
@@ -58,7 +58,7 @@ your own joins one of them, or a section you add to the list.
 />
 
 ```ts
-import { getColumnIndexProps, getGroupIndexProps } from '@vue-stack/table';
+import { getColumnIndexProps, getGroupIndexProps } from 'vue-data-grid';
 
 getColumnIndexProps(2); // { 'aria-colindex': 3 }
 getGroupIndexProps({ index: 1, span: 3 }); // { 'aria-colindex': 2, 'aria-colspan': 3 }
@@ -75,7 +75,7 @@ column window, where the first rendered column may be the twelfth. `getCellProps
 `readGridPosition` turns any element inside a cell into its place in the grid:
 
 ```ts
-import { readGridPosition } from '@vue-stack/table';
+import { readGridPosition } from 'vue-data-grid';
 
 function onPointerdown(event: PointerEvent) {
 	const cell = event.target instanceof Element ? event.target.closest('[data-tc-column]') : null;

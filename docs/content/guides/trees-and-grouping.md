@@ -41,7 +41,7 @@ is a group.
 indent for the row's level and a toggle for a group, then the column's own content:
 
 ```ts
-import { tree, treeColumn } from '@vue-stack/table';
+import { tree, treeColumn } from 'vue-data-grid';
 
 const columns = defineColumns({
 	name: treeColumn(column(member => member.name, { label: 'Name', width: 240 })),

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type SortDirection, useDataTableContext, useHeaderCellContext } from '@vue-stack/table';
+import { type SortDirection, useDataTableContext, useHeaderCellContext } from 'vue-data-grid';
 import IconMore from '~icons/lucide/ellipsis-vertical';
 import { computed } from 'vue';
 

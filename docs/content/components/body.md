@@ -29,7 +29,7 @@ renders again only when its own data changes.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableCells, TableRow } from '@vue-stack/table';
+import { TableBody, TableCells, TableRow } from 'vue-data-grid';
 </script>
 
 <template>

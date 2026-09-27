@@ -61,7 +61,7 @@ callback. You write `defineColumn<Invoice>()` once and never a generic again.
 
 ## Three levels of API
 
-Everything in `@vue-stack/table` is public, in three levels, each built on the one below:
+Everything in `vue-data-grid` is public, in three levels, each built on the one below:
 
 | Level | What it is | Use it when |
 | --- | --- | --- |
@@ -74,16 +74,16 @@ you can import, so dropping a level never means losing a capability.
 
 ## The packages
 
-You install one package, `@vue-stack/table`. It re-exports two others, so you import everything from
+You install one package, `vue-data-grid`. It re-exports two others, so you import everything from
 one place:
 
-- **`@vue-stack/table-core`**: the headless core. The column model, the row pipeline, the row and
+- **`@vue-data-grid/core`**: the headless core. The column model, the row pipeline, the row and
   column windows, geometry as CSS variables. It knows nothing about markup.
-- **`@vue-stack/flip`**: the animation engines that move rows and columns, and the contract that lets
+- **`@vue-data-grid/flip`**: the animation engines that move rows and columns, and the contract that lets
   you bring GSAP, Motion or anything else.
 
-Dragging rows and columns lives in a separate entry, `@vue-stack/table/drag-and-drop`, on top of the
-optional peer `@vue-stack/drag-and-drop`, so a table that does not drag does not carry it.
+Dragging rows and columns lives in a separate entry, `vue-data-grid/drag-and-drop`, on top of the
+optional peer `@vue-data-grid/drag-and-drop`, so a table that does not drag does not carry it.
 
 ## What is in the box
 

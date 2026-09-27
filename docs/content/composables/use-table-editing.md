@@ -21,7 +21,7 @@ cell. Select a range and press <kbd>Delete</kbd> to clear it.
 A column is editable when it says so and knows how to write a value into a row:
 
 ```ts
-import { defineColumn, defineColumns, editing, navigation, numberField, useDataTable } from '@vue-stack/table';
+import { defineColumn, defineColumns, editing, navigation, numberField, useDataTable } from 'vue-data-grid';
 import { shallowRef } from 'vue';
 
 const rows = shallowRef<readonly Product[]>(products);
@@ -129,7 +129,7 @@ An editor is a function of its context that renders the field. Bind `inputProps`
 takes input: it focuses it, gives it the keys of editing, its label and its error.
 
 ```ts
-import type { CellEditor } from '@vue-stack/table';
+import type { CellEditor } from 'vue-data-grid';
 import { h } from 'vue';
 
 const PRIORITIES = ['low', 'medium', 'high'] as const;

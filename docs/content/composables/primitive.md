@@ -53,7 +53,7 @@ A part in the manner of the built-in ones: it takes `as` and `asChild`, renders 
 `data-tc-part`, and gives its slot what it knows.
 
 ```ts
-import { primitiveProps, renderPrimitive, useDataTableContext } from '@vue-stack/table';
+import { primitiveProps, renderPrimitive, useDataTableContext } from 'vue-data-grid';
 import { defineComponent, type SlotsType, type VNodeChild } from 'vue';
 
 export const TableSelectedCount = defineComponent({

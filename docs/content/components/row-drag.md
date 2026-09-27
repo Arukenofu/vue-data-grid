@@ -29,8 +29,8 @@ tables, with a pointer, a finger or the keyboard.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableCells, TableRow } from '@vue-stack/table';
-import { TableDragHandle, TableDragPreview, TableRowDrag } from '@vue-stack/table/drag-and-drop';
+import { TableBody, TableCells, TableRow } from 'vue-data-grid';
+import { TableDragHandle, TableDragPreview, TableRowDrag } from 'vue-data-grid/drag-and-drop';
 </script>
 
 <template>
@@ -47,10 +47,10 @@ import { TableDragHandle, TableDragPreview, TableRowDrag } from '@vue-stack/tabl
 </template>
 ```
 
-Dragging lives in the subpath `@vue-stack/table/drag-and-drop`, over the optional peer
-`@vue-stack/drag-and-drop`. Install it next to the table:
+Dragging lives in the subpath `vue-data-grid/drag-and-drop`, over the optional peer
+`@vue-data-grid/drag-and-drop`. Install it next to the table:
 
-<InstallTabs packages="@vue-stack/table @vue-stack/drag-and-drop" />
+<InstallTabs packages="vue-data-grid @vue-data-grid/drag-and-drop" />
 
 `TableRowDrag` renders no element: put it around the `TableBody`, inside the `TableRoot`. The rows
 under it register themselves, and a [`TableDragPreview`](/components/drag-preview) inside it is the
@@ -96,7 +96,7 @@ ghost under the pointer.
 	]"
 />
 
-While a row is dragged the elements carry the attributes of `@vue-stack/drag-and-drop`:
+While a row is dragged the elements carry the attributes of `@vue-data-grid/drag-and-drop`:
 
 <DataAttributesTable
 	:data="[
@@ -150,8 +150,8 @@ The event says where the row goes; `moveRow` returns your rows with it moved, ev
 same object:
 
 ```ts
-import { moveRow } from '@vue-stack/table';
-import type { TableRowDropEvent } from '@vue-stack/table/drag-and-drop';
+import { moveRow } from 'vue-data-grid';
+import type { TableRowDropEvent } from 'vue-data-grid/drag-and-drop';
 
 function drop({ key, index }: TableRowDropEvent<unknown>) {
 	const row = rows.value.find(track => track.id === key);

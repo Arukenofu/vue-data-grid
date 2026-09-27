@@ -6,7 +6,7 @@
 	sorts, Alt+arrows move, Shift+arrows resize.
 -->
 <script setup lang="ts">
-import { type TableProps, useColumnResize, useHeaderCell, useTableScopeContext } from '@vue-stack/table';
+import { type TableProps, useColumnResize, useHeaderCell, useTableScopeContext } from 'vue-data-grid';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
 

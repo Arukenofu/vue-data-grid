@@ -128,7 +128,7 @@ column still works: the new column takes its declared place, next to the column 
 Give the table a store, and the layout and the sort survive a reload:
 
 ```ts
-import { localStorageStore } from '@vue-stack/table';
+import { localStorageStore } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,
@@ -155,7 +155,7 @@ store is any object with `read` and `write`, and optionally `subscribe`, so the 
 your server:
 
 ```ts
-import type { PersistStore } from '@vue-stack/table';
+import type { PersistStore } from 'vue-data-grid';
 
 const serverStore: PersistStore = {
 	read: () => fetch('/api/layouts/orders').then(response => response.json()),

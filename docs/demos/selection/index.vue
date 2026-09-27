@@ -8,7 +8,7 @@ import {
 	type SelectionMode,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import IconArchive from '~icons/lucide/archive';
 import IconTruck from '~icons/lucide/truck';
 import { computed, h, shallowRef, watch } from 'vue';

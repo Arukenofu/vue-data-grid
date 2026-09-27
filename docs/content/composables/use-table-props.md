@@ -23,7 +23,7 @@ to the row window. Spread each one on its element.
 
 ```vue
 <script setup lang="ts">
-import { getCellText, useDataTable } from '@vue-stack/table';
+import { getCellText, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 const { root, head, items, scope } = table;
@@ -54,7 +54,7 @@ Call `useTableProps(scope, options)` yourself only on a table built on the engin
 without `useDataTable`:
 
 ```ts
-import { useTableEngine, useTableProps } from '@vue-stack/table';
+import { useTableEngine, useTableProps } from 'vue-data-grid';
 
 const engine = useTableEngine({ columns, rows, root, rowKey: 'id', rowHeight: 40 });
 const props = useTableProps(engine.scope, { navigation: true, footerRows: 1 });

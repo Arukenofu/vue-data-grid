@@ -69,7 +69,7 @@ around it:
 
 ```vue
 <script setup lang="ts">
-import { useBodyRowContext } from '@vue-stack/table';
+import { useBodyRowContext } from 'vue-data-grid';
 
 const row = useBodyRowContext<Person>();
 
@@ -102,7 +102,7 @@ A sort button for a header cell, in the same way:
 
 ```vue
 <script setup lang="ts">
-import { useDataTableContext, useHeaderCellContext } from '@vue-stack/table';
+import { useDataTableContext, useHeaderCellContext } from 'vue-data-grid';
 
 const table = useDataTableContext();
 const cell = useHeaderCellContext();

@@ -18,7 +18,7 @@ A group names its children, columns and nested groups, in order. `defineColumnGr
 by name, as `defineColumns` does, and the table takes it as `groups`:
 
 ```ts
-import { defineColumnGroups, useDataTable } from '@vue-stack/table';
+import { defineColumnGroups, useDataTable } from 'vue-data-grid';
 
 const groups = defineColumnGroups({
 	item: { label: 'Product', children: ['product', 'category'] },

@@ -19,7 +19,7 @@ on top.
 ## Usage
 
 ```ts
-import { editing, history, useDataTable } from '@vue-stack/table';
+import { editing, history, useDataTable } from 'vue-data-grid';
 
 const table = useDataTable({
 	columns,

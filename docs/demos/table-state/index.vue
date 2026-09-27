@@ -14,7 +14,7 @@ import {
 	TableRow,
 	TableSortIndicator,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { computed } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';

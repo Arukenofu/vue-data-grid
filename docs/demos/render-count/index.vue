@@ -11,7 +11,7 @@ import {
 	TableRow,
 	useCellChanges,
 	useDataTable,
-} from '@vue-stack/table';
+} from 'vue-data-grid';
 import { h, ref, shallowRef } from 'vue';
 
 import { createRandom } from '@/data/random';

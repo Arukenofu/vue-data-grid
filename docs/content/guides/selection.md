@@ -22,7 +22,7 @@ Selection is the `selection` feature, and the checkboxes come with `selectionCol
 column:
 
 ```ts
-import { selection, selectionColumn, useDataTable } from '@vue-stack/table';
+import { selection, selectionColumn, useDataTable } from 'vue-data-grid';
 
 const columns = defineColumns({
 	select: selectionColumn(),

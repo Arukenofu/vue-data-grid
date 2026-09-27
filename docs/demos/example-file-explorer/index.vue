@@ -12,8 +12,8 @@ import {
 	treeColumn,
 	useDataTable,
 	useTableMotion,
-} from '@vue-stack/table';
-import { dragHandleColumn, TableDragPreview, useTableRowDrag } from '@vue-stack/table/drag-and-drop';
+} from 'vue-data-grid';
+import { dragHandleColumn, TableDragPreview, useTableRowDrag } from 'vue-data-grid/drag-and-drop';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
 import IconUnfoldVertical from '~icons/lucide/unfold-vertical';
 import { computed, h, nextTick, ref, shallowRef, useTemplateRef } from 'vue';
