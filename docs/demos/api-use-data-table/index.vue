@@ -15,7 +15,7 @@ import {
 	TableRow,
 	TableSortIndicator,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import { computed, shallowRef } from 'vue';
 
 import { createPeople, type Person } from '@/data/people';

@@ -13,7 +13,7 @@ import {
 	useColumnResize,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 
 import { type Stock, stocks } from '@/data/stocks';
 import { UiButton, UiToolbar } from '@/ui';
@@ -89,7 +89,7 @@ const resizing = resize.resizing;
 
 .grip:hover .grip-line,
 .grip:focus-visible .grip-line,
-.grip[data-tc-state='resizing'] .grip-line {
+.grip[data-dg-state='resizing'] .grip-line {
 	background: var(--ui-accent);
 }
 

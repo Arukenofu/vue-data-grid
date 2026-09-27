@@ -19,7 +19,7 @@ the arrows move the track, <kbd>Space</kbd> drops it, <kbd>Escape</kbd> puts it 
 
 ## Installation
 
-Dragging lives in its own entry point, `vue-data-grid/drag-and-drop`, on top of the
+Dragging lives in its own entry point, `@vue-data-grid/core/drag-and-drop`, on top of the
 `@vue-data-grid/drag-and-drop` package. It is an optional peer dependency, so a table that never drags
 never downloads it. Install it next to the table:
 
@@ -33,8 +33,8 @@ tells you where, as a key, a parent and an index. Moving the row in your data is
 
 ```vue
 <script setup lang="ts">
-import { moveRow, TableBody, TableCells, TableRoot, TableRow, useDataTable } from 'vue-data-grid';
-import { type TableRowDropEvent, TableRowDrag } from 'vue-data-grid/drag-and-drop';
+import { moveRow, TableBody, TableCells, TableRoot, TableRow, useDataTable } from '@vue-data-grid/core';
+import { type TableRowDropEvent, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 
 const playlist = shallowRef(tracks);
 
@@ -77,7 +77,7 @@ their clicks. With `handle`, a drag starts only on a `TableDragHandle`, which is
 also drags with the keyboard. `dragHandleColumn()` is a ready column of handles:
 
 ```ts
-import { dragHandleColumn } from 'vue-data-grid/drag-and-drop';
+import { dragHandleColumn } from '@vue-data-grid/core/drag-and-drop';
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
@@ -165,7 +165,7 @@ drop, as the demo does.
   dragged one stands in the gap. Nothing is laid out again: they move by `translate`, so a drop
   lands exactly where the gap was drawn.
 - `'line'`: one line that slides from place to place, `[data-drop-indicator]`, drawn by the
-  structural styles in `--tc-drop-color`.
+  structural styles in `--dg-drop-color`.
 - `'mark'`: attributes alone, `data-drop-target="before"`, `"after"` or `"inside"` on the row next
   to the place, for your own CSS.
 
@@ -204,7 +204,7 @@ with `external: true` and the `source` table, so you move the row between your l
 In a group the drag may leave its table, `bounds="window"` by default, so the row can travel to the
 other one. `canAccept(offer)` decides which rows a table takes from the others.
 `TableDragOverlay` shows a message over a table while a row it would take is on its way; its
-`data-tc-state` is `ready`, then `over`, or `refused` over a place that is not allowed.
+`data-dg-state` is `ready`, then `over`, or `refused` over a place that is not allowed.
 
 ### Drop zones
 

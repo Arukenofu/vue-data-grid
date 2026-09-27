@@ -30,7 +30,7 @@ An editor belongs to a column, next to what makes the column editable: `editable
 that returns the row with the new value.
 
 ```ts
-import { defineColumn, defineColumns, numberField, selectEditor } from 'vue-data-grid';
+import { defineColumn, defineColumns, numberField, selectEditor } from '@vue-data-grid/core';
 
 const column = defineColumn<Product>({ editable: true });
 
@@ -56,7 +56,7 @@ The table edits with the `editing` feature, which hands every commit to you: wri
 and save it wherever they live.
 
 ```ts
-import { editing, navigation, useDataTable } from 'vue-data-grid';
+import { editing, navigation, useDataTable } from '@vue-data-grid/core';
 
 const rows = shallowRef(products);
 
@@ -88,7 +88,7 @@ The draft comes through the column's `parse`, and the text stays as it was typed
 		{ name: 'format', type: '(value) => string', description: 'The text of a value the editor starts with; `String(value)`, and `\'\'` for `null`, by default.' },
 		{ name: 'placeholder', type: 'string', description: 'The placeholder of the field.' },
 		{ name: 'maxLength', type: 'number', description: 'The longest text the field takes.' },
-		{ name: 'multiline', type: 'boolean', default: 'false', description: 'A text area of several lines: Alt+Enter breaks a line, Enter saves. It grows up to `--tc-editor-text-max-height`.' },
+		{ name: 'multiline', type: 'boolean', default: 'false', description: 'A text area of several lines: Alt+Enter breaks a line, Enter saves. It grows up to `--dg-editor-text-max-height`.' },
 	]"
 />
 
@@ -147,22 +147,22 @@ do through the navigation. It is disabled where the cell cannot be edited. `chec
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['editor', 'editor-error', 'editor-list', 'editor-option', 'editor-empty', 'cell-checkbox'] },
-		{ attribute: '[data-tc-state]', values: ['quick', 'full'] },
-		{ attribute: '[data-tc-side]', values: ['top', 'bottom'] },
+		{ attribute: '[data-dg-part]', values: ['editor', 'editor-error', 'editor-list', 'editor-option', 'editor-empty', 'cell-checkbox'] },
+		{ attribute: '[data-dg-state]', values: ['quick', 'full'] },
+		{ attribute: '[data-dg-side]', values: ['top', 'bottom'] },
 	]"
 />
 
 `editor` is the field, `editor-error` the error under it, `editor-list` the list of `selectEditor`
 with its `editor-option`s and `editor-empty`, and `cell-checkbox` the box of `checkboxCell()`. The
-field carries the mode in `data-tc-state`, and a checked choice of the list `data-tc-state="checked"`;
-the list says in `data-tc-side` which side of the cell it opened on.
+field carries the mode in `data-dg-state`, and a checked choice of the list `data-dg-state="checked"`;
+the list says in `data-dg-side` which side of the cell it opened on.
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-error-color', default: '#d93025', description: 'The outline of an invalid draft and the background of its error.' },
-		{ name: '--tc-editor-list-max-height', default: '16em', description: 'The list of `selectEditor`, which also keeps to the room in view.' },
-		{ name: '--tc-editor-text-max-height', default: '12em', description: 'A text area of `textEditor({ multiline: true })`, growing with its text.' },
+		{ name: '--dg-error-color', default: '#d93025', description: 'The outline of an invalid draft and the background of its error.' },
+		{ name: '--dg-editor-list-max-height', default: '16em', description: 'The list of `selectEditor`, which also keeps to the room in view.' },
+		{ name: '--dg-editor-text-max-height', default: '12em', description: 'A text area of `textEditor({ multiline: true })`, growing with its text.' },
 	]"
 />
 
@@ -211,7 +211,7 @@ An editor is a function of its context that renders the field. Bind `inputProps`
 that takes input: it brings focus, the keys, the commit on blur and the accessible name.
 
 ```ts
-import type { CellEditor } from 'vue-data-grid';
+import type { CellEditor } from '@vue-data-grid/core';
 import { h } from 'vue';
 
 function ratingEditor(): CellEditor<Product, number> {
@@ -240,7 +240,7 @@ of Reka UI: a field of segments, and a calendar that opens with it. It is a comp
 and the editor is a function that renders it:
 
 ```ts
-import type { CellEditor } from 'vue-data-grid';
+import type { CellEditor } from '@vue-data-grid/core';
 import { h } from 'vue';
 
 import DateEditor from './DateEditor.vue';

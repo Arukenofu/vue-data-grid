@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { type DataTable, TableBody, TableCells, TableRow } from 'vue-data-grid';
-import { TableDragOverlay, TableDragPreview, type TableRowDropEvent, TableRowDrag } from 'vue-data-grid/drag-and-drop';
+import { type DataTable, TableBody, TableCells, TableRow } from '@vue-data-grid/core';
+import { TableDragOverlay, TableDragPreview, type TableRowDropEvent, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 
 import { UiDataTable } from '@/ui';

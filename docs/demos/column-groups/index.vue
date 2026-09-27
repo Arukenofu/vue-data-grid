@@ -22,7 +22,7 @@ import {
 	TableSortIndicator,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconFoldHorizontal from '~icons/lucide/fold-horizontal';

@@ -8,14 +8,14 @@ import {
 	TableRow,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import {
 	dragHandleColumn,
 	TableDragOverlay,
 	TableDragPreview,
 	TableRowDrag,
 	type TableRowDropEvent,
-} from 'vue-data-grid/drag-and-drop';
+} from '@vue-data-grid/core/drag-and-drop';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import { computed, h } from 'vue';
 
@@ -160,11 +160,11 @@ function drop(event: TableRowDropEvent<unknown>) {
 	height: 400px;
 }
 
-.task-list-table :deep([data-tc-part='body']) {
+.task-list-table :deep([data-dg-part='body']) {
 	flex: 1 0 auto;
 }
 
-.task-list-table :deep([data-tc-part='empty']) {
+.task-list-table :deep([data-dg-part='empty']) {
 	position: absolute;
 	inset: 38px 0 0;
 	pointer-events: none;

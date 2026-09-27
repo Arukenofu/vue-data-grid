@@ -18,7 +18,7 @@ a label, a width, an alignment, and how to render its cells when plain text is n
 row is, and infers its value type from the function you give it:
 
 ```ts
-import { defineColumn, defineColumns } from 'vue-data-grid';
+import { defineColumn, defineColumns } from '@vue-data-grid/core';
 
 const column = defineColumn<Invoice>();
 
@@ -76,7 +76,7 @@ proportion to its `flex`, as a flex item does in CSS.
 		{ name: 'minWidth', type: 'number', default: 'min(width, 120)', description: 'The narrowest a resize can make it, px.' },
 		{ name: 'maxWidth', type: 'number', description: 'The widest a resize or a fit can make it, px.' },
 		{ name: 'flex', type: 'number', default: '0', description: 'How much of the room left in the row the column takes.' },
-		{ name: 'align', type: '\'left\' | \'center\' | \'right\'', default: '\'left\'', description: 'Where the content of its cells sits. The table marks cells with `data-tc-align`; the structural styles lay them out.' },
+		{ name: 'align', type: '\'left\' | \'center\' | \'right\'', default: '\'left\'', description: 'Where the content of its cells sits. The table marks cells with `data-dg-align`; the structural styles lay them out.' },
 		{ name: 'pinned', type: '\'start\' | \'end\'', description: 'Pins the column to an edge, where it stays while the rest scrolls. See the Column layout guide.' },
 		{ name: 'hiddenByDefault', type: 'boolean', default: 'false', description: 'The column starts hidden, and can be shown from a column menu.' },
 	]"

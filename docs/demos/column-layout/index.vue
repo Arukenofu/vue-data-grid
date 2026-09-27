@@ -6,7 +6,7 @@ import {
 	localStorageStore,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconArrowLeftRight from '~icons/lucide/arrow-left-right';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconUnfoldHorizontal from '~icons/lucide/unfold-horizontal';

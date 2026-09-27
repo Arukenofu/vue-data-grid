@@ -11,7 +11,7 @@ import {
 	TableRow,
 	useDataTable,
 	useTableAnnouncer,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconMegaphone from '~icons/lucide/megaphone';
 import { shallowRef, watch } from 'vue';
 

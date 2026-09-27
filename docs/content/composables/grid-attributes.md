@@ -18,7 +18,7 @@ and a cell of it that is not a column cell with its key:
 
 ```vue
 <script setup lang="ts">
-import { getGridCellAttributes, getGridRowAttributes } from 'vue-data-grid';
+import { getGridCellAttributes, getGridRowAttributes } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -28,15 +28,15 @@ import { getGridCellAttributes, getGridRowAttributes } from 'vue-data-grid';
 </template>
 ```
 
-A column cell needs none of this: it is found by its `data-tc-column`, which the core puts on
+A column cell needs none of this: it is found by its `data-dg-column`, which the core puts on
 `cellProps` and `headerProps`.
 
 ## Grid attributes
 
 <ReturnsTable
 	:data="[
-		{ name: 'getGridRowAttributes', type: '(section: string, row: number) => Record<string, string | number>', description: 'The section a row belongs to and its index there: `data-tc-grid-section` and `data-tc-grid-row`.' },
-		{ name: 'getGridCellAttributes', type: '(key: string) => Readonly<Record<string, string>>', description: 'The key of a cell that is not a column cell, `data-tc-grid-cell`: one frozen object per key.' },
+		{ name: 'getGridRowAttributes', type: '(section: string, row: number) => Record<string, string | number>', description: 'The section a row belongs to and its index there: `data-dg-grid-section` and `data-dg-grid-row`.' },
+		{ name: 'getGridCellAttributes', type: '(key: string) => Readonly<Record<string, string>>', description: 'The key of a cell that is not a column cell, `data-dg-grid-cell`: one frozen object per key.' },
 		{ name: 'readGridPosition', type: '(cell: Element) => GridPosition | null', description: 'The position of a cell element, `{ section, row, cell }`, from its attributes and its row\'s; `null` for an element that is not a cell of the grid.' },
 		{ name: 'findGridRow', type: '(grid: ParentNode, section: string, row: number) => HTMLElement | null', description: 'The element of a row; `null` while it is not rendered.' },
 		{ name: 'findGridCell', type: '(grid: ParentNode, position: GridPosition) => HTMLElement | null', description: 'The element of a cell; `null` while it is not rendered.' },
@@ -58,7 +58,7 @@ your own joins one of them, or a section you add to the list.
 />
 
 ```ts
-import { getColumnIndexProps, getGroupIndexProps } from 'vue-data-grid';
+import { getColumnIndexProps, getGroupIndexProps } from '@vue-data-grid/core';
 
 getColumnIndexProps(2); // { 'aria-colindex': 3 }
 getGroupIndexProps({ index: 1, span: 3 }); // { 'aria-colindex': 2, 'aria-colspan': 3 }
@@ -75,10 +75,10 @@ column window, where the first rendered column may be the twelfth. `getCellProps
 `readGridPosition` turns any element inside a cell into its place in the grid:
 
 ```ts
-import { readGridPosition } from 'vue-data-grid';
+import { readGridPosition } from '@vue-data-grid/core';
 
 function onPointerdown(event: PointerEvent) {
-	const cell = event.target instanceof Element ? event.target.closest('[data-tc-column]') : null;
+	const cell = event.target instanceof Element ? event.target.closest('[data-dg-column]') : null;
 	const position = cell ? readGridPosition(cell) : null;
 
 	if (position?.section === 'body') {

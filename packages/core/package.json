@@ -1,26 +1,29 @@
 {
   "name": "@vue-data-grid/core",
-  "version": "0.0.0",
-  "description": "Headless table core for Vue: column model, row and column windows, CSS-variable geometry, row pipeline.",
+  "version": "0.0.1",
+  "description": "Headless Vue table on top of @vue-data-grid/engine, which it re-exports: a table assembled in one call, headless components, ARIA grid props, service columns, keyboard navigation, column resize, autosize, structural CSS, and dragging rows and columns with @vue-data-grid/drag-and-drop.",
   "license": "MIT",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "keywords": [
     "vue",
     "table",
     "data-grid",
-    "headless",
-    "virtual-scroll"
+    "keyboard",
+    "accessibility"
   ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./internals": {
-      "types": "./dist/internals.d.ts",
-      "default": "./dist/internals.js"
+    "./drag-and-drop": {
+      "types": "./dist/drag-and-drop.d.ts",
+      "default": "./dist/drag-and-drop.js"
     },
+    "./style.css": "./dist/style.css",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -34,10 +37,21 @@
     "typecheck": "tsc --project tsconfig.json",
     "lint:package": "publint"
   },
+  "dependencies": {
+    "@vue-data-grid/flip": "workspace:^",
+    "@vue-data-grid/engine": "workspace:^"
+  },
   "peerDependencies": {
+    "@vue-data-grid/drag-and-drop": "workspace:^",
     "vue": "^3.5.0"
   },
+  "peerDependenciesMeta": {
+    "@vue-data-grid/drag-and-drop": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@vue-data-grid/drag-and-drop": "workspace:*",
     "vue": "catalog:"
   },
   "publishConfig": {

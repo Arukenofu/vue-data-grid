@@ -27,7 +27,7 @@ favourites, a folder in a sidebar, a column chooser.
 
 ```vue
 <script setup lang="ts">
-import { TableDropZone, TableRowDrag } from 'vue-data-grid/drag-and-drop';
+import { TableDropZone, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
@@ -72,8 +72,8 @@ a `group`, so that a row can reach a zone outside the table.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['drop-zone'] },
-		{ attribute: '[data-tc-state]', values: ['idle', 'ready', 'over'] },
+		{ attribute: '[data-dg-part]', values: ['drop-zone'] },
+		{ attribute: '[data-dg-state]', values: ['idle', 'ready', 'over'] },
 	]"
 />
 
@@ -102,14 +102,14 @@ function remove({ key }: TableDropZoneEvent) {
 </TableDropZone>
 ```
 
-The state is also in `data-tc-state`, so the look can come from CSS alone:
+The state is also in `data-dg-state`, so the look can come from CSS alone:
 
 ```css
-[data-tc-part='drop-zone'][data-tc-state='ready'] {
+[data-dg-part='drop-zone'][data-dg-state='ready'] {
 	border-style: dashed;
 }
 
-[data-tc-part='drop-zone'][data-tc-state='over'] {
+[data-dg-part='drop-zone'][data-dg-state='over'] {
 	background: color-mix(in srgb, crimson 12%, transparent);
 }
 ```

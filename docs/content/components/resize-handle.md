@@ -29,7 +29,7 @@ it to fit the column to its content.
 
 ```vue
 <script setup lang="ts">
-import { TableHeaderCell, TableHeaderContent, TableResizeHandle } from 'vue-data-grid';
+import { TableHeaderCell, TableHeaderContent, TableResizeHandle } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -71,14 +71,14 @@ handle does not sort the column under it.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['resize-handle'] },
-		{ attribute: '[data-tc-state]', values: ['resizing', 'idle'] },
+		{ attribute: '[data-dg-part]', values: ['resize-handle'] },
+		{ attribute: '[data-dg-state]', values: ['resizing', 'idle'] },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-resize-handle-width', default: '8px', description: 'The width of the grab area.' },
+		{ name: '--dg-resize-handle-width', default: '8px', description: 'The width of the grab area.' },
 	]"
 />
 
@@ -101,7 +101,7 @@ The same autosize a double click runs is a function, and the scope stretches col
 the view:
 
 ```ts
-import { autosizeColumns } from 'vue-data-grid';
+import { autosizeColumns } from '@vue-data-grid/core';
 
 autosizeColumns(table.scope);
 table.scope.fitColumns();
@@ -118,7 +118,7 @@ reset of the layout, can glide instead: `useTableMotion` animates every change o
 layout, frame by frame through CSS variables, without rendering a row. The demo above does just this:
 
 ```ts
-import { useTableMotion } from 'vue-data-grid';
+import { useTableMotion } from '@vue-data-grid/core';
 
 useTableMotion(table);
 ```
@@ -133,7 +133,7 @@ The handle is empty and invisible by default; the look is yours. A line that sho
 while dragging:
 
 ```css
-[data-tc-part='resize-handle']::after {
+[data-dg-part='resize-handle']::after {
 	position: absolute;
 	inset-block: 8px;
 	inset-inline-end: 3px;
@@ -143,8 +143,8 @@ while dragging:
 	content: '';
 }
 
-[role='columnheader']:hover [data-tc-part='resize-handle']::after,
-[data-tc-part='resize-handle'][data-tc-state='resizing']::after {
+[role='columnheader']:hover [data-dg-part='resize-handle']::after,
+[data-dg-part='resize-handle'][data-dg-state='resizing']::after {
 	opacity: 0.5;
 }
 ```

@@ -21,7 +21,7 @@ last puts the declared widths back; `useTableMotion` animates both.
 
 ```vue
 <script setup lang="ts">
-import { useColumnResize } from 'vue-data-grid';
+import { useColumnResize } from '@vue-data-grid/core';
 
 const resize = useColumnResize(table.scope, { step: 10 });
 </script>
@@ -35,7 +35,7 @@ const resize = useColumnResize(table.scope, { step: 10 });
 ```
 
 `getHandleProps` gives the handle everything: its role, the width for the screen reader, the
-handlers of the drag and the keys, and `data-tc-part="resize-handle"`, for which the structural styles
+handlers of the drag and the keys, and `data-dg-part="resize-handle"`, for which the structural styles
 make a grab area at the end edge of the header cell. For a column that is not `resizable` it gives
 nothing. A click on the handle does not sort the column under it.
 
@@ -55,7 +55,7 @@ nothing. A click on the handle does not sort the column under it.
 
 <ReturnsTable
 	:data="[
-		{ name: 'getHandleProps', type: '(name: string) => Props', description: '`role=&quot;separator&quot;`, `aria-orientation`, `aria-label`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`, `tabindex=&quot;0&quot;`, `data-tc-part`, `data-tc-state` of `resizing` or `idle`, and the handlers. Nothing for a column that is not `resizable`.' },
+		{ name: 'getHandleProps', type: '(name: string) => Props', description: '`role=&quot;separator&quot;`, `aria-orientation`, `aria-label`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`, `tabindex=&quot;0&quot;`, `data-dg-part`, `data-dg-state` of `resizing` or `idle`, and the handlers. Nothing for a column that is not `resizable`.' },
 		{ name: 'resizing', type: 'Ref<string | null>', description: 'The column a drag or a key is resizing now.' },
 		{ name: 'autosize', type: '(name: string) => void', description: 'Fits the column to its content, as a double click on its handle does.' },
 		{ name: 'end', type: '() => void', description: 'Ends a gesture in progress and writes the width to the layout.' },
@@ -89,7 +89,7 @@ const columns = defineColumns({
 `useTableMotion` animates them.
 
 ```ts
-import { autosizeColumns } from 'vue-data-grid';
+import { autosizeColumns } from '@vue-data-grid/core';
 
 autosizeColumns(table.scope);
 table.scope.fitColumns();

@@ -107,7 +107,7 @@ over the table:
 ### The bin
 
 `TableDropZone` is a drop target that is not a table. It takes rows of the tables in its `group`,
-emits `drop` with the key of the row, and describes itself with `data-tc-state`, which the styles
+emits `drop` with the key of the row, and describes itself with `data-dg-state`, which the styles
 use to tint it while a task is on its way:
 
 ```vue
@@ -118,11 +118,11 @@ use to tint it while a task is on its way:
 ```
 
 ```css
-.board-bin[data-tc-state='ready'] {
+.board-bin[data-dg-state='ready'] {
 	border-color: var(--ui-warn);
 }
 
-.board-bin[data-tc-state='over'] {
+.board-bin[data-dg-state='over'] {
 	border-style: solid;
 	border-color: var(--ui-down);
 }

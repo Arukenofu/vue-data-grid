@@ -23,7 +23,7 @@ to select them all.
 Navigation is a feature, like sorting. Add it to the table and nothing else changes in the markup:
 
 ```ts
-import { navigation, useDataTable } from 'vue-data-grid';
+import { navigation, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -133,7 +133,7 @@ stays on the last cell after focus leaves the table, so <kbd>Tab</kbd> comes bac
 ::: tip Keep focus out of the rows
 `focused` is reactive, but do not read it in a row template to highlight the focused cell. Every row
 would re-render on every arrow key. DOM focus and `:focus-visible` already do the highlighting, and
-the structural styles draw the focus ring with `--tc-focus-ring`. Read `focused` outside the rows, as
+the structural styles draw the focus ring with `--dg-focus-ring`. Read `focused` outside the rows, as
 the toolbar of the demo does.
 :::
 

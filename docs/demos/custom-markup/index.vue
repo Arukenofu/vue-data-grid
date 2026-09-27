@@ -8,7 +8,7 @@ import {
 	sorting,
 	useDataTable,
 	useHeaderCell,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconArrowDown from '~icons/lucide/arrow-down';
 import IconArrowUp from '~icons/lucide/arrow-up';
 
@@ -66,7 +66,7 @@ function getHeaderProps(rendered: RenderedColumn) {
 						:class="{ 'is-sortable': rendered.column?.sortable }"
 					>
 						<template v-if="rendered.column">
-							<span data-tc-part="cell-text">{{ rendered.column.label }}</span>
+							<span data-dg-part="cell-text">{{ rendered.column.label }}</span>
 							<IconArrowUp v-if="table.scope.getSortDirection(rendered.column.name) === 'asc'" class="sort" aria-hidden="true" />
 							<IconArrowDown v-else-if="table.scope.getSortDirection(rendered.column.name) === 'desc'" class="sort" aria-hidden="true" />
 						</template>
@@ -80,7 +80,7 @@ function getHeaderProps(rendered: RenderedColumn) {
 						<UiBadge v-if="rendered.column?.name === 'status'" :tone="STATUS[table.rows.value[item.index].status]" dot>
 							{{ table.rows.value[item.index].status }}
 						</UiBadge>
-						<span v-else-if="rendered.column" data-tc-part="cell-text">
+						<span v-else-if="rendered.column" data-dg-part="cell-text">
 							{{ getCellText(rendered.column, table.rows.value[item.index]) }}
 						</span>
 					</div>

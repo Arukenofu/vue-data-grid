@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, getCellText, sorting, useDataTable, useHeaderCell } from 'vue-data-grid';
+import { defineColumn, defineColumns, getCellText, sorting, useDataTable, useHeaderCell } from '@vue-data-grid/core';
 
 import { type Task, tasks } from '@/data/tasks';
 
@@ -37,7 +37,7 @@ const rendered = scope.renderedColumns;
 					v-bind="{ ...table.getHeaderCellProps(cell), ...header.getHandlers(cell.key) }"
 				>
 					<template v-if="cell.column">
-						<span data-tc-part="cell-text">{{ cell.column.label }}</span>
+						<span data-dg-part="cell-text">{{ cell.column.label }}</span>
 						<span class="sort-mark" aria-hidden="true">{{ MARKS[scope.getSortDirection(cell.key) ?? 'none'] }}</span>
 					</template>
 				</div>
@@ -46,7 +46,7 @@ const rendered = scope.renderedColumns;
 		<div v-bind="table.getBodyProps()">
 			<div v-for="item in items" :key="item.key" v-bind="table.getRowProps(item)">
 				<div v-for="cell in rendered" :key="cell.key" v-bind="table.getCellProps(cell)">
-					<span v-if="cell.column" data-tc-part="cell-text">{{ getCellText(cell.column, rows[item.index]) }}</span>
+					<span v-if="cell.column" data-dg-part="cell-text">{{ getCellText(cell.column, rows[item.index]) }}</span>
 				</div>
 			</div>
 		</div>

@@ -7,7 +7,7 @@ import CopyButton from './CopyButton.vue';
 const props = withDefaults(defineProps<{
 	/** The packages to add, separated by spaces. */
 	packages?: string;
-}>(), { packages: 'vue-data-grid' });
+}>(), { packages: '@vue-data-grid/core' });
 
 const managers = computed(() => [
 	{ name: 'pnpm', command: `pnpm add ${props.packages}` },

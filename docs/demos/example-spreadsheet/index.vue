@@ -18,7 +18,7 @@ import {
 	toColumnList,
 	toCsv,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import IconCopy from '~icons/lucide/copy';
 import IconDownload from '~icons/lucide/download';

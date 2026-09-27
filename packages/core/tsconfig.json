@@ -1,4 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src", "tests", "vite.config.ts"]
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@vue-data-grid/flip": ["../flip/src/index.ts"],
+      "@vue-data-grid/engine": ["../engine/src/index.ts"],
+      "@vue-data-grid/drag-and-drop": ["../drag-and-drop/src/index.ts"]
+    }
+  },
+  "include": ["src", "tests", "vite.config.ts", "vitest.browser.config.ts"]
 }

@@ -11,14 +11,14 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import {
 	TableDragPreview,
 	TableDropZone,
 	type TableDropZoneEvent,
 	type TableRowDropEvent,
 	TableRowDrag,
-} from 'vue-data-grid/drag-and-drop';
+} from '@vue-data-grid/core/drag-and-drop';
 import IconFile from '~icons/lucide/file';
 import IconStar from '~icons/lucide/star';
 import IconTrash from '~icons/lucide/trash-2';
@@ -174,12 +174,12 @@ function restore() {
 	color: var(--tone);
 }
 
-.zone[data-tc-state='ready'] {
+.zone[data-dg-state='ready'] {
 	border-color: var(--tone);
 	background: color-mix(in srgb, var(--tone) 6%, var(--ui-bg));
 }
 
-.zone[data-tc-state='over'] {
+.zone[data-dg-state='over'] {
 	border-style: solid;
 	border-color: var(--tone);
 	background: color-mix(in srgb, var(--tone) 14%, var(--ui-bg));

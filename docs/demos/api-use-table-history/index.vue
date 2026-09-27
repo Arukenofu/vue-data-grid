@@ -9,7 +9,7 @@ import {
 	numberField,
 	ranges,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconRedo from '~icons/lucide/redo-2';
 import IconUndo from '~icons/lucide/undo-2';
 import { computed, shallowRef } from 'vue';

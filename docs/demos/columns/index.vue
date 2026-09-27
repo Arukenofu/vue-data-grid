@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, rowNumberColumn, useDataTable } from 'vue-data-grid';
+import { defineColumn, defineColumns, rowNumberColumn, useDataTable } from '@vue-data-grid/core';
 import { h } from 'vue';
 
 import { type BadgeTone, UiBadge, UiDataTable, UiProgress } from '@/ui';

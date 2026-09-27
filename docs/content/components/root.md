@@ -29,7 +29,7 @@ to every part inside it.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableHeader, TableRoot, useDataTable } from 'vue-data-grid';
+import { TableBody, TableHeader, TableRoot, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 </script>
@@ -72,13 +72,13 @@ provides the table and its messages to the parts inside. Attributes you put on i
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['table'] },
+		{ attribute: '[data-dg-part]', values: ['table'] },
 	]"
 />
 
 With the `navigation` feature, `TableRoot` also renders an empty focusable element right after the
 table. Tab leaves the grid through it, so the grid is a single Tab stop. Next to the table stands
-the live region of the announcer, `[data-tc-part="announcer"]`, hidden from sight by the
+the live region of the announcer, `[data-dg-part="announcer"]`, hidden from sight by the
 structural styles.
 
 ## Examples
@@ -120,7 +120,7 @@ the table from an element around it:
 
 ```vue
 <style scoped>
-.panel :deep([data-tc-part='table']) {
+.panel :deep([data-dg-part='table']) {
 	height: 480px;
 }
 </style>

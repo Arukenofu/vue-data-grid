@@ -13,8 +13,8 @@ import {
 	toCsv,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
-import { TableColumnDrag, TableDragPreview } from 'vue-data-grid/drag-and-drop';
+} from '@vue-data-grid/core';
+import { TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
 import IconDownload from '~icons/lucide/download';
 import IconMail from '~icons/lucide/mail';
 import IconUserX from '~icons/lucide/user-x';

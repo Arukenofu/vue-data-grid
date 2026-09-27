@@ -7,7 +7,7 @@ import {
 	useDataTable,
 	useRowStream,
 	useTableMotion,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconPause from '~icons/lucide/pause';
 import IconPlay from '~icons/lucide/play';
 import { h, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue';

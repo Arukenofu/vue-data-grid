@@ -1,5 +1,5 @@
 /*
- * The styled kit of the docs: controls on Reka UI and a table theme over vue-data-grid, in one
+ * The styled kit of the docs: controls on Reka UI and a table theme over @vue-data-grid/core, in one
  * look. The demos import it as `@/ui`; copy the files into an app to start from the same look.
  */
 import './tokens.css';

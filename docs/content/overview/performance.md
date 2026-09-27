@@ -70,7 +70,7 @@ hold. `TableRow` renders again only when that object changes, so:
 ## Geometry without renders
 
 Widths, pins and the offsets of pinned columns are not in the render at all. The core writes them as
-CSS variables, `--tc-width-*` and `--tc-pin-*`: the ones that rarely change on the table element,
+CSS variables, `--dg-width-*` and `--dg-pin-*`: the ones that rarely change on the table element,
 and the ones a gesture changes on exactly the cells that read them. Dragging a resize handle writes
 the width of one column once per frame, and the browser lays the cells out again without Vue doing
 anything. The same path animates widths under [`useTableMotion`](/composables/use-table-motion).

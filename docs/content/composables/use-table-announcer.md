@@ -24,7 +24,7 @@ table has `:announce="false"`, so the region of the demo is the only one.
 
 ```vue
 <script setup lang="ts">
-import { useTableAnnouncer } from 'vue-data-grid';
+import { useTableAnnouncer } from '@vue-data-grid/core';
 
 const { message, announce } = useTableAnnouncer(table);
 
@@ -101,7 +101,7 @@ editing({
 - The region is `role="status"` with `aria-live="polite"`: announcements wait until the screen
   reader finishes what it is saying, rather than cutting it short.
 - Hide the region from sight, not from assistive technology: clip it to a pixel as the structural
-  styles do for `[data-tc-part="announcer"]`, never `display: none`, which silences it.
+  styles do for `[data-dg-part="announcer"]`, never `display: none`, which silences it.
 - Announce outcomes, not every step: a count after a selection, not each checkbox.
 
 ## See also

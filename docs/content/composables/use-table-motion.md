@@ -16,7 +16,7 @@ plays.
 ## Usage
 
 ```ts
-import { useDataTable, useTableMotion } from 'vue-data-grid';
+import { useDataTable, useTableMotion } from '@vue-data-grid/core';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 
@@ -56,7 +56,7 @@ how to write an engine; this page is the reference.
 ## What it needs of the table
 
 `useTableMotion` takes the table of `useDataTable`, or the same parts of a table built on the core:
-its `scope`, `state` and `root`, and for the rows its `body` with rows that carry `data-tc-index`
+its `scope`, `state` and `root`, and for the rows its `body` with rows that carry `data-dg-index`
 (`indexAttribute`). A table rendered from your own markup with the prop-getters has all of them. The
 columns and their widths need only the `root`.
 
@@ -64,7 +64,7 @@ columns and their widths need only the `root`.
 
 An engine is a function of a transition: `{ kind, moves, enters, leaves, context, signal }`. Every
 element is already in its final state when the engine is called; a move should look as if it came
-from `x`, `y` pixels away. These come from `vue-data-grid`:
+from `x`, `y` pixels away. These come from `@vue-data-grid/core`:
 
 <ReturnsTable
 	:data="[
@@ -83,7 +83,7 @@ drag parts.
 ### GSAP
 
 ```ts
-import { defineMotionEngine } from 'vue-data-grid';
+import { defineMotionEngine } from '@vue-data-grid/core';
 import { gsap } from 'gsap';
 
 export const gsapEngine = defineMotionEngine({
@@ -97,7 +97,7 @@ export const gsapEngine = defineMotionEngine({
 ### Motion
 
 ```ts
-import { defineMotionEngine } from 'vue-data-grid';
+import { defineMotionEngine } from '@vue-data-grid/core';
 import { animate } from 'motion';
 
 export const motionEngine = defineMotionEngine({
@@ -110,7 +110,7 @@ export const motionEngine = defineMotionEngine({
 ### anime.js
 
 ```ts
-import { defineMotionEngine } from 'vue-data-grid';
+import { defineMotionEngine } from '@vue-data-grid/core';
 import { animate } from 'animejs';
 
 export const animeEngine = defineMotionEngine({

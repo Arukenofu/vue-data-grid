@@ -28,7 +28,7 @@ among the columns that sort.
 
 ```vue
 <script setup lang="ts">
-import { TableHeaderCell, TableHeaderContent, TableSortIndicator } from 'vue-data-grid';
+import { TableHeaderCell, TableHeaderContent, TableSortIndicator } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -62,8 +62,8 @@ the sort state either way.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['sort-indicator'] },
-		{ attribute: '[data-tc-state]', values: ['asc', 'desc', 'none'] },
+		{ attribute: '[data-dg-part]', values: ['sort-indicator'] },
+		{ attribute: '[data-dg-state]', values: ['asc', 'desc', 'none'] },
 	]"
 />
 
@@ -88,11 +88,11 @@ Lucide and a small badge for the place:
 Without a slot, style the default mark by its state:
 
 ```css
-[data-tc-part='sort-indicator'][data-tc-state='none'] {
+[data-dg-part='sort-indicator'][data-dg-state='none'] {
 	opacity: 0;
 }
 
-[role='columnheader']:hover [data-tc-part='sort-indicator'][data-tc-state='none'] {
+[role='columnheader']:hover [data-dg-part='sort-indicator'][data-dg-state='none'] {
 	opacity: 0.4;
 }
 ```

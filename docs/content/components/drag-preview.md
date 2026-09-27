@@ -28,7 +28,7 @@ that says a row can be dropped on it.
 
 ```vue
 <script setup lang="ts">
-import { TableDragOverlay, TableDragPreview, TableRowDrag } from 'vue-data-grid/drag-and-drop';
+import { TableDragOverlay, TableDragPreview, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
@@ -68,12 +68,12 @@ nothing in place.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['drag-preview'] },
+		{ attribute: '[data-dg-part]', values: ['drag-preview'] },
 	]"
 />
 
 The ghost lives outside the table, so the table's theme variables do not reach it: style it on its
-own, by `[data-tc-part="drag-preview"]` or by a class on the content of its slot. The part renders
+own, by `[data-dg-part="drag-preview"]` or by a class on the content of its slot. The part renders
 through a teleport, so a class on `TableDragPreview` itself does not reach the ghost.
 
 ### TableDragOverlay
@@ -87,7 +87,7 @@ another table of the group, and for columns always.
 		{ name: 'for', type: '\'rows\' | \'columns\'', description: 'What it shows the drag of; the rows when both drag.' },
 		{ name: 'own', type: 'boolean', description: 'Show while an item of this very table is dragged too; `false` for rows and `true` for columns by default.' },
 		{ name: 'when', type: '(context) => boolean', description: 'Whether to show for what is dragged, instead of the default rule; it gets the context of the slot.' },
-		{ name: 'forceMount', type: 'boolean', default: 'false', description: 'Stay rendered while nothing is shown, with `data-tc-state=&quot;idle&quot;` and no slot, for animations of your own.' },
+		{ name: 'forceMount', type: 'boolean', default: 'false', description: 'Stay rendered while nothing is shown, with `data-dg-state=&quot;idle&quot;` and no slot, for animations of your own.' },
 		{ name: 'as', type: 'string | Component', default: '\'div\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
 	]"
@@ -101,20 +101,20 @@ another table of the group, and for columns always.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['drag-overlay'] },
-		{ attribute: '[data-tc-state]', values: ['ready', 'over', 'refused', 'idle'] },
+		{ attribute: '[data-dg-part]', values: ['drag-overlay'] },
+		{ attribute: '[data-dg-state]', values: ['ready', 'over', 'refused', 'idle'] },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-view-top', description: 'Set on the overlay: how far the table is scrolled down, px.' },
-		{ name: '--tc-view-left', description: 'How far it is scrolled across, px.' },
-		{ name: '--tc-view-width', description: 'The width of the view, px.' },
-		{ name: '--tc-view-height', description: 'The height of the view, px.' },
-		{ name: '--tc-head-height', description: 'The height of the sticky header, which the overlay starts below.' },
-		{ name: '--tc-foot-height', description: 'The height of the sticky footer, which it ends above.' },
-		{ name: '--tc-drop-color', default: 'Highlight', description: 'The dashed outline of the overlay, solid while the pointer is over it.' },
+		{ name: '--dg-view-top', description: 'Set on the overlay: how far the table is scrolled down, px.' },
+		{ name: '--dg-view-left', description: 'How far it is scrolled across, px.' },
+		{ name: '--dg-view-width', description: 'The width of the view, px.' },
+		{ name: '--dg-view-height', description: 'The height of the view, px.' },
+		{ name: '--dg-head-height', description: 'The height of the sticky header, which the overlay starts below.' },
+		{ name: '--dg-foot-height', description: 'The height of the sticky footer, which it ends above.' },
+		{ name: '--dg-drop-color', default: 'Highlight', description: 'The dashed outline of the overlay, solid while the pointer is over it.' },
 	]"
 />
 

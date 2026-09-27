@@ -12,10 +12,10 @@ function resolvePath(path: string) {
  * site and its tests need no build of the packages.
  */
 export const aliases: Alias[] = [
-	{ find: /^vue-data-grid\/drag-and-drop$/, replacement: resolvePath('../../packages/vue-data-grid/src/drag-and-drop.ts') },
-	{ find: /^vue-data-grid\/style\.css$/, replacement: resolvePath('../../packages/vue-data-grid/src/style.css') },
-	{ find: /^vue-data-grid$/, replacement: resolvePath('../../packages/vue-data-grid/src/index.ts') },
+	{ find: /^@vue-data-grid\/core\/drag-and-drop$/, replacement: resolvePath('../../packages/core/src/drag-and-drop.ts') },
+	{ find: /^@vue-data-grid\/core\/style\.css$/, replacement: resolvePath('../../packages/core/src/style.css') },
 	{ find: /^@vue-data-grid\/core$/, replacement: resolvePath('../../packages/core/src/index.ts') },
+	{ find: /^@vue-data-grid\/engine$/, replacement: resolvePath('../../packages/engine/src/index.ts') },
 	{ find: /^@vue-data-grid\/drag-and-drop$/, replacement: resolvePath('../../packages/drag-and-drop/src/index.ts') },
 	{ find: /^@vue-data-grid\/flip$/, replacement: resolvePath('../../packages/flip/src/index.ts') },
 	{ find: /^@\//, replacement: resolvePath('../') },

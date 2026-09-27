@@ -20,7 +20,7 @@ import {
 	TableRoot,
 	TableRow,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import { computed, shallowRef } from 'vue';
 
 import { UiStat, UiToolbar } from '@/ui';

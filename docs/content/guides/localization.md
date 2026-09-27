@@ -28,7 +28,7 @@ handles, the empty and loading states, and the announcements. Pass your own to `
 ```
 
 ```ts
-import type { TableMessages } from 'vue-data-grid';
+import type { TableMessages } from '@vue-data-grid/core';
 
 const germanMessages: Partial<TableMessages> = {
 	selectRow: 'Zeile auswählen',

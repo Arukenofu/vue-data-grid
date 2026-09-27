@@ -19,7 +19,7 @@ and the window renders every row.
 ## Usage
 
 ```ts
-import { defineColumn, defineColumns, selection, sorting, useDataTable } from 'vue-data-grid';
+import { defineColumn, defineColumns, selection, sorting, useDataTable } from '@vue-data-grid/core';
 
 const column = defineColumn<Person>({ sortable: true });
 
@@ -70,7 +70,7 @@ provides it to the parts, or call `createDataTableContext(table)` for parts unde
 		{ name: 'keepRows', type: 'MaybeRefOrGetter<readonly number[]>', description: 'Row indexes that stay rendered whatever the window says, such as a row being edited far away.' },
 		{ name: 'keepColumns', type: 'MaybeRefOrGetter<readonly string[]>', description: 'Column names that stay rendered whatever the column window says.' },
 		{ name: 'rowLayout', type: '\'positioned\' | \'flow\'', default: '\'positioned\'', description: 'How body rows are laid out: stacked at their offsets by the row window, or left in normal flow. Read once.' },
-		{ name: 'indexAttribute', type: 'string', default: '\'data-tc-index\'', description: 'The attribute with the row index that every body row carries, by which rows are measured and animated. Read once.' },
+		{ name: 'indexAttribute', type: 'string', default: '\'data-dg-index\'', description: 'The attribute with the row index that every body row carries, by which rows are measured and animated. Read once.' },
 	]"
 />
 
@@ -211,7 +211,7 @@ watch(sort, async (next) => {
 after mount, so the server-rendered markup still matches the first render.
 
 ```ts
-import { localStorageStore, useDataTable } from 'vue-data-grid';
+import { localStorageStore, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -244,7 +244,7 @@ A component that renders any table of people takes a `DataTable<Person>`: every 
 be `undefined` there. Name the handles it needs in the second parameter.
 
 ```ts
-import type { DataTable, TableSelectionFeature } from 'vue-data-grid';
+import type { DataTable, TableSelectionFeature } from '@vue-data-grid/core';
 
 defineProps<{
 	table: DataTable<Person, { selection: TableSelectionFeature }>;

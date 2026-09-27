@@ -29,7 +29,7 @@ compute over its rows.
 
 ```vue
 <script setup lang="ts">
-import { TableFooter, TableFooterCell, TableFooterRow } from 'vue-data-grid';
+import { TableFooter, TableFooterCell, TableFooterRow } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -77,7 +77,7 @@ it.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['foot'] },
+		{ attribute: '[data-dg-part]', values: ['foot'] },
 	]"
 />
 
@@ -101,9 +101,9 @@ A footer row. It counts itself into the table's `aria-rowcount` while it is moun
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['row'] },
-		{ attribute: '[data-tc-grid-section]', values: ['foot'] },
-		{ attribute: '[data-tc-grid-row]', values: 'The index of the row among the footer rows.' },
+		{ attribute: '[data-dg-part]', values: ['row'] },
+		{ attribute: '[data-dg-grid-section]', values: ['foot'] },
+		{ attribute: '[data-dg-grid-row]', values: 'The index of the row among the footer rows.' },
 	]"
 />
 
@@ -128,9 +128,9 @@ A footer cell of a column, with the geometry of its column. Without a slot it sh
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-column]', values: 'The name of the column.' },
-		{ attribute: '[data-tc-pinned]', values: ['start', 'end'] },
-		{ attribute: '[data-tc-align]', values: ['center', 'right'] },
+		{ attribute: '[data-dg-column]', values: 'The name of the column.' },
+		{ attribute: '[data-dg-pinned]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-align]', values: ['center', 'right'] },
 	]"
 />
 
@@ -142,7 +142,7 @@ to keep it next to content of your own.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['cell-text'] },
+		{ attribute: '[data-dg-part]', values: ['cell-text'] },
 	]"
 />
 

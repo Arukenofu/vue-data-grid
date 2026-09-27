@@ -16,13 +16,13 @@ Install the package with the package manager you use:
 
 <InstallTabs />
 
-Vue 3.5 or later is a peer dependency. `vue-data-grid` also brings the table core and the
+Vue 3.5 or later is a peer dependency. `@vue-data-grid/core` also brings the table core and the
 animation engines with it, so this one package is all you import from.
 
 Then import the structural styles once, in your app's entry file:
 
 ```ts
-import 'vue-data-grid/style.css';
+import '@vue-data-grid/core/style.css';
 ```
 
 They hold only what a table needs to work: rows laid out as flex lines, a sticky header, pinned
@@ -36,7 +36,7 @@ A column is a function that reads a value from a row, plus a few facts about how
 and what its value is:
 
 ```ts
-import { defineColumn, defineColumns } from 'vue-data-grid';
+import { defineColumn, defineColumns } from '@vue-data-grid/core';
 
 interface Person {
 	id: string;
@@ -75,7 +75,7 @@ Columns are compared by reference to decide what to re-render. Declare them at t
 one place.
 
 ```ts
-import { useDataTable } from 'vue-data-grid';
+import { useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -136,7 +136,7 @@ A table does nothing it was not asked to. Behaviour comes in as **features**, ea
 factory, so the code of a feature you do not use never reaches your bundle:
 
 ```ts
-import { sorting } from 'vue-data-grid';
+import { sorting } from '@vue-data-grid/core';
 
 const column = defineColumn<Person>({ sortable: true });
 

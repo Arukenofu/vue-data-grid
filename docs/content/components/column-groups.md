@@ -36,7 +36,7 @@ import {
 	TableHeader,
 	TableHeaderCell,
 	TableHeaderRow,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -57,7 +57,7 @@ import {
 Groups are declared next to the columns, with `defineColumnGroups`, and passed to `useDataTable`:
 
 ```ts
-import { defineColumnGroups, useDataTable } from 'vue-data-grid';
+import { defineColumnGroups, useDataTable } from '@vue-data-grid/core';
 
 const groups = defineColumnGroups({
 	item: { label: 'Product', children: ['product', 'category'] },
@@ -95,7 +95,7 @@ A row of group cells, `level` rows from the top.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['row'] },
+		{ attribute: '[data-dg-part]', values: ['row'] },
 	]"
 />
 
@@ -122,15 +122,15 @@ the parts inside, such as a `TableGroupToggle`, their cell. Without a slot it sh
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-group]', values: 'The name of the group; absent on a cell over columns without one.' },
-		{ attribute: '[data-tc-columns]', values: 'The tokens of the columns under the cell, by which a resize reaches it.' },
-		{ attribute: '[data-tc-pinned]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-group]', values: 'The name of the group; absent on a cell over columns without one.' },
+		{ attribute: '[data-dg-columns]', values: 'The tokens of the columns under the cell, by which a resize reaches it.' },
+		{ attribute: '[data-dg-pinned]', values: ['start', 'end'] },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-group-row-height', description: 'The height of a group row. A column header without a group above it reaches up by as many of these; without the variable it stays in its own row.' },
+		{ name: '--dg-group-row-height', description: 'The height of a group row. A column header without a group above it reaches up by as many of these; without the variable it stays in its own row.' },
 	]"
 />
 
@@ -141,7 +141,7 @@ The content of the group cell it is in: the group's `header` field when it has o
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['cell-text'] },
+		{ attribute: '[data-dg-part]', values: ['cell-text'] },
 	]"
 />
 
@@ -165,8 +165,8 @@ that cannot collapse, that is one without `showWhen`, so you can put it in every
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['group-toggle'] },
-		{ attribute: '[data-tc-state]', values: ['expanded', 'collapsed'] },
+		{ attribute: '[data-dg-part]', values: ['group-toggle'] },
+		{ attribute: '[data-dg-state]', values: ['expanded', 'collapsed'] },
 	]"
 />
 

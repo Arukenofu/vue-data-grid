@@ -10,7 +10,7 @@ import {
 	sorting,
 	toCsv,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconDownload from '~icons/lucide/download';
 import IconTrash from '~icons/lucide/trash-2';
 import IconX from '~icons/lucide/x';

@@ -92,7 +92,7 @@ With the `navigation` feature, focus is managed for you:
 - after an edit is saved or cancelled, focus goes back to the cell.
 
 Rows do not re-render when focus moves: the browser's own `:focus-visible` draws the focus ring, and
-the structural styles set it through `--tc-focus-ring`.
+the structural styles set it through `--dg-focus-ring`.
 
 ## Announcements
 

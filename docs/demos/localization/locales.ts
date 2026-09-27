@@ -1,4 +1,4 @@
-import type { SortMessageItem, TableMessages } from 'vue-data-grid';
+import type { SortMessageItem, TableMessages } from '@vue-data-grid/core';
 
 export type LocaleName = 'en' | 'de' | 'ru' | 'kk' | 'ar';
 

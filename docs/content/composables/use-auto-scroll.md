@@ -23,7 +23,7 @@ Call `start` when the gesture starts, `move` with every pointer move and `stop` 
 look at what is under it now.
 
 ```ts
-import { useAutoScroll } from 'vue-data-grid';
+import { useAutoScroll } from '@vue-data-grid/core';
 
 const autoScroll = useAutoScroll(() => table.root.value, {
 	margin: () => ({ top: table.headHeight.value, bottom: table.footHeight.value }),

@@ -22,7 +22,7 @@ Each feature has a factory named after it. Call the factory with its options and
 under the same name:
 
 ```ts
-import { editing, history, navigation, ranges, selection, sorting, useDataTable } from 'vue-data-grid';
+import { editing, history, navigation, ranges, selection, sorting, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -186,7 +186,7 @@ the table builds it in the same slot. A feature that changes the rows takes a `R
 of the step before, the row key, the columns and the column state — and returns `{ rows }`:
 
 ```ts
-import { createRowKeyResolver, type RowsTable, type TableRowsFeature, useTableSorting } from 'vue-data-grid';
+import { createRowKeyResolver, type RowsTable, type TableRowsFeature, useTableSorting } from '@vue-data-grid/core';
 import { computed, type Ref } from 'vue';
 
 export function starredFirst(starred: Readonly<Ref<ReadonlySet<string>>>) {
@@ -218,7 +218,7 @@ A feature that works on the rendered table takes the table as it is so far, with
 features before it. The simplest way to write one is to wrap the built-in function and add to it:
 
 ```ts
-import { type EditingTable, useTableEditing } from 'vue-data-grid';
+import { type EditingTable, useTableEditing } from '@vue-data-grid/core';
 import { watch } from 'vue';
 
 const table = useDataTable({

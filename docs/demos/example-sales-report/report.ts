@@ -1,4 +1,4 @@
-import type { RowGroupLevel } from 'vue-data-grid';
+import type { RowGroupLevel } from '@vue-data-grid/core';
 
 import type { Sale } from '@/data/sales';
 

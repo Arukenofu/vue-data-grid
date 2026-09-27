@@ -15,8 +15,8 @@ import {
 	tree,
 	treeColumn,
 	useDataTable,
-} from 'vue-data-grid';
-import { dragHandleColumn, TableDragPreview, type TableRowDropEvent, TableRowDrag } from 'vue-data-grid/drag-and-drop';
+} from '@vue-data-grid/core';
+import { dragHandleColumn, TableDragPreview, type TableRowDropEvent, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 import { shallowRef } from 'vue';
 

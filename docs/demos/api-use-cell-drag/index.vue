@@ -8,7 +8,7 @@ import {
 	selectionColumn,
 	useCellDrag,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 
 import { createPeople, type Person } from '@/data/people';
 import { UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';
@@ -57,7 +57,7 @@ const drag = useCellDrag(table, {
 });
 
 function readCell(target: EventTarget | null): CellPosition | null {
-	const cell = target instanceof Element ? target.closest('[data-tc-column]') : null;
+	const cell = target instanceof Element ? target.closest('[data-dg-column]') : null;
 	const position = cell ? readGridPosition(cell) : null;
 
 	return position?.section === 'body' && dataColumns.includes(position.cell)
@@ -95,7 +95,7 @@ const selectedCount = table.selection.selectedCount;
 </template>
 
 <style scoped>
-.paint :deep([data-tc-part='body']) {
+.paint :deep([data-dg-part='body']) {
 	cursor: cell;
 	user-select: none;
 }

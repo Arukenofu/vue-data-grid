@@ -12,7 +12,7 @@ import {
 	TableRow,
 	tree,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import { h, shallowRef } from 'vue';
 
 import { type FileEntry, files, formatSize } from '@/data/files';
@@ -102,7 +102,7 @@ const table = useDataTable({
 </template>
 
 <style scoped>
-.files :deep(button[data-tc-part='tree-toggle']::before) {
+.files :deep(button[data-dg-part='tree-toggle']::before) {
 	content: none;
 }
 </style>

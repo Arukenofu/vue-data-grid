@@ -26,8 +26,8 @@ toggle of a tree, and a handle to drag rows by.
 ## Anatomy
 
 ```ts
-import { rowNumberColumn, selectionColumn, treeColumn } from 'vue-data-grid';
-import { dragHandleColumn } from 'vue-data-grid/drag-and-drop';
+import { rowNumberColumn, selectionColumn, treeColumn } from '@vue-data-grid/core';
+import { dragHandleColumn } from '@vue-data-grid/core/drag-and-drop';
 
 const columns = defineColumns({
 	drag: dragHandleColumn(),
@@ -82,7 +82,7 @@ with the row.
 ### treeColumn
 
 Turns a data column into the column of the tree: each cell starts with an indent of
-`--tc-tree-indent` per level and a [`TableTreeToggle`](/components/tree-toggle), then the column's own
+`--dg-tree-indent` per level and a [`TableTreeToggle`](/components/tree-toggle), then the column's own
 content. It stays a data column, and it is marked `tree`, so → and ← expand and collapse rows in it.
 
 ```ts
@@ -92,7 +92,7 @@ treeColumn(column: ColumnInput<TRow, TValue>): ColumnInput<TRow, TValue>
 ### dragHandleColumn
 
 The column of drag handles: a [`TableDragHandle`](/components/row-drag) in every cell and an empty
-header. Pinned to the start by default, 32 px wide. Import it from `vue-data-grid/drag-and-drop`.
+header. Pinned to the start by default, 32 px wide. Import it from `@vue-data-grid/core/drag-and-drop`.
 
 ```ts
 dragHandleColumn(options?: ServiceColumnOptions): ColumnInput<TRow, null>
@@ -124,14 +124,14 @@ and the [drag handle](/components/row-drag). A cell of `treeColumn()` has an ind
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['tree-indent'] },
+		{ attribute: '[data-dg-part]', values: ['tree-indent'] },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-tree-indent', default: '16px', description: 'The indent of one level in a cell of `treeColumn()`.' },
-		{ name: '--tc-level', description: 'Set inline on the indent: the level of the row, from which its width is computed.' },
+		{ name: '--dg-tree-indent', default: '16px', description: 'The indent of one level in a cell of `treeColumn()`.' },
+		{ name: '--dg-level', description: 'Set inline on the indent: the level of the row, from which its width is computed.' },
 	]"
 />
 
@@ -169,7 +169,7 @@ const columns = defineColumns({
 The demo reorders the tree with `moveRow`, which puts the row under its new parent:
 
 ```ts
-import { moveRow } from 'vue-data-grid';
+import { moveRow } from '@vue-data-grid/core';
 
 function drop({ key, parent, index }: TableRowDropEvent<unknown>) {
 	const row = rows.value.find(item => item.id === key);

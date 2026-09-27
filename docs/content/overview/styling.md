@@ -15,7 +15,7 @@ else, in any state.
 
 ## Two layers
 
-**The structural styles** come with the package, in `vue-data-grid/style.css`. They hold what a
+**The structural styles** come with the package, in `@vue-data-grid/core/style.css`. They hold what a
 table needs to work and nothing that is a matter of taste:
 
 - the table is a scroll container, and the header and the footer stick to its edges;
@@ -29,7 +29,7 @@ Every rule is wrapped in `:where()`, which gives it zero specificity: a single c
 over any of them, with no `!important` and no fight. Import the file once:
 
 ```ts
-import 'vue-data-grid/style.css';
+import '@vue-data-grid/core/style.css';
 ```
 
 **Your theme** is everything else: colours, fonts, spacing, borders, hover states, icons. The demo
@@ -59,11 +59,11 @@ The structural styles read these variables. Set them on the table element, or an
 
 ```css
 .invoices {
-	--tc-background: #ffffff;
-	--tc-head-background: #f7f9f8;
-	--tc-line-color: #dfe2e0;
-	--tc-cell-padding: 0 12px;
-	--tc-focus-ring: 2px solid #30a46c;
+	--dg-background: #ffffff;
+	--dg-head-background: #f7f9f8;
+	--dg-line-color: #dfe2e0;
+	--dg-cell-padding: 0 12px;
+	--dg-focus-ring: 2px solid #30a46c;
 
 	height: 480px;
 	border: 1px solid #dfe2e0;
@@ -74,50 +74,50 @@ The structural styles read these variables. Set them on the table element, or an
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-background', default: 'Canvas', description: 'Body rows, and the cells of pinned columns, which must hide what scrolls under them.' },
-		{ name: '--tc-foreground', default: 'CanvasText', description: 'The text.' },
-		{ name: '--tc-head-background', default: '--tc-background', description: 'The header and the footer.' },
-		{ name: '--tc-pinned-background', default: '--tc-background', description: 'The cells of pinned columns in the body.' },
-		{ name: '--tc-selected-background', default: 'Highlight at 18%', description: 'The cells of a selected row. Opaque, for the same reason as pinned cells.' },
-		{ name: '--tc-line-color', default: 'CanvasText at 15%', description: 'The line under a row and at the edge of pinned columns.' },
-		{ name: '--tc-line-width', default: '1px', description: 'The width of those lines.' },
-		{ name: '--tc-cell-padding', default: '0 8px', description: 'The padding of every cell: the density of the table.' },
-		{ name: '--tc-focus-ring', default: '2px solid Highlight', description: 'The outline of a focused cell or table.' },
-		{ name: '--tc-resize-handle-width', default: '8px', description: 'The grab area of a column resize handle.' },
-		{ name: '--tc-group-row-height', description: 'The height of a group row of the header. Headers of columns without a group span it only when it is set.' },
-		{ name: '--tc-tree-indent', default: '16px', description: 'The indent of a tree cell per level.' },
-		{ name: '--tc-drop-color', default: 'Highlight', description: 'The line of the place a dragged row or column goes to.' },
-		{ name: '--tc-range-background', default: 'Highlight at 12%', description: 'The tint of a cell in a range. Translucent: the cell shows through.' },
-		{ name: '--tc-range-border', default: '1px solid Highlight', description: 'The outline of a cell range.' },
-		{ name: '--tc-error-color', default: '#d93025', description: 'The error of an editor\'s draft.' },
-		{ name: '--tc-fill-handle-color', default: 'Highlight', description: 'The fill handle at the corner of a range.' },
-		{ name: '--tc-fill-handle-size', default: '8px', description: 'The size of the fill handle.' },
-		{ name: '--tc-editor-list-max-height', default: '16em', description: 'The list of `selectEditor`, which also keeps to the room in view.' },
-		{ name: '--tc-editor-text-max-height', default: '12em', description: 'A text area of `textEditor({ multiline: true })`, which grows with its text.' },
+		{ name: '--dg-background', default: 'Canvas', description: 'Body rows, and the cells of pinned columns, which must hide what scrolls under them.' },
+		{ name: '--dg-foreground', default: 'CanvasText', description: 'The text.' },
+		{ name: '--dg-head-background', default: '--dg-background', description: 'The header and the footer.' },
+		{ name: '--dg-pinned-background', default: '--dg-background', description: 'The cells of pinned columns in the body.' },
+		{ name: '--dg-selected-background', default: 'Highlight at 18%', description: 'The cells of a selected row. Opaque, for the same reason as pinned cells.' },
+		{ name: '--dg-line-color', default: 'CanvasText at 15%', description: 'The line under a row and at the edge of pinned columns.' },
+		{ name: '--dg-line-width', default: '1px', description: 'The width of those lines.' },
+		{ name: '--dg-cell-padding', default: '0 8px', description: 'The padding of every cell: the density of the table.' },
+		{ name: '--dg-focus-ring', default: '2px solid Highlight', description: 'The outline of a focused cell or table.' },
+		{ name: '--dg-resize-handle-width', default: '8px', description: 'The grab area of a column resize handle.' },
+		{ name: '--dg-group-row-height', description: 'The height of a group row of the header. Headers of columns without a group span it only when it is set.' },
+		{ name: '--dg-tree-indent', default: '16px', description: 'The indent of a tree cell per level.' },
+		{ name: '--dg-drop-color', default: 'Highlight', description: 'The line of the place a dragged row or column goes to.' },
+		{ name: '--dg-range-background', default: 'Highlight at 12%', description: 'The tint of a cell in a range. Translucent: the cell shows through.' },
+		{ name: '--dg-range-border', default: '1px solid Highlight', description: 'The outline of a cell range.' },
+		{ name: '--dg-error-color', default: '#d93025', description: 'The error of an editor\'s draft.' },
+		{ name: '--dg-fill-handle-color', default: 'Highlight', description: 'The fill handle at the corner of a range.' },
+		{ name: '--dg-fill-handle-size', default: '8px', description: 'The size of the fill handle.' },
+		{ name: '--dg-editor-list-max-height', default: '16em', description: 'The list of `selectEditor`, which also keeps to the room in view.' },
+		{ name: '--dg-editor-text-max-height', default: '12em', description: 'A text area of `textEditor({ multiline: true })`, which grows with its text.' },
 	]"
 />
 
-The table writes its geometry into variables of its own: `--tc-width-*`, `--tc-grow-*` and `--tc-pin-*`
-for every column, `--tc-inset-start` and `--tc-inset-end`, and `--tc-pinned-z-index`. Read them if
+The table writes its geometry into variables of its own: `--dg-width-*`, `--dg-grow-*` and `--dg-pin-*`
+for every column, `--dg-inset-start` and `--dg-inset-end`, and `--dg-pinned-z-index`. Read them if
 you need to, but do not set them: they change on every resize without a render, which is what keeps
 resizing smooth.
 
 ## Data attributes
 
-Every part says what it is in `data-tc-part`, and an interactive part says its state in
-`data-tc-state`. That is all a selector needs:
+Every part says what it is in `data-dg-part`, and an interactive part says its state in
+`data-dg-state`. That is all a selector needs:
 
 ```css
-.invoices [data-tc-part='head'] {
+.invoices [data-dg-part='head'] {
 	color: #5f6563;
 	font-weight: 560;
 }
 
-.invoices [data-tc-part='row']:hover {
-	--tc-background: #f7f9f8;
+.invoices [data-dg-part='row']:hover {
+	--dg-background: #f7f9f8;
 }
 
-.invoices [data-tc-part='tree-toggle'][data-tc-state='expanded'] {
+.invoices [data-dg-part='tree-toggle'][data-dg-state='expanded'] {
 	rotate: 90deg;
 }
 ```
@@ -126,26 +126,26 @@ Every part says what it is in `data-tc-part`, and an interactive part says its s
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part=&quot;table&quot;]', values: 'The table element, the scroll container.' },
-		{ attribute: '[data-tc-part=&quot;head&quot;]', values: 'The header block; `foot` is the footer block, `body` the body block.' },
-		{ attribute: '[data-tc-part=&quot;row&quot;]', values: 'Any row: a group row or the row of column headers, a body row, a footer row.' },
-		{ attribute: '[data-tc-part=&quot;cell-text&quot;]', values: 'The text a part renders in a cell by default, cut with an ellipsis.' },
-		{ attribute: '[data-tc-part=&quot;sort-indicator&quot;]', values: 'The sort mark of a header cell.' },
-		{ attribute: '[data-tc-part=&quot;resize-handle&quot;]', values: 'The resize handle of a header cell.' },
-		{ attribute: '[data-tc-part=&quot;group-toggle&quot;]', values: 'The button that collapses a column group.' },
-		{ attribute: '[data-tc-part=&quot;selection-checkbox&quot;]', values: 'A row checkbox, and the select-all checkbox.' },
-		{ attribute: '[data-tc-part=&quot;tree-toggle&quot;]', values: 'The button that expands a row of a tree; `tree-indent` is the indent before it.' },
-		{ attribute: '[data-tc-part=&quot;empty&quot;]', values: 'The row of an empty table; `empty-cell` is its cell.' },
-		{ attribute: '[data-tc-part=&quot;loading&quot;]', values: 'The loading bar.' },
-		{ attribute: '[data-tc-part=&quot;range&quot;]', values: 'A cell range drawn over the body; `range-cell` is a piece of it on one pin side.' },
-		{ attribute: '[data-tc-part=&quot;fill-handle&quot;]', values: 'The fill handle at the corner of the last range.' },
-		{ attribute: '[data-tc-part=&quot;editor&quot;]', values: 'The field of an editor; `editor-error`, `editor-list`, `editor-option` and `editor-empty` are its error and list.' },
-		{ attribute: '[data-tc-part=&quot;cell-checkbox&quot;]', values: 'The checkbox of `checkboxCell()`.' },
-		{ attribute: '[data-tc-part=&quot;drag-handle&quot;]', values: 'The drag handle of a row.' },
-		{ attribute: '[data-tc-part=&quot;drag-preview&quot;]', values: 'The ghost under the pointer during a drag.' },
-		{ attribute: '[data-tc-part=&quot;drag-overlay&quot;]', values: 'The message over a table a drag can drop on.' },
-		{ attribute: '[data-tc-part=&quot;drop-zone&quot;]', values: 'An area rows or columns are dropped on.' },
-		{ attribute: '[data-tc-part=&quot;announcer&quot;]', values: 'The live region of the announcer, hidden from sight.' },
+		{ attribute: '[data-dg-part=&quot;table&quot;]', values: 'The table element, the scroll container.' },
+		{ attribute: '[data-dg-part=&quot;head&quot;]', values: 'The header block; `foot` is the footer block, `body` the body block.' },
+		{ attribute: '[data-dg-part=&quot;row&quot;]', values: 'Any row: a group row or the row of column headers, a body row, a footer row.' },
+		{ attribute: '[data-dg-part=&quot;cell-text&quot;]', values: 'The text a part renders in a cell by default, cut with an ellipsis.' },
+		{ attribute: '[data-dg-part=&quot;sort-indicator&quot;]', values: 'The sort mark of a header cell.' },
+		{ attribute: '[data-dg-part=&quot;resize-handle&quot;]', values: 'The resize handle of a header cell.' },
+		{ attribute: '[data-dg-part=&quot;group-toggle&quot;]', values: 'The button that collapses a column group.' },
+		{ attribute: '[data-dg-part=&quot;selection-checkbox&quot;]', values: 'A row checkbox, and the select-all checkbox.' },
+		{ attribute: '[data-dg-part=&quot;tree-toggle&quot;]', values: 'The button that expands a row of a tree; `tree-indent` is the indent before it.' },
+		{ attribute: '[data-dg-part=&quot;empty&quot;]', values: 'The row of an empty table; `empty-cell` is its cell.' },
+		{ attribute: '[data-dg-part=&quot;loading&quot;]', values: 'The loading bar.' },
+		{ attribute: '[data-dg-part=&quot;range&quot;]', values: 'A cell range drawn over the body; `range-cell` is a piece of it on one pin side.' },
+		{ attribute: '[data-dg-part=&quot;fill-handle&quot;]', values: 'The fill handle at the corner of the last range.' },
+		{ attribute: '[data-dg-part=&quot;editor&quot;]', values: 'The field of an editor; `editor-error`, `editor-list`, `editor-option` and `editor-empty` are its error and list.' },
+		{ attribute: '[data-dg-part=&quot;cell-checkbox&quot;]', values: 'The checkbox of `checkboxCell()`.' },
+		{ attribute: '[data-dg-part=&quot;drag-handle&quot;]', values: 'The drag handle of a row.' },
+		{ attribute: '[data-dg-part=&quot;drag-preview&quot;]', values: 'The ghost under the pointer during a drag.' },
+		{ attribute: '[data-dg-part=&quot;drag-overlay&quot;]', values: 'The message over a table a drag can drop on.' },
+		{ attribute: '[data-dg-part=&quot;drop-zone&quot;]', values: 'An area rows or columns are dropped on.' },
+		{ attribute: '[data-dg-part=&quot;announcer&quot;]', values: 'The live region of the announcer, hidden from sight.' },
 	]"
 />
 
@@ -153,7 +153,7 @@ Every part says what it is in `data-tc-part`, and an interactive part says its s
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-state]', values: 'The state of an interactive part, one value at a time.' },
+		{ attribute: '[data-dg-state]', values: 'The state of an interactive part, one value at a time.' },
 		{ attribute: 'sort-indicator', values: ['asc', 'desc', 'none'] },
 		{ attribute: 'resize-handle', values: ['resizing', 'idle'] },
 		{ attribute: 'selection-checkbox', values: ['checked', 'unchecked', 'indeterminate'] },
@@ -165,7 +165,7 @@ Every part says what it is in `data-tc-part`, and an interactive part says its s
 		{ attribute: 'drag-overlay', values: ['ready', 'over', 'refused', 'idle'] },
 		{ attribute: 'drop-zone', values: ['over', 'ready', 'idle'] },
 		{ attribute: 'a row leaving under motion', values: ['leaving'] },
-		{ attribute: '[data-tc-disabled]', values: 'Present on a checkbox or a drag handle whose row refuses it.' },
+		{ attribute: '[data-dg-disabled]', values: 'Present on a checkbox or a drag handle whose row refuses it.' },
 	]"
 />
 
@@ -173,16 +173,16 @@ Every part says what it is in `data-tc-part`, and an interactive part says its s
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-column]', values: 'The name of the column of a body, header or footer cell.' },
-		{ attribute: '[data-tc-columns]', values: 'The columns under a group cell or a piece of a range, as tokens.' },
-		{ attribute: '[data-tc-group]', values: 'The name of the group of a group cell.' },
-		{ attribute: '[data-tc-pinned]', values: ['start', 'end'] },
-		{ attribute: '[data-tc-align]', values: ['center', 'right'] },
-		{ attribute: '[data-tc-inset]', values: ['start', 'end'] },
-		{ attribute: '[data-tc-rowspan]', values: 'How many header rows a column header covers, from `2`.' },
-		{ attribute: '[data-tc-row-layout]', values: ['positioned', 'flow'] },
-		{ attribute: '[data-tc-index]', values: 'The index of a body row in the shown rows.' },
-		{ attribute: '[data-tc-draggable]', values: 'Present on a row or header that can be dragged now.' },
+		{ attribute: '[data-dg-column]', values: 'The name of the column of a body, header or footer cell.' },
+		{ attribute: '[data-dg-columns]', values: 'The columns under a group cell or a piece of a range, as tokens.' },
+		{ attribute: '[data-dg-group]', values: 'The name of the group of a group cell.' },
+		{ attribute: '[data-dg-pinned]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-align]', values: ['center', 'right'] },
+		{ attribute: '[data-dg-inset]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-rowspan]', values: 'How many header rows a column header covers, from `2`.' },
+		{ attribute: '[data-dg-row-layout]', values: ['positioned', 'flow'] },
+		{ attribute: '[data-dg-index]', values: 'The index of a body row in the shown rows.' },
+		{ attribute: '[data-dg-draggable]', values: 'Present on a row or header that can be dragged now.' },
 	]"
 />
 
@@ -221,12 +221,12 @@ live region, so style it from an element around it:
 </template>
 
 <style scoped>
-.invoices :deep([data-tc-part='table']) {
+.invoices :deep([data-dg-part='table']) {
 	height: 480px;
 }
 
-.invoices :deep([data-tc-part='row'][aria-selected='true']) {
-	--tc-selected-background: #e6f6eb;
+.invoices :deep([data-dg-part='row'][aria-selected='true']) {
+	--dg-selected-background: #e6f6eb;
 }
 </style>
 ```
@@ -239,7 +239,7 @@ The data attributes work as Tailwind variants, and the theme variables as arbitr
 <TableRoot
 	:table="table"
 	label="Invoices"
-	class="h-[480px] rounded-xl border border-stone-200 text-sm [--tc-cell-padding:0_12px] [--tc-line-color:var(--color-stone-200)]"
+	class="h-[480px] rounded-xl border border-stone-200 text-sm [--dg-cell-padding:0_12px] [--dg-line-color:var(--color-stone-200)]"
 >
 	<TableHeader class="font-medium text-stone-500">
 		<!-- … -->
@@ -248,7 +248,7 @@ The data attributes work as Tailwind variants, and the theme variables as arbitr
 ```
 
 For states deep in the table, a small CSS file with `@apply` often reads better than long class
-strings: `[data-tc-part='resize-handle'][data-tc-state='resizing'] { @apply bg-emerald-500; }`.
+strings: `[data-dg-part='resize-handle'][data-dg-state='resizing'] { @apply bg-emerald-500; }`.
 
 ## The kit of these docs
 
@@ -258,7 +258,7 @@ your app to start from the same look.
 
 ## Accessibility
 
-- The focus ring is drawn by `:focus-visible` through `--tc-focus-ring`: keep it visible, and at a
+- The focus ring is drawn by `:focus-visible` through `--dg-focus-ring`: keep it visible, and at a
   contrast of at least 3:1 against both the cell and the selection tint.
 - Selected rows and ranges are marked with `aria-selected`, not only with colour. Style them from
   that attribute, and screen readers and your CSS agree.

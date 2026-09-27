@@ -12,8 +12,8 @@ import {
 	TableRow,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
-import { type DragIndicator, TableColumnDrag, TableDragPreview } from 'vue-data-grid/drag-and-drop';
+} from '@vue-data-grid/core';
+import { type DragIndicator, TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
 import IconColumns from '~icons/lucide/columns-3';
 import { computed, shallowRef } from 'vue';
 

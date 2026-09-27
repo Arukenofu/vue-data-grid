@@ -208,6 +208,9 @@ importers:
       '@internationalized/date':
         specifier: ^3.12.4
         version: 3.12.4
+      '@vue-data-grid/core':
+        specifier: workspace:*
+        version: link:../packages/core
       '@vue-data-grid/drag-and-drop':
         specifier: workspace:*
         version: link:../packages/drag-and-drop
@@ -226,9 +229,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.43(typescript@5.9.3)
-      vue-data-grid:
-        specifier: workspace:*
-        version: link:../packages/vue-data-grid
     devDependencies:
       '@iconify-json/lucide':
         specifier: 1.2.136
@@ -256,7 +256,17 @@ importers:
         version: 3.3.11(typescript@5.9.3)
 
   packages/core:
+    dependencies:
+      '@vue-data-grid/engine':
+        specifier: workspace:^
+        version: link:../engine
+      '@vue-data-grid/flip':
+        specifier: workspace:^
+        version: link:../flip
     devDependencies:
+      '@vue-data-grid/drag-and-drop':
+        specifier: workspace:*
+        version: link:../drag-and-drop
       vue:
         specifier: 'catalog:'
         version: 3.5.43(typescript@7.0.2)
@@ -271,23 +281,13 @@ importers:
         specifier: 'catalog:'
         version: 3.5.43(typescript@7.0.2)
 
-  packages/flip: {}
-
-  packages/vue-data-grid:
-    dependencies:
-      '@vue-data-grid/core':
-        specifier: workspace:^
-        version: link:../core
-      '@vue-data-grid/flip':
-        specifier: workspace:^
-        version: link:../flip
+  packages/engine:
     devDependencies:
-      '@vue-data-grid/drag-and-drop':
-        specifier: workspace:*
-        version: link:../drag-and-drop
       vue:
         specifier: 'catalog:'
         version: 3.5.43(typescript@7.0.2)
+
+  packages/flip: {}
 
 packages:
 

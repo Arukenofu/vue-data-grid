@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, useDataTable, useTableMotion } from 'vue-data-grid';
+import { defineColumn, defineColumns, useDataTable, useTableMotion } from '@vue-data-grid/core';
 import { h, shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';

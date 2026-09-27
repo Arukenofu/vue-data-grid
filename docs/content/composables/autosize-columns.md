@@ -19,7 +19,7 @@ gets its room too. The widths animate because the table has `useTableMotion`.
 ## Usage
 
 ```ts
-import { autosizeColumns } from 'vue-data-grid';
+import { autosizeColumns } from '@vue-data-grid/core';
 
 autosizeColumns(table.scope);
 autosizeColumns(table.scope, ['name', 'email']);
@@ -49,7 +49,7 @@ kept, persisted and reset like any other width.
 	label="Option"
 	:data="[
 		{ name: 'rows', type: '\'rendered\' | \'all\'', default: '\'rendered\'', description: '`all` also covers rows outside the row window, by measuring their `format` text in the font of a body cell. Right only while `format` returns exactly what the cell shows.' },
-		{ name: 'bodyAttribute', type: 'string', default: '\'data-tc-index\'', description: 'The attribute of body rows, the engine\'s `indexAttribute`.' },
+		{ name: 'bodyAttribute', type: 'string', default: '\'data-dg-index\'', description: 'The attribute of body rows, the engine\'s `indexAttribute`.' },
 		{ name: 'measureText', type: '(text: string, font: string) => number | null', default: 'a canvas', description: 'The width of a text in a font, px.' },
 	]"
 />
@@ -65,7 +65,7 @@ What `autosizeColumns` measures with: the content widths of columns from their r
 body and footer cells, as a `Map` by name, without writing anything.
 
 ```ts
-import { measureColumnsContent } from 'vue-data-grid';
+import { measureColumnsContent } from '@vue-data-grid/core';
 
 const widths = measureColumnsContent(table.root.value, ['name', 'email']);
 
@@ -80,7 +80,7 @@ the same task, so the page never shows them and the browser lays out once.
 	label="Option"
 	:data="[
 		{ name: 'texts', type: 'ReadonlyMap<string, readonly string[]>', description: 'Cell texts by column, to cover rows that are not rendered. Each text is measured in the font of a body cell, plus what the cell takes beyond its text.' },
-		{ name: 'bodyAttribute', type: 'string', default: '\'data-tc-index\'', description: 'The attribute of body rows: a cell inside such a row is a body cell.' },
+		{ name: 'bodyAttribute', type: 'string', default: '\'data-dg-index\'', description: 'The attribute of body rows: a cell inside such a row is a body cell.' },
 		{ name: 'measureText', type: '(text: string, font: string) => number | null', default: 'a canvas', description: 'The width of a text in a font, px; `null` when it cannot be measured.' },
 	]"
 />

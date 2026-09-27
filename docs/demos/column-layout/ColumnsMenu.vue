@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AnyColumn, TableScope } from 'vue-data-grid';
+import type { AnyColumn, TableScope } from '@vue-data-grid/core';
 import IconColumns from '~icons/lucide/columns-3';
 import { computed } from 'vue';
 

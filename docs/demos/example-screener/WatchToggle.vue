@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TableSelectionCheckbox } from 'vue-data-grid';
+import { TableSelectionCheckbox } from '@vue-data-grid/core';
 import IconStar from '~icons/lucide/star';
 
 defineProps<{
@@ -17,7 +17,7 @@ defineProps<{
 </template>
 
 <style scoped>
-.watch[data-tc-part] {
+.watch[data-dg-part] {
 	display: inline-flex;
 	flex: none;
 	align-items: center;
@@ -35,21 +35,21 @@ defineProps<{
 	transition: color 0.15s, background-color 0.15s, scale 0.15s;
 }
 
-.watch[data-tc-part]::before {
+.watch[data-dg-part]::before {
 	content: none;
 }
 
-.watch[data-tc-part]:hover {
+.watch[data-dg-part]:hover {
 	background: var(--ui-bg-muted);
 	color: var(--ui-fg);
 }
 
-.watch[data-tc-part]:focus-visible {
+.watch[data-dg-part]:focus-visible {
 	outline: none;
 	box-shadow: var(--ui-ring);
 }
 
-.watch[data-tc-part]:active {
+.watch[data-dg-part]:active {
 	scale: 0.9;
 }
 

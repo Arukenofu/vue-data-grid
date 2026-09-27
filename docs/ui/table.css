@@ -1,23 +1,23 @@
 /*
  * The look of a table in the styled kit. Put `ui-table` on the table element (the scroll container,
  * `TableRoot` or an element with `getGridProps()`). How the table works comes from
- * vue-data-grid/style.css; this file only sets its theme variables and styles the attributes the
+ * @vue-data-grid/core/style.css; this file only sets its theme variables and styles the attributes the
  * package puts on its parts, so tables of parts and tables of hand-written markup look the same.
  */
 .ui-table {
-	--tc-background: var(--ui-bg);
-	--tc-foreground: var(--ui-fg);
-	--tc-head-background: var(--ui-bg-subtle);
-	--tc-pinned-background: var(--ui-bg);
-	--tc-selected-background: color-mix(in srgb, var(--ui-accent) 9%, var(--ui-bg));
-	--tc-line-color: var(--ui-border);
-	--tc-cell-padding: 0 12px;
-	--tc-focus-ring: 2px solid var(--ui-accent);
-	--tc-tree-indent: 20px;
-	--tc-range-background: color-mix(in srgb, var(--ui-accent) 12%, transparent);
-	--tc-range-border: 1px solid var(--ui-accent);
-	--tc-fill-handle-color: var(--ui-accent);
-	--tc-drop-color: var(--ui-accent);
+	--dg-background: var(--ui-bg);
+	--dg-foreground: var(--ui-fg);
+	--dg-head-background: var(--ui-bg-subtle);
+	--dg-pinned-background: var(--ui-bg);
+	--dg-selected-background: color-mix(in srgb, var(--ui-accent) 9%, var(--ui-bg));
+	--dg-line-color: var(--ui-border);
+	--dg-cell-padding: 0 12px;
+	--dg-focus-ring: 2px solid var(--ui-accent);
+	--dg-tree-indent: 20px;
+	--dg-range-background: color-mix(in srgb, var(--ui-accent) 12%, transparent);
+	--dg-range-border: 1px solid var(--ui-accent);
+	--dg-fill-handle-color: var(--ui-accent);
+	--dg-drop-color: var(--ui-accent);
 	--ui-table-hover: color-mix(in srgb, var(--ui-fg) 3.5%, var(--ui-bg));
 
 	flex: 1 1 auto;
@@ -49,7 +49,7 @@
 }
 
 .ui-table[data-density='compact'] {
-	--tc-cell-padding: 0 8px;
+	--dg-cell-padding: 0 8px;
 
 	font-size: 12.5px;
 }
@@ -58,17 +58,17 @@
  * Header: the row of column headers is the last one, group rows stand above it. Only rows count:
  * the drop line of a column drag is appended to the header too.
  */
-.ui-table [data-tc-part='head'] {
+.ui-table [data-dg-part='head'] {
 	box-shadow: 0 1px 0 var(--ui-border);
 }
 
-.ui-table [data-tc-part='head'] > [data-tc-part='row']:nth-last-child(1 of [data-tc-part='row']) {
+.ui-table [data-dg-part='head'] > [data-dg-part='row']:nth-last-child(1 of [data-dg-part='row']) {
 	height: 38px;
 }
 
 .ui-table {
 	/* A group row of the header; a column without a group spans it with its header. */
-	--tc-group-row-height: 30px;
+	--dg-group-row-height: 30px;
 }
 
 .ui-table [role='columnheader'] {
@@ -84,13 +84,13 @@
 	color: var(--ui-fg);
 }
 
-.ui-table [data-tc-part='head'] > [data-tc-part='row']::after,
-.ui-table [data-tc-part='foot'] > [data-tc-part='row']::after {
+.ui-table [data-dg-part='head'] > [data-dg-part='row']::after,
+.ui-table [data-dg-part='foot'] > [data-dg-part='row']::after {
 	content: none;
 }
 
-/* Group cells: in the header, as the pieces of a cell range over the body carry `data-tc-columns` too. */
-.ui-table [data-tc-part='head'] [data-tc-columns] {
+/* Group cells: in the header, as the pieces of a cell range over the body carry `data-dg-columns` too. */
+.ui-table [data-dg-part='head'] [data-dg-columns] {
 	justify-content: center;
 	gap: 6px;
 	border-inline-end: 1px solid var(--ui-border);
@@ -102,23 +102,23 @@
 }
 
 /* The line under a group row is its groups': the empty cells above a column without one have none. */
-.ui-table [data-tc-part='head'] [data-tc-group] {
+.ui-table [data-dg-part='head'] [data-dg-group] {
 	box-shadow: inset 0 -1px 0 var(--ui-border);
 }
 
 /* A header that sorts: the whole cell is the target, the icon shows the state. */
-.ui-table [data-tc-part='head'] [data-tc-column].is-sortable,
-.ui-table [data-tc-part='head'] [data-tc-column]:has(> [data-tc-part='sort-indicator']) {
+.ui-table [data-dg-part='head'] [data-dg-column].is-sortable,
+.ui-table [data-dg-part='head'] [data-dg-column]:has(> [data-dg-part='sort-indicator']) {
 	cursor: pointer;
 }
 
-.ui-table [data-tc-part='head'] [data-tc-column].is-sortable:hover,
-.ui-table [data-tc-part='head'] [data-tc-column]:has(> [data-tc-part='sort-indicator']):hover {
+.ui-table [data-dg-part='head'] [data-dg-column].is-sortable:hover,
+.ui-table [data-dg-part='head'] [data-dg-column]:has(> [data-dg-part='sort-indicator']):hover {
 	background: var(--ui-bg-muted);
 	color: var(--ui-fg);
 }
 
-.ui-table [data-tc-part='sort-indicator'] {
+.ui-table [data-dg-part='sort-indicator'] {
 	display: inline-flex;
 	align-items: center;
 	gap: 1px;
@@ -130,18 +130,18 @@
 }
 
 /* In a column aligned to the end the mark goes before the label, which then lines up with the values. */
-.ui-table [data-tc-align='right'] > [data-tc-part='sort-indicator'] {
+.ui-table [data-dg-align='right'] > [data-dg-part='sort-indicator'] {
 	order: -1;
 	justify-content: flex-end;
 	margin-inline: 0 2px;
 }
 
-.ui-table [data-tc-part='sort-indicator'] svg {
+.ui-table [data-dg-part='sort-indicator'] svg {
 	width: 14px;
 	height: 14px;
 }
 
-.ui-table [data-tc-part='sort-indicator'] .is-idle {
+.ui-table [data-dg-part='sort-indicator'] .is-idle {
 	color: var(--ui-fg-subtle);
 	opacity: 0;
 	transition: opacity 0.15s;
@@ -153,7 +153,7 @@
 }
 
 /* The resize handle: a line at the edge of the header cell while it is hovered, focused or dragged. */
-.ui-table [data-tc-part='resize-handle']::after {
+.ui-table [data-dg-part='resize-handle']::after {
 	position: absolute;
 	inset-block: 8px;
 	inset-inline-end: 3px;
@@ -165,23 +165,23 @@
 	transition: opacity 0.15s, background-color 0.15s;
 }
 
-.ui-table [data-tc-pinned='end'] > [data-tc-part='resize-handle']::after {
+.ui-table [data-dg-pinned='end'] > [data-dg-part='resize-handle']::after {
 	inset-inline: 3px auto;
 }
 
-.ui-table [role='columnheader']:hover [data-tc-part='resize-handle']::after {
+.ui-table [role='columnheader']:hover [data-dg-part='resize-handle']::after {
 	opacity: 1;
 }
 
-.ui-table [data-tc-part='resize-handle']:hover::after,
-.ui-table [data-tc-part='resize-handle']:focus-visible::after,
-.ui-table [data-tc-part='resize-handle'][data-tc-state='resizing']::after {
+.ui-table [data-dg-part='resize-handle']:hover::after,
+.ui-table [data-dg-part='resize-handle']:focus-visible::after,
+.ui-table [data-dg-part='resize-handle'][data-dg-state='resizing']::after {
 	inset-block: 4px;
 	background: var(--ui-accent);
 	opacity: 1;
 }
 
-.ui-table [data-tc-part='resize-handle']:focus-visible {
+.ui-table [data-dg-part='resize-handle']:focus-visible {
 	outline: none;
 }
 
@@ -190,10 +190,10 @@
  * in the cell's own padding and type; the ring turns red while the draft is invalid.
  */
 .ui-table {
-	--tc-error-color: var(--ui-down);
+	--dg-error-color: var(--ui-down);
 }
 
-.ui-table [data-tc-column][data-tc-state='editing'] {
+.ui-table [data-dg-column][data-dg-state='editing'] {
 	padding: 0;
 	border-radius: 3px;
 	background: var(--ui-bg);
@@ -201,12 +201,12 @@
 	outline-offset: -2px;
 }
 
-.ui-table [data-tc-column][data-tc-state='editing']:has([aria-invalid='true']) {
-	outline-color: var(--tc-error-color);
+.ui-table [data-dg-column][data-dg-state='editing']:has([aria-invalid='true']) {
+	outline-color: var(--dg-error-color);
 }
 
-.ui-table [data-tc-part='editor'] {
-	padding: var(--tc-cell-padding);
+.ui-table [data-dg-part='editor'] {
+	padding: var(--dg-cell-padding);
 	border: none;
 	border-radius: 3px;
 	background: transparent;
@@ -214,36 +214,36 @@
 	caret-color: var(--ui-accent);
 }
 
-.ui-table [data-tc-part='editor']::placeholder {
+.ui-table [data-dg-part='editor']::placeholder {
 	color: var(--ui-fg-subtle);
 }
 
 /* A text area of several lines is a card over the rows below: the ring goes with it. */
-.ui-table [data-tc-column][data-tc-state='editing']:has(> textarea) {
+.ui-table [data-dg-column][data-dg-state='editing']:has(> textarea) {
 	outline: none;
 }
 
-.ui-table textarea[data-tc-part='editor'] {
+.ui-table textarea[data-dg-part='editor'] {
 	padding-block: 8px;
 	background: var(--ui-bg);
 	box-shadow: 0 0 0 2px var(--ui-accent), var(--ui-shadow-lg);
 	line-height: 1.45;
 }
 
-.ui-table textarea[data-tc-part='editor'][aria-invalid='true'] {
-	box-shadow: 0 0 0 2px var(--tc-error-color), var(--ui-shadow-lg);
+.ui-table textarea[data-dg-part='editor'][aria-invalid='true'] {
+	box-shadow: 0 0 0 2px var(--dg-error-color), var(--ui-shadow-lg);
 }
 
-.ui-table input[type='date'][data-tc-part='editor']::-webkit-calendar-picker-indicator {
+.ui-table input[type='date'][data-dg-part='editor']::-webkit-calendar-picker-indicator {
 	opacity: 0.5;
 	cursor: pointer;
 }
 
-.ui-table input[type='date'][data-tc-part='editor']::-webkit-calendar-picker-indicator:hover {
+.ui-table input[type='date'][data-dg-part='editor']::-webkit-calendar-picker-indicator:hover {
 	opacity: 1;
 }
 
-.ui-table [data-tc-part='editor-error'] {
+.ui-table [data-dg-part='editor-error'] {
 	margin-block: 4px;
 	padding: 4px 8px;
 	border-radius: var(--ui-radius-xs);
@@ -252,7 +252,7 @@
 }
 
 /* The list of a list editor: a card under the cell, or above it, like the kit's selects. */
-.ui-table [data-tc-part='editor-list'] {
+.ui-table [data-dg-part='editor-list'] {
 	margin-block: 4px;
 	padding: 4px;
 	border: 1px solid var(--ui-border);
@@ -264,12 +264,12 @@
 	animation: ui-pop-in 0.12s ease-out;
 }
 
-.ui-table [data-tc-part='editor-list'][data-tc-side='top'] {
+.ui-table [data-dg-part='editor-list'][data-dg-side='top'] {
 	animation-name: ui-table-list-up;
 }
 
-.ui-table [data-tc-part='editor-option'],
-.ui-table [data-tc-part='editor-empty'] {
+.ui-table [data-dg-part='editor-option'],
+.ui-table [data-dg-part='editor-empty'] {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -279,21 +279,21 @@
 	line-height: 30px;
 }
 
-.ui-table [data-tc-part='editor-option']:hover {
+.ui-table [data-dg-part='editor-option']:hover {
 	background: var(--ui-bg-muted);
 }
 
-.ui-table [data-tc-part='editor-option'][aria-selected='true'] {
+.ui-table [data-dg-part='editor-option'][aria-selected='true'] {
 	background: var(--ui-accent-soft);
 	color: var(--ui-accent-text);
 }
 
-.ui-table [data-tc-part='editor-option'][data-tc-state='checked'] {
+.ui-table [data-dg-part='editor-option'][data-dg-state='checked'] {
 	font-weight: 560;
 }
 
 /* The value of the cell is ticked, as in the kit's selects. */
-.ui-table [data-tc-part='editor-option'][data-tc-state='checked']::after {
+.ui-table [data-dg-part='editor-option'][data-dg-state='checked']::after {
 	flex: none;
 	width: 14px;
 	height: 14px;
@@ -303,13 +303,13 @@
 	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 
-.ui-table [data-tc-part='editor-option'][aria-disabled='true'] {
+.ui-table [data-dg-part='editor-option'][aria-disabled='true'] {
 	background: none;
 	color: var(--ui-fg-subtle);
 	opacity: 1;
 }
 
-.ui-table [data-tc-part='editor-empty'] {
+.ui-table [data-dg-part='editor-empty'] {
 	color: var(--ui-fg-muted);
 	opacity: 1;
 }
@@ -327,34 +327,34 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ui-table [data-tc-part='editor-list'] {
+	.ui-table [data-dg-part='editor-list'] {
 		animation: none;
 	}
 }
 
 /* Body. */
-.ui-table [data-tc-part='body'] > [data-tc-part='row']:hover > [data-tc-column] {
+.ui-table [data-dg-part='body'] > [data-dg-part='row']:hover > [data-dg-column] {
 	background: var(--ui-table-hover);
 }
 
-.ui-table [data-tc-part='body'] > [data-tc-part='row'][aria-selected='true'] > [data-tc-column] {
-	background: var(--tc-selected-background);
+.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-selected='true'] > [data-dg-column] {
+	background: var(--dg-selected-background);
 }
 
-.ui-table [data-tc-part='body'] > [data-tc-part='row'][aria-selected='true']:hover > [data-tc-column] {
+.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-selected='true']:hover > [data-dg-column] {
 	background: color-mix(in srgb, var(--ui-accent) 14%, var(--ui-bg));
 }
 
-.ui-table [data-tc-part='body'] > [data-tc-part='row'][aria-selected='true'] > [data-tc-column]:first-child {
+.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-selected='true'] > [data-dg-column]:first-child {
 	box-shadow: inset 2px 0 0 var(--ui-accent);
 }
 
-.ui-table [data-tc-part='body'] > [data-tc-part='row'][aria-level='1'][aria-expanded] > [data-tc-column] {
+.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-level='1'][aria-expanded] > [data-dg-column] {
 	font-weight: 560;
 }
 
-.ui-table [data-tc-column]:focus-visible,
-.ui-table [data-tc-column][aria-selected]:focus {
+.ui-table [data-dg-column]:focus-visible,
+.ui-table [data-dg-column][aria-selected]:focus {
 	border-radius: 3px;
 }
 
@@ -363,21 +363,21 @@
 }
 
 /* Footer. */
-.ui-table [data-tc-part='foot'] {
+.ui-table [data-dg-part='foot'] {
 	box-shadow: 0 -1px 0 var(--ui-border);
 }
 
-.ui-table [data-tc-part='foot'] > [data-tc-part='row'] {
+.ui-table [data-dg-part='foot'] > [data-dg-part='row'] {
 	height: 36px;
 }
 
-.ui-table [data-tc-part='foot'] [data-tc-column] {
+.ui-table [data-dg-part='foot'] [data-dg-column] {
 	font-weight: 560;
 }
 
 /* Selection checkboxes and the checkboxes of `checkboxCell()`: native inputs, drawn in the accent. */
-.ui-table input[data-tc-part='selection-checkbox'],
-.ui-table input[data-tc-part='cell-checkbox'] {
+.ui-table input[data-dg-part='selection-checkbox'],
+.ui-table input[data-dg-part='cell-checkbox'] {
 	display: inline-grid;
 	flex: none;
 	place-content: center;
@@ -392,8 +392,8 @@
 	transition: background-color 0.12s, border-color 0.12s;
 }
 
-.ui-table input[data-tc-part='selection-checkbox']::before,
-.ui-table input[data-tc-part='cell-checkbox']::before {
+.ui-table input[data-dg-part='selection-checkbox']::before,
+.ui-table input[data-dg-part='cell-checkbox']::before {
 	width: 11px;
 	height: 11px;
 	background: var(--ui-accent-fg);
@@ -403,43 +403,43 @@
 	transition: transform 0.12s;
 }
 
-.ui-table input[data-tc-part='selection-checkbox']:checked,
-.ui-table input[data-tc-part='selection-checkbox']:indeterminate,
-.ui-table input[data-tc-part='cell-checkbox']:checked {
+.ui-table input[data-dg-part='selection-checkbox']:checked,
+.ui-table input[data-dg-part='selection-checkbox']:indeterminate,
+.ui-table input[data-dg-part='cell-checkbox']:checked {
 	border-color: var(--ui-accent);
 	background: var(--ui-accent);
 }
 
-.ui-table input[data-tc-part='selection-checkbox']:checked::before,
-.ui-table input[data-tc-part='cell-checkbox']:checked::before {
+.ui-table input[data-dg-part='selection-checkbox']:checked::before,
+.ui-table input[data-dg-part='cell-checkbox']:checked::before {
 	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
 	transform: scale(1);
 }
 
-.ui-table input[data-tc-part='selection-checkbox']:indeterminate::before {
+.ui-table input[data-dg-part='selection-checkbox']:indeterminate::before {
 	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round'%3E%3Cpath d='M6 12h12'/%3E%3C/svg%3E");
 	transform: scale(1);
 }
 
-.ui-table input[data-tc-part='selection-checkbox']:hover:not(:disabled),
-.ui-table input[data-tc-part='cell-checkbox']:hover:not(:disabled) {
+.ui-table input[data-dg-part='selection-checkbox']:hover:not(:disabled),
+.ui-table input[data-dg-part='cell-checkbox']:hover:not(:disabled) {
 	border-color: var(--ui-accent);
 }
 
-.ui-table input[data-tc-part='selection-checkbox']:focus-visible,
-.ui-table input[data-tc-part='cell-checkbox']:focus-visible {
+.ui-table input[data-dg-part='selection-checkbox']:focus-visible,
+.ui-table input[data-dg-part='cell-checkbox']:focus-visible {
 	outline: none;
 	box-shadow: var(--ui-ring);
 }
 
-.ui-table input[data-tc-part='selection-checkbox']:disabled,
-.ui-table input[data-tc-part='cell-checkbox']:disabled {
+.ui-table input[data-dg-part='selection-checkbox']:disabled,
+.ui-table input[data-dg-part='cell-checkbox']:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
 
 /* Tree toggles: a chevron that turns when the row expands. */
-.ui-table [data-tc-part='tree-toggle'] {
+.ui-table [data-dg-part='tree-toggle'] {
 	height: 20px;
 	margin-inline-end: 4px;
 	border-radius: 4px;
@@ -447,7 +447,7 @@
 	font-size: 0;
 }
 
-.ui-table button[data-tc-part='tree-toggle']::before {
+.ui-table button[data-dg-part='tree-toggle']::before {
 	width: 14px;
 	height: 14px;
 	background: currentcolor;
@@ -456,17 +456,17 @@
 	transition: transform 0.15s;
 }
 
-.ui-table button[data-tc-part='tree-toggle'][data-tc-state='expanded']::before {
+.ui-table button[data-dg-part='tree-toggle'][data-dg-state='expanded']::before {
 	transform: rotate(90deg);
 }
 
-.ui-table button[data-tc-part='tree-toggle']:hover {
+.ui-table button[data-dg-part='tree-toggle']:hover {
 	background: var(--ui-bg-muted);
 	color: var(--ui-fg);
 }
 
-.ui-table [dir='rtl'] button[data-tc-part='tree-toggle']:not([data-tc-state='expanded'])::before,
-.ui-table[dir='rtl'] button[data-tc-part='tree-toggle']:not([data-tc-state='expanded'])::before {
+.ui-table [dir='rtl'] button[data-dg-part='tree-toggle']:not([data-dg-state='expanded'])::before,
+.ui-table[dir='rtl'] button[data-dg-part='tree-toggle']:not([data-dg-state='expanded'])::before {
 	transform: scaleX(-1);
 }
 
@@ -497,12 +497,12 @@
 }
 
 /* Empty and loading. */
-.ui-table [data-tc-part='empty-cell'] {
+.ui-table [data-dg-part='empty-cell'] {
 	padding: 56px 12px;
 	color: var(--ui-fg-muted);
 }
 
-.ui-table [data-tc-part='loading'] {
+.ui-table [data-dg-part='loading'] {
 	gap: 8px;
 	align-items: center;
 	padding: 8px 12px;
@@ -513,7 +513,7 @@
 	font-size: 12.5px;
 }
 
-.ui-table [data-tc-part='loading']::before {
+.ui-table [data-dg-part='loading']::before {
 	position: absolute;
 	inset-inline: 0;
 	inset-block-start: -1px;
@@ -535,14 +535,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ui-table [data-tc-part='loading']::before {
+	.ui-table [data-dg-part='loading']::before {
 		animation: none;
 		background-position: center;
 	}
 }
 
 /* The kit's group toggle, the parts' default one included. */
-.ui-table [data-tc-part='group-toggle'] {
+.ui-table [data-dg-part='group-toggle'] {
 	display: inline-flex;
 	flex: none;
 	align-items: center;
@@ -557,31 +557,31 @@
 	cursor: pointer;
 }
 
-.ui-table [data-tc-part='group-toggle']:hover {
+.ui-table [data-dg-part='group-toggle']:hover {
 	background: var(--ui-bg-muted);
 	color: var(--ui-fg);
 }
 
 /* Drag handles of rows. */
-.ui-table [data-tc-part='drag-handle'] {
+.ui-table [data-dg-part='drag-handle'] {
 	width: 22px;
 	height: 22px;
 	border-radius: 4px;
 	color: var(--ui-fg-subtle);
 }
 
-.ui-table [data-tc-part='drag-handle']:not([data-tc-disabled]):hover {
+.ui-table [data-dg-part='drag-handle']:not([data-dg-disabled]):hover {
 	background: var(--ui-bg-muted);
 	color: var(--ui-fg);
 }
 
-.ui-table [data-tc-part='drag-handle']:focus-visible {
+.ui-table [data-dg-part='drag-handle']:focus-visible {
 	outline: none;
 	box-shadow: var(--ui-ring);
 }
 
 /* The ghost under the pointer lives outside the table: it is styled on its own. */
-[data-tc-part='drag-preview'] {
+[data-dg-part='drag-preview'] {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
@@ -595,7 +595,7 @@
 }
 
 /* The message over a table a drag can drop on. */
-.ui-table [data-tc-part='drag-overlay'] {
+.ui-table [data-dg-part='drag-overlay'] {
 	border-radius: var(--ui-radius);
 	outline-color: var(--ui-accent);
 	background: color-mix(in srgb, var(--ui-accent) 6%, transparent);

@@ -23,7 +23,7 @@ In a table of `useDataTable`, add the `navigation` feature. It passes the table'
 sticky blocks, tree and selection for you:
 
 ```ts
-import { navigation, useDataTable } from 'vue-data-grid';
+import { navigation, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -39,7 +39,7 @@ table.navigation.focusCell({ section: 'body', row: 0, cell: 'name' });
 On markup of your own, call it with the scope of the engine and the elements:
 
 ```ts
-import { useGridNavigation, useTableProps } from 'vue-data-grid';
+import { useGridNavigation, useTableProps } from '@vue-data-grid/core';
 
 const props = useTableProps(scope, { navigation: true });
 

@@ -1,4 +1,4 @@
-import { defineColumn, defineColumns, selectionColumn } from 'vue-data-grid';
+import { defineColumn, defineColumns, selectionColumn } from '@vue-data-grid/core';
 import { h } from 'vue';
 
 import type { Person, Presence, Team } from '@/data/people';

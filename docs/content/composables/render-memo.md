@@ -17,7 +17,7 @@ that renders rows in one render function, where there is no component per row to
 ## Usage
 
 ```ts
-import { isSameTokens, keepMounted, type VirtualItem } from 'vue-data-grid';
+import { isSameTokens, keepMounted, type VirtualItem } from '@vue-data-grid/core';
 import { h, type VNode } from 'vue';
 
 const cache = new Map<string, { tokens: unknown[]; vnode: VNode }>();

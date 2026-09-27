@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { autosizeColumns, defineColumn, defineColumns, sorting, useDataTable, useTableMotion } from 'vue-data-grid';
+import { autosizeColumns, defineColumn, defineColumns, sorting, useDataTable, useTableMotion } from '@vue-data-grid/core';
 import IconMoveHorizontal from '~icons/lucide/move-horizontal';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import { shallowRef } from 'vue';

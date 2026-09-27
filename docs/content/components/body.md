@@ -29,7 +29,7 @@ renders again only when its own data changes.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableCells, TableRow } from 'vue-data-grid';
+import { TableBody, TableCells, TableRow } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -67,8 +67,8 @@ so the scrollbar is right even when only the rows in view are rendered. It also 
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['body'] },
-		{ attribute: '[data-tc-row-layout]', values: ['positioned', 'flow'] },
+		{ attribute: '[data-dg-part]', values: ['body'] },
+		{ attribute: '[data-dg-row-layout]', values: ['positioned', 'flow'] },
 	]"
 />
 
@@ -95,11 +95,11 @@ gives the parts inside, such as a selection checkbox or a drag handle, their row
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['row'] },
-		{ attribute: '[data-tc-index]', values: 'The index of the row in `rows`, by which rows are measured; the `indexAttribute` option renames it.' },
-		{ attribute: '[data-tc-grid-section]', values: ['body'] },
-		{ attribute: '[data-tc-grid-row]', values: 'The index of the row in its section, for the keyboard navigation.' },
-		{ attribute: '[data-tc-draggable]', values: 'Present while the row can be dragged, inside a `TableRowDrag`; `steps` when Alt with the arrows moves it too.' },
+		{ attribute: '[data-dg-part]', values: ['row'] },
+		{ attribute: '[data-dg-index]', values: 'The index of the row in `rows`, by which rows are measured; the `indexAttribute` option renames it.' },
+		{ attribute: '[data-dg-grid-section]', values: ['body'] },
+		{ attribute: '[data-dg-grid-row]', values: 'The index of the row in its section, for the keyboard navigation.' },
+		{ attribute: '[data-dg-draggable]', values: 'Present while the row can be dragged, inside a `TableRowDrag`; `steps` when Alt with the arrows moves it too.' },
 	]"
 />
 
@@ -128,21 +128,21 @@ the column's `cell` field, else its text through `format`.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-column]', values: 'The name of the column.' },
-		{ attribute: '[data-tc-pinned]', values: ['start', 'end'] },
-		{ attribute: '[data-tc-align]', values: ['center', 'right'] },
-		{ attribute: '[data-tc-state]', values: ['editing'] },
+		{ attribute: '[data-dg-column]', values: 'The name of the column.' },
+		{ attribute: '[data-dg-pinned]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-align]', values: ['center', 'right'] },
+		{ attribute: '[data-dg-state]', values: ['editing'] },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-background', default: 'Canvas', description: 'The background of rows, and of pinned cells, which must hide what scrolls under them.' },
-		{ name: '--tc-pinned-background', default: 'var(--tc-background)', description: 'The background of pinned cells of the body.' },
-		{ name: '--tc-selected-background', default: 'color-mix(in srgb, Highlight 18%, Canvas)', description: 'The background of the cells of a selected row.' },
-		{ name: '--tc-line-color', default: 'color-mix(in srgb, CanvasText 15%, Canvas)', description: 'The line under every row.' },
-		{ name: '--tc-line-width', default: '1px', description: 'Its width.' },
-		{ name: '--tc-cell-padding', default: '0 8px', description: 'The padding of every cell.' },
+		{ name: '--dg-background', default: 'Canvas', description: 'The background of rows, and of pinned cells, which must hide what scrolls under them.' },
+		{ name: '--dg-pinned-background', default: 'var(--dg-background)', description: 'The background of pinned cells of the body.' },
+		{ name: '--dg-selected-background', default: 'color-mix(in srgb, Highlight 18%, Canvas)', description: 'The background of the cells of a selected row.' },
+		{ name: '--dg-line-color', default: 'color-mix(in srgb, CanvasText 15%, Canvas)', description: 'The line under every row.' },
+		{ name: '--dg-line-width', default: '1px', description: 'Its width.' },
+		{ name: '--dg-cell-padding', default: '0 8px', description: 'The padding of every cell.' },
 	]"
 />
 

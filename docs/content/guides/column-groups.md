@@ -18,7 +18,7 @@ A group names its children, columns and nested groups, in order. `defineColumnGr
 by name, as `defineColumns` does, and the table takes it as `groups`:
 
 ```ts
-import { defineColumnGroups, useDataTable } from 'vue-data-grid';
+import { defineColumnGroups, useDataTable } from '@vue-data-grid/core';
 
 const groups = defineColumnGroups({
 	item: { label: 'Product', children: ['product', 'category'] },
@@ -63,7 +63,7 @@ cells of every level; render a `TableGroupRow` for each level and a `TableGroupC
   fold. Its slot takes an icon of your own, as the demo's chevrons.
 
 Columns that have no group at some level get an empty cell there. When the theme sets
-`--tc-group-row-height`, the height of a group row, the header of such a column reaches up over the
+`--dg-group-row-height`, the height of a group row, the header of such a column reaches up over the
 empty cells above it, as `Name` and `Year` do in the demo.
 
 ## Folding a group
@@ -119,13 +119,13 @@ const groups = defineColumnGroups({
 
 ## Styling
 
-Group cells carry `data-tc-group` with the group's name and `data-tc-columns` with the tokens of its
-columns. The toggle carries `data-tc-part="group-toggle"` and `data-tc-state` of `expanded` or
+Group cells carry `data-dg-group` with the group's name and `data-dg-columns` with the tokens of its
+columns. The toggle carries `data-dg-part="group-toggle"` and `data-dg-state` of `expanded` or
 `collapsed`.
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-group-row-height', description: 'The height of a group row. With it, the header of a column without a group reaches up over the empty cells above it.' },
+		{ name: '--dg-group-row-height', description: 'The height of a group row. With it, the header of a column without a group reaches up over the empty cells above it.' },
 	]"
 />
 

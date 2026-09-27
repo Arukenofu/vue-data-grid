@@ -3,7 +3,7 @@ import DefaultTheme from 'vitepress/theme';
 import { defineAsyncComponent } from 'vue';
 
 // After the default theme, whose variables these override.
-import 'vue-data-grid/style.css';
+import '@vue-data-grid/core/style.css';
 import '@/ui/tokens.css';
 import '@/ui/table.css';
 import './styles/vars.css';

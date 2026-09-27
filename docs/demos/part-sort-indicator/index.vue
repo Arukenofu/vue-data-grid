@@ -13,7 +13,7 @@ import {
 	TableRow,
 	TableSortIndicator,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconArrowDownWideNarrow from '~icons/lucide/arrow-down-wide-narrow';
 import IconArrowUpNarrowWide from '~icons/lucide/arrow-up-narrow-wide';
 import IconArrowUpDown from '~icons/lucide/arrow-up-down';

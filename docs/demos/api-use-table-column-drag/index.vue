@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, useDataTable, useTableMotion } from 'vue-data-grid';
-import { TableDragPreview, useTableColumnDrag } from 'vue-data-grid/drag-and-drop';
+import { defineColumn, defineColumns, useDataTable, useTableMotion } from '@vue-data-grid/core';
+import { TableDragPreview, useTableColumnDrag } from '@vue-data-grid/core/drag-and-drop';
 import { computed, shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';

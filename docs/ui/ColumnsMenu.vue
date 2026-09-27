@@ -4,7 +4,7 @@
 	`hideable` are listed but locked; service columns, such as a checkbox or row actions, are not listed.
 -->
 <script setup lang="ts">
-import type { TableScope } from 'vue-data-grid';
+import type { TableScope } from '@vue-data-grid/core';
 import IconCheck from '~icons/lucide/check';
 import IconColumns from '~icons/lucide/columns-3';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';

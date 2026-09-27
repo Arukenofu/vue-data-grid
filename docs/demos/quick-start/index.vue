@@ -13,7 +13,7 @@ import {
 	TableRow,
 	TableSortIndicator,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 
 import { type Person, people } from '@/data/people';
 

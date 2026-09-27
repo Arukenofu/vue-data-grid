@@ -28,7 +28,7 @@ beside it, so their text lines up.
 
 ```vue
 <script setup lang="ts">
-import { TableTreeToggle } from 'vue-data-grid';
+import { TableTreeToggle } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -40,7 +40,7 @@ The toggle needs the `tree` feature, which turns the rows into a tree by a paren
 of children:
 
 ```ts
-import { tree, useDataTable } from 'vue-data-grid';
+import { tree, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -75,17 +75,17 @@ your own design, as the demo does with a folder that opens.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['tree-toggle'] },
-		{ attribute: '[data-tc-state]', values: ['expanded', 'collapsed'] },
+		{ attribute: '[data-dg-part]', values: ['tree-toggle'] },
+		{ attribute: '[data-dg-state]', values: ['expanded', 'collapsed'] },
 	]"
 />
 
-The placeholder of a leaf is a `span` with the same `data-tc-part`, `aria-hidden` and without
-`data-tc-state`, so both take the same width from the same rule.
+The placeholder of a leaf is a `span` with the same `data-dg-part`, `aria-hidden` and without
+`data-dg-state`, so both take the same width from the same rule.
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-tree-indent', default: '16px', description: 'The indent of one level, in the cells of `treeColumn()`.' },
+		{ name: '--dg-tree-indent', default: '16px', description: 'The indent of one level, in the cells of `treeColumn()`.' },
 	]"
 />
 

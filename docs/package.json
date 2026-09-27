@@ -11,7 +11,7 @@
   "dependencies": {
     "@internationalized/date": "^3.12.4",
     "@vue-data-grid/drag-and-drop": "workspace:*",
-    "vue-data-grid": "workspace:*",
+    "@vue-data-grid/core": "workspace:*",
     "animejs": "^4.5.0",
     "gsap": "^3.15.0",
     "motion": "^13.4.4",

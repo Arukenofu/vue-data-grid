@@ -23,7 +23,7 @@ to the row window. Spread each one on its element.
 
 ```vue
 <script setup lang="ts">
-import { getCellText, useDataTable } from 'vue-data-grid';
+import { getCellText, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 const { root, head, items, scope } = table;
@@ -54,7 +54,7 @@ Call `useTableProps(scope, options)` yourself only on a table built on the engin
 without `useDataTable`:
 
 ```ts
-import { useTableEngine, useTableProps } from 'vue-data-grid';
+import { useTableEngine, useTableProps } from '@vue-data-grid/core';
 
 const engine = useTableEngine({ columns, rows, root, rowKey: 'id', rowHeight: 40 });
 const props = useTableProps(engine.scope, { navigation: true, footerRows: 1 });
@@ -74,7 +74,7 @@ const props = useTableProps(engine.scope, { navigation: true, footerRows: 1 });
 		{ name: 'nodes', type: 'MaybeRefOrGetter<readonly RowNode[]>', description: 'The node of each body row, from a tree: level, place among siblings, expand state.' },
 		{ name: 'selection', type: 'TableRowSelection', description: 'The row selection: rows get `aria-selected`, and the table `aria-multiselectable` in `multiple` mode.' },
 		{ name: 'cellSelection', type: 'boolean', default: 'false', description: 'Cells can be selected: the table is `aria-multiselectable`, and `getCellProps` takes `selected`.' },
-		{ name: 'indexAttribute', type: 'string', default: '\'data-tc-index\'', description: 'The attribute with the row index on every body row, for measuring. Read once.' },
+		{ name: 'indexAttribute', type: 'string', default: '\'data-dg-index\'', description: 'The attribute with the row index on every body row, for measuring. Read once.' },
 		{ name: 'rowLayout', type: '\'positioned\' | \'flow\'', default: '\'positioned\'', description: 'Whether body rows are positioned by the row window or left in normal flow. Read once.' },
 	]"
 />
@@ -85,7 +85,7 @@ const props = useTableProps(engine.scope, { navigation: true, footerRows: 1 });
 	:data="[
 		{ name: 'getGridProps', type: '() => Props', description: 'The table element: `role`, `aria-rowcount`, `aria-colcount`, `aria-multiselectable`, `aria-busy`.' },
 		{ name: 'getHeadProps', type: '() => Props', description: 'The header block, `role=&quot;rowgroup&quot;`, which the structural styles stick to the top.' },
-		{ name: 'getBodyProps', type: '() => Props', description: 'The body block, with `data-tc-row-layout`. The table object sizes it to the row window.' },
+		{ name: 'getBodyProps', type: '() => Props', description: 'The body block, with `data-dg-row-layout`. The table object sizes it to the row window.' },
 		{ name: 'getFootProps', type: '() => Props', description: 'The footer block, stuck to the bottom.' },
 		{ name: 'getGroupRowProps', type: '(level: number) => Props', description: 'A group row of the header, `level` from the top.' },
 		{ name: 'getHeaderRowProps', type: '() => Props', description: 'The row of column headers.' },
@@ -102,18 +102,18 @@ const props = useTableProps(engine.scope, { navigation: true, footerRows: 1 });
 	]"
 />
 
-The props mark each element with a `data-tc-part`, which the structural styles and your theme find
+The props mark each element with a `data-dg-part`, which the structural styles and your theme find
 it by:
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['table', 'head', 'body', 'foot', 'row', 'range', 'range-cell'] },
-		{ attribute: '[data-tc-column]', values: 'The column name, on its header, body and footer cells.' },
-		{ attribute: '[data-tc-columns]', values: 'The columns under a group cell or a piece of a range.' },
-		{ attribute: '[data-tc-pinned]', values: ['start', 'end'] },
-		{ attribute: '[data-tc-align]', values: ['center', 'right'] },
-		{ attribute: '[data-tc-row-layout]', values: ['positioned', 'flow'] },
-		{ attribute: '[data-tc-index]', values: 'The index of a body row in the shown rows.' },
+		{ attribute: '[data-dg-part]', values: ['table', 'head', 'body', 'foot', 'row', 'range', 'range-cell'] },
+		{ attribute: '[data-dg-column]', values: 'The column name, on its header, body and footer cells.' },
+		{ attribute: '[data-dg-columns]', values: 'The columns under a group cell or a piece of a range.' },
+		{ attribute: '[data-dg-pinned]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-align]', values: ['center', 'right'] },
+		{ attribute: '[data-dg-row-layout]', values: ['positioned', 'flow'] },
+		{ attribute: '[data-dg-index]', values: 'The index of a body row in the shown rows.' },
 	]"
 />
 

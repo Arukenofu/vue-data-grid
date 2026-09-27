@@ -35,7 +35,7 @@ import {
 	TableFillPreview,
 	TableRangeOverlay,
 	TableRow,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -55,7 +55,7 @@ The overlay draws the ranges of the `ranges` feature; the handle and the preview
 feature, which writes through the `editing` feature:
 
 ```ts
-import { editing, fill, navigation, ranges, useDataTable } from 'vue-data-grid';
+import { editing, fill, navigation, ranges, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -98,20 +98,20 @@ feature.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['range', 'range-cell'] },
-		{ attribute: '[data-tc-continues]', values: ['start', 'end', 'start end'] },
-		{ attribute: '[data-tc-columns]', values: 'The tokens of the columns under a piece, by which a resize reaches it.' },
-		{ attribute: '[data-tc-pinned]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-part]', values: ['range', 'range-cell'] },
+		{ attribute: '[data-dg-continues]', values: ['start', 'end', 'start end'] },
+		{ attribute: '[data-dg-columns]', values: 'The tokens of the columns under a piece, by which a resize reaches it.' },
+		{ attribute: '[data-dg-pinned]', values: ['start', 'end'] },
 	]"
 />
 
 `range` is the row of a range, `range-cell` a piece inside it. A piece that goes on past a pin into
-another piece has `data-tc-continues` on that side, where it draws no border.
+another piece has `data-dg-continues` on that side, where it draws no border.
 
 ### TableFillPreview
 
 The range a fill reaches while its handle is dragged, drawn as a range is, with
-`data-tc-state="fill"`: the structural styles make it dashed. Put it in `TableBody` next to the
+`data-dg-state="fill"`: the structural styles make it dashed. Put it in `TableBody` next to the
 overlay. It renders nothing without the `fill` feature, and nothing while no fill is dragged.
 
 <PropsTable
@@ -122,8 +122,8 @@ overlay. It renders nothing without the `fill` feature, and nothing while no fil
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['range', 'range-cell'] },
-		{ attribute: '[data-tc-state]', values: ['fill'] },
+		{ attribute: '[data-dg-part]', values: ['range', 'range-cell'] },
+		{ attribute: '[data-dg-state]', values: ['fill'] },
 	]"
 />
 
@@ -149,17 +149,17 @@ editor it would cover.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['fill-handle'] },
-		{ attribute: '[data-tc-state]', values: ['dragging', 'idle'] },
+		{ attribute: '[data-dg-part]', values: ['fill-handle'] },
+		{ attribute: '[data-dg-state]', values: ['dragging', 'idle'] },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-range-background', default: 'color-mix(in srgb, Highlight 12%, transparent)', description: 'The tint of a cell in a range; translucent, so the cell shows through.' },
-		{ name: '--tc-range-border', default: '1px solid Highlight', description: 'The outline of a range.' },
-		{ name: '--tc-fill-handle-color', default: 'Highlight', description: 'The colour of the fill handle.' },
-		{ name: '--tc-fill-handle-size', default: '8px', description: 'Its size.' },
+		{ name: '--dg-range-background', default: 'color-mix(in srgb, Highlight 12%, transparent)', description: 'The tint of a cell in a range; translucent, so the cell shows through.' },
+		{ name: '--dg-range-border', default: '1px solid Highlight', description: 'The outline of a range.' },
+		{ name: '--dg-fill-handle-color', default: 'Highlight', description: 'The colour of the fill handle.' },
+		{ name: '--dg-fill-handle-size', default: '8px', description: 'Its size.' },
 	]"
 />
 

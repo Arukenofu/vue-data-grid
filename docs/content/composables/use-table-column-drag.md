@@ -18,8 +18,8 @@ the reset puts it back. The pinned Symbol column is not `movable` and stays wher
 ## Usage
 
 ```ts
-import { useDataTable } from 'vue-data-grid';
-import { useTableColumnDrag } from 'vue-data-grid/drag-and-drop';
+import { useDataTable } from '@vue-data-grid/core';
+import { useTableColumnDrag } from '@vue-data-grid/core/drag-and-drop';
 
 const column = defineColumn<Stock>({ movable: true });
 
@@ -67,7 +67,7 @@ the places the layout allows: within their pinned side, and never splitting a `k
 		{ name: 'getLabel', type: '(name: string) => string', description: 'The name of a column, as screen readers hear it.' },
 		{ name: 'setPreview', type: '(render, options?) => () => void', description: 'Fills the ghost under the pointer, as `TableDragPreview` does.' },
 		{ name: 'register', type: '(element: HTMLElement, key: string) => () => void', description: 'Connects the element of a header cell; `TableHeaderCell` calls it.' },
-		{ name: 'getItemProps', type: '(key: string) => Props', description: 'The attributes of a header cell: `data-tc-draggable` while it may be dragged.' },
+		{ name: 'getItemProps', type: '(key: string) => Props', description: 'The attributes of a header cell: `data-dg-draggable` while it may be dragged.' },
 	]"
 />
 

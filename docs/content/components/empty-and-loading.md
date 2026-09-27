@@ -28,7 +28,7 @@ valid for assistive technology while they are there.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableEmpty, TableFooter, TableLoading, TableRoot } from 'vue-data-grid';
+import { TableBody, TableEmpty, TableFooter, TableLoading, TableRoot } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -67,7 +67,7 @@ while there are rows, so it can stay in the template.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['empty', 'empty-cell'] },
+		{ attribute: '[data-dg-part]', values: ['empty', 'empty-cell'] },
 	]"
 />
 
@@ -92,7 +92,7 @@ from screen readers: the announcer says the table is loading instead.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['loading'] },
+		{ attribute: '[data-dg-part]', values: ['loading'] },
 	]"
 />
 

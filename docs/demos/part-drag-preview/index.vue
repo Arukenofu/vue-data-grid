@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { moveRow } from 'vue-data-grid';
-import type { TableRowDropEvent } from 'vue-data-grid/drag-and-drop';
+import { moveRow } from '@vue-data-grid/core';
+import type { TableRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 import { type ShallowRef, shallowRef } from 'vue';
 
 import { type Task, tasks } from '@/data/tasks';

@@ -35,7 +35,7 @@ import {
 	TableHeaderRow,
 	TableResizeHandle,
 	TableSortIndicator,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -77,7 +77,7 @@ never leave a row hidden under it.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['head'] },
+		{ attribute: '[data-dg-part]', values: ['head'] },
 	]"
 />
 
@@ -101,9 +101,9 @@ and with a column window the spacers that stand for the columns out of view.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['row'] },
-		{ attribute: '[data-tc-grid-section]', values: ['head'] },
-		{ attribute: '[data-tc-grid-row]', values: 'The index of the row in its section, `0`: where the keyboard navigation finds it.' },
+		{ attribute: '[data-dg-part]', values: ['row'] },
+		{ attribute: '[data-dg-grid-section]', values: ['head'] },
+		{ attribute: '[data-dg-grid-row]', values: 'The index of the row in its section, `0`: where the keyboard navigation finds it.' },
 	]"
 />
 
@@ -133,18 +133,18 @@ window renders an empty cell with `role="presentation"`.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-column]', values: 'The name of the column.' },
-		{ attribute: '[data-tc-pinned]', values: ['start', 'end'] },
-		{ attribute: '[data-tc-align]', values: ['center', 'right'] },
-		{ attribute: '[data-tc-rowspan]', values: 'How many rows the header spans: set for a column without a group in the group rows right above it, which it reaches up over.' },
-		{ attribute: '[data-tc-draggable]', values: 'Present while the column can be dragged, inside a `TableColumnDrag`.' },
+		{ attribute: '[data-dg-column]', values: 'The name of the column.' },
+		{ attribute: '[data-dg-pinned]', values: ['start', 'end'] },
+		{ attribute: '[data-dg-align]', values: ['center', 'right'] },
+		{ attribute: '[data-dg-rowspan]', values: 'How many rows the header spans: set for a column without a group in the group rows right above it, which it reaches up over.' },
+		{ attribute: '[data-dg-draggable]', values: 'Present while the column can be dragged, inside a `TableColumnDrag`.' },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-head-background', default: 'var(--tc-background, Canvas)', description: 'The background of the header and of its pinned cells.' },
-		{ name: '--tc-cell-padding', default: '0 8px', description: 'The padding of every cell, header cells included.' },
+		{ name: '--dg-head-background', default: 'var(--dg-background, Canvas)', description: 'The background of the header and of its pinned cells.' },
+		{ name: '--dg-cell-padding', default: '0 8px', description: 'The padding of every cell, header cells included.' },
 	]"
 />
 
@@ -156,7 +156,7 @@ only when the cell has a slot, to keep the default content next to parts of your
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['cell-text'] },
+		{ attribute: '[data-dg-part]', values: ['cell-text'] },
 	]"
 />
 

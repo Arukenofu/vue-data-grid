@@ -1,14 +1,14 @@
 ---
 title: The core
-description: What vue-data-grid re-exports from @vue-data-grid/core — the engine, the column state, the row and cell models — and when to use them directly.
+description: What @vue-data-grid/core re-exports from @vue-data-grid/engine — the engine, the column state, the row and cell models — and when to use them directly.
 ---
 
 # The core
 
 <Description>
-Under the parts and composables of `vue-data-grid` lies `@vue-data-grid/core`: the engine, the
+Under the parts and composables of `@vue-data-grid/core` lies `@vue-data-grid/engine`: the engine, the
 column state, and models of rows and cells with no markup at all. The table re-exports its stable
-API, so everything on this page is imported from `vue-data-grid` too.
+API, so everything on this page is imported from `@vue-data-grid/core` too.
 </Description>
 
 ## When to use it
@@ -30,7 +30,7 @@ states and CSS variables; the markup, the keys and the ARIA are the table's.
 columns, the row window, and the geometry of every cell as CSS variables.
 
 ```ts
-import { createTableScopeContext, useTableEngine, useTableGeometry } from 'vue-data-grid';
+import { createTableScopeContext, useTableEngine, useTableGeometry } from '@vue-data-grid/core';
 
 const root = shallowRef<HTMLElement | null>(null);
 
@@ -75,7 +75,7 @@ The scope is the one object the markup reads. The main members:
 | Scrolling | `scrollToRow`, `scrollToColumn`, `keepRendered` |
 
 A `RenderedColumn` carries `cellProps` and `headerProps`: one frozen object per column with its
-`data-tc-column`, pin, alignment and geometry, shared by every row. That sharing is what lets a
+`data-dg-column`, pin, alignment and geometry, shared by every row. That sharing is what lets a
 thousand cells of a column cost Vue one comparison each.
 
 ## The column state
@@ -85,7 +85,7 @@ and can keep them between visits. Create one yourself to share it between two ta
 in a store:
 
 ```ts
-import { localStorageStore, useTableColumnsState } from 'vue-data-grid';
+import { localStorageStore, useTableColumnsState } from '@vue-data-grid/core';
 
 const state = useTableColumnsState({
 	sort: [{ name: 'created', direction: 'desc' }],
@@ -106,7 +106,7 @@ after mount, writes every change, and follows writes from other tabs. The stores
 object with `read`, `write` and, to follow other writers, `subscribe`.
 
 ```ts
-import { localStorageStore, usePersistedState } from 'vue-data-grid';
+import { localStorageStore, usePersistedState } from '@vue-data-grid/core';
 
 const density = ref<'comfortable' | 'compact'>('comfortable');
 
@@ -138,7 +138,7 @@ no change touched stays the same object, which keeps its row from rendering and 
 re-sort only what moved.
 
 ```ts
-import { useRowStream } from 'vue-data-grid';
+import { useRowStream } from '@vue-data-grid/core';
 
 const stream = useRowStream({ rows: initial, rowKey: 'id' });
 
@@ -183,7 +183,7 @@ and keeps each change for a moment with its direction. It is reactive per row: a
 the row it is in.
 
 ```ts
-import { useCellChanges, useDataTable } from 'vue-data-grid';
+import { useCellChanges, useDataTable } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	price: column(stock => stock.price, {
@@ -202,7 +202,7 @@ The cells read `changes` when they render, after setup, so it may be declared af
 ### Text in and out
 
 ```ts
-import { parseDelimited, toCsv } from 'vue-data-grid';
+import { parseDelimited, toCsv } from '@vue-data-grid/core';
 
 const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
 const csv = toCsv({ columns: shown, rows: table.rows.value });
@@ -225,7 +225,7 @@ for CSS or layers of your own:
 | `getGrowVariable(name)` | the variable of its grow factor |
 | `getPinVariable(side, name)` | the variable of its pin offset |
 | `getInsetVariable(side)` | the variable of an inset's width |
-| `getColumnCellSelector(name)` | the cells of a column, by `data-tc-column` |
+| `getColumnCellSelector(name)` | the cells of a column, by `data-dg-column` |
 | `getColumnSelector(name)` | the cells and the group cells over them |
 | `compileCellStyle`, `compileGroupStyle`, `getFlexSpacerStyle`, `FLEX_CELL_STYLES` | the default styles, for a `cellStyles` of your own |
 
@@ -234,20 +234,20 @@ render of any row.
 
 ## Internals
 
-`@vue-data-grid/core/internals` exposes the building blocks `useTableEngine` is made of: column
+`@vue-data-grid/engine/internals` exposes the building blocks `useTableEngine` is made of: column
 reconciliation, the row and column windows, the stream queue, incremental sorting, `stableComputed`.
 It is for building an engine of your own, and it is **not covered by semver**: its signatures change
 with the engine, in minor releases too. Import it from the core package, added to your dependencies:
 
 ```ts
-import { reconcileColumns, useVirtualRows } from '@vue-data-grid/core/internals';
+import { reconcileColumns, useVirtualRows } from '@vue-data-grid/engine/internals';
 ```
 
-Nothing of the stable API is repeated there, and nothing there is re-exported by `vue-data-grid`.
+Nothing of the stable API is repeated there, and nothing there is re-exported by `@vue-data-grid/core`.
 
 ## Animation engines
 
-`vue-data-grid` also re-exports `@vue-data-grid/flip`, the engines its motion plays with:
+`@vue-data-grid/core` also re-exports `@vue-data-grid/flip`, the engines its motion plays with:
 `webAnimations`, `defineMotionEngine`, `captureLayout`, `playMotion`, `slide`, `fadeIn`, `fadeOut`.
 The [Animation](/guides/animation) guide and [useTableMotion](/composables/use-table-motion) show them
 at work, with GSAP and Motion too.

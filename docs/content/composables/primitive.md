@@ -50,10 +50,10 @@ development build warns when there is none. `TableCells` and `TableRangeOverlay`
 ## Usage
 
 A part in the manner of the built-in ones: it takes `as` and `asChild`, renders one element with a
-`data-tc-part`, and gives its slot what it knows.
+`data-dg-part`, and gives its slot what it knows.
 
 ```ts
-import { primitiveProps, renderPrimitive, useDataTableContext } from 'vue-data-grid';
+import { primitiveProps, renderPrimitive, useDataTableContext } from '@vue-data-grid/core';
 import { defineComponent, type SlotsType, type VNodeChild } from 'vue';
 
 export const TableSelectedCount = defineComponent({
@@ -69,7 +69,7 @@ export const TableSelectedCount = defineComponent({
 		return () => {
 			const count = table.selection?.selectedCount.value ?? 0;
 
-			return renderPrimitive(props, { 'data-tc-part': 'selected-count' }, () => (
+			return renderPrimitive(props, { 'data-dg-part': 'selected-count' }, () => (
 				slots.default ? slots.default({ count }) : `${count} selected`
 			));
 		};
@@ -99,7 +99,7 @@ whether the part renders an element, a component through `as`, or a child throug
 const element = shallowRef<HTMLElement | null>(null);
 const elementRef = forwardElement(element);
 
-return () => renderPrimitive(props, { ref: elementRef, 'data-tc-part': 'toolbar' }, () => slots.default?.());
+return () => renderPrimitive(props, { ref: elementRef, 'data-dg-part': 'toolbar' }, () => slots.default?.());
 ```
 
 Make the ref once in `setup`: a new function on every render makes Vue set the ref to `null` and back

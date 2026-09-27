@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useBodyRowContext } from 'vue-data-grid';
+import { useBodyRowContext } from '@vue-data-grid/core';
 import { computed } from 'vue';
 
 import type { Person } from '@/data/people';

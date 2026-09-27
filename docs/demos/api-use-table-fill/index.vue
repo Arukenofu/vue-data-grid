@@ -10,7 +10,7 @@ import {
 	numberField,
 	ranges,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import { shallowRef } from 'vue';
 
 import { UiButton, UiDataTable, UiSwitch, UiToolbar } from '@/ui';

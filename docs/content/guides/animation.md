@@ -19,7 +19,7 @@ engine differs: open the code and compare `gsap.ts`, `motion.ts` and `anime.ts`,
 ## One line to turn it on
 
 ```ts
-import { useDataTable, useTableMotion } from 'vue-data-grid';
+import { useDataTable, useTableMotion } from '@vue-data-grid/core';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 
@@ -92,7 +92,7 @@ An engine is the part that decides how movement looks. The default is `webAnimat
 browser's Web Animations API, with no dependency:
 
 ```ts
-import { useTableMotion, webAnimations } from 'vue-data-grid';
+import { useTableMotion, webAnimations } from '@vue-data-grid/core';
 
 useTableMotion(table, {
 	engine: webAnimations({ duration: 320, easing: 'cubic-bezier(0.2, 0, 0, 1)', fade: true }),
@@ -108,7 +108,7 @@ useTableMotion(table, {
 from where it was drawn, and every function gets its `index` among the others, for a stagger:
 
 ```ts
-import { defineMotionEngine, fadeIn, slide } from 'vue-data-grid';
+import { defineMotionEngine, fadeIn, slide } from '@vue-data-grid/core';
 
 const cascade = defineMotionEngine({
 	move: (move, index) => slide(move, { duration: 300, delay: index * 20 }),
@@ -131,7 +131,7 @@ GSAP tweens are thenable, so they fit as they are. `gsap.from` plays the element
 to where it already stands, and `clearProps` leaves its styles as they were:
 
 ```ts
-import { defineMotionEngine } from 'vue-data-grid';
+import { defineMotionEngine } from '@vue-data-grid/core';
 import { gsap } from 'gsap';
 
 export const gsapEngine = defineMotionEngine({
@@ -155,7 +155,7 @@ export const gsapEngine = defineMotionEngine({
 for free:
 
 ```ts
-import { defineMotionEngine } from 'vue-data-grid';
+import { defineMotionEngine } from '@vue-data-grid/core';
 import { animate } from 'motion';
 
 export const motionEngine = defineMotionEngine({
@@ -176,7 +176,7 @@ export const motionEngine = defineMotionEngine({
 inline styles it wrote, so a row is left exactly as the table drew it:
 
 ```ts
-import { defineMotionEngine } from 'vue-data-grid';
+import { defineMotionEngine } from '@vue-data-grid/core';
 import { animate, type JSAnimation } from 'animejs';
 
 function clear(animation: JSAnimation) {
@@ -212,7 +212,7 @@ transition says what changed, `kind` and `context`, and lists the `moves`, `ente
 That makes an engine a good place to decide, such as animating the rows but not the columns:
 
 ```ts
-import type { MotionEngine } from 'vue-data-grid';
+import type { MotionEngine } from '@vue-data-grid/core';
 
 const rowsOnly: MotionEngine = transition => (transition.kind === 'rows' ? gsapEngine(transition) : undefined);
 ```
@@ -229,7 +229,7 @@ element: measure its height before the change, let Vue render, measure again, an
 difference with the selected engine.
 
 ```ts
-import { prefersReducedMotion } from 'vue-data-grid';
+import { prefersReducedMotion } from '@vue-data-grid/core';
 import { nextTick, watch } from 'vue';
 
 watch(() => table.totalSize.value, async () => {

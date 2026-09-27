@@ -7,7 +7,7 @@ import {
 	useDataTable,
 	useTableMotion,
 	webAnimations,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconArrowDownWideNarrow from '~icons/lucide/arrow-down-wide-narrow';
 import IconArrowLeftRight from '~icons/lucide/arrow-left-right';
 import IconMoveHorizontal from '~icons/lucide/move-horizontal';

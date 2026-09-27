@@ -76,8 +76,8 @@ table.scope.getPin('email');
 ```
 
 A column that is not `pinnable` stays where it was declared. Pinned cells get
-`data-tc-pinned="start"` or `"end"`; the structural styles make them opaque and draw a line at their
-inner edge, and `--tc-pinned-background` sets their background.
+`data-dg-pinned="start"` or `"end"`; the structural styles make them opaque and draw a line at their
+inner edge, and `--dg-pinned-background` sets their background.
 
 ## Hiding and showing
 
@@ -128,7 +128,7 @@ column still works: the new column takes its declared place, next to the column 
 Give the table a store, and the layout and the sort survive a reload:
 
 ```ts
-import { localStorageStore } from 'vue-data-grid';
+import { localStorageStore } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -155,7 +155,7 @@ store is any object with `read` and `write`, and optionally `subscribe`, so the 
 your server:
 
 ```ts
-import type { PersistStore } from 'vue-data-grid';
+import type { PersistStore } from '@vue-data-grid/core';
 
 const serverStore: PersistStore = {
 	read: () => fetch('/api/layouts/orders').then(response => response.json()),

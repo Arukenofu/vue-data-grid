@@ -26,7 +26,7 @@ Vue, and this library follows it in almost every way a part can be built:
 - **Context you can reach.** Parts share state through provide and inject, and the helpers are
   exported, `useDataTableContext`, `useBodyRowContext` and the rest, so a part of your own can stand
   in for any built-in one.
-- **State as data attributes.** `data-state` in Reka UI, `data-tc-state` here: one attribute that
+- **State as data attributes.** `data-state` in Reka UI, `data-dg-state` here: one attribute that
   says what an interactive part is doing, for CSS to read.
 - **Accessibility as the default,** by the WAI-ARIA Authoring Practices, with the keys of every part
   written down.
@@ -62,7 +62,7 @@ yours from the first line.
 [TanStack Table](https://tanstack.com/table) made headless tables mainstream, and showed how far a
 table's logic can go without any markup:
 
-- **Headless logic.** The core of this library, `@vue-data-grid/core`, holds no markup at all, as
+- **Headless logic.** The core of this library, `@vue-data-grid/engine`, holds no markup at all, as
   TanStack Table holds none: columns, rows, sorting, grouping and windows are data and functions.
 - **Features as plugins.** TanStack Table's row models are opted into one by one; features here are
   functions passed to `useDataTable`, and what is not used is not bundled.

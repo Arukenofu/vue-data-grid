@@ -18,7 +18,7 @@ import {
 	TableSelectionCheckbox,
 	TableSortIndicator,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconArrowDown from '~icons/lucide/arrow-down';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconCheck from '~icons/lucide/check';
@@ -83,7 +83,7 @@ const table = useDataTable({
 						</TableSelectionCheckbox>
 						<template v-else-if="column.name === 'name'">
 							<PresenceDot />
-							<span data-tc-part="cell-text">{{ value }}</span>
+							<span data-dg-part="cell-text">{{ value }}</span>
 						</template>
 					</TableCells>
 				</TableRow>

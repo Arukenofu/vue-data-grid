@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { moveRow } from 'vue-data-grid';
-import { TableDropZone } from 'vue-data-grid/drag-and-drop';
+import { moveRow } from '@vue-data-grid/core';
+import { TableDropZone } from '@vue-data-grid/core/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
 import IconArchiveRestore from '~icons/lucide/archive-restore';
 import { computed, shallowRef } from 'vue';
@@ -137,13 +137,13 @@ function restore() {
 	height: 18px;
 }
 
-.board-bin[data-tc-state='ready'] {
+.board-bin[data-dg-state='ready'] {
 	border-color: var(--ui-warn);
 	background: var(--ui-warn-soft);
 	color: var(--ui-warn);
 }
 
-.board-bin[data-tc-state='over'] {
+.board-bin[data-dg-state='over'] {
 	border-style: solid;
 	border-color: var(--ui-down);
 	background: var(--ui-down-soft);

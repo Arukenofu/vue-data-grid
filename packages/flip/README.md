@@ -2,7 +2,7 @@
 
 Pluggable FLIP transitions. A list changes the DOM, measures what moved, came and went, and hands
 it to an **engine**, a plain function, that decides how it looks: the Web Animations API, GSAP,
-anime.js, Motion, CSS classes, or nothing. It is what `vue-data-grid` and
+anime.js, Motion, CSS classes, or nothing. It is what `@vue-data-grid/core` and
 `@vue-data-grid/drag-and-drop` animate with, and both re-export it.
 
 ```sh

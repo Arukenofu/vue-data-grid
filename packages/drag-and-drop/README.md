@@ -11,7 +11,7 @@ pnpm add @vue-data-grid/drag-and-drop vue
 
 Vue 3.5 or later is a peer dependency; Vapor components of Vue 3.6 are supported (see
 [Vapor](#vue-36-vapor)). The package is ESM-only and free of side effects, and depends only on
-`@vue-data-grid/flip`, the engines of its movement, not on `@vue-data-grid/core`.
+`@vue-data-grid/flip`, the engines of its movement, not on `@vue-data-grid/engine`.
 
 ## A sortable list
 
@@ -174,7 +174,7 @@ The list positions the items of the gap, the line and the ghost by `translate`: 
 them by `transform`, or layers over `translate` with `composite: 'add'`, as `webAnimations()`
 does; a `transition` stays yours. Under a virtual window an item that mounts in the middle of a
 gesture takes its place at once. An element is in one transition at a time: a new change of it
-cuts the running one short, whoever started it, `vue-data-grid` included, and carries on from
+cuts the running one short, whoever started it, `@vue-data-grid/core` included, and carries on from
 where the element is drawn.
 
 While a landing ghost flies, its item has `[data-drag-landing]`: for a ghost that looks like the item, hide
@@ -232,7 +232,7 @@ useDragList({
 ```
 
 `autoScroll: false` scrolls nothing. The settings are those of `useAutoScroll` in
-`vue-data-grid`, for gestures of your own.
+`@vue-data-grid/core`, for gestures of your own.
 
 `handle`, `ignore`, `touchDelay`, `keyboard`, `stepKeys` and `announcements` may be refs or
 getters, as `indicator`, `group`, `bounds` and `settle` may, and `motion` a ref: each is read when
@@ -327,7 +327,7 @@ Templates keep `v-drag-item="{ list, key }"`, and `useDragList` and the rest wor
 components. `useDragPreviewRenderer` renders Vue content into the ghost for components with a
 virtual DOM only: in a Vapor component, fill the ghost in `preview.render` yourself.
 
-## With `@vue-data-grid/core`
+## With `@vue-data-grid/engine`
 
 Columns: `index` of the drop means what `scope.moveColumnTo(name, index)` expects.
 

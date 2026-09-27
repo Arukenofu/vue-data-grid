@@ -23,7 +23,7 @@ Start the drag from a press on a cell; the rest follows the pointer on the windo
 released.
 
 ```ts
-import { readGridPosition, useCellDrag } from 'vue-data-grid';
+import { readGridPosition, useCellDrag } from '@vue-data-grid/core';
 
 const drag = useCellDrag(table, {
 	getColumns: () => ['name', 'role', 'team'],
@@ -32,7 +32,7 @@ const drag = useCellDrag(table, {
 });
 
 function onPointerdown(event: PointerEvent) {
-	const element = event.target instanceof Element ? event.target.closest('[data-tc-column]') : null;
+	const element = event.target instanceof Element ? event.target.closest('[data-dg-column]') : null;
 	const position = element ? readGridPosition(element) : null;
 
 	if (position?.section === 'body') {

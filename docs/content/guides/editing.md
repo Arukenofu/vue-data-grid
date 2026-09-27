@@ -47,7 +47,7 @@ The table never touches your data. It hands you a **commit** and you decide what
 it into your rows, send it to a server, or both. That is the `editing` feature:
 
 ```ts
-import { editing, navigation, ranges, useDataTable } from 'vue-data-grid';
+import { editing, navigation, ranges, useDataTable } from '@vue-data-grid/core';
 
 const rows = shallowRef(products);
 
@@ -114,7 +114,7 @@ An editor is a function of its context that renders the element to type in. Spre
 error state.
 
 ```ts
-import type { CellEditor } from 'vue-data-grid';
+import type { CellEditor } from '@vue-data-grid/core';
 
 const colorEditor: CellEditor<Label, string> = context => h('input', {
 	...context.inputProps,
@@ -204,7 +204,7 @@ down, up or sideways, and the new cells continue the range: numbers as a series,
 <kbd>Ctrl</kbd>+<kbd>D</kbd> and <kbd>Ctrl</kbd>+<kbd>R</kbd> fill down and right from the keyboard.
 
 ```ts
-import { editing, fill, navigation, ranges } from 'vue-data-grid';
+import { editing, fill, navigation, ranges } from '@vue-data-grid/core';
 
 features: {
 	navigation: navigation(),
@@ -236,7 +236,7 @@ A fill needs both `ranges` and `editing`, and TypeScript says so when one is mis
 The `history` feature keeps the commits as steps:
 
 ```ts
-import { history } from 'vue-data-grid';
+import { history } from '@vue-data-grid/core';
 
 features: {
 	editing: editing<Product>({ onCommit }),

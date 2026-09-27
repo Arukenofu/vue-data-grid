@@ -5,8 +5,8 @@ import { demoPlugin } from './demo-plugin.ts';
 import { nav, sidebar } from './sidebar.ts';
 
 export default defineConfig({
-	title: 'Vue Stack Table',
-	titleTemplate: ':title · Vue Stack Table',
+	title: 'Vue Data Grid',
+	titleTemplate: ':title · Vue Data Grid',
 	description: 'Headless, accessible and fast tables for Vue 3, assembled from small parts.',
 	srcDir: 'content',
 	cleanUrls: true,
@@ -25,7 +25,7 @@ export default defineConfig({
 	},
 	themeConfig: {
 		logo: '/logo.svg',
-		siteTitle: 'Vue Stack',
+		siteTitle: 'Vue Data Grid',
 		nav,
 		sidebar,
 		outline: { level: [2, 3], label: 'On this page' },

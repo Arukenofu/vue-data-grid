@@ -1,4 +1,4 @@
-import { useRowStream } from 'vue-data-grid';
+import { useRowStream } from '@vue-data-grid/core';
 import { onBeforeUnmount, onMounted, type Ref, shallowRef, watch } from 'vue';
 
 import { createRandom } from '@/data/random';

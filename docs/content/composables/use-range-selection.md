@@ -22,7 +22,7 @@ The `ranges` feature is `useCellRanges` of the core with these gestures on top. 
 tables need:
 
 ```ts
-import { navigation, ranges, useDataTable } from 'vue-data-grid';
+import { navigation, ranges, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -48,7 +48,7 @@ const table = useDataTable({
 Call it yourself to put the gestures over a model of your own, or over a table of your own markup:
 
 ```ts
-import { useCellRanges, useRangeSelection } from 'vue-data-grid';
+import { useCellRanges, useRangeSelection } from '@vue-data-grid/core';
 
 const cellRanges = useCellRanges(table.scope, { corners: 'index' });
 

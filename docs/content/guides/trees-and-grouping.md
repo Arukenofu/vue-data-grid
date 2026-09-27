@@ -41,7 +41,7 @@ is a group.
 indent for the row's level and a toggle for a group, then the column's own content:
 
 ```ts
-import { tree, treeColumn } from 'vue-data-grid';
+import { tree, treeColumn } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	name: treeColumn(column(member => member.name, { label: 'Name', width: 240 })),
@@ -50,7 +50,7 @@ const columns = defineColumns({
 ```
 
 The toggle is a `TableTreeToggle`. A leaf gets an empty space of the same width, so names line up
-across levels. The indent is `--tc-tree-indent` per level, `16px` by default. To place the toggle
+across levels. The indent is `--dg-tree-indent` per level, `16px` by default. To place the toggle
 yourself, put a `TableTreeToggle` in a `cell` of your own; it finds its row in the `TableRow` it is in.
 
 ## Expanding and collapsing
@@ -162,7 +162,7 @@ margin: amount(row => (row.revenue - row.cost) / row.revenue, {
 - A table with a tree has `role="treegrid"`. Every row carries `aria-level`, `aria-posinset` and
   `aria-setsize`, so a screen reader says "level 2, 3 of 4", and a group row carries `aria-expanded`.
 - The toggle is a button named "Expand" or "Collapse", from the table's messages, with
-  `data-tc-state` of `expanded` or `collapsed`.
+  `data-dg-state` of `expanded` or `collapsed`.
 - With the `navigation` feature the arrow keys open and close groups in the tree column, as the
   treegrid pattern asks.
 - With the `selection` feature, selecting a group selects every leaf under it, and a group with some of

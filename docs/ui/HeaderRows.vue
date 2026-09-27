@@ -6,7 +6,7 @@
 	sorts, Alt+arrows move, Shift+arrows resize.
 -->
 <script setup lang="ts">
-import { type TableProps, useColumnResize, useHeaderCell, useTableScopeContext } from 'vue-data-grid';
+import { type TableProps, useColumnResize, useHeaderCell, useTableScopeContext } from '@vue-data-grid/core';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
 
@@ -27,13 +27,13 @@ const resize = useColumnResize(scope);
 	<div v-for="(cells, level) in headerGroups" :key="`level-${level}`" v-bind="tableProps.getGroupRowProps(level)">
 		<div v-for="cell in cells" :key="cell.key" v-bind="tableProps.getGroupCellProps(cell)">
 			<template v-if="cell.group">
-				<span data-tc-part="cell-text">{{ cell.group.label ?? cell.group.name }}</span>
+				<span data-dg-part="cell-text">{{ cell.group.label ?? cell.group.name }}</span>
 				<button
 					v-if="cell.collapsible"
 					type="button"
 					class="ui-cell-button"
-					data-tc-part="group-toggle"
-					:data-tc-state="cell.collapsed ? 'collapsed' : 'expanded'"
+					data-dg-part="group-toggle"
+					:data-dg-state="cell.collapsed ? 'collapsed' : 'expanded'"
 					:aria-expanded="!cell.collapsed"
 					:aria-label="cell.collapsed ? 'Expand the group' : 'Collapse the group'"
 					@click="scope.toggleGroup(cell.group.name)"
@@ -52,11 +52,11 @@ const resize = useColumnResize(scope);
 				v-bind="{ ...tableProps.getHeaderCellProps(item), ...header.getHandlers(item.column.name) }"
 				:class="{ 'is-sortable': item.column.sortable }"
 			>
-				<span data-tc-part="cell-text">{{ item.column.label ?? item.column.name }}</span>
+				<span data-dg-part="cell-text">{{ item.column.label ?? item.column.name }}</span>
 				<span
 					v-if="item.column.sortable"
-					data-tc-part="sort-indicator"
-					:data-tc-state="scope.getSortDirection(item.column.name) ?? 'none'"
+					data-dg-part="sort-indicator"
+					:data-dg-state="scope.getSortDirection(item.column.name) ?? 'none'"
 					aria-hidden="true"
 				>
 					<SortIcon

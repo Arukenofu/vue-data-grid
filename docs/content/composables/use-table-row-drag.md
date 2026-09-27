@@ -22,11 +22,11 @@ the dragged one would land.
 Import it from the `drag-and-drop` entry, which needs `@vue-data-grid/drag-and-drop` installed next to the
 table:
 
-<InstallTabs packages="vue-data-grid @vue-data-grid/drag-and-drop" />
+<InstallTabs packages="@vue-data-grid/core @vue-data-grid/drag-and-drop" />
 
 ```ts
-import { moveRow } from 'vue-data-grid';
-import { dragHandleColumn, useTableRowDrag } from 'vue-data-grid/drag-and-drop';
+import { moveRow } from '@vue-data-grid/core';
+import { dragHandleColumn, useTableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
@@ -87,7 +87,7 @@ Call it in the component that renders the table: the rows below register themsel
 		{ name: 'setPreview', type: '(render, options?) => () => void', description: 'Fills the ghost under the pointer, as `TableDragPreview` does.' },
 		{ name: 'describedBy', type: 'string | undefined', description: 'The id of the hidden keyboard instructions, for `aria-describedby` of a handle.' },
 		{ name: 'register', type: '(element: HTMLElement, key: string) => () => void', description: 'Connects the element of a row; `TableRow` calls it.' },
-		{ name: 'getItemProps', type: '(key: string, row?: unknown) => Props', description: 'The attributes of a row: `data-tc-draggable` while it may be dragged.' },
+		{ name: 'getItemProps', type: '(key: string, row?: unknown) => Props', description: 'The attributes of a row: `data-dg-draggable` while it may be dragged.' },
 	]"
 />
 

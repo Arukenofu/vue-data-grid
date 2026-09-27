@@ -29,8 +29,8 @@ tables, with a pointer, a finger or the keyboard.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableCells, TableRow } from 'vue-data-grid';
-import { TableDragHandle, TableDragPreview, TableRowDrag } from 'vue-data-grid/drag-and-drop';
+import { TableBody, TableCells, TableRow } from '@vue-data-grid/core';
+import { TableDragHandle, TableDragPreview, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
@@ -47,10 +47,10 @@ import { TableDragHandle, TableDragPreview, TableRowDrag } from 'vue-data-grid/d
 </template>
 ```
 
-Dragging lives in the subpath `vue-data-grid/drag-and-drop`, over the optional peer
+Dragging lives in the subpath `@vue-data-grid/core/drag-and-drop`, over the optional peer
 `@vue-data-grid/drag-and-drop`. Install it next to the table:
 
-<InstallTabs packages="vue-data-grid @vue-data-grid/drag-and-drop" />
+<InstallTabs packages="@vue-data-grid/core @vue-data-grid/drag-and-drop" />
 
 `TableRowDrag` renders no element: put it around the `TableBody`, inside the `TableRoot`. The rows
 under it register themselves, and a [`TableDragPreview`](/components/drag-preview) inside it is the
@@ -103,13 +103,13 @@ While a row is dragged the elements carry the attributes of `@vue-data-grid/drag
 		{ attribute: '[data-drag-source]', values: 'The row being dragged: it stays in place, faded, or stands in the gap.' },
 		{ attribute: '[data-drop-target]', values: ['before', 'after', 'inside'] },
 		{ attribute: '[data-drop-indicator]', values: ['before', 'after', 'inside'] },
-		{ attribute: '[data-tc-draggable]', values: 'On a row while it can be dragged; `steps` when Alt with the arrows moves it too.' },
+		{ attribute: '[data-dg-draggable]', values: 'On a row while it can be dragged; `steps` when Alt with the arrows moves it too.' },
 	]"
 />
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-drop-color', default: 'Highlight', description: 'The line of the place a row goes to, and the outline of a row it goes inside.' },
+		{ name: '--dg-drop-color', default: 'Highlight', description: 'The line of the place a row goes to, and the outline of a row it goes inside.' },
 		{ name: '--drop-level', description: 'Set on the line and the target: the level of the place in a tree, which indents the line.' },
 	]"
 />
@@ -136,9 +136,9 @@ the row drag, with the keyboard too. The row is its `row` prop, else the `TableR
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['drag-handle'] },
-		{ attribute: '[data-tc-state]', values: ['dragging', 'idle'] },
-		{ attribute: '[data-tc-disabled]', values: 'Present while its row may not be dragged.' },
+		{ attribute: '[data-dg-part]', values: ['drag-handle'] },
+		{ attribute: '[data-dg-state]', values: ['dragging', 'idle'] },
+		{ attribute: '[data-dg-disabled]', values: 'Present while its row may not be dragged.' },
 	]"
 />
 
@@ -150,8 +150,8 @@ The event says where the row goes; `moveRow` returns your rows with it moved, ev
 same object:
 
 ```ts
-import { moveRow } from 'vue-data-grid';
-import type { TableRowDropEvent } from 'vue-data-grid/drag-and-drop';
+import { moveRow } from '@vue-data-grid/core';
+import type { TableRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 
 function drop({ key, index }: TableRowDropEvent<unknown>) {
 	const row = rows.value.find(track => track.id === key);

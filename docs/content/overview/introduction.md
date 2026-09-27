@@ -6,7 +6,7 @@ description: Headless, accessible and fast tables for Vue 3, assembled from smal
 # Introduction
 
 <Description>
-Vue Stack Table is a headless table library for Vue 3. You compose a table from small parts, style it
+Vue Data Grid is a headless table library for Vue 3. You compose a table from small parts, style it
 with your own CSS, and add behaviour one feature at a time, while the library takes care of the
 things that are hard to get right: keyboard, accessibility, virtualization and stable rendering.
 </Description>
@@ -30,7 +30,7 @@ is done, as with a grid; and every piece of it can be used, restyled or replaced
 
 ### Headless, not markup-less
 
-The parts render plain elements, one each, with `data-tc-*` attributes that say what they are and
+The parts render plain elements, one each, with `data-dg-*` attributes that say what they are and
 what state they are in. There is no theme to fight: a small structural stylesheet makes the table
 work, and everything you see comes from your own CSS. See [Styling](/overview/styling).
 
@@ -61,7 +61,7 @@ callback. You write `defineColumn<Invoice>()` once and never a generic again.
 
 ## Three levels of API
 
-Everything in `vue-data-grid` is public, in three levels, each built on the one below:
+Everything in `@vue-data-grid/core` is public, in three levels, each built on the one below:
 
 | Level | What it is | Use it when |
 | --- | --- | --- |
@@ -74,15 +74,15 @@ you can import, so dropping a level never means losing a capability.
 
 ## The packages
 
-You install one package, `vue-data-grid`. It re-exports two others, so you import everything from
+You install one package, `@vue-data-grid/core`. It re-exports two others, so you import everything from
 one place:
 
-- **`@vue-data-grid/core`**: the headless core. The column model, the row pipeline, the row and
+- **`@vue-data-grid/engine`**: the headless core. The column model, the row pipeline, the row and
   column windows, geometry as CSS variables. It knows nothing about markup.
 - **`@vue-data-grid/flip`**: the animation engines that move rows and columns, and the contract that lets
   you bring GSAP, Motion or anything else.
 
-Dragging rows and columns lives in a separate entry, `vue-data-grid/drag-and-drop`, on top of the
+Dragging rows and columns lives in a separate entry, `@vue-data-grid/core/drag-and-drop`, on top of the
 optional peer `@vue-data-grid/drag-and-drop`, so a table that does not drag does not carry it.
 
 ## What is in the box

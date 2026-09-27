@@ -22,7 +22,7 @@ Cell ranges are the `ranges` feature. It works best with `navigation`, which giv
 focused cell to start from, as the active cell of a spreadsheet:
 
 ```ts
-import { navigation, ranges, useDataTable } from 'vue-data-grid';
+import { navigation, ranges, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,
@@ -123,7 +123,7 @@ const summary = computed(() => {
 The `clipboard` feature owns the `copy`, `cut` and `paste` events of the table:
 
 ```ts
-import { clipboard, navigation, ranges, useDataTable } from 'vue-data-grid';
+import { clipboard, navigation, ranges, useDataTable } from '@vue-data-grid/core';
 
 const withHeaders = shallowRef(false);
 
@@ -167,7 +167,7 @@ editor among them, keep the clipboard to themselves.
 order mark Excel needs to read UTF-8:
 
 ```ts
-import { downloadCsv, toCsv } from 'vue-data-grid';
+import { downloadCsv, toCsv } from '@vue-data-grid/core';
 
 function download() {
 	const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));

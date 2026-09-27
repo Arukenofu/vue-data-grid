@@ -1,4 +1,4 @@
-import { defineMotionEngine } from 'vue-data-grid';
+import { defineMotionEngine } from '@vue-data-grid/core';
 import { animate, type JSAnimation } from 'animejs';
 
 import type { HeightMotion } from './height';

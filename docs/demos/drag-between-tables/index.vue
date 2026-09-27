@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, moveRow, useDataTable, useTableMotion } from 'vue-data-grid';
-import { TableDropZone, type TableDropZoneEvent, type TableRowDropEvent } from 'vue-data-grid/drag-and-drop';
+import { defineColumn, defineColumns, moveRow, useDataTable, useTableMotion } from '@vue-data-grid/core';
+import { TableDropZone, type TableDropZoneEvent, type TableRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
 import { computed, h, shallowRef } from 'vue';
 
@@ -107,12 +107,12 @@ const archiveText = computed(() => (archived.value.length === 0
 	transition: border-color 0.15s, background-color 0.15s, color 0.15s;
 }
 
-.bin[data-tc-state='ready'] {
+.bin[data-dg-state='ready'] {
 	border-color: var(--ui-accent);
 	color: var(--ui-accent-text);
 }
 
-.bin[data-tc-state='over'] {
+.bin[data-dg-state='over'] {
 	border-style: solid;
 	border-color: var(--ui-accent);
 	background: var(--ui-accent-soft);

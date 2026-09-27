@@ -3,7 +3,7 @@ import IconArrowRight from '~icons/lucide/arrow-right';
 
 import CopyButton from '../components/CopyButton.vue';
 
-const INSTALL = 'pnpm add vue-data-grid';
+const INSTALL = 'pnpm add @vue-data-grid/core';
 </script>
 
 <template>

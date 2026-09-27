@@ -10,7 +10,7 @@ import {
 	TableRow,
 	type TableSort,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconLoaderCircle from '~icons/lucide/loader-circle';
 import IconSearchX from '~icons/lucide/search-x';
 import { onMounted, shallowRef, watch } from 'vue';

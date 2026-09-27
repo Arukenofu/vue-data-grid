@@ -22,7 +22,7 @@ Selection is the `selection` feature, and the checkboxes come with `selectionCol
 column:
 
 ```ts
-import { selection, selectionColumn, useDataTable } from 'vue-data-grid';
+import { selection, selectionColumn, useDataTable } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	select: selectionColumn(),
@@ -160,8 +160,8 @@ when all its leaves are, and partly checked when some are. The model holds leave
 ## Styling
 
 Selected rows get `aria-selected="true"`, and the structural styles tint their cells with
-`--tc-selected-background`. The checkboxes carry `data-tc-part="selection-checkbox"` and
-`data-tc-state` of `checked`, `unchecked` or `indeterminate`, with `data-tc-disabled` on a row that
+`--dg-selected-background`. The checkboxes carry `data-dg-part="selection-checkbox"` and
+`data-dg-state` of `checked`, `unchecked` or `indeterminate`, with `data-dg-disabled` on a row that
 cannot be selected.
 
 ## Accessibility

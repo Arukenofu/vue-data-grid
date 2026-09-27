@@ -9,8 +9,8 @@ import {
 	TableRow,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
-import { type DragIndicator, TableColumnDrag, TableDragPreview } from 'vue-data-grid/drag-and-drop';
+} from '@vue-data-grid/core';
+import { type DragIndicator, TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
 import IconColumns from '~icons/lucide/columns-3';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import { computed, shallowRef } from 'vue';
@@ -90,7 +90,7 @@ const order = computed(() => table.scope.columns.value.map(item => item.column?.
 </template>
 
 <style scoped>
-.ui-stack :deep([role='columnheader'][data-tc-draggable]) {
+.ui-stack :deep([role='columnheader'][data-dg-draggable]) {
 	cursor: grab;
 }
 

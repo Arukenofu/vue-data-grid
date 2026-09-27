@@ -28,8 +28,8 @@ moves the column itself, and the layout remembers it.
 
 ```vue
 <script setup lang="ts">
-import { TableHeader, TableHeaderCell, TableHeaderRow } from 'vue-data-grid';
-import { TableColumnDrag, TableDragPreview } from 'vue-data-grid/drag-and-drop';
+import { TableHeader, TableHeaderCell, TableHeaderRow } from '@vue-data-grid/core';
+import { TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
@@ -91,7 +91,7 @@ const columns = defineColumns({
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-draggable]', values: 'On a header cell while its column can be dragged.' },
+		{ attribute: '[data-dg-draggable]', values: 'On a header cell while its column can be dragged.' },
 		{ attribute: '[data-drag-source]', values: 'The header being dragged.' },
 		{ attribute: '[data-drop-target]', values: ['before', 'after'] },
 		{ attribute: '[data-drop-indicator]', values: ['before', 'after'] },
@@ -100,7 +100,7 @@ const columns = defineColumns({
 
 <CssVariablesTable
 	:data="[
-		{ name: '--tc-drop-color', default: 'Highlight', description: 'The upright line between the headers of `indicator: \'line\'`.' },
+		{ name: '--dg-drop-color', default: 'Highlight', description: 'The upright line between the headers of `indicator: \'line\'`.' },
 	]"
 />
 
@@ -112,7 +112,7 @@ The gap already shows the columns at their new places while the header is dragge
 indicator, or with the keys, the columns jump on the drop; `useTableMotion` slides them there:
 
 ```ts
-import { useTableMotion } from 'vue-data-grid';
+import { useTableMotion } from '@vue-data-grid/core';
 
 useTableMotion(table);
 ```
@@ -123,7 +123,7 @@ The order is `order` of the layout in the column state, next to widths, pins and
 it back with `reset`, or keep it between visits with `persist`:
 
 ```ts
-import { localStorageStore, useDataTable } from 'vue-data-grid';
+import { localStorageStore, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({
 	columns,

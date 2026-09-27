@@ -28,7 +28,7 @@ default, or the checkbox of your own design system.
 
 ```vue
 <script setup lang="ts">
-import { TableSelectAllCheckbox, TableSelectionCheckbox } from 'vue-data-grid';
+import { TableSelectAllCheckbox, TableSelectionCheckbox } from '@vue-data-grid/core';
 </script>
 
 <template>
@@ -43,7 +43,7 @@ and a row's box in each cell. Place them yourself when you want them anywhere el
 look.
 
 ```ts
-import { selection, selectionColumn, useDataTable } from 'vue-data-grid';
+import { selection, selectionColumn, useDataTable } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	select: selectionColumn(),
@@ -77,9 +77,9 @@ row toggled last. The row is its `row` prop, else the `TableRow` around it.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['selection-checkbox'] },
-		{ attribute: '[data-tc-state]', values: ['checked', 'unchecked', 'indeterminate'] },
-		{ attribute: '[data-tc-disabled]', values: 'Present while the selection refuses the row.' },
+		{ attribute: '[data-dg-part]', values: ['selection-checkbox'] },
+		{ attribute: '[data-dg-state]', values: ['checked', 'unchecked', 'indeterminate'] },
+		{ attribute: '[data-dg-disabled]', values: 'Present while the selection refuses the row.' },
 	]"
 />
 
@@ -104,9 +104,9 @@ some are. It is disabled in the `'single'` selection mode.
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-tc-part]', values: ['selection-checkbox'] },
-		{ attribute: '[data-tc-state]', values: ['checked', 'unchecked', 'indeterminate'] },
-		{ attribute: '[data-tc-disabled]', values: 'Present in the `single` selection mode.' },
+		{ attribute: '[data-dg-part]', values: ['selection-checkbox'] },
+		{ attribute: '[data-dg-state]', values: ['checked', 'unchecked', 'indeterminate'] },
+		{ attribute: '[data-dg-disabled]', values: 'Present in the `single` selection mode.' },
 	]"
 />
 
@@ -159,7 +159,7 @@ along its stroke and lets the tint of a selected row fade:
 	animation: mark-draw 0.28s 0.04s cubic-bezier(0.2, 0, 0, 1) backwards;
 }
 
-.people [data-tc-part='body'] [data-tc-column] {
+.people [data-dg-part='body'] [data-dg-column] {
 	transition: background-color 0.2s, box-shadow 0.2s;
 }
 

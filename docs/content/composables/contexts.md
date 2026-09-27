@@ -24,7 +24,7 @@ A part with parts inside it provides a context; the parts inside read it. The ta
 
 ```vue
 <script setup lang="ts">
-import { useDataTableContext, useHeaderCellContext } from 'vue-data-grid';
+import { useDataTableContext, useHeaderCellContext } from '@vue-data-grid/core';
 import { computed } from 'vue';
 
 const table = useDataTableContext();
@@ -89,7 +89,7 @@ Parts need their table from the context. Without `TableRoot`, provide it yoursel
 that renders the table:
 
 ```ts
-import { createDataTableContext, useDataTable } from 'vue-data-grid';
+import { createDataTableContext, useDataTable } from '@vue-data-grid/core';
 
 const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
 

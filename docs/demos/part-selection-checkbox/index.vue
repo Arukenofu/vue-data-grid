@@ -15,7 +15,7 @@ import {
 	TableSelectAllCheckbox,
 	TableSelectionCheckbox,
 	useDataTable,
-} from 'vue-data-grid';
+} from '@vue-data-grid/core';
 import IconCheck from '~icons/lucide/check';
 import IconMinus from '~icons/lucide/minus';
 import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
@@ -170,7 +170,7 @@ const { selectedCount, clear } = table.selection;
 	animation: mark-draw 0.28s 0.04s cubic-bezier(0.2, 0, 0, 1) backwards;
 }
 
-.people :deep([data-tc-part='body'] [data-tc-column]) {
+.people :deep([data-dg-part='body'] [data-dg-column]) {
 	transition: background-color 0.2s, box-shadow 0.2s;
 }
 

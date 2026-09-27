@@ -21,7 +21,7 @@ cell. Select a range and press <kbd>Delete</kbd> to clear it.
 A column is editable when it says so and knows how to write a value into a row:
 
 ```ts
-import { defineColumn, defineColumns, editing, navigation, numberField, useDataTable } from 'vue-data-grid';
+import { defineColumn, defineColumns, editing, navigation, numberField, useDataTable } from '@vue-data-grid/core';
 import { shallowRef } from 'vue';
 
 const rows = shallowRef<readonly Product[]>(products);
@@ -129,7 +129,7 @@ An editor is a function of its context that renders the field. Bind `inputProps`
 takes input: it focuses it, gives it the keys of editing, its label and its error.
 
 ```ts
-import type { CellEditor } from 'vue-data-grid';
+import type { CellEditor } from '@vue-data-grid/core';
 import { h } from 'vue';
 
 const PRIORITIES = ['low', 'medium', 'high'] as const;
@@ -194,7 +194,7 @@ editing({
   as it opens; the caret goes to the end of what was typed.
 - An invalid draft sets `aria-invalid="true"` on the field and points `aria-describedby` at the error,
   so the screen reader reads the problem with the field.
-- The cell being edited carries `data-tc-state="editing"`, and focus returns to the cell after a
+- The cell being edited carries `data-dg-state="editing"`, and focus returns to the cell after a
   commit or a cancel, where the grid keys work again.
 - The keys of an input method's composition are left to it: Enter that picks a word does not save.
 

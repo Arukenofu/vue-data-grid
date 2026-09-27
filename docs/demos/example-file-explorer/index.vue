@@ -12,8 +12,8 @@ import {
 	treeColumn,
 	useDataTable,
 	useTableMotion,
-} from 'vue-data-grid';
-import { dragHandleColumn, TableDragPreview, useTableRowDrag } from 'vue-data-grid/drag-and-drop';
+} from '@vue-data-grid/core';
+import { dragHandleColumn, TableDragPreview, useTableRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
 import IconUnfoldVertical from '~icons/lucide/unfold-vertical';
 import { computed, h, nextTick, ref, shallowRef, useTemplateRef } from 'vue';
@@ -125,7 +125,7 @@ function onRowClick(event: MouseEvent, key: string) {
 }
 
 function onRowKeydown(event: KeyboardEvent, key: string) {
-	const cell = event.target instanceof HTMLElement && event.target.matches('[data-tc-column]') ? event.target : null;
+	const cell = event.target instanceof HTMLElement && event.target.matches('[data-dg-column]') ? event.target : null;
 
 	if (!cell || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
 		return;
@@ -195,22 +195,22 @@ function onRowKeydown(event: KeyboardEvent, key: string) {
 }
 
 .explorer :deep(.ui-table) {
-	--tc-drop-color: var(--ui-accent);
+	--dg-drop-color: var(--ui-accent);
 }
 
-.explorer :deep(.ui-table [data-tc-part='row'][aria-level][aria-expanded] > [data-tc-column]) {
+.explorer :deep(.ui-table [data-dg-part='row'][aria-level][aria-expanded] > [data-dg-column]) {
 	font-weight: 400;
 }
 
-.explorer :deep(.ui-table [data-tc-part='body'] > [data-tc-part='row']) {
+.explorer :deep(.ui-table [data-dg-part='body'] > [data-dg-part='row']) {
 	cursor: default;
 }
 
-.explorer :deep(.ui-table [data-tc-part='body'] > [data-tc-part='row'][aria-current='true'] > [data-tc-column]) {
+.explorer :deep(.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-current='true'] > [data-dg-column]) {
 	background: color-mix(in srgb, var(--ui-accent) 10%, var(--ui-bg));
 }
 
-.explorer :deep(.ui-table [data-tc-part='body'] > [data-tc-part='row'][aria-current='true'] > [data-tc-column]:first-child) {
+.explorer :deep(.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-current='true'] > [data-dg-column]:first-child) {
 	box-shadow: inset 2px 0 0 var(--ui-accent);
 }
 
