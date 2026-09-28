@@ -1,5 +1,5 @@
 /**
- * The building blocks of `useTableEngine` and the row pipeline: column reconciliation, groups, order,
+ * The building blocks of `useGridEngine` and the row pipeline: column reconciliation, groups, order,
  * row and column windows, the stream queue, incremental sorting. For building your own engine.
  *
  * Not covered by semver: signatures here change with the engine, in minor releases too. Everything
@@ -32,7 +32,7 @@ export {
 	useColumnGroups,
 } from './column-groups';
 export type { FitColumn } from './engine';
-export { fitColumnWidths, useTableColumns } from './engine';
+export { fitColumnWidths, useGridColumns } from './engine';
 export type {
 	ColumnRange,
 	ColumnWindow,

@@ -2,24 +2,24 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridRow,
 	moveRow,
 	navigation,
-	TableBody,
-	TableCells,
-	TableRow,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import {
 	dragHandleColumn,
 	type DragIndicator,
-	TableDragPreview,
-	type TableRowDropEvent,
-	TableRowDrag,
+	GridDragPreview,
+	type GridRowDropEvent,
+	GridRowDrag,
 } from '@vue-data-grid/core/drag-and-drop';
 import IconMusic from '~icons/lucide/music';
 import { computed, shallowRef } from 'vue';
 
-import { type ToggleOption, UiDataTable, UiStat, UiToggleGroup, UiToolbar } from '@/ui';
+import { type ToggleOption, UiDataGrid, UiStat, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { type Track, tracks } from './data';
 
@@ -46,7 +46,7 @@ const columns = defineColumns({
 const playlist = shallowRef(tracks);
 const indicator = shallowRef<DragIndicator>('gap');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: playlist,
 	rowKey: 'id',
@@ -56,7 +56,7 @@ const table = useDataTable({
 
 const length = computed(() => formatTime(playlist.value.reduce((total, track) => total + track.seconds, 0)));
 
-function reorder(event: TableRowDropEvent<unknown>) {
+function reorder(event: GridRowDropEvent<unknown>) {
 	const track = playlist.value.find(item => item.id === event.key);
 
 	if (track) {
@@ -75,18 +75,18 @@ function reorder(event: TableRowDropEvent<unknown>) {
 			<UiStat label="Length" :value="length" />
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Playlist">
-			<TableRowDrag handle :indicator="indicator" @drop="reorder">
-				<TableBody v-slot="{ rows }">
-					<TableRow v-for="row in rows" :key="row.key" :row="row">
-						<TableCells />
-					</TableRow>
-				</TableBody>
-				<TableDragPreview v-slot="{ label }">
+		<UiDataGrid :grid="grid" label="Playlist">
+			<GridRowDrag handle :indicator="indicator" @drop="reorder">
+				<GridBody v-slot="{ rows }">
+					<GridRow v-for="row in rows" :key="row.key" :row="row">
+						<GridCells />
+					</GridRow>
+				</GridBody>
+				<GridDragPreview v-slot="{ label }">
 					<IconMusic aria-hidden="true" />
 					{{ label }}
-				</TableDragPreview>
-			</TableRowDrag>
-		</UiDataTable>
+				</GridDragPreview>
+			</GridRowDrag>
+		</UiDataGrid>
 	</div>
 </template>

@@ -7,34 +7,34 @@ description: What @vue-data-grid/core re-exports from @vue-data-grid/engine — 
 
 <Description>
 Under the parts and composables of `@vue-data-grid/core` lies `@vue-data-grid/engine`: the engine, the
-column state, and models of rows and cells with no markup at all. The table re-exports its stable
-API, so everything on this page is imported from `@vue-data-grid/core` too.
+column state, and models of rows and cells with no markup at all. `@vue-data-grid/core` re-exports
+its stable API, so everything on this page is imported from there too.
 </Description>
 
 ## When to use it
 
-`useDataTable` assembles the core for you, and most tables never touch it directly. Reach for it
+`useDataGrid` assembles the core for you, and most grids never touch it directly. Reach for it
 when you need a piece on its own:
 
-- a model without a table, such as `useRowSelection` over a list of cards, or `toCsv` in an export;
+- a model without a grid, such as `useRowSelection` over a list of cards, or `toCsv` in an export;
 - a row pipeline of your own order, such as filtering between grouping and sorting;
 - live data, with `useRowStream` and `useCellChanges`;
-- a table on markup that `useDataTable` does not fit, with `useTableEngine` and your own markup.
+- a grid on markup that `useDataGrid` does not fit, with `useGridEngine` and your own markup.
 
 The core is headless in the strict sense: no components, no templates, no roles. It gives numbers,
-states and CSS variables; the markup, the keys and the ARIA are the table's.
+states and CSS variables; the markup, the keys and the ARIA are the grid's.
 
 ## The engine
 
-`useTableEngine` turns columns and rows into what markup renders from: the shown and rendered
+`useGridEngine` turns columns and rows into what markup renders from: the shown and rendered
 columns, the row window, and the geometry of every cell as CSS variables.
 
 ```ts
-import { createTableScopeContext, useTableEngine, useTableGeometry } from '@vue-data-grid/core';
+import { createGridScopeContext, useGridEngine, useGridGeometry } from '@vue-data-grid/core';
 
 const root = shallowRef<HTMLElement | null>(null);
 
-const engine = useTableEngine({
+const engine = useGridEngine({
 	columns,
 	rows,
 	root,
@@ -43,24 +43,24 @@ const engine = useTableEngine({
 	virtual: true,
 });
 
-createTableScopeContext(engine.scope);
-useTableGeometry(root, engine.layers);
+createGridScopeContext(engine.scope);
+useGridGeometry(root, engine.layers);
 ```
 
 <ReturnsTable
 	:data="[
-		{ name: 'scope', type: 'TableScope', description: 'Everything the markup renders from, and what changes the layout.' },
-		{ name: 'state', type: 'TableColumnsState', description: 'The column state: the one passed in, or its own.' },
+		{ name: 'scope', type: 'GridScope', description: 'Everything the markup renders from, and what changes the layout.' },
+		{ name: 'state', type: 'GridColumnsState', description: 'The column state: the one passed in, or its own.' },
 		{ name: 'items', type: 'ComputedRef<VirtualItem[]>', description: 'The row window: `{ key, index, start, end, size }` of each row to render.' },
 		{ name: 'totalSize', type: 'ComputedRef<number>', description: 'The height of all rows, px.' },
 		{ name: 'measureElement', type: '(element) => void', description: 'Measures a row, with `measureRows`.' },
-		{ name: 'layers', type: 'ComputedRef<GeometryLayer[]>', description: 'The geometry to write with `useTableGeometry`: widths, grow factors and pin offsets as CSS variables.' },
+		{ name: 'layers', type: 'ComputedRef<GeometryLayer[]>', description: 'The geometry to write with `useGridGeometry`: widths, grow factors and pin offsets as CSS variables.' },
 		{ name: 'windowed', type: 'ComputedRef<boolean>', description: 'Whether the column window leaves columns out.' },
 		{ name: 'contentWidth', type: 'ComputedRef<number>', description: 'The width of the shown columns, px.' },
 	]"
 />
 
-### TableScope
+### GridScope
 
 The scope is the one object the markup reads. The main members:
 
@@ -75,7 +75,7 @@ The scope is the one object the markup reads. The main members:
 | Scrolling | `scrollToRow`, `scrollToColumn`, `keepRendered` |
 
 Members take column names as plain strings, so a name from `column.name`, a prop or a stored
-setting fits without a cast. A method that changes the table by a name that is not a declared
+setting fits without a cast. A method that changes the grid by a name that is not a declared
 column, such as a typo, ignores it and warns once in development; queries such as `getWidth` answer
 for it quietly.
 
@@ -85,20 +85,20 @@ thousand cells of a column cost Vue one comparison each.
 
 ## The column state
 
-`useTableColumnsState` holds the order, widths, pins, hidden columns, collapsed groups and the sort,
-and can keep them between visits. Create one yourself to share it between two tables, or to own it
+`useGridColumnsState` holds the order, widths, pins, hidden columns, collapsed groups and the sort,
+and can keep them between visits. Create one yourself to share it between two grids, or to own it
 in a store:
 
 ```ts
-import { localStorageStore, useTableColumnsState } from '@vue-data-grid/core';
+import { localStorageStore, useGridColumnsState } from '@vue-data-grid/core';
 
-const state = useTableColumnsState({
+const state = useGridColumnsState({
 	sort: [{ name: 'created', direction: 'desc' }],
 	multiSort: true,
 	persist: localStorageStore('orders'),
 });
 
-const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40, state });
+const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 40, state });
 
 state.reset();
 ```
@@ -122,7 +122,7 @@ usePersistedState(density, localStorageStore('density'), {
 
 ## Rows
 
-Each step of the row pipeline is a composable of its own. The features of `useDataTable` are built on
+Each step of the row pipeline is a composable of its own. The features of `useDataGrid` are built on
 them, in this order.
 
 | Composable | Does |
@@ -151,7 +151,7 @@ socket.on('quote', quote => stream.patch(quote.id, { price: quote.price }));
 socket.on('listing', row => stream.apply({ add: [row] }));
 socket.on('delisting', id => stream.apply({ remove: [id] }));
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stream.rows,
 	rowKey: 'id',
@@ -163,7 +163,7 @@ const table = useDataTable({
 ### Moving rows
 
 `moveRow(rows, move, options)` returns the rows with one row taken out and put at `index` among the
-children of `parent`: exactly what a drop of `useTableRowDrag` gives. Every other row keeps its
+children of `parent`: exactly what a drop of `useGridRowDrag` gives. Every other row keeps its
 reference.
 
 ## Cells
@@ -188,7 +188,7 @@ and keeps each change for a moment with its direction. It is reactive per row: a
 the row it is in.
 
 ```ts
-import { useCellChanges, useDataTable } from '@vue-data-grid/core';
+import { useCellChanges, useDataGrid } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	price: column(stock => stock.price, {
@@ -197,9 +197,9 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({ columns, rows: stream.rows, rowKey: 'id', rowHeight: 36 });
+const grid = useDataGrid({ columns, rows: stream.rows, rowKey: 'id', rowHeight: 36 });
 
-const changes = useCellChanges(table.scope, { duration: 900, columns: ['price'] });
+const changes = useCellChanges(grid.scope, { duration: 900, columns: ['price'] });
 ```
 
 The cells read `changes` when they render, after setup, so it may be declared after the columns.
@@ -209,8 +209,8 @@ The cells read `changes` when they render, after setup, so it may be declared af
 ```ts
 import { parseDelimited, toCsv } from '@vue-data-grid/core';
 
-const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
-const csv = toCsv({ columns: shown, rows: table.rows.value });
+const shown = grid.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
+const csv = toCsv({ columns: shown, rows: grid.rows.value });
 const cells = parseDelimited(clipboardText, { delimiter: '\t' });
 ```
 
@@ -221,7 +221,7 @@ writes them.
 ## Geometry
 
 The core lays a row out as a flex line: a width and a grow factor per column, `position: sticky` and
-an offset for pinned ones, all as CSS variables written by `useTableGeometry`. The helpers name them,
+an offset for pinned ones, all as CSS variables written by `useGridGeometry`. The helpers name them,
 for CSS or layers of your own:
 
 | Helper | Gives |
@@ -239,7 +239,7 @@ render of any row.
 
 ## Internals
 
-`@vue-data-grid/engine/internals` exposes the building blocks `useTableEngine` is made of: column
+`@vue-data-grid/engine/internals` exposes the building blocks `useGridEngine` is made of: column
 reconciliation, the row and column windows, the stream queue, incremental sorting, `stableComputed`.
 It is for building an engine of your own, and it is **not covered by semver**: its signatures change
 with the engine, in minor releases too. Import it from the core package, added to your dependencies:
@@ -254,7 +254,7 @@ Nothing of the stable API is repeated there, and nothing there is re-exported by
 
 `@vue-data-grid/core` also re-exports `@vue-data-grid/flip`, the engines its motion plays with:
 `webAnimations`, `defineMotionEngine`, `captureLayout`, `playMotion`, `slide`, `fadeIn`, `fadeOut`.
-The [Animation](/guides/animation) guide and [useTableMotion](/composables/use-table-motion) show them
+The [Animation](/guides/animation) guide and [useGridMotion](/composables/use-grid-motion) show them
 at work, with GSAP and Motion too.
 
 ## Accessibility
@@ -262,11 +262,11 @@ at work, with GSAP and Motion too.
 The core sets no role and no `aria-*` attribute: it computes the numbers they are made of. Row
 indexes that stay right under the row window, the place of a row among its siblings for
 `aria-posinset`, the rows that fit a page for PageDown, the cell focus that survives sorting — all
-of these live here, so a table of any markup can say the right thing. The table's prop-getters turn
+of these live here, so a grid of any markup can say the right thing. The grid's prop-getters turn
 them into attributes; markup of your own on the engine alone must do the same.
 
 ## See also
 
-- [useDataTable](/composables/use-data-table): the core, assembled.
+- [useDataGrid](/composables/use-data-grid): the core, assembled.
 - [Live data](/guides/live-data): streaming rows and flashing cells.
 - [Your own markup](/guides/custom-markup): rendering from the scope.

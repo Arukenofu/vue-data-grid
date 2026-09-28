@@ -31,7 +31,7 @@
 	height: 400px;
 }
 
-.theme [data-dg-part="table"] {
+.theme [data-dg-part="grid"] {
 	flex: 1 1 0;
 	height: auto;
 	min-height: 0;
@@ -190,7 +190,7 @@
 	font-weight: 600;
 }
 
-.theme-mono [data-dg-part="table"] {
+.theme-mono [data-dg-part="grid"] {
 	border: 1px solid #e4e4e4;
 	border-radius: 6px;
 	background: #ffffff;
@@ -258,7 +258,7 @@
 	color: #0a0a0a;
 }
 
-:where(.dark) .theme-mono [data-dg-part="table"] {
+:where(.dark) .theme-mono [data-dg-part="grid"] {
 	border-color: #262626;
 	background: #0a0a0a;
 }
@@ -348,7 +348,7 @@
 	font-weight: 600;
 }
 
-.theme-cards [data-dg-part="table"] {
+.theme-cards [data-dg-part="grid"] {
 	background: var(--canvas);
 }
 
@@ -645,7 +645,7 @@
 	font-weight: 600;
 }
 
-.theme-sheet [data-dg-part="table"] {
+.theme-sheet [data-dg-part="grid"] {
 	border: 1px solid var(--sheet-frame);
 	border-block-start: none;
 	border-radius: 0 0 6px 6px;
@@ -815,7 +815,7 @@
 		var(--theme-accent);
 }
 
-:where(.dark) .theme-sheet [data-dg-part="table"] {
+:where(.dark) .theme-sheet [data-dg-part="grid"] {
 	background: #1e1f23;
 }
 
@@ -901,7 +901,7 @@
 	content: "■ ";
 }
 
-.theme-terminal [data-dg-part="table"] {
+.theme-terminal [data-dg-part="grid"] {
 	background: #07090c;
 	scrollbar-color: #2a323c transparent;
 }

@@ -118,7 +118,7 @@ insert it at `index`. A place where a drop would change nothing is never offered
   that are not rendered are taken as the size of the dragged one, and an item of another list as
   the size of the items at the gap. The gap reads where every item is drawn before it moves any,
   so the browser restyles the list once per move, not once per item. An item drawn by more than
-  one element, such as a column of a table, is moved by `shift(shifts, engine)` instead: one call
+  one element, such as a column of a grid, is moved by `shift(shifts, engine)` instead: one call
   gets every item that moved, as a map from key to offset, the list leaves the `translate` of their
   elements to you, and measures the registered element without the one you give it.
 
@@ -128,7 +128,7 @@ A place stays until the pointer finds another one. Over a place `canDrop` refuse
 or off the list altogether, the list keeps showing the last place, and a drop there goes to it:
 what the gap shows is what the drop does, and Escape cancels. Only the item's own place takes the
 gap back home, and only another target, such as a `useDropTarget`, takes the drop away from the
-list. Items are found along the list from the pointer, so a column of a table is found with the
+list. Items are found along the list from the pointer, so a column of a grid is found with the
 pointer over its body cells.
 
 ## Movement

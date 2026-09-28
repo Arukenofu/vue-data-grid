@@ -6,7 +6,7 @@ description: Declare columns once, with types that flow from your rows into ever
 # Columns
 
 <Description>
-A column is a function that reads a value from a row, plus the few facts the table needs to show it:
+A column is a function that reads a value from a row, plus the few facts the grid needs to show it:
 a label, a width, an alignment, and how to render its cells when plain text is not enough.
 </Description>
 
@@ -35,11 +35,11 @@ a `number` from here on: its `format`, `compare`, `cell` and `footer` all receiv
 single type annotation.
 
 Columns can also be an array, or a `ref` or getter of either, when the set of columns changes at
-run time. The table then reconciles the new set against the old one field by field, and keeps every
+run time. The grid then reconciles the new set against the old one field by field, and keeps every
 column that did not change as the same object, so its cells do not render again.
 
 ::: warning Declare columns outside of `computed`
-A `computed` that builds columns makes new arrow functions every time it runs. The table can only
+A `computed` that builds columns makes new arrow functions every time it runs. The grid can only
 compare functions by reference, so it sees every column as changed and renders all of their cells.
 It warns about it in development. Keep the declarations at the top of the module, and let a
 `computed` pick which of them to show.
@@ -57,7 +57,7 @@ It warns about it in development. Keep the declarations at the top of the module
 		{ name: 'format', type: '(value: TValue, row: TRow) => string', description: 'The value as text: what the default cell shows, what CSV, copying and autosize read. `String(value)` by default, and `\'\'` for `null` and `undefined`.' },
 		{ name: 'equals', type: '(current: TValue, next: TValue) => boolean', description: 'Equality for values that arrive as new objects, such as dates. `Object.is` by default.' },
 		{ name: 'compare', type: '(a: TValue, b: TValue) => number', description: 'The order of values when sorting. See the Sorting guide.' },
-		{ name: 'meta', type: 'TMeta', description: 'Your own data about the column. The table never reads it; type it with the second parameter of `defineColumn`.' },
+		{ name: 'meta', type: 'TMeta', description: 'Your own data about the column. The grid never reads it; type it with the second parameter of `defineColumn`.' },
 	]"
 />
 
@@ -76,13 +76,13 @@ proportion to its `flex`, as a flex item does in CSS.
 		{ name: 'minWidth', type: 'number', default: 'min(width, 120)', description: 'The narrowest a resize can make it, px.' },
 		{ name: 'maxWidth', type: 'number', description: 'The widest a resize or a fit can make it, px.' },
 		{ name: 'flex', type: 'number', default: '0', description: 'How much of the room left in the row the column takes.' },
-		{ name: 'align', type: '\'left\' | \'center\' | \'right\'', default: '\'left\'', description: 'Where the content of its cells sits. The table marks cells with `data-dg-align`; the structural styles lay them out.' },
+		{ name: 'align', type: '\'left\' | \'center\' | \'right\'', default: '\'left\'', description: 'Where the content of its cells sits. The grid marks cells with `data-dg-align`; the structural styles lay them out.' },
 		{ name: 'pinned', type: '\'start\' | \'end\'', description: 'Pins the column to an edge, where it stays while the rest scrolls. See the Column layout guide.' },
 		{ name: 'hiddenByDefault', type: 'boolean', default: 'false', description: 'The column starts hidden, and can be shown from a column menu.' },
 	]"
 />
 
-The table writes widths into CSS variables rather than into each cell. When a width changes, one
+The grid writes widths into CSS variables rather than into each cell. When a width changes, one
 style changes and the browser lays the column out again, without rendering a single cell. That is
 why resizing a column of a thousand rows stays smooth.
 
@@ -116,9 +116,9 @@ The context is typed by the column: `value` is the value of the column, `row` is
 		{ name: 'row', type: 'TRow', description: 'The row of the cell.' },
 		{ name: 'value', type: 'TValue', description: 'The value of the column for that row.' },
 		{ name: 'key', type: 'string', description: 'The key of the row.' },
-		{ name: 'index', type: 'number', description: 'The place of the row among the rows the table shows, from `0`.' },
+		{ name: 'index', type: 'number', description: 'The place of the row among the rows the grid shows, from `0`.' },
 		{ name: 'column', type: 'RuntimeColumn', description: 'The column itself.' },
-		{ name: 'node', type: 'RowNode | undefined', description: 'The place of the row in a tree: its level, parent and expand state. `undefined` in a flat table.' },
+		{ name: 'node', type: 'RowNode | undefined', description: 'The place of the row in a tree: its level, parent and expand state. `undefined` in a flat grid.' },
 		{ name: 'write', type: '(value: TValue) => void', description: 'Writes a value into the cell at once, for a control in the cell. Present only with the `editing` feature, on a cell that can be edited.' },
 	]"
 />
@@ -137,14 +137,14 @@ amount: column(invoice => invoice.amount, {
 
 ### From the template instead
 
-`TableCells` takes a slot too. It runs for every cell, and a cell the slot renders nothing for keeps
+`GridCells` takes a slot too. It runs for every cell, and a cell the slot renders nothing for keeps
 its own content, as a `<slot>` keeps its fallback. That makes the slot handy for a quick change in
 the template:
 
 ```vue
-<TableCells v-slot="{ column, value }">
+<GridCells v-slot="{ column, value }">
 	<strong v-if="column.name === 'number'">{{ value }}</strong>
-</TableCells>
+</GridCells>
 ```
 
 The slot is shared by every column, so it cannot know the type of your rows: `row` and `value` are
@@ -173,7 +173,7 @@ functions of an object literal in order. Group rows use the same aggregates; see
 ## Defaults for every column
 
 The builder takes defaults that every column it makes starts with, and each column can override.
-It is the place for what a whole table shares, such as its rights:
+It is the place for what a whole grid shares, such as its rights:
 
 ```ts
 const column = defineColumn<Invoice>({ sortable: true, resizable: true, width: 140 });
@@ -183,8 +183,8 @@ Defaults cover the kind, the rights, the geometry, `sortOrder` and `editable`.
 
 ## Rights
 
-A table does only what a column allows. Every right is `false` until you turn it on, for the whole
-table in the builder's defaults or column by column:
+A grid does only what a column allows. Every right is `false` until you turn it on, for the whole
+grid in the builder's defaults or column by column:
 
 | Right | What it allows |
 | --- | --- |
@@ -196,15 +196,15 @@ table in the builder's defaults or column by column:
 
 ## Service columns and row headers
 
-Most columns hold data. Some are the table's own furniture: a checkbox, a row number, a drag handle.
-Mark those `kind: 'service'`, and CSV, cell ranges, copying and autosize leave them out. The table
+Most columns hold data. Some are the grid's own furniture: a checkbox, a row number, a drag handle.
+Mark those `kind: 'service'`, and CSV, cell ranges, copying and autosize leave them out. The grid
 ships factories for the usual ones, `selectionColumn()`, `rowNumberColumn()`, `treeColumn()` and
 `dragHandleColumn()`; see [Service columns](/components/service-columns).
 
 One column names each row for assistive technology: its cells get `role="rowheader"`, and a screen
 reader reads them when focus moves along a column. By default it is the first data column. Set
 `rowHeader: true` on the columns that should name the row instead, or `rowHeader: false` on the first
-one to have none. The column window of a [virtualized](/guides/virtualization) table always keeps a
+one to have none. The column window of a [virtualized](/guides/virtualization) grid always keeps a
 row header rendered, so a row keeps its name while it is scrolled sideways.
 
 ## Accessibility
@@ -222,5 +222,5 @@ row header rendered, so a row keeps its name while it is scrolled sideways.
 
 - [Sorting](/guides/sorting): `sortable`, `compare` and `sortOrder` at work.
 - [Column layout](/guides/column-layout): widths, pinning, hiding and order.
-- [Body](/components/body): `TableCells` and its slot in detail.
-- [Service columns](/components/service-columns): the ready-made columns of the table.
+- [Body](/components/body): `GridCells` and its slot in detail.
+- [Service columns](/components/service-columns): the ready-made columns of the grid.

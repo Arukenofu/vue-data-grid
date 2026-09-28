@@ -2,21 +2,21 @@ import type { DragGhostExit, DragPayload, DragPreview, DragPreviewPlacement } fr
 import type { RuntimeColumn } from '@vue-data-grid/engine';
 import { type MaybeRefOrGetter, type Ref, toValue } from 'vue';
 
-import type { TableDragItems } from '../components/context';
-import type { DataTable } from '../data-table/use-data-table';
+import type { GridDragItems } from '../components/context';
+import type { DataGrid } from '../data-grid/use-data-grid';
 import { CONTROL_SELECTOR, DRAGGABLE_ATTRIBUTE } from '../pointer/controls';
 
 /**
- * The area neither the pointer nor the ghost leaves during a drag: `'table'`, the scroll container of
- * the table; `'window'`; or an element of your own.
+ * The area neither the pointer nor the ghost leaves during a drag: `'grid'`, the scroll container of
+ * the grid; `'window'`; or an element of your own.
  */
-export type TableDragBounds = MaybeRefOrGetter<'table' | 'window' | HTMLElement | null | undefined>;
+export type GridDragBounds = MaybeRefOrGetter<'grid' | 'window' | HTMLElement | null | undefined>;
 
 /** Fills the ghost of a drag for item `key`; returns the cleanup, called when the ghost goes away. */
-export type TableDragPreviewRender = (key: string, container: HTMLElement) => (() => void) | void;
+export type GridDragPreviewRender = (key: string, container: HTMLElement) => (() => void) | void;
 
 /** How the ghost of a drag stands and goes, read when each gesture starts. */
-export interface TableDragPreviewOptions {
+export interface GridDragPreviewOptions {
 	/** Where it stands: `'outside'` the pointer by default, `'center'` under it, or `'source'`, where the item was grabbed. */
 	placement?: MaybeRefOrGetter<DragPreviewPlacement | undefined>;
 	/**
@@ -26,20 +26,20 @@ export interface TableDragPreviewOptions {
 	exit?: MaybeRefOrGetter<DragGhostExit | undefined>;
 }
 
-/** What a dragged row or column carries to the tables and drop zones it passes over. */
-export interface TableDragData {
-	/** The table it comes from. */
-	table: DataTable;
+/** What a dragged row or column carries to the grids and drop zones it passes over. */
+export interface GridDragData {
+	/** The grid it comes from. */
+	grid: DataGrid;
 	/** Its name, as screen readers hear it. */
 	label: string;
 }
 
 /**
- * The row or column being dragged that a table or a drop zone takes, as its parts show it: what it is
- * and where it comes from. A table or a zone the bounds of the drag keep the pointer from never
- * hears of it: a drag kept to its table shows nothing anywhere else.
+ * The row or column being dragged that a grid or a drop zone takes, as its parts show it: what it is
+ * and where it comes from. A grid or a zone the bounds of the drag keep the pointer from never
+ * hears of it: a drag kept to its grid shows nothing anywhere else.
  */
-export interface TableDragItem {
+export interface GridDragItem {
 	/** The key of the row, or the name of the column. */
 	key: string;
 	label: string;
@@ -47,17 +47,17 @@ export interface TableDragItem {
 	row: unknown;
 	/** The dragged column; `undefined` for a row. */
 	column: RuntimeColumn | undefined;
-	/** The table it comes from. */
-	source: DataTable;
-	/** It comes from this very table. */
+	/** The grid it comes from. */
+	source: DataGrid;
+	/** It comes from this very grid. */
 	own: boolean;
 }
 
-/** The dragged item of a payload, seen from `table`. */
-export function describeDragItem(payload: DragPayload | null, table: DataTable | null): TableDragItem | null {
-	const data = payload?.data as (TableDragData & { row?: unknown; column?: RuntimeColumn }) | undefined;
+/** The dragged item of a payload, seen from `grid`. */
+export function describeDragItem(payload: DragPayload | null, grid: DataGrid | null): GridDragItem | null {
+	const data = payload?.data as (GridDragData & { row?: unknown; column?: RuntimeColumn }) | undefined;
 
-	if (!payload || !data?.table) {
+	if (!payload || !data?.grid) {
 		return null;
 	}
 
@@ -66,17 +66,17 @@ export function describeDragItem(payload: DragPayload | null, table: DataTable |
 		label: data.label,
 		row: data.row,
 		column: data.column,
-		source: data.table,
-		own: data.table === table,
+		source: data.grid,
+		own: data.grid === grid,
 	};
 }
 
-/** What a drag list of the table gives its parts on top of registering elements. */
-export interface TableDragContext extends TableDragItems {
-	/** The key of the item being dragged from this table, or `null`. */
+/** What a drag list of the grid gives its parts on top of registering elements. */
+export interface GridDragContext extends GridDragItems {
+	/** The key of the item being dragged from this grid, or `null`. */
 	readonly active: Readonly<Ref<string | null>>;
-	/** The item being dragged that the table takes, own or from another table; `null` for none. */
-	readonly item: Readonly<Ref<TableDragItem | null>>;
+	/** The item being dragged that the grid takes, own or from another grid; `null` for none. */
+	readonly item: Readonly<Ref<GridDragItem | null>>;
 	/** Whether it is over the body, or the header for columns. */
 	readonly over: Readonly<Ref<boolean>>;
 	/** Whether it is over a place it may be dropped at. */
@@ -94,10 +94,10 @@ export interface TableDragContext extends TableDragItems {
 	/** The name of item `key`, as screen readers hear it; the row as in `canDrag`. */
 	getLabel: (key: string, row?: unknown) => string;
 	/**
-	 * Fills the ghost with `render`, as `TableDragPreview` does, until the returned function is
+	 * Fills the ghost with `render`, as `GridDragPreview` does, until the returned function is
 	 * called; without one the drag is shown by the place alone.
 	 */
-	setPreview: (render: TableDragPreviewRender, options?: TableDragPreviewOptions) => () => void;
+	setPreview: (render: GridDragPreviewRender, options?: GridDragPreviewOptions) => () => void;
 }
 
 /** What a drag never starts from: the controls, and `ignore` of your own on top. */
@@ -121,11 +121,11 @@ export function getDraggableProps(draggable: boolean, steps = false): Readonly<R
 	return steps ? STEPPING_PROPS : DRAGGABLE_PROPS;
 }
 
-/** The element of `bounds`: the table's `root` for `'table'`, `null` for the window. */
-export function resolveBounds(bounds: TableDragBounds, fallback: 'table' | 'window', root: HTMLElement | null) {
+/** The element of `bounds`: the grid's `root` for `'grid'`, `null` for the window. */
+export function resolveBounds(bounds: GridDragBounds, fallback: 'grid' | 'window', root: HTMLElement | null) {
 	const value = toValue(bounds) ?? fallback;
 
-	if (value === 'table') {
+	if (value === 'grid') {
 		return root;
 	}
 
@@ -139,7 +139,7 @@ export function resolveBounds(bounds: TableDragBounds, fallback: 'table' | 'wind
 export function createPreviewHolder() {
 	let current: DragPreview | null = null;
 
-	function set(render: TableDragPreviewRender, options: TableDragPreviewOptions = {}) {
+	function set(render: GridDragPreviewRender, options: GridDragPreviewOptions = {}) {
 		const preview: DragPreview = {
 			render,
 			placement: () => toValue(options.placement) ?? 'outside',

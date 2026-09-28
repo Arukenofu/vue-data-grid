@@ -2,18 +2,18 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridResizeHandle,
+	GridRoot,
+	GridRow,
+	GridSortIndicator,
 	sorting,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableResizeHandle,
-	TableRoot,
-	TableRow,
-	TableSortIndicator,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconActivity from '~icons/lucide/activity';
 import IconBuilding from '~icons/lucide/building-2';
@@ -63,7 +63,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
@@ -72,8 +72,8 @@ const table = useDataTable({
 	features: { sorting: sorting() },
 });
 
-const summary = computed(() => table.scope.sort.value
-	.map(item => `${table.scope.getColumn(item.name)?.column?.label ?? item.name} ${item.direction === 'asc' ? '↑' : '↓'}`)
+const summary = computed(() => grid.scope.sort.value
+	.map(item => `${grid.scope.getColumn(item.name)?.column?.label ?? item.name} ${item.direction === 'asc' ? '↑' : '↓'}`)
 	.join(', then '));
 </script>
 
@@ -82,13 +82,13 @@ const summary = computed(() => table.scope.sort.value
 		<UiToolbar>
 			<span class="ui-toolbar-text">{{ summary ? `Sorted by ${summary}` : 'Unsorted' }}</span>
 			<span class="ui-spacer" />
-			<UiButton size="sm" @click="table.state.reset()">Reset layout</UiButton>
+			<UiButton size="sm" @click="grid.state.reset()">Reset layout</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Stocks" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell
+		<GridRoot :grid="grid" label="Stocks" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell
 						v-for="header in headers"
 						:key="header.key"
 						v-slot="{ column: declared }"
@@ -96,20 +96,20 @@ const summary = computed(() => table.scope.sort.value
 						class="is-sortable"
 					>
 						<component :is="ICONS[declared.name]" v-if="ICONS[declared.name]" class="header-icon" aria-hidden="true" />
-						<TableHeaderContent />
-						<TableSortIndicator v-slot="{ direction, sortIndex }">
+						<GridHeaderContent />
+						<GridSortIndicator v-slot="{ direction, sortIndex }">
 							<UiSortIcon :direction="direction" :sort-index="sortIndex" />
-						</TableSortIndicator>
-						<TableResizeHandle />
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+						</GridSortIndicator>
+						<GridResizeHandle />
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

@@ -53,7 +53,7 @@
 	max-width: none !important;
 }
 
-/* A column for the content wide enough for a table, and still a comfortable line for the prose. */
+/* A column for the content wide enough for a grid, and still a comfortable line for the prose. */
 @media (min-width: 60rem) {
 	.VPContent .VPDoc {
 		padding-inline: 1.5rem;
@@ -84,8 +84,8 @@
 	}
 }
 
-/* Reference tables: props, options, slots, events, data attributes, CSS variables, keys. */
-.vp-doc .site-api table {
+/* Reference grids: props, options, slots, events, data attributes, CSS variables, keys. */
+.vp-doc .site-api grid {
 	display: table;
 	width: 100%;
 	margin-block: 16px 24px;

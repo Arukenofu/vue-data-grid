@@ -9,12 +9,12 @@ import {
 	numberField,
 	ranges,
 	toCsv,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { computed, onBeforeUnmount, shallowRef } from 'vue';
 
 import { createSales, type Sale } from '@/data/sales';
-import { UiButton, UiDataTable, UiSwitch, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiSwitch, UiToolbar } from '@/ui';
 
 const COPIED_FOR = 1500;
 
@@ -50,7 +50,7 @@ const columns = defineColumns({
 
 const headers = shallowRef(false);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -67,10 +67,10 @@ const table = useDataTable({
 	},
 });
 
-table.ranges.selectBounds({ rowStart: 0, rowEnd: 4, columnStart: 0, columnEnd: 4 });
+grid.ranges.selectBounds({ rowStart: 0, rowEnd: 4, columnStart: 0, columnEnd: 4 });
 
 const preview = computed(() => {
-	const text = table.clipboard.getText();
+	const text = grid.clipboard.getText();
 
 	return text === '' ? 'Select cells to see what a copy takes.' : text;
 });
@@ -79,7 +79,7 @@ const copied = shallowRef(false);
 let timer: ReturnType<typeof setTimeout> | undefined;
 
 async function copy() {
-	copied.value = await table.clipboard.copy();
+	copied.value = await grid.clipboard.copy();
 	clearTimeout(timer);
 	timer = setTimeout(() => {
 		copied.value = false;
@@ -87,9 +87,9 @@ async function copy() {
 }
 
 function download() {
-	const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
+	const shown = grid.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
 
-	downloadCsv(toCsv({ columns: shown, rows: table.rows.value }), { name: 'sales' });
+	downloadCsv(toCsv({ columns: shown, rows: grid.rows.value }), { name: 'sales' });
 }
 
 onBeforeUnmount(() => clearTimeout(timer));
@@ -104,7 +104,7 @@ onBeforeUnmount(() => clearTimeout(timer));
 			<UiSwitch v-model="headers" label="Copy with headers" />
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Sales" data-size="sm" />
+		<UiDataGrid :grid="grid" label="Sales" data-size="sm" />
 
 		<pre class="clipboard">{{ preview }}</pre>
 	</div>

@@ -3,12 +3,12 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, type ShallowRef, shallowRef } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableRangeOverlay } from '../../src/components/table-range-overlay';
-import { TableRoot } from '../../src/components/table-root';
-import { clipboard, editing, fill, history, navigation, ranges, selection } from '../../src/data-table/factories';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import type { GridBodyRow } from '../../src/components/context';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridRangeOverlay } from '../../src/components/grid-range-overlay';
+import { GridRoot } from '../../src/components/grid-root';
+import { clipboard, editing, fill, history, navigation, ranges, selection } from '../../src/data-grid/factories';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { numberField } from '../../src/editing/editors';
 
 interface Row {
@@ -30,8 +30,8 @@ const initial: Row[] = [
 	{ id: 'c', name: 'Gamma', price: 3 },
 ];
 
-function createTable(rows: ShallowRef<Row[]>) {
-	return useDataTable({
+function createGrid(rows: ShallowRef<Row[]>) {
+	return useDataGrid({
 		columns,
 		rows,
 		rowKey: 'id',
@@ -62,24 +62,24 @@ afterEach(() => {
 
 function setup() {
 	const rows: ShallowRef<Row[]> = shallowRef(initial);
-	let table: ReturnType<typeof createTable> | null = null;
+	let grid: ReturnType<typeof createGrid> | null = null;
 
 	wrapper = mount(defineComponent({
 		setup() {
-			table = createTable(rows);
+			grid = createGrid(rows);
 
-			return () => h(TableRoot, { table: table as DataTable }, {
-				default: () => h(TableBody, null, {
-					default: ({ rows: bodyRows }: { rows: readonly TableBodyRow[] }) => [
-						...bodyRows.map(row => h(TableRow, { key: row.key, row }, { default: () => h(TableCells), $stable: true })),
-						h(TableRangeOverlay, { key: 'ranges' }),
+			return () => h(GridRoot, { grid: grid as DataGrid }, {
+				default: () => h(GridBody, null, {
+					default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => [
+						...bodyRows.map(row => h(GridRow, { key: row.key, row }, { default: () => h(GridCells), $stable: true })),
+						h(GridRangeOverlay, { key: 'ranges' }),
 					],
 				}),
 			});
 		},
 	}), { attachTo: document.body });
 
-	return { rows, table: table as unknown as ReturnType<typeof createTable> };
+	return { rows, grid: grid as unknown as ReturnType<typeof createGrid> };
 }
 
 function cell(row: number, column: string) {
@@ -94,28 +94,28 @@ function key(target: Element, name: string, init: KeyboardEventInit = {}) {
 	return event;
 }
 
-async function focus(table: ReturnType<typeof createTable>, row: number, column: string) {
-	await table.navigation.focusCell({ section: 'body', row, cell: column });
+async function focus(grid: ReturnType<typeof createGrid>, row: number, column: string) {
+	await grid.navigation.focusCell({ section: 'body', row, cell: column });
 }
 
-describe('who takes a key on a cell of a table with every feature', () => {
+describe('who takes a key on a cell of a grid with every feature', () => {
 	it('Ctrl+A selects every cell, not every row', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
-		await focus(table, 0, 'name');
+		await focus(grid, 0, 'name');
 		key(cell(0, 'name'), 'a', { ctrlKey: true });
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 3, columnStart: 0, columnEnd: 2 }]);
-		expect(table.selection.selectedCount.value).toBe(0);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 3, columnStart: 0, columnEnd: 2 }]);
+		expect(grid.selection.selectedCount.value).toBe(0);
 	});
 
 	it('Shift with an arrow extends the range and keeps focus; an arrow alone moves focus', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
-		await focus(table, 0, 'name');
+		await focus(grid, 0, 'name');
 		key(cell(0, 'name'), 'ArrowDown', { shiftKey: true });
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 2, columnStart: 0, columnEnd: 1 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 2, columnStart: 0, columnEnd: 1 }]);
 		expect(document.activeElement).toBe(cell(0, 'name'));
 
 		key(cell(0, 'name'), 'ArrowRight');
@@ -123,49 +123,49 @@ describe('who takes a key on a cell of a table with every feature', () => {
 	});
 
 	it('Shift+Space toggles the row; Ctrl+Space selects the column as a range', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
-		await focus(table, 1, 'price');
+		await focus(grid, 1, 'price');
 		key(cell(1, 'price'), ' ', { shiftKey: true });
 
-		expect(table.selection.isSelected('b')).toBe(true);
+		expect(grid.selection.isSelected('b')).toBe(true);
 
 		key(cell(1, 'price'), ' ', { ctrlKey: true });
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 3, columnStart: 1, columnEnd: 2 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 3, columnStart: 1, columnEnd: 2 }]);
 	});
 
 	it('Enter and a character start editing rather than move focus', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
-		await focus(table, 0, 'name');
+		await focus(grid, 0, 'name');
 
 		expect(key(cell(0, 'name'), 'Enter').defaultPrevented).toBe(true);
-		expect(table.editing.cell.value).toMatchObject({ key: 'a', column: 'name' });
+		expect(grid.editing.cell.value).toMatchObject({ key: 'a', column: 'name' });
 	});
 
 	it('Escape in an editor cancels it; on a cell it collapses the ranges', async () => {
-		const { table, rows } = setup();
+		const { grid, rows } = setup();
 
-		await focus(table, 0, 'name');
+		await focus(grid, 0, 'name');
 		key(cell(0, 'name'), 'x');
 		await nextTick();
 		key(document.querySelector('[data-dg-part="editor"]') as HTMLElement, 'Escape');
 
-		expect(table.editing.cell.value).toBeNull();
+		expect(grid.editing.cell.value).toBeNull();
 		expect(rows.value[0].name).toBe('Alpha');
 
 		await vi.waitFor(() => expect(document.activeElement).toBe(cell(0, 'name')));
 		key(cell(0, 'name'), 'ArrowDown', { shiftKey: true });
 
 		expect(key(cell(0, 'name'), 'Escape').defaultPrevented).toBe(true);
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 1, columnStart: 0, columnEnd: 1 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 1, columnStart: 0, columnEnd: 1 }]);
 	});
 
 	it('Delete clears, Ctrl+D fills down, Ctrl+Z undoes: each once, by the feature that owns it', async () => {
-		const { table, rows } = setup();
+		const { grid, rows } = setup();
 
-		await focus(table, 0, 'price');
+		await focus(grid, 0, 'price');
 		key(cell(0, 'price'), 'ArrowDown', { shiftKey: true });
 		key(cell(0, 'price'), 'd', { ctrlKey: true });
 
@@ -178,6 +178,6 @@ describe('who takes a key on a cell of a table with every feature', () => {
 		key(cell(0, 'price'), 'z', { ctrlKey: true });
 
 		expect(rows.value.map(row => row.price)).toEqual([1, 1, 3]);
-		expect(table.history.steps.value.map(step => step.source)).toEqual(['fill']);
+		expect(grid.history.steps.value.map(step => step.source)).toEqual(['fill']);
 	});
 });

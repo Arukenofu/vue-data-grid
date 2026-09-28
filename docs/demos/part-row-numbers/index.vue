@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, rowNumberColumn, sorting, useDataTable } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, rowNumberColumn, sorting, useDataGrid } from '@vue-data-grid/core';
 
 import { type Person, people } from '@/data/people';
-import { UiDataTable, UiToolbar } from '@/ui';
+import { UiDataGrid, UiToolbar } from '@/ui';
 
 const column = defineColumn<Person>({ sortable: true });
 
@@ -19,7 +19,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people.slice(0, 12),
 	rowKey: 'id',
@@ -35,6 +35,6 @@ const table = useDataTable({
 			<span class="ui-toolbar-text">Sort by any column: the place of a row is its number, from 1.</span>
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Leaderboard" />
+		<UiDataGrid :grid="grid" label="Leaderboard" />
 	</div>
 </template>

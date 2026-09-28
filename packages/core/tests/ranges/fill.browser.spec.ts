@@ -5,13 +5,13 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, type ShallowRef, shallowRef } from 'vue';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableFillHandle } from '../../src/components/table-fill-handle';
-import { TableFillPreview, TableRangeOverlay } from '../../src/components/table-range-overlay';
-import { TableRoot } from '../../src/components/table-root';
-import { editing, fill, navigation, ranges } from '../../src/data-table/factories';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import type { GridBodyRow } from '../../src/components/context';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridFillHandle } from '../../src/components/grid-fill-handle';
+import { GridFillPreview, GridRangeOverlay } from '../../src/components/grid-range-overlay';
+import { GridRoot } from '../../src/components/grid-root';
+import { editing, fill, navigation, ranges } from '../../src/data-grid/factories';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 
 interface Row {
 	id: string;
@@ -29,8 +29,8 @@ afterEach(() => {
 	wrapper = null;
 });
 
-function createTable(rows: ShallowRef<Row[]>) {
-	return useDataTable({
+function createGrid(rows: ShallowRef<Row[]>) {
+	return useDataGrid({
 		columns,
 		rows,
 		rowKey: 'id',
@@ -51,27 +51,27 @@ function createTable(rows: ShallowRef<Row[]>) {
 
 function setup() {
 	const rows: ShallowRef<Row[]> = shallowRef(Array.from({ length: 30 }, (_, index) => ({ id: `r${index}`, price: index === 1 ? 5 : 0 })));
-	let table: ReturnType<typeof createTable> | null = null;
+	let grid: ReturnType<typeof createGrid> | null = null;
 
 	wrapper = mount(defineComponent({
 		setup() {
-			table = createTable(rows);
+			grid = createGrid(rows);
 
-			return () => h(TableRoot, { table: table as DataTable, style: { width: '300px', height: '240px', font: '14px sans-serif' } }, {
-				default: () => h(TableBody, null, {
-					default: ({ rows: bodyRows }: { rows: readonly TableBodyRow[] }) => [
-						...bodyRows.map(row => h(TableRow, { key: row.key, row }, { default: () => h(TableCells), $stable: true })),
-						h(TableRangeOverlay, { key: 'ranges' }, {
-							default: ({ corner }: { corner: boolean }) => (corner ? h(TableFillHandle) : null),
+			return () => h(GridRoot, { grid: grid as DataGrid, style: { width: '300px', height: '240px', font: '14px sans-serif' } }, {
+				default: () => h(GridBody, null, {
+					default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => [
+						...bodyRows.map(row => h(GridRow, { key: row.key, row }, { default: () => h(GridCells), $stable: true })),
+						h(GridRangeOverlay, { key: 'ranges' }, {
+							default: ({ corner }: { corner: boolean }) => (corner ? h(GridFillHandle) : null),
 						}),
-						h(TableFillPreview, { key: 'fill' }),
+						h(GridFillPreview, { key: 'fill' }),
 					],
 				}),
 			});
 		},
 	}), { attachTo: document.body });
 
-	return { rows, table: table as unknown as ReturnType<typeof createTable> };
+	return { rows, grid: grid as unknown as ReturnType<typeof createGrid> };
 }
 
 function centre(element: Element) {
@@ -86,10 +86,10 @@ function pointer(type: string, target: EventTarget, point: { x: number; y: numbe
 
 describe('the fill handle in a browser', () => {
 	it('stands on the end corner of the range, and dragging it down fills a series', async () => {
-		const { rows, table } = setup();
+		const { rows, grid } = setup();
 
-		table.ranges.select({ key: 'r0', column: 'price' });
-		table.ranges.select({ key: 'r1', column: 'price' }, 'extend');
+		grid.ranges.select({ key: 'r0', column: 'price' });
+		grid.ranges.select({ key: 'r1', column: 'price' }, 'extend');
 		await nextTick();
 
 		const handle = document.querySelector('[data-dg-part="fill-handle"]') as HTMLElement;
@@ -110,6 +110,6 @@ describe('the fill handle in a browser', () => {
 		pointer('pointerup', window, { x: 0, y: 0 });
 
 		expect(rows.value.slice(0, 6).map(row => row.price)).toEqual([0, 5, 10, 15, 20, 0]);
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 5, columnStart: 0, columnEnd: 1 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 5, columnStart: 0, columnEnd: 1 }]);
 	});
 });

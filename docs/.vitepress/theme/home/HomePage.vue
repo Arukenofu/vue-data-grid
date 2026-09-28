@@ -61,7 +61,7 @@ onBeforeUnmount(() => media?.revert());
 				</div>
 			</div>
 			<p class="home-caption">
-				A live table, not a picture: search it, sort by several columns with <kbd>Shift</kbd>, select
+				A live grid, not a picture: search it, sort by several columns with <kbd>Shift</kbd>, select
 				rows, resize and move through the cells with the arrow keys.
 			</p>
 		</section>
@@ -74,7 +74,7 @@ onBeforeUnmount(() => media?.revert());
 
 		<section class="home-section">
 			<p class="home-eyebrow" data-reveal>Examples</p>
-			<h2 class="home-heading" data-reveal>Real tables to take apart.</h2>
+			<h2 class="home-heading" data-reveal>Real grids to take apart.</h2>
 			<p class="home-subheading" data-reveal>
 				Each example is a complete component with its source one switch away. Copy what you need.
 			</p>
@@ -83,7 +83,7 @@ onBeforeUnmount(() => media?.revert());
 
 		<section class="home-cta" data-reveal>
 			<h2 class="home-cta-title">Ready to build yours?</h2>
-			<p class="home-cta-text">Four small steps from an empty component to a sortable, accessible table.</p>
+			<p class="home-cta-text">Four small steps from an empty component to a sortable, accessible grid.</p>
 			<a href="/overview/getting-started" class="home-cta-button">
 				Get started
 				<IconArrowRight aria-hidden="true" />

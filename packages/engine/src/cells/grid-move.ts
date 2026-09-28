@@ -1,7 +1,7 @@
 import { type CellMove, resolveCellMove } from './cell-focus';
 
 /** A cell of a grid row. `span` is how many columns it covers, `1` by default: a group cell covers several. */
-export interface GridCell {
+export interface SectionCell {
 	key: string;
 	span?: number;
 	/**
@@ -21,7 +21,7 @@ export interface GridSection {
 	/** Rows in the section; a section without rows is skipped. */
 	rows: number;
 	/** The cells of each of its rows, from the start edge. */
-	cells: readonly GridCell[];
+	cells: readonly SectionCell[];
 }
 
 /** A cell of the grid: a section, a row inside it and a cell key inside the row. */
@@ -74,7 +74,7 @@ function fromFlatRow(sections: readonly GridSection[], flat: number): FlatRow | 
 	return null;
 }
 
-function getStartColumn(cells: readonly GridCell[], index: number) {
+function getStartColumn(cells: readonly SectionCell[], index: number) {
 	let column = 0;
 
 	for (let position = 0; position < index; position += 1) {
@@ -84,7 +84,7 @@ function getStartColumn(cells: readonly GridCell[], index: number) {
 	return column;
 }
 
-function findCellAtColumn(cells: readonly GridCell[], column: number) {
+function findCellAtColumn(cells: readonly SectionCell[], column: number) {
 	let end = 0;
 
 	for (const cell of cells) {
@@ -98,7 +98,7 @@ function findCellAtColumn(cells: readonly GridCell[], column: number) {
 	return cells[cells.length - 1];
 }
 
-function alignCell(from: readonly GridCell[], index: number, to: readonly GridCell[]) {
+function alignCell(from: readonly SectionCell[], index: number, to: readonly SectionCell[]) {
 	const key = from[index]?.key;
 
 	return to.find(cell => cell.key === key) ?? findCellAtColumn(to, getStartColumn(from, index));
@@ -107,7 +107,7 @@ function alignCell(from: readonly GridCell[], index: number, to: readonly GridCe
 /** Whether a move goes towards the start of its row or column when it lands on a cell to skip. */
 const BACKWARD_MOVES: ReadonlySet<CellMove> = new Set(['left', 'rowEnd', 'up', 'columnEnd', 'last']);
 
-function findInRow(cells: readonly GridCell[], from: number, backward: boolean) {
+function findInRow(cells: readonly SectionCell[], from: number, backward: boolean) {
 	for (let index = from; index >= 0 && index < cells.length; index += backward ? -1 : 1) {
 		if (!cells[index].skip) {
 			return cells[index];
@@ -121,7 +121,7 @@ function findInRow(cells: readonly GridCell[], from: number, backward: boolean) 
  * The first cell that takes focus from row `flat` on, one row at a time towards the start or the end
  * of the grid: over the same column, or for `first` and `last` the first or the last cell of a row.
  */
-function findInColumn(sections: readonly GridSection[], flat: number, backward: boolean, pick: (cells: readonly GridCell[]) => GridCell | null) {
+function findInColumn(sections: readonly GridSection[], flat: number, backward: boolean, pick: (cells: readonly SectionCell[]) => SectionCell | null) {
 	for (let row = flat; row >= 0; row += backward ? -1 : 1) {
 		const target = fromFlatRow(sections, row);
 
@@ -171,7 +171,7 @@ export function resolveGridMove(
 	}
 
 	const targetCells = target.section.cells;
-	let cell: GridCell;
+	let cell: SectionCell;
 
 	if (ROW_MOVES.has(move)) {
 		cell = cells[next.column];
@@ -193,7 +193,7 @@ export function resolveGridMove(
 		return found ? { ...stay, cell: found.key } : stay;
 	}
 
-	const pick = (row: readonly GridCell[]) => (move === 'first' || move === 'last'
+	const pick = (row: readonly SectionCell[]) => (move === 'first' || move === 'last'
 		? findInRow(row, move === 'first' ? 0 : row.length - 1, move === 'last')
 		: skipCell(alignCell(cells, index, row)));
 
@@ -209,6 +209,6 @@ export function resolveGridMove(
 	return findInColumn(sections, next.row, upward, pick) ?? findInColumn(sections, next.row, !upward, pick) ?? stay;
 }
 
-function skipCell(cell: GridCell) {
+function skipCell(cell: SectionCell) {
 	return cell.skip ? null : cell;
 }

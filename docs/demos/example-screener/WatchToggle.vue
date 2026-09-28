@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TableSelectionCheckbox } from '@vue-data-grid/core';
+import { GridSelectionCheckbox } from '@vue-data-grid/core';
 import IconStar from '~icons/lucide/star';
 
 defineProps<{
@@ -9,11 +9,11 @@ defineProps<{
 </script>
 
 <template>
-	<TableSelectionCheckbox v-slot="{ selected }" :row="rowKey" :label="`Watch ${symbol}`" as-child>
+	<GridSelectionCheckbox v-slot="{ selected }" :row="rowKey" :label="`Watch ${symbol}`" as-child>
 		<button type="button" class="watch" :data-watched="selected ? '' : undefined">
 			<IconStar aria-hidden="true" />
 		</button>
-	</TableSelectionCheckbox>
+	</GridSelectionCheckbox>
 </template>
 
 <style scoped>

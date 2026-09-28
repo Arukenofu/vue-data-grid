@@ -2,17 +2,17 @@
 import {
 	defineColumn,
 	defineColumns,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
 	useColumnResize,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
 
 import { type Stock, stocks } from '@/data/stocks';
@@ -33,46 +33,46 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
 	rowHeight: 40,
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
-const resize = useColumnResize(table.scope, { step: 10 });
+const resize = useColumnResize(grid.scope, { step: 10 });
 const resizing = resize.resizing;
 </script>
 
 <template>
 	<div>
 		<UiToolbar>
-			<UiButton @click="table.scope.fitColumns()">Fill the width</UiButton>
+			<UiButton @click="grid.scope.fitColumns()">Fill the width</UiButton>
 			<span class="ui-toolbar-text">Drag a line between headers, or focus it and press ← or →.</span>
 			<span class="ui-toolbar-spacer" />
-			<UiButton variant="ghost" @click="table.state.reset()">Reset</UiButton>
+			<UiButton variant="ghost" @click="grid.state.reset()">Reset</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Stocks" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns }">
-					<TableHeaderCell v-for="column in columns" :key="column.key" v-slot="{ column: header }" :column="column">
-						<TableHeaderContent />
+		<GridRoot :grid="grid" label="Stocks" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns }">
+					<GridHeaderCell v-for="column in columns" :key="column.key" v-slot="{ column: header }" :column="column">
+						<GridHeaderContent />
 						<span v-bind="resize.getHandleProps(header.name)" class="grip">
 							<span class="grip-line" />
-							<span v-if="resizing === header.name" class="grip-width">{{ table.scope.getWidth(header.name) }} px</span>
+							<span v-if="resizing === header.name" class="grip-width">{{ grid.scope.getWidth(header.name) }} px</span>
 						</span>
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

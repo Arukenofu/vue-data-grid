@@ -6,15 +6,15 @@ import {
 	selection,
 	sorting,
 	useCellChanges,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
 import IconPause from '~icons/lucide/pause';
 import IconPlay from '~icons/lucide/play';
 import { computed, h, ref, shallowRef } from 'vue';
 
 import { getChange, type Sector, type Stock } from '@/data/stocks';
-import { type BadgeTone, UiBadge, UiButton, UiDataTable, UiSelect, UiSparkline, UiToggleGroup, UiToolbar } from '@/ui';
+import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiSelect, UiSparkline, UiToggleGroup, UiToolbar } from '@/ui';
 
 import ChangeCell from './ChangeCell.vue';
 import { formatCap, formatChange, formatPrice, formatVolume } from './format';
@@ -136,7 +136,7 @@ const columns = defineColumns({
 const rows = computed(() => quotes.value.filter(stock => (sector.value === 'all' || stock.sector === sector.value)
 	&& (view.value === 'all' || watchlist.value.includes(stock.id))));
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -149,9 +149,9 @@ const table = useDataTable({
 	},
 });
 
-const changes = useCellChanges(table.scope, { columns: ['price'], duration: 900 });
+const changes = useCellChanges(grid.scope, { columns: ['price'], duration: 900 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
 const advancing = computed(() => quotes.value.filter(stock => stock.price > stock.open).length);
 const declining = computed(() => quotes.value.length - advancing.value);
@@ -170,8 +170,8 @@ const declining = computed(() => quotes.value.length - advancing.value);
 			</UiButton>
 		</UiToolbar>
 
-		<UiDataTable
-			:table="table"
+		<UiDataGrid
+			:grid="grid"
 			label="Stock screener"
 			:messages="{ empty: 'Star a few stocks to build your watchlist.' }"
 			footer

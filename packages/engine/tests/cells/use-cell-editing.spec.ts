@@ -11,7 +11,7 @@ import {
 	useCellEditing,
 } from '../../src/cells/use-cell-editing';
 import { defineColumn, defineColumns } from '../../src/columns/define-columns';
-import { useTableEngine } from '../../src/engine/use-table-engine';
+import { useGridEngine } from '../../src/engine/use-grid-engine';
 
 interface Row {
 	id: string;
@@ -65,11 +65,11 @@ function setup(options: Partial<CellEditingOptions<Row>> = {}) {
 	const rows: ShallowRef<Row[]> = shallowRef(initial);
 	const commits: CellCommit<Row>[] = [];
 	let editing: ReturnType<typeof useCellEditing<Row>> | null = null;
-	let scope: ReturnType<typeof useTableEngine<Row>>['scope'] | null = null;
+	let scope: ReturnType<typeof useGridEngine<Row>>['scope'] | null = null;
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			const engine = useTableEngine<Row>({ columns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 30 });
+			const engine = useGridEngine<Row>({ columns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 30 });
 
 			scope = engine.scope;
 
@@ -91,7 +91,7 @@ function setup(options: Partial<CellEditingOptions<Row>> = {}) {
 		rows,
 		commits,
 		editing: editing as unknown as ReturnType<typeof useCellEditing<Row>>,
-		scope: scope as unknown as ReturnType<typeof useTableEngine<Row>>['scope'],
+		scope: scope as unknown as ReturnType<typeof useGridEngine<Row>>['scope'],
 	};
 }
 
@@ -363,7 +363,7 @@ describe('useCellEditing — what a commit holds', () => {
 	});
 });
 
-describe('useCellEditing — sessions and the table', () => {
+describe('useCellEditing — sessions and the grid', () => {
 	it('starting the cell being edited again starts from the value its commit wrote', () => {
 		const { editing } = setup();
 

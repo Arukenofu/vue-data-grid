@@ -1,4 +1,4 @@
-import type { TableScope } from '@vue-data-grid/engine';
+import type { GridScope } from '@vue-data-grid/engine';
 import { getCurrentScope, nextTick, onScopeDispose } from 'vue';
 
 import { isRtl } from '../keyboard/keys';
@@ -43,7 +43,7 @@ function hasOnly(event: KeyboardEvent, modifier: 'alt' | 'shift') {
 		&& !event.metaKey;
 }
 
-/** `1` toward the inline end, `-1` toward the start: ← and → swap in a right-to-left table. */
+/** `1` toward the inline end, `-1` toward the start: ← and → swap in a right-to-left grid. */
 function getInlineStep(event: KeyboardEvent) {
 	const step = HORIZONTAL_STEPS[event.key];
 
@@ -94,7 +94,7 @@ function requestFrame(callback: () => void) {
  * width held on a key is one gesture, as a drag of the resize handle: it reaches the layout when the
  * key is released or focus leaves the cell.
  */
-export function useHeaderCell(scope: TableScope, options: HeaderCellOptions = {}) {
+export function useHeaderCell(scope: GridScope, options: HeaderCellOptions = {}) {
 	const handlers = new Map<string, HeaderCellHandlers>();
 	let moveName: string | null = null;
 	let moveSteps = 0;

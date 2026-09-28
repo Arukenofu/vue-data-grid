@@ -1,6 +1,6 @@
 export type SortDirection = 'asc' | 'desc';
 
-export interface TableSort<TName extends string = string> {
+export interface GridSort<TName extends string = string> {
 	name: TName;
 	direction: SortDirection;
 }
@@ -9,10 +9,10 @@ export interface TableSort<TName extends string = string> {
 export const DEFAULT_SORT_ORDER: readonly SortDirection[] = ['desc', 'asc'];
 
 function getNextSort(
-	current: TableSort | undefined,
+	current: GridSort | undefined,
 	name: string,
 	order: readonly SortDirection[],
-): TableSort | null {
+): GridSort | null {
 	const direction = order[current ? order.indexOf(current.direction) + 1 : 0];
 
 	return direction ? { name, direction } : null;
@@ -24,11 +24,11 @@ function getNextSort(
  * column is appended or changes direction in place.
  */
 export function toggleSort(
-	sort: readonly TableSort[],
+	sort: readonly GridSort[],
 	name: string,
 	additive: boolean,
 	order: readonly SortDirection[] = DEFAULT_SORT_ORDER,
-): TableSort[] {
+): GridSort[] {
 	const index = sort.findIndex(item => item.name === name);
 	const next = getNextSort(sort[index], name, order);
 

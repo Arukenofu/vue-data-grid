@@ -1,18 +1,18 @@
 /**
- * The main package of the table: what the headless core leaves to markup. A table assembled in one
- * call (`useDataTable`) from features, the render fields of columns (`header`, `cell`, `cellClass`,
+ * The main package of the grid: what the headless core leaves to markup. A grid assembled in one
+ * call (`useDataGrid`) from features, the render fields of columns (`header`, `cell`, `cellClass`,
  * `footer`, `editor`), the markup props of the WAI-ARIA grid, keyboard navigation of the grid, cell
  * ranges, editing with its editors, undo, the clipboard with paste, the fill handle, what header cells
  * do, autosize from content, the sticky offset, and the render memo.
  *
- * It re-exports the stable API of `@vue-data-grid/engine`, so a table imports everything from here
+ * It re-exports the stable API of `@vue-data-grid/engine`, so a grid imports everything from here
  * and gets one copy of the core, the one this package augments, and `@vue-data-grid/flip`, the engines
- * of `useTableMotion` and the drags.
+ * of `useGridMotion` and the drags.
  */
 export * from '@vue-data-grid/flip';
 export * from '@vue-data-grid/engine';
-export { useTableAnnouncer } from './announcer/use-table-announcer';
-export type { ClipboardEditing, ClipboardOptions, ClipboardTable, TableClipboard } from './clipboard/use-clipboard';
+export { useGridAnnouncer } from './announcer/use-grid-announcer';
+export type { ClipboardEditing, ClipboardGrid, ClipboardOptions, GridClipboard } from './clipboard/use-clipboard';
 export { useClipboard } from './clipboard/use-clipboard';
 export type { DownloadCsvOptions } from './clipboard/download-csv';
 export { downloadCsv } from './clipboard/download-csv';
@@ -51,80 +51,80 @@ export {
 	textEditor,
 } from './editing/editors';
 export type { SelectEditorFilter, SelectEditorOption } from './editing/select-editor';
-export type { EditingTable, TableEditing, TableEditingOptions } from './editing/use-table-editing';
-export { useTableEditing } from './editing/use-table-editing';
-export type { HistoryTable, TableHistory, TableHistoryOptions } from './editing/use-table-history';
-export { useTableHistory } from './editing/use-table-history';
-export type { CellSlotContext } from './components/table-body';
-export { TableBody, TableCells, TableRow } from './components/table-body';
-export type { TableBodyRow, TableDragItems } from './components/context';
+export type { EditingGrid, GridEditing, GridEditingOptions } from './editing/use-grid-editing';
+export { useGridEditing } from './editing/use-grid-editing';
+export type { GridHistory, GridHistoryOptions, HistoryGrid } from './editing/use-grid-history';
+export { useGridHistory } from './editing/use-grid-history';
+export type { CellSlotContext } from './components/grid-body';
+export { GridBody, GridCells, GridRow } from './components/grid-body';
+export type { GridBodyRow, GridDragItems } from './components/context';
 export {
 	createBodyRowContext,
 	createColumnDragContext,
-	createDataTableContext,
+	createDataGridContext,
 	createFooterCellContext,
 	createGroupCellContext,
 	createHeaderCellContext,
 	createRowDragContext,
 	useBodyRowContext,
 	useColumnDragContext,
-	useDataTableContext,
+	useDataGridContext,
 	useFooterCellContext,
 	useGroupCellContext,
 	useHeaderCellContext,
 	useRowDragContext,
 } from './components/context';
-export type { FooterSlotContext } from './components/table-footer';
-export { TableFooter, TableFooterCell, TableFooterContent, TableFooterRow } from './components/table-footer';
-export type { GroupCellSlotContext } from './components/table-header';
+export type { FooterSlotContext } from './components/grid-footer';
+export { GridFooter, GridFooterCell, GridFooterContent, GridFooterRow } from './components/grid-footer';
+export type { GroupCellSlotContext } from './components/grid-header';
 export {
-	TableGroupCell,
-	TableGroupContent,
-	TableGroupRow,
-	TableGroupToggle,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-} from './components/table-header';
-export type { SortMessageItem, TableMessages } from './components/messages';
-export { createTableMessagesContext, DEFAULT_MESSAGES, useTableMessagesContext } from './components/messages';
+	GridGroupCell,
+	GridGroupContent,
+	GridGroupRow,
+	GridGroupToggle,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+} from './components/grid-header';
+export type { GridMessages, SortMessageItem } from './components/messages';
+export { createGridMessagesContext, DEFAULT_MESSAGES, useGridMessagesContext } from './components/messages';
 export type { PrimitiveOptions } from './components/primitive';
 export { forwardElement, primitiveProps, renderPrimitive } from './components/primitive';
-export { TableFillHandle } from './components/table-fill-handle';
-export type { RangeCellSlotContext } from './components/table-range-overlay';
-export { TableFillPreview, TableRangeOverlay } from './components/table-range-overlay';
-export { TableResizeHandle } from './components/table-resize-handle';
-export { TableEmpty, TableLoading } from './components/table-overlays';
-export { TableRoot } from './components/table-root';
+export { GridFillHandle } from './components/grid-fill-handle';
+export type { RangeCellSlotContext } from './components/grid-range-overlay';
+export { GridFillPreview, GridRangeOverlay } from './components/grid-range-overlay';
+export { GridResizeHandle } from './components/grid-resize-handle';
+export { GridEmpty, GridLoading } from './components/grid-overlays';
+export { GridRoot } from './components/grid-root';
 export {
-	TableSelectAllCheckbox,
-	TableSelectionCheckbox,
-	TableSortIndicator,
-	TableTreeToggle,
-} from './components/table-service-parts';
+	GridSelectAllCheckbox,
+	GridSelectionCheckbox,
+	GridSortIndicator,
+	GridTreeToggle,
+} from './components/grid-service-parts';
 export type {
-	NavigationTable,
-	RangesTable,
-	RowsTable,
-	SelectionTable,
-	TableColumns,
-	TableGroupingOptions,
-	TableNavigationOptions,
-	TableRangesOptions,
-	TableRowsFeature,
-	TableSelectionOptions,
-	TableSortingOptions,
-	TableTreeOptions,
-} from './data-table/features';
+	GridColumns,
+	GridGroupingOptions,
+	GridNavigationOptions,
+	GridRangesOptions,
+	GridRowsFeature,
+	GridSelectionOptions,
+	GridSortingOptions,
+	GridTreeOptions,
+	NavigationGrid,
+	RangesGrid,
+	RowsGrid,
+	SelectionGrid,
+} from './data-grid/features';
 export {
-	useTableGrouping,
-	useTableNavigation,
-	useTableRanges,
-	useTableSelection,
-	useTableSorting,
-	useTableTree,
-} from './data-table/features';
+	useGridGrouping,
+	useGridNavigation,
+	useGridRanges,
+	useGridSelection,
+	useGridSorting,
+	useGridTree,
+} from './data-grid/features';
 export {
 	clipboard,
 	editing,
@@ -136,43 +136,43 @@ export {
 	selection,
 	sorting,
 	tree,
-} from './data-table/factories';
+} from './data-grid/factories';
 export type {
-	DataTable,
-	DataTableBaseOptions,
-	DataTableFeatureChecks,
-	DataTableFeatureName,
-	DataTableFeatures,
-	DataTableHandle,
-	DataTableHandles,
-	DataTableHandlesOf,
-	DataTableOptions,
-	DataTableRowRef,
-	DataTableStateOptions,
-	DataTableStateSource,
-	FeatureTable,
-	TableClipboardFeature,
-	TableEditingFeature,
-	TableFillFeature,
-	TableHistoryFeature,
-	TableNavigationFeature,
-	TableRangesFeature,
-	TableSelectionFeature,
-	TableTreeFeature,
-} from './data-table/use-data-table';
-export { useDataTable } from './data-table/use-data-table';
+	DataGrid,
+	DataGridBaseOptions,
+	DataGridFeatureChecks,
+	DataGridFeatureName,
+	DataGridFeatures,
+	DataGridHandle,
+	DataGridHandles,
+	DataGridHandlesOf,
+	DataGridOptions,
+	DataGridRowRef,
+	DataGridStateOptions,
+	DataGridStateSource,
+	FeatureGrid,
+	GridClipboardFeature,
+	GridEditingFeature,
+	GridFillFeature,
+	GridHistoryFeature,
+	GridNavigationFeature,
+	GridRangesFeature,
+	GridSelectionFeature,
+	GridTreeFeature,
+} from './data-grid/use-data-grid';
+export { useDataGrid } from './data-grid/use-data-grid';
 export type { MeasureColumnsOptions } from './columns/measure-column';
 export { measureColumnsContent } from './columns/measure-column';
 export type { AutoScroll, AutoScrollEdges, AutoScrollOptions, AutoScrollPoint } from './scroll/use-auto-scroll';
 export { useAutoScroll } from './scroll/use-auto-scroll';
-export type { CellDrag, CellDragEnd, CellDragOptions, CellDragTable } from './ranges/use-cell-drag';
+export type { CellDrag, CellDragEnd, CellDragGrid, CellDragOptions } from './ranges/use-cell-drag';
 export { useCellDrag } from './ranges/use-cell-drag';
-export type { RangeSelection, RangeSelectionOptions, RangeSelectionTable } from './ranges/use-range-selection';
+export type { RangeSelection, RangeSelectionGrid, RangeSelectionOptions } from './ranges/use-range-selection';
 export { useRangeSelection } from './ranges/use-range-selection';
-export type { FillRequest, FillTable, TableFill, TableFillOptions } from './ranges/use-table-fill';
-export { useTableFill } from './ranges/use-table-fill';
-export type { MotionTable, TableMotion, TableMotionChange, TableMotionOptions, TableMotionWidths } from './motion/use-table-motion';
-export { useTableMotion } from './motion/use-table-motion';
+export type { FillGrid, FillRequest, GridFill, GridFillOptions } from './ranges/use-grid-fill';
+export { useGridFill } from './ranges/use-grid-fill';
+export type { GridMotion, GridMotionChange, GridMotionOptions, GridMotionWidths, MotionGrid } from './motion/use-grid-motion';
+export { useGridMotion } from './motion/use-grid-motion';
 export type { HeaderCellHandlers, HeaderCellOptions } from './header/use-header-cell';
 export { useHeaderCell } from './header/use-header-cell';
 export type { BodyCellFocus } from './navigation/body-cell-focus';
@@ -185,20 +185,20 @@ export {
 	readGridPosition,
 } from './navigation/grid-attributes';
 export type {
-	GridNavigation,
-	GridNavigationOptions,
-	GridNavigationSelection,
-	GridNavigationTree,
-} from './navigation/use-grid-navigation';
-export { useGridNavigation } from './navigation/use-grid-navigation';
+	CellNavigation,
+	CellNavigationOptions,
+	CellNavigationSelection,
+	CellNavigationTree,
+} from './navigation/use-cell-navigation';
+export { useCellNavigation } from './navigation/use-cell-navigation';
 export { getColumnIndexProps, getGroupIndexProps } from './props/index-props';
 export type {
-	TableProps,
-	TablePropsOptions,
-	TableRole,
-	TableRowRef,
-	TableRowSelection,
-} from './props/use-table-props';
-export { useTableProps } from './props/use-table-props';
+	GridProps,
+	GridPropsOptions,
+	GridRole,
+	GridRowRef,
+	GridRowSelection,
+} from './props/use-grid-props';
+export { useGridProps } from './props/use-grid-props';
 export { isSameTokens, keepMounted } from './render/memo';
 export { useStickyOffset } from './render/use-sticky-offset';

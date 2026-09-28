@@ -6,14 +6,14 @@ import {
 	selection,
 	selectionColumn,
 	type SelectionMode,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
 import IconArchive from '~icons/lucide/archive';
 import IconTruck from '~icons/lucide/truck';
 import { computed, h, shallowRef, watch } from 'vue';
 
-import { type BadgeTone, UiBadge, UiButton, UiDataTable, UiToggleGroup, UiToolbar } from '@/ui';
+import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { createOrders, type Order, type OrderStatus } from './data';
 
@@ -54,7 +54,7 @@ const selectionMode = shallowRef<SelectionMode>('multiple');
 
 const cancelled = computed(() => new Set(orders.value.filter(order => order.status === 'cancelled').map(order => order.id)));
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: orders,
 	rowKey: 'id',
@@ -69,11 +69,11 @@ const table = useDataTable({
 	},
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
-const selectedCount = table.selection.selectedCount;
+const selectedCount = grid.selection.selectedCount;
 
-watch(selectionMode, () => table.selection.clear());
+watch(selectionMode, () => grid.selection.clear());
 
 function ship(order: Order): Order {
 	return { ...order, status: 'shipped' };
@@ -83,14 +83,14 @@ function markShipped() {
 	const keys = new Set(selected.value);
 
 	orders.value = orders.value.map(order => (keys.has(order.id) ? ship(order) : order));
-	table.selection.clear();
+	grid.selection.clear();
 }
 
 function archive() {
 	const keys = new Set(selected.value);
 
 	orders.value = orders.value.filter(order => !keys.has(order.id));
-	table.selection.clear();
+	grid.selection.clear();
 }
 </script>
 
@@ -107,12 +107,12 @@ function archive() {
 					<IconArchive aria-hidden="true" />
 					Archive
 				</UiButton>
-				<UiButton size="sm" variant="ghost" @click="table.selection.clear()">Clear</UiButton>
+				<UiButton size="sm" variant="ghost" @click="grid.selection.clear()">Clear</UiButton>
 			</template>
 			<span v-else class="ui-toolbar-text">Select orders to ship or archive them. Cancelled ones cannot be selected.</span>
 			<span class="ui-spacer" />
 			<UiToggleGroup v-model="selectionMode" :options="MODES" label="Selection mode" />
 		</UiToolbar>
-		<UiDataTable :table="table" label="Orders" />
+		<UiDataGrid :grid="grid" label="Orders" />
 	</div>
 </template>

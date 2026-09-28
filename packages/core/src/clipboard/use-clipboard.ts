@@ -1,13 +1,13 @@
-import { type CellEditSource, type CellRanges, type RangeTextOptions, type TableScope, toCsv } from '@vue-data-grid/engine';
+import { type CellEditSource, type CellRanges, type GridScope, type RangeTextOptions, toCsv } from '@vue-data-grid/engine';
 import { type MaybeRefOrGetter, type Ref, toValue, watch } from 'vue';
 
 import type { BodyCellFocus } from '../navigation/body-cell-focus';
 import { TEXT_FIELD_SELECTOR } from '../pointer/controls';
 
-/** What the clipboard needs of a table; the table of `useDataTable` fits, with its features. */
-export interface ClipboardTable {
-	scope: TableScope;
-	/** The table element: its `copy`, `cut` and `paste` events are listened to. */
+/** What the clipboard needs of a grid; the grid of `useDataGrid` fits, with its features. */
+export interface ClipboardGrid {
+	scope: GridScope;
+	/** The grid element: its `copy`, `cut` and `paste` events are listened to. */
 	root: Readonly<Ref<HTMLElement | null>>;
 	/** The cell ranges to copy; the `ranges` feature. */
 	ranges?: Pick<CellRanges, 'getText'>;
@@ -30,14 +30,14 @@ export interface ClipboardEditing {
 export interface ClipboardOptions {
 	/** Start the text with a line of column headers; `false` by default. */
 	headers?: MaybeRefOrGetter<boolean>;
-	/** Focus of the body cells, whose cell is copied when there is no range; the table's navigation by default. */
+	/** Focus of the body cells, whose cell is copied when there is no range; the grid's navigation by default. */
 	focus?: BodyCellFocus;
 	/** `true` by default. */
 	enabled?: MaybeRefOrGetter<boolean>;
 }
 
 /**
- * The clipboard of a table, the one owner of its `copy`, `cut` and `paste` events. Ctrl+C or ⌘+C, and
+ * The clipboard of a grid, the one owner of its `copy`, `cut` and `paste` events. Ctrl+C or ⌘+C, and
  * Copy of the browser's menu, put the last cell range on the clipboard as tab-separated text through
  * each column's `format`, the way a spreadsheet pastes it; without a range, the focused cell. With the
  * editing, a cut clears the cells it copied, and a paste writes the clipboard's rows over the
@@ -45,11 +45,11 @@ export interface ClipboardOptions {
  *
  * The events write and read the clipboard at once and need no permission; `copy()` goes through
  * `navigator.clipboard`, which a browser allows from a click. The clipboard of a text field inside a
- * cell, an editor included, and of text selected in the table, is left to the browser.
+ * cell, an editor included, and of text selected in the grid, is left to the browser.
  */
-export function useClipboard(table: ClipboardTable, options: ClipboardOptions = {}) {
-	const { scope } = table;
-	const focus = options.focus ?? table.navigation?.cells;
+export function useClipboard(grid: ClipboardGrid, options: ClipboardOptions = {}) {
+	const { scope } = grid;
+	const focus = options.focus ?? grid.navigation?.cells;
 
 	function isEnabled() {
 		return toValue(options.enabled) ?? true;
@@ -80,7 +80,7 @@ export function useClipboard(table: ClipboardTable, options: ClipboardOptions = 
 	/** What a copy puts on the clipboard now: the last range, else the focused cell; `''` for nothing. */
 	function getText() {
 		const text: RangeTextOptions = { headers: getHeaders() };
-		const ranged = table.ranges?.getText(text) ?? '';
+		const ranged = grid.ranges?.getText(text) ?? '';
 
 		return ranged === '' ? getFocusedText() : ranged;
 	}
@@ -109,9 +109,9 @@ export function useClipboard(table: ClipboardTable, options: ClipboardOptions = 
 		}
 	}
 
-	/** Whether the event is the browser's: in a text field, or with text selected in the table. */
+	/** Whether the event is the browser's: in a text field, or with text selected in the grid. */
 	function isBrowserClipboard(event: ClipboardEvent) {
-		const root = table.root.value;
+		const root = grid.root.value;
 		const selection = typeof document === 'undefined' ? null : document.getSelection();
 		const selected = selection !== null && !selection.isCollapsed && root !== null && root.contains(selection.anchorNode);
 
@@ -119,7 +119,7 @@ export function useClipboard(table: ClipboardTable, options: ClipboardOptions = 
 	}
 
 	function isOurs(event: ClipboardEvent) {
-		return isEnabled() && event.clipboardData !== null && !isBrowserClipboard(event) && (table.editing?.cell.value ?? null) === null;
+		return isEnabled() && event.clipboardData !== null && !isBrowserClipboard(event) && (grid.editing?.cell.value ?? null) === null;
 	}
 
 	function handleCopy(event: ClipboardEvent) {
@@ -132,7 +132,7 @@ export function useClipboard(table: ClipboardTable, options: ClipboardOptions = 
 	}
 
 	function handleCut(event: ClipboardEvent) {
-		const { editing } = table;
+		const { editing } = grid;
 		const text = editing && isOurs(event) ? getText() : '';
 
 		if (editing && text !== '') {
@@ -143,17 +143,17 @@ export function useClipboard(table: ClipboardTable, options: ClipboardOptions = 
 	}
 
 	function handlePaste(event: ClipboardEvent) {
-		const { editing } = table;
+		const { editing } = grid;
 		const text = editing && isOurs(event) && editing.hasSelection() ? event.clipboardData?.getData('text/plain') ?? '' : '';
 
-		// Without a selection the table has nowhere to paste, and the paste stays the page's.
+		// Without a selection the grid has nowhere to paste, and the paste stays the page's.
 		if (editing && text !== '') {
 			event.preventDefault();
 			editing.paste(text);
 		}
 	}
 
-	watch(() => table.root.value, (root, _previous, onCleanup) => {
+	watch(() => grid.root.value, (root, _previous, onCleanup) => {
 		if (!root) {
 			return;
 		}
@@ -171,5 +171,5 @@ export function useClipboard(table: ClipboardTable, options: ClipboardOptions = 
 	return { copy, getText };
 }
 
-/** The clipboard of a table as `useClipboard` gives it. */
-export type TableClipboard = ReturnType<typeof useClipboard>;
+/** The clipboard of a grid as `useClipboard` gives it. */
+export type GridClipboard = ReturnType<typeof useClipboard>;

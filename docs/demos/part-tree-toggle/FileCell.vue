@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type RowNode, TableTreeToggle } from '@vue-data-grid/core';
+import { GridTreeToggle, type RowNode } from '@vue-data-grid/core';
 import IconChevronRight from '~icons/lucide/chevron-right';
 import IconFileArchive from '~icons/lucide/file-archive';
 import IconFileCode from '~icons/lucide/file-code';
@@ -39,9 +39,9 @@ const icon = computed(() => {
 <template>
 	<span class="file">
 		<span class="indent" :style="{ width: `${(node?.level ?? 0) * INDENT}px` }" />
-		<TableTreeToggle v-slot="{ expanded }" class="toggle">
+		<GridTreeToggle v-slot="{ expanded }" class="toggle">
 			<IconChevronRight class="chevron" :data-expanded="expanded || undefined" />
-		</TableTreeToggle>
+		</GridTreeToggle>
 		<component :is="icon" class="icon" :data-kind="file.kind" aria-hidden="true" />
 		<span class="name">{{ file.name }}</span>
 	</span>

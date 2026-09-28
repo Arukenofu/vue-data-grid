@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, sorting, useDataTable } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, navigation, sorting, useDataGrid } from '@vue-data-grid/core';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import IconArrowUpToLine from '~icons/lucide/arrow-up-to-line';
 import IconLocate from '~icons/lucide/locate';
 import { computed, h, nextTick, shallowRef, watch } from 'vue';
 
-import { type BadgeTone, type Option, UiBadge, UiButton, UiDataTable, UiNumberField, UiStat, UiToggleGroup, UiToolbar } from '@/ui';
+import { type BadgeTone, type Option, UiBadge, UiButton, UiDataGrid, UiNumberField, UiStat, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { createReadings, type Health, METRICS, type Reading } from './data';
 
@@ -59,7 +59,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -71,7 +71,7 @@ const table = useDataTable({
 	},
 });
 
-const { scope } = table;
+const { scope } = grid;
 
 const cellCount = computed(() => rows.value.length * scope.columns.value.length);
 const renderedRows = computed(() => scope.rowRange.value.end - scope.rowRange.value.start);
@@ -88,7 +88,7 @@ watch(scope.sort, () => {
 function goToRow() {
 	const row = Math.min(Math.max(target.value, 1), rows.value.length) - 1;
 
-	void table.navigation.focusCell({ section: 'body', row, cell: 'id' });
+	void grid.navigation.focusCell({ section: 'body', row, cell: 'id' });
 }
 
 function formatCount(value: number) {
@@ -115,7 +115,7 @@ function formatCount(value: number) {
 			</UiButton>
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Device readings" density="compact" style="height: 560px" />
+		<UiDataGrid :grid="grid" label="Device readings" density="compact" style="height: 560px" />
 
 		<div class="stats">
 			<UiStat label="Cells" :value="formatCount(cellCount)" />

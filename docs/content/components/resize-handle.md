@@ -16,7 +16,7 @@ it to fit the column to its content.
 
 <Highlights
 	:features="[
-		'Drags with pointer capture, and follows the reading direction in a right-to-left table.',
+		'Drags with pointer capture, and follows the reading direction in a right-to-left grid.',
 		'The width reaches the cells once per animation frame through CSS variables: no row renders during a drag.',
 		'A double click fits the column to its content.',
 		'Focusable, with ← and → to resize and Home and End for the limits.',
@@ -29,14 +29,14 @@ it to fit the column to its content.
 
 ```vue
 <script setup lang="ts">
-import { TableHeaderCell, TableHeaderContent, TableResizeHandle } from '@vue-data-grid/core';
+import { GridHeaderCell, GridHeaderContent, GridResizeHandle } from '@vue-data-grid/core';
 </script>
 
 <template>
-	<TableHeaderCell :column="column">
-		<TableHeaderContent />
-		<TableResizeHandle />
-	</TableHeaderCell>
+	<GridHeaderCell :column="column">
+		<GridHeaderContent />
+		<GridResizeHandle />
+	</GridHeaderCell>
 </template>
 ```
 
@@ -48,7 +48,7 @@ const column = defineColumn<Person>({ resizable: true, minWidth: 80, maxWidth: 3
 
 ## API reference
 
-### TableResizeHandle
+### GridResizeHandle
 
 A thin grab area at the end edge of the header cell it is in, at the start edge for a column pinned
 to the end. The structural styles place it; the element is empty without a slot. A click on the
@@ -90,9 +90,9 @@ The slot gets the width and whether the handle is being dragged. The demo shows 
 width only during a drag:
 
 ```vue
-<TableResizeHandle v-slot="{ width, resizing }">
+<GridResizeHandle v-slot="{ width, resizing }">
 	<span v-if="resizing" class="width">{{ Math.round(width) }} px</span>
-</TableResizeHandle>
+</GridResizeHandle>
 ```
 
 ### Fitting columns from a button
@@ -103,24 +103,24 @@ the view:
 ```ts
 import { autosizeColumns } from '@vue-data-grid/core';
 
-autosizeColumns(table.scope);
-table.scope.fitColumns();
+autosizeColumns(grid.scope);
+grid.scope.fitColumns();
 ```
 
 Both write every width in one change of the layout. Widths are kept in the column state with the
-order and the pins: persist it with the `persist` option of `useDataTable`, and the widths come back
+order and the pins: persist it with the `persist` option of `useDataGrid`, and the widths come back
 on the next visit.
 
 ### Animating a fit
 
 A drag follows the pointer and is never animated. A width that jumps, from a double click, a fit or a
-reset of the layout, can glide instead: `useTableMotion` animates every change of the widths in the
+reset of the layout, can glide instead: `useGridMotion` animates every change of the widths in the
 layout, frame by frame through CSS variables, without rendering a row. The demo above does just this:
 
 ```ts
-import { useTableMotion } from '@vue-data-grid/core';
+import { useGridMotion } from '@vue-data-grid/core';
 
-useTableMotion(table);
+useGridMotion(grid);
 ```
 
 Its `widths` option sets the duration and the easing, or `false` turns the widths off while rows and
@@ -171,5 +171,5 @@ pattern.
 	]"
 />
 
-In a right-to-left table ← and → swap. With the header cell focused, <kbd>Shift</kbd>+<kbd>←</kbd>
+In a right-to-left grid ← and → swap. With the header cell focused, <kbd>Shift</kbd>+<kbd>←</kbd>
 and <kbd>Shift</kbd>+<kbd>→</kbd> resize the column without reaching the handle.

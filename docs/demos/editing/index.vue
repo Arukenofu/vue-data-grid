@@ -12,14 +12,14 @@ import {
 	numberField,
 	ranges,
 	selectEditor,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconRedo from '~icons/lucide/redo-2';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconUndo from '~icons/lucide/undo-2';
 import { computed, shallowRef } from 'vue';
 
-import { UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiStat, UiToolbar } from '@/ui';
 
 import { CATEGORIES, type Product, products } from './data';
 
@@ -95,7 +95,7 @@ const columns = defineColumns({
 
 const rows = shallowRef(products);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -115,7 +115,7 @@ const table = useDataTable({
 });
 
 const lastChange = computed(() => {
-	const commit = table.editing.lastCommit.value;
+	const commit = grid.editing.lastCommit.value;
 
 	if (!commit) {
 		return 'Nothing yet';
@@ -128,18 +128,18 @@ const lastChange = computed(() => {
 
 function reset() {
 	rows.value = products;
-	table.history.clear();
+	grid.history.clear();
 }
 </script>
 
 <template>
 	<div class="ui-stack">
 		<UiToolbar>
-			<UiButton :disabled="!table.history.canUndo.value" @click="table.history.undo()">
+			<UiButton :disabled="!grid.history.canUndo.value" @click="grid.history.undo()">
 				<IconUndo aria-hidden="true" />
 				Undo
 			</UiButton>
-			<UiButton :disabled="!table.history.canRedo.value" @click="table.history.redo()">
+			<UiButton :disabled="!grid.history.canRedo.value" @click="grid.history.redo()">
 				<IconRedo aria-hidden="true" />
 				Redo
 			</UiButton>
@@ -151,6 +151,6 @@ function reset() {
 			<UiStat label="Last change" :value="lastChange" />
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Inventory" />
+		<UiDataGrid :grid="grid" label="Inventory" />
 	</div>
 </template>

@@ -16,7 +16,7 @@ export {
 } from './cell-range';
 export type { CsvOptions } from './csv';
 export { toCsv } from './csv';
-export type { GridCell, GridPosition, GridSection } from './grid-move';
+export type { GridPosition, GridSection, SectionCell } from './grid-move';
 export { resolveGridMove } from './grid-move';
 export type { FillOptions } from './fill';
 export { getFillTarget, resolveFill } from './fill';

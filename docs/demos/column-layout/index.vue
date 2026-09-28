@@ -4,15 +4,15 @@ import {
 	defineColumn,
 	defineColumns,
 	localStorageStore,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
 import IconArrowLeftRight from '~icons/lucide/arrow-left-right';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import IconUnfoldHorizontal from '~icons/lucide/unfold-horizontal';
 
 import { type Person, people } from '@/data/people';
-import { UiButton, UiDataTable, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiToolbar } from '@/ui';
 
 import ColumnsMenu from './ColumnsMenu.vue';
 
@@ -31,7 +31,7 @@ const columns = defineColumns({
 	salary: column(person => person.salary, { label: 'Salary', width: 110, align: 'right', format: salary => money.format(salary) }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -39,21 +39,21 @@ const table = useDataTable({
 	persist: localStorageStore('vue-data-grid-docs:column-layout'),
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
 function fitToContent() {
-	autosizeColumns(table.scope);
+	autosizeColumns(grid.scope);
 }
 
 function fitToWidth() {
-	table.scope.fitColumns();
+	grid.scope.fitColumns();
 }
 </script>
 
 <template>
 	<div>
 		<UiToolbar>
-			<ColumnsMenu :scope="table.scope" />
+			<ColumnsMenu :scope="grid.scope" />
 			<UiButton @click="fitToContent">
 				<IconUnfoldHorizontal aria-hidden="true" />
 				Fit to content
@@ -63,11 +63,11 @@ function fitToWidth() {
 				Fit to width
 			</UiButton>
 			<span class="ui-spacer" />
-			<UiButton variant="ghost" @click="table.state.reset()">
+			<UiButton variant="ghost" @click="grid.state.reset()">
 				<IconRotateCcw aria-hidden="true" />
 				Reset
 			</UiButton>
 		</UiToolbar>
-		<UiDataTable :table="table" label="People" />
+		<UiDataGrid :grid="grid" label="People" />
 	</div>
 </template>

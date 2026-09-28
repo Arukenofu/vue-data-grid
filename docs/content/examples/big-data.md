@@ -10,7 +10,7 @@ aside: false
 <Description>
 Fifty thousand rows of device readings by twenty columns: a million cells, of which only the few
 hundred in view are in the DOM. Scroll both ways, sort any column, jump to a row, or switch to a
-hundred thousand rows and watch the counters below the table stay small.
+hundred thousand rows and watch the counters below the grid stay small.
 </Description>
 
 <Demo name="example-big-data" />
@@ -24,10 +24,10 @@ hundred thousand rows and watch the counters below the table stay small.
 - **Sorting a large set** with the `sorting` feature: the "Last sort" counter shows how long a sort
   and the render after it take.
 - **Keyboard navigation over rows that are not there**: <kbd>PageDown</kbd>, <kbd>Ctrl</kbd>+<kbd>End</kbd>
-  or "Go to row" move focus to a row far outside the window; the table scrolls to it and renders it
+  or "Go to row" move focus to a row far outside the window; the grid scrolls to it and renders it
   first. See [Keyboard navigation](/guides/keyboard-navigation).
-- **A kit table**: the toolbar, the counters and `UiDataTable` are the demo's design system; the
-  table itself is one `useDataTable` call.
+- **A kit grid**: the toolbar, the counters and `UiDataGrid` are the demo's design system; the
+  grid itself is one `useDataGrid` call.
 
 ## How it works
 
@@ -59,7 +59,7 @@ const columns = defineColumns({
 ### Both windows, one option
 
 ```ts
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -77,11 +77,11 @@ the scrollbar its true length.
 
 ### Counting what is rendered
 
-The counters read the scope of the table. `rowRange` is the half-open range of rendered rows, and
+The counters read the scope of the grid. `rowRange` is the half-open range of rendered rows, and
 `renderedColumns` the columns after the column window, spacers included:
 
 ```ts
-const { scope } = table;
+const { scope } = grid;
 
 const renderedRows = computed(() => scope.rowRange.value.end - scope.rowRange.value.start);
 const renderedColumns = computed(() => scope.renderedColumns.value.filter(rendered => rendered.column !== null).length);
@@ -92,14 +92,14 @@ keep their objects, so Vue skips them.
 
 ### Going to a row
 
-"Go to row" asks the navigation to focus a cell. The cell is held rendered while the table scrolls
+"Go to row" asks the navigation to focus a cell. The cell is held rendered while the grid scrolls
 to it, then focused, so the screen reader lands on it too:
 
 ```ts
 function goToRow() {
 	const row = Math.min(Math.max(target.value, 1), rows.value.length) - 1;
 
-	void table.navigation.focusCell({ section: 'body', row, cell: 'id' });
+	void grid.navigation.focusCell({ section: 'body', row, cell: 'id' });
 }
 ```
 
@@ -108,7 +108,7 @@ and footer and leaves the row clear of them.
 
 ### Why it stays fast
 
-- A row is one component: `TableCells` renders the cells of a row as plain elements, so a render of a
+- A row is one component: `GridCells` renders the cells of a row as plain elements, so a render of a
   row does not create twenty components.
 - A cell's props are one frozen object per column, shared by every row, so Vue stops comparing at the
   reference.
@@ -119,24 +119,24 @@ See [Performance](/overview/performance) for the whole list.
 
 ## Accessibility
 
-- `aria-rowcount` and `aria-colcount` give the size of the whole table, and every rendered row and
+- `aria-rowcount` and `aria-colcount` give the size of the whole grid, and every rendered row and
   cell carries its `aria-rowindex` and `aria-colindex`. A screen reader says "row 31,204 of 50,001"
   even though only thirty rows exist in the DOM.
 - The row number column is the row header, so each cell is announced with the row it belongs to. The
   column window always renders the row header, wherever you scroll sideways.
 - Focus is held by row key and column name: a focused cell scrolled out of view stays rendered, and
   sorting keeps focus on the same reading rather than the same position.
-- "Go to row" moves focus into the table, as a keyboard user expects of it; the scroll buttons do
+- "Go to row" moves focus into the grid, as a keyboard user expects of it; the scroll buttons do
   not move focus.
 
 ### Keyboard interactions
 
 <KeyboardTable
 	:data="[
-		{ keys: ['↑', '↓', '←', '→'], description: 'Moves one cell; the table scrolls under pinned columns and the sticky header as needed.' },
+		{ keys: ['↑', '↓', '←', '→'], description: 'Moves one cell; the grid scrolls under pinned columns and the sticky header as needed.' },
 		{ keys: ['PageUp', 'PageDown'], description: 'Moves by as many rows as fit in view.' },
 		{ keys: ['Home', 'End'], description: 'Moves to the first or the last cell of the row.' },
-		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves to the first or the last cell of the table, fifty thousand rows away.' },
+		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves to the first or the last cell of the grid, fifty thousand rows away.' },
 		{ keys: ['Enter'], description: 'On a header, sorts by the column.' },
 	]"
 />

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type CellChangesOptions, useCellChanges } from '../../src/cells/use-cell-changes';
 import { defineColumns } from '../../src/columns/define-columns';
-import { useTableEngine } from '../../src/engine/use-table-engine';
+import { useGridEngine } from '../../src/engine/use-grid-engine';
 
 interface Row {
 	id: string;
@@ -32,7 +32,7 @@ function setup(options: CellChangesOptions = {}) {
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			const engine = useTableEngine({ columns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 36 });
+			const engine = useGridEngine({ columns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 36 });
 
 			changes = useCellChanges(engine.scope, options);
 

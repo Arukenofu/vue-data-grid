@@ -2,17 +2,17 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	GridSortIndicator,
 	sorting,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	TableSortIndicator,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconReset from '~icons/lucide/rotate-ccw';
 
@@ -31,7 +31,7 @@ const columns = defineColumns({
 	projects: column(person => person.projects, { label: 'Projects', width: 130, align: 'right' }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -45,29 +45,29 @@ const table = useDataTable({
 		<UiToolbar>
 			<span class="ui-toolbar-text">Open the menu in a header: sort, pin or hide the column.</span>
 			<span class="ui-spacer" />
-			<UiButton @click="table.state.reset()">
+			<UiButton @click="grid.state.reset()">
 				<IconReset aria-hidden="true" />
 				Reset columns
 			</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="People" class="ui-table">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns }">
-					<TableHeaderCell v-for="column in columns" :key="column.key" :column="column">
-						<TableHeaderContent />
-						<TableSortIndicator v-slot="{ direction }">
+		<GridRoot :grid="grid" label="People" class="ui-grid">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns }">
+					<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">
+						<GridHeaderContent />
+						<GridSortIndicator v-slot="{ direction }">
 							<UiSortIcon :direction="direction" />
-						</TableSortIndicator>
+						</GridSortIndicator>
 						<ColumnMenu />
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>

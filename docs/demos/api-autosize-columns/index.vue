@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { autosizeColumns, defineColumn, defineColumns, sorting, useDataTable, useTableMotion } from '@vue-data-grid/core';
+import { autosizeColumns, defineColumn, defineColumns, sorting, useDataGrid, useGridMotion } from '@vue-data-grid/core';
 import IconMoveHorizontal from '~icons/lucide/move-horizontal';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import { shallowRef } from 'vue';
 
 import { createPeople, type Person } from '@/data/people';
-import { UiButton, UiDataTable, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiToolbar } from '@/ui';
 
 const people = createPeople(400, 23);
 
@@ -19,7 +19,7 @@ const columns = defineColumns({
 	location: column(person => person.location, { label: 'Office' }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -28,20 +28,20 @@ const table = useDataTable({
 	features: { sorting: sorting() },
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
 const measured = shallowRef<readonly string[]>([]);
 
 function fitRendered() {
-	measured.value = autosizeColumns(table.scope);
+	measured.value = autosizeColumns(grid.scope);
 }
 
 function fitAll() {
-	measured.value = autosizeColumns(table.scope, undefined, { rows: 'all' });
+	measured.value = autosizeColumns(grid.scope, undefined, { rows: 'all' });
 }
 
 function reset() {
-	table.state.reset();
+	grid.state.reset();
 	measured.value = [];
 }
 </script>
@@ -62,6 +62,6 @@ function reset() {
 			<span class="ui-toolbar-text">{{ measured.length > 0 ? `Measured ${measured.length} columns` : 'Or double-click a column edge' }}</span>
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="People" data-size="sm" />
+		<UiDataGrid :grid="grid" label="People" data-size="sm" />
 	</div>
 </template>

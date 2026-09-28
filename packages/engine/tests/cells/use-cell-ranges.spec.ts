@@ -6,8 +6,8 @@ import type { CellRange } from '../../src/cells/cell-range';
 import { type CellRangesOptions, useCellRanges } from '../../src/cells/use-cell-ranges';
 import { type RenderedColumn, toRuntimeColumn } from '../../src/columns/column';
 import { defineColumns } from '../../src/columns/define-columns';
-import type { TableScope } from '../../src/engine/scope';
-import { useTableEngine } from '../../src/engine/use-table-engine';
+import type { GridScope } from '../../src/engine/scope';
+import { useGridEngine } from '../../src/engine/use-grid-engine';
 
 interface Row {
 	symbol: string;
@@ -38,7 +38,7 @@ function createScope() {
 		columns: computed(() => shown.value.map(name => ({
 			column: toRuntimeColumn(columns[name]),
 		}) as RenderedColumn)),
-	} as unknown as TableScope;
+	} as unknown as GridScope;
 
 	return { rows, shown, scope };
 }
@@ -429,11 +429,11 @@ describe('useCellRanges — rectangles', () => {
 
 	function setupEngine() {
 		const rows = shallowRef<Row[]>(['A', 'B', 'C', 'D'].map((symbol, index) => ({ symbol, price: index, cap: index * 10 })));
-		let result: { engine: ReturnType<typeof useTableEngine<Row>>; ranges: ReturnType<typeof useCellRanges> } | null = null;
+		let result: { engine: ReturnType<typeof useGridEngine<Row>>; ranges: ReturnType<typeof useCellRanges> } | null = null;
 
 		const wrapper = mount(defineComponent({
 			setup() {
-				const engine = useTableEngine<Row>({
+				const engine = useGridEngine<Row>({
 					columns: sheet,
 					rows,
 					root: shallowRef(null),

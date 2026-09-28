@@ -1,25 +1,25 @@
 ---
 title: Live data
-description: Tables that update many times a second, where only the rows that changed render, sorted tables re-sort only what moved, and changed cells flash.
+description: Grids that update many times a second, where only the rows that changed render, sorted grids re-sort only what moved, and changed cells flash.
 ---
 
 # Live data
 
 <Description>
-Price feeds, monitoring dashboards, order books: tables that change many times a second. Only the
-rows that changed render again, a sorted table re-sorts only the rows that moved, and each changed
+Price feeds, monitoring dashboards, order books: grids that change many times a second. Only the
+rows that changed render again, a sorted grid re-sorts only the rows that moved, and each changed
 cell can flash up or down.
 </Description>
 
 <Demo name="live-data" />
 
 The numbers on the right tell the story: every second dozens of quotes arrive, and only the cells of
-those rows render again, not the whole table. Push the slider up, then pause the feed: the table
+those rows render again, not the whole grid. Push the slider up, then pause the feed: the grid
 stays sorted by the change of the day the whole time.
 
 ## Why it stays fast
 
-The table compares rows **by reference**. A row that is the same object as before is the same row:
+The grid compares rows **by reference**. A row that is the same object as before is the same row:
 its component does not render again, its cells are not touched. A row that changed is a new object,
 and only it renders.
 
@@ -38,11 +38,11 @@ of them would waste most of the work. `useRowStream` collects them and applies t
 animation frame:
 
 ```ts
-import { useDataTable, useRowStream } from '@vue-data-grid/core';
+import { useDataGrid, useRowStream } from '@vue-data-grid/core';
 
 const stream = useRowStream({ rows: initialStocks, rowKey: 'id' });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stream.rows,
 	rowKey: 'id',
@@ -65,20 +65,20 @@ socket.on('quote', (quote) => {
 	]"
 />
 
-`wait: 250` collects for a quarter of a second instead of a frame, for a calmer table. A tab in the
+`wait: 250` collects for a quarter of a second instead of a frame, for a calmer grid. A tab in the
 background has no frames at all: its changes collect, one per key, until it is visible again, so a
-hidden table costs nothing.
+hidden grid costs nothing.
 
 ## Sorting a moving target
 
-A table sorted by price has to re-sort whenever a price changes. Sorting everything again each frame
+A grid sorted by price has to re-sort whenever a price changes. Sorting everything again each frame
 is wasteful when three rows of a thousand changed, so the sorting feature can re-sort only the rows
 that arrived as new objects and put them into their places among the others:
 
 ```ts
 import { sorting } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stream.rows,
 	rowKey: 'id',
@@ -101,7 +101,7 @@ direction:
 ```ts
 import { useCellChanges } from '@vue-data-grid/core';
 
-const changes = useCellChanges(table.scope, { duration: 900, columns: ['price', 'change'] });
+const changes = useCellChanges(grid.scope, { duration: 900, columns: ['price', 'change'] });
 ```
 
 `changes.getChange(key, column)` gives `{ direction, at }` while the change is fresh: `direction` is
@@ -135,21 +135,21 @@ price: column(stock => stock.price, {
 
 Reading a change is reactive **per row**: a change in one row wakes only that row, never its
 neighbours. Comparing costs nothing for rows that are the same object as before, and new rows are not
-changes, so the first load does not light up the whole table.
+changes, so the first load does not light up the whole grid.
 
 ## Moving rows
 
-With [`useTableMotion`](/guides/animation), rows that change places in a sorted table slide there
+With [`useGridMotion`](/guides/animation), rows that change places in a sorted grid slide there
 instead of jumping. At very high rates constant movement becomes noise; `when` turns it off by any
 rule you like, such as a switch or the size of a batch:
 
 ```ts
-useTableMotion(table, { when: () => animated.value });
+useGridMotion(grid, { when: () => animated.value });
 ```
 
 ## Accessibility
 
-- The table does not announce data changes: its live region speaks only of the sort, the selection
+- The grid does not announce data changes: its live region speaks only of the sort, the selection
   and loading. A screen reader user reads the current values when moving through the cells, rather
   than hearing every tick.
 - A flash is decoration. The direction is also in the text, as the sign of the change and its
@@ -162,7 +162,7 @@ useTableMotion(table, { when: () => animated.value });
 
 ## See also
 
-- [Stock screener](/examples/screener): a complete live table.
+- [Stock screener](/examples/screener): a complete live grid.
 - [Sorting](/guides/sorting): sort state, multi-sort and server-side sorting.
 - [Animation](/guides/animation): engines and what animates.
-- [Performance](/overview/performance): why references matter everywhere in the table.
+- [Performance](/overview/performance): why references matter everywhere in the grid.

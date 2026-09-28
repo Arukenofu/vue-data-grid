@@ -6,25 +6,25 @@ description: The height of a sticky block, such as a header or a footer, tracked
 # useStickyOffset
 
 <Description>
-The height of a sticky block, such as the header or the footer of a table, tracked with a
+The height of a sticky block, such as the header or the footer of a grid, tracked with a
 <code>ResizeObserver</code>. The engine needs it to keep scrolled-to rows clear of what sticks over them.
 </Description>
 
-`useDataTable` measures its header and footer with it and hands the heights to the engine, as
-`table.headHeight` and `table.footHeight`. You need it yourself when you build on the core engine, or
-when something else sticks to the top or the bottom of the table.
+`useDataGrid` measures its header and footer with it and hands the heights to the engine, as
+`grid.headHeight` and `grid.footHeight`. You need it yourself when you build on the core engine, or
+when something else sticks to the top or the bottom of the grid.
 
 ## Usage
 
 ```ts
-import { useStickyOffset, useTableEngine } from '@vue-data-grid/core';
+import { useStickyOffset, useGridEngine } from '@vue-data-grid/core';
 import { shallowRef } from 'vue';
 
 const root = shallowRef<HTMLElement | null>(null);
 const head = shallowRef<HTMLElement | null>(null);
 const foot = shallowRef<HTMLElement | null>(null);
 
-const engine = useTableEngine({
+const engine = useGridEngine({
 	columns,
 	rows,
 	root,
@@ -63,7 +63,7 @@ Something that sticks at the top together with the header adds to the room scrol
 const headHeight = useStickyOffset(head);
 const toolbarHeight = useStickyOffset(toolbar);
 
-const engine = useTableEngine({
+const engine = useGridEngine({
 	columns,
 	rows,
 	root,
@@ -75,11 +75,11 @@ const engine = useTableEngine({
 
 ### A bar that stands on the footer
 
-`TableLoading` places itself above the footer with `table.footHeight`, the same measure. A bar of
+`GridLoading` places itself above the footer with `grid.footHeight`, the same measure. A bar of
 your own can do the same:
 
 ```vue
-<div class="bulk-bar" :style="{ insetBlockEnd: `${table.footHeight.value}px` }">…</div>
+<div class="bulk-bar" :style="{ insetBlockEnd: `${grid.footHeight.value}px` }">…</div>
 ```
 
 ## Accessibility
@@ -91,6 +91,6 @@ your own can do the same:
 
 ## See also
 
-- [useDataTable](/composables/use-data-table): `headHeight` and `footHeight`.
+- [useDataGrid](/composables/use-data-grid): `headHeight` and `footHeight`.
 - [The core](/composables/core): the engine that takes `scrollMargin` and `scrollMarginEnd`.
 - [Virtualization](/guides/virtualization)

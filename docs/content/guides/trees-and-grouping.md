@@ -1,6 +1,6 @@
 ---
 title: Trees and grouping
-description: Rows inside rows, from a parent key, nested arrays, or groups the table builds by value with totals on every level.
+description: Rows inside rows, from a parent key, nested arrays, or groups the grid builds by value with totals on every level.
 ---
 
 # Trees and grouping
@@ -31,7 +31,7 @@ The `tree` feature takes the hierarchy from your rows in one of two ways:
   features: { tree: tree({ childrenField: 'children' }) },
   ```
 
-The feature flattens the tree into the rows the table shows: the rows of the top level, then the
+The feature flattens the tree into the rows the grid shows: the rows of the top level, then the
 children of every expanded row under it, in order. A row with children, even an empty array of them,
 is a group.
 
@@ -49,9 +49,9 @@ const columns = defineColumns({
 });
 ```
 
-The toggle is a `TableTreeToggle`. A leaf gets an empty space of the same width, so names line up
+The toggle is a `GridTreeToggle`. A leaf gets an empty space of the same width, so names line up
 across levels. The indent is `--dg-tree-indent` per level, `16px` by default. To place the toggle
-yourself, put a `TableTreeToggle` in a `cell` of your own; it finds its row in the `TableRow` it is in.
+yourself, put a `GridTreeToggle` in a `cell` of your own; it finds its row in the `GridRow` it is in.
 
 ## Expanding and collapsing
 
@@ -66,7 +66,7 @@ tree({ parentKey: 'manager', expanded, defaultExpanded: 2 }),
 ```
 
 The demo's buttons write the keys of every manager, or none. The handle of the feature,
-`table.tree`, also has:
+`grid.tree`, also has:
 
 <ReturnsTable
 	:data="[
@@ -82,8 +82,8 @@ The demo's buttons write the keys of every manager, or none. The handle of the f
 
 ### Sorting a tree
 
-The tree sorts the siblings of every level by the table's sort, so children stay under their
-parent. Make columns `sortable` and leave the `sorting` feature out: a table with a tree does not need
+The tree sorts the siblings of every level by the grid's sort, so children stay under their
+parent. Make columns `sortable` and leave the `sorting` feature out: a grid with a tree does not need
 it. Pass `sort: false` to `tree()` to keep the order of your data.
 
 ## Grouping flat rows
@@ -146,7 +146,7 @@ A group whose rows did not change keeps its row object between updates, so it do
 
 ## Totals in the footer
 
-`table.leaves` holds every leaf of the tree, collapsed ones included, and a footer aggregates over it.
+`grid.leaves` holds every leaf of the tree, collapsed ones included, and a footer aggregates over it.
 Totals therefore stay right whichever groups are open. In the demo each amount column has
 `aggregate: 'sum'` and a `footer`, and the margin column computes its footer from the rows it gets:
 
@@ -159,9 +159,9 @@ margin: amount(row => (row.revenue - row.cost) / row.revenue, {
 
 ## Accessibility
 
-- A table with a tree has `role="treegrid"`. Every row carries `aria-level`, `aria-posinset` and
+- A grid with a tree has `role="treegrid"`. Every row carries `aria-level`, `aria-posinset` and
   `aria-setsize`, so a screen reader says "level 2, 3 of 4", and a group row carries `aria-expanded`.
-- The toggle is a button named "Expand" or "Collapse", from the table's messages, with
+- The toggle is a button named "Expand" or "Collapse", from the grid's messages, with
   `data-dg-state` of `expanded` or `collapsed`.
 - With the `navigation` feature the arrow keys open and close groups in the tree column, as the
   treegrid pattern asks.

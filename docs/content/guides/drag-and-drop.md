@@ -1,13 +1,13 @@
 ---
 title: Drag and drop
-description: Reorder rows and columns, nest rows in a tree, move rows between tables and drop them on areas of your own.
+description: Reorder rows and columns, nest rows in a tree, move rows between grids and drop them on areas of your own.
 ---
 
 # Drag and drop
 
 <Description>
 Reorder rows with a handle or by the whole row, with the pointer, a finger or the keyboard; move
-columns by their headers; pass rows between tables, and drop them on areas of your own.
+columns by their headers; pass rows between grids, and drop them on areas of your own.
 </Description>
 
 <Demo name="row-drag" />
@@ -20,27 +20,27 @@ the arrows move the track, <kbd>Space</kbd> drops it, <kbd>Escape</kbd> puts it 
 ## Installation
 
 Dragging lives in its own entry point, `@vue-data-grid/core/drag-and-drop`, on top of the
-`@vue-data-grid/drag-and-drop` package. It is an optional peer dependency, so a table that never drags
-never downloads it. Install it next to the table:
+`@vue-data-grid/drag-and-drop` package. It is an optional peer dependency, so a grid that never drags
+never downloads it. Install it next to the grid:
 
 <InstallTabs packages="@vue-data-grid/drag-and-drop" />
 
 ## Reordering rows
 
-Put a `TableRowDrag` around the body. Its rows can then be dragged, and when one is dropped it
+Put a `GridRowDrag` around the body. Its rows can then be dragged, and when one is dropped it
 tells you where, as a key, a parent and an index. Moving the row in your data is yours, and
 `moveRow` does it in one line:
 
 ```vue
 <script setup lang="ts">
-import { moveRow, TableBody, TableCells, TableRoot, TableRow, useDataTable } from '@vue-data-grid/core';
-import { type TableRowDropEvent, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { moveRow, GridBody, GridCells, GridRoot, GridRow, useDataGrid } from '@vue-data-grid/core';
+import { type GridRowDropEvent, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 
 const playlist = shallowRef(tracks);
 
-const table = useDataTable({ columns, rows: playlist, rowKey: 'id', rowHeight: 44 });
+const grid = useDataGrid({ columns, rows: playlist, rowKey: 'id', rowHeight: 44 });
 
-function reorder(event: TableRowDropEvent<unknown>) {
+function reorder(event: GridRowDropEvent<unknown>) {
 	const track = playlist.value.find(item => item.id === event.key);
 
 	if (track) {
@@ -50,15 +50,15 @@ function reorder(event: TableRowDropEvent<unknown>) {
 </script>
 
 <template>
-	<TableRoot :table="table" label="Playlist">
-		<TableRowDrag @drop="reorder">
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRowDrag>
-	</TableRoot>
+	<GridRoot :grid="grid" label="Playlist">
+		<GridRowDrag @drop="reorder">
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRowDrag>
+	</GridRoot>
 </template>
 ```
 
@@ -67,13 +67,13 @@ it at `index`. `moveRow` does exactly that, keeps every other row as the same ob
 trees by a `parentKey` field. The row in the event is `unknown`, since the part does not know the
 type of your rows; looking it up by key, as above, keeps everything typed.
 
-`TableRowDrag` renders no element of its own. Rows are dragged while the table is not sorted: the
-order of a sorted table belongs to the sort, not to the rows. `enabled` changes that.
+`GridRowDrag` renders no element of its own. Rows are dragged while the grid is not sorted: the
+order of a sorted grid belongs to the sort, not to the rows. `enabled` changes that.
 
 ### A handle, and the keyboard
 
 By default the whole row drags with the pointer, and buttons, links and fields in its cells keep
-their clicks. With `handle`, a drag starts only on a `TableDragHandle`, which is a button, so it
+their clicks. With `handle`, a drag starts only on a `GridDragHandle`, which is a button, so it
 also drags with the keyboard. `dragHandleColumn()` is a ready column of handles:
 
 ```ts
@@ -86,7 +86,7 @@ const columns = defineColumns({
 ```
 
 ```vue
-<TableRowDrag handle @drop="reorder">
+<GridRowDrag handle @drop="reorder">
 ```
 
 Without a handle, <kbd>Alt</kbd>+<kbd>↑</kbd> and <kbd>Alt</kbd>+<kbd>↓</kbd> on any cell move its row
@@ -98,7 +98,7 @@ Three functions decide what a drag may do; each is asked while the drag goes on,
 not allowed is simply never shown:
 
 ```vue
-<TableRowDrag
+<GridRowDrag
 	:can-drag="(row, key) => key !== 'pinned-note'"
 	:can-drop="target => target.index > 0"
 	:can-nest="row => isFolder(row)"
@@ -118,7 +118,7 @@ With the `tree` feature, a row can go between rows at any level or inside a grou
 name:
 
 ```ts
-function reorder(event: TableRowDropEvent<unknown>) {
+function reorder(event: GridRowDropEvent<unknown>) {
 	const file = files.value.find(item => item.id === event.key);
 
 	if (file) {
@@ -132,29 +132,29 @@ that receives a row opens to show it.
 
 ## Reordering columns
 
-A `TableColumnDrag` around the header lets `movable` columns be dragged by their headers. The table
+A `GridColumnDrag` around the header lets `movable` columns be dragged by their headers. The grid
 moves them in its own layout, so there is nothing to write back; `drop` only tells you it happened.
 
 <Demo name="column-drag" />
 
 ```vue
-<TableRoot :table="table" label="Stocks">
-	<TableColumnDrag>
-		<TableHeader>
+<GridRoot :grid="grid" label="Stocks">
+	<GridColumnDrag>
+		<GridHeader>
 			<!-- … -->
-		</TableHeader>
-		<TableDragPreview />
-	</TableColumnDrag>
-	<TableBody>
+		</GridHeader>
+		<GridDragPreview />
+	</GridColumnDrag>
+	<GridBody>
 		<!-- … -->
-	</TableBody>
-</TableRoot>
+	</GridBody>
+</GridRoot>
 ```
 
 A column stays within its pinned side, and never splits a column group that keeps its columns
 together. `canDrop(name, index)` narrows it further. Columns move with the keyboard without any drag
 at all: <kbd>Alt</kbd>+<kbd>←</kbd> and <kbd>Alt</kbd>+<kbd>→</kbd> on a header. Add
-[`useTableMotion`](/guides/animation) and the cells of the moved column slide into place after the
+[`useGridMotion`](/guides/animation) and the cells of the moved column slide into place after the
 drop, as the demo does.
 
 ## Showing the place
@@ -173,59 +173,59 @@ The dragged row itself gets `data-drag-source`, and is faded by the structural s
 
 ### The ghost
 
-`TableDragPreview` is what follows the pointer. Its slot is rendered into the ghost through a
+`GridDragPreview` is what follows the pointer. Its slot is rendered into the ghost through a
 `Teleport`, so it is an ordinary part of your template, with your components and styles:
 
 ```vue
-<TableDragPreview v-slot="{ label, row }" placement="outside">
+<GridDragPreview v-slot="{ label, row }" placement="outside">
 	<IconMusic aria-hidden="true" />
 	{{ label }}
-</TableDragPreview>
+</GridDragPreview>
 ```
 
 It stands `placement` from the pointer, `'outside'` it by default, `'center'` under it, or
 `'source'` where the row was grabbed, and goes as `exit` says: it fades by default, and
 `exit="land"` flies it into the row at its new place, for a ghost that looks like the row.
 
-## Between tables
+## Between grids
 
-Tables that share a `group` take each other's rows. The drop reaches the table the row lands on,
-with `external: true` and the `source` table, so you move the row between your lists:
+Grids that share a `group` take each other's rows. The drop reaches the grid the row lands on,
+with `external: true` and the `source` grid, so you move the row between your lists:
 
-<Demo name="drag-between-tables" />
+<Demo name="drag-between-grids" />
 
 ```vue
-<TableRowDrag group="tasks" @drop="event => place('sprint', event)">
-	<TableBody />
-	<TableDragOverlay v-slot="{ label }">Drop “{{ label }}” here</TableDragOverlay>
-</TableRowDrag>
+<GridRowDrag group="tasks" @drop="event => place('sprint', event)">
+	<GridBody />
+	<GridDragOverlay v-slot="{ label }">Drop “{{ label }}” here</GridDragOverlay>
+</GridRowDrag>
 ```
 
-In a group the drag may leave its table, `bounds="window"` by default, so the row can travel to the
-other one. `canAccept(offer)` decides which rows a table takes from the others.
-`TableDragOverlay` shows a message over a table while a row it would take is on its way; its
+In a group the drag may leave its grid, `bounds="window"` by default, so the row can travel to the
+other one. `canAccept(offer)` decides which rows a grid takes from the others.
+`GridDragOverlay` shows a message over a grid while a row it would take is on its way; its
 `data-dg-state` is `ready`, then `over`, or `refused` over a place that is not allowed.
 
 ### Drop zones
 
-`TableDropZone` is an area that takes rows, or columns with `accept="columns"`, without being a
-table: a bin, a "favourites" box, a column chooser. It emits `drop` with the key, the label, the row
-and the table it came from:
+`GridDropZone` is an area that takes rows, or columns with `accept="columns"`, without being a
+grid: a bin, a "favourites" box, a column chooser. It emits `drop` with the key, the label, the row
+and the grid it came from:
 
 ```vue
-<TableDropZone v-slot="{ ready, over }" group="tasks" @drop="archive">
+<GridDropZone v-slot="{ ready, over }" group="tasks" @drop="archive">
 	{{ over ? 'Release to archive' : ready ? 'Drop here to archive' : 'Archive' }}
-</TableDropZone>
+</GridDropZone>
 ```
 
 ## Saving the order on a server
 
 `drop` has no veto: a synchronous "no" belongs in `canDrop`, where the place is never offered. For a
 server that may refuse, move the row at once and move it back if the request fails. With
-`useTableMotion`, both moves animate:
+`useGridMotion`, both moves animate:
 
 ```ts
-async function reorder(event: TableRowDropEvent<unknown>) {
+async function reorder(event: GridRowDropEvent<unknown>) {
 	const before = playlist.value;
 	const track = before.find(item => item.id === event.key);
 
@@ -250,20 +250,20 @@ API by default, `false` for none, or an engine of GSAP, Motion or your own, as d
 [Animation](/guides/animation). A user who prefers reduced motion gets none.
 
 ```vue
-<TableRowDrag :motion="gsapEngine" @drop="reorder">
+<GridRowDrag :motion="gsapEngine" @drop="reorder">
 ```
 
 ## Accessibility
 
 - With `handle`, every row has a real button to drag it with. It is named after the row, "Drag
-  Northern Lights" from the table's `dragRow` message, and described by the keyboard instructions.
+  Northern Lights" from the grid's `dragRow` message, and described by the keyboard instructions.
 - A keyboard drag is announced through a live region: when a row is picked up, every place it passes
   as "position 3 of 10", the drop and a cancel. `announcements` translates them.
 - Without a handle, <kbd>Alt</kbd>+<kbd>↑</kbd> and <kbd>Alt</kbd>+<kbd>↓</kbd> move a row from any
   cell, and columns always move with <kbd>Alt</kbd>+<kbd>←</kbd> and <kbd>Alt</kbd>+<kbd>→</kbd> on
   their headers, so no gesture needs a pointer.
-- A drag scrolls the table near its edges, clear of the sticky header and footer, and a finger has to
-  rest for a moment, `touchDelay`, before a drag starts, so the table still scrolls by touch.
+- A drag scrolls the grid near its edges, clear of the sticky header and footer, and a finger has to
+  rest for a moment, `touchDelay`, before a drag starts, so the grid still scrolls by touch.
 
 ### Keyboard interactions
 
@@ -283,7 +283,7 @@ API by default, `false` for none, or an engine of GSAP, Motion or your own, as d
 - [Row drag](/components/row-drag), [Column drag](/components/column-drag),
   [Drag preview and overlay](/components/drag-preview) and [Drop zone](/components/drop-zone): every
   prop of the parts.
-- [`useTableRowDrag`](/composables/use-table-row-drag) and
-  [`useTableColumnDrag`](/composables/use-table-column-drag): the same without the parts.
+- [`useGridRowDrag`](/composables/use-grid-row-drag) and
+  [`useGridColumnDrag`](/composables/use-grid-column-drag): the same without the parts.
 - [Task board](/examples/task-board) and [File explorer](/examples/file-explorer): drag and drop in
-  complete tables.
+  complete grids.

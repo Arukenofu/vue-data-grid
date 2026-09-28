@@ -2,17 +2,17 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	GridSortIndicator,
 	sorting,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	TableSortIndicator,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 
 import { type Person, people } from '@/data/people';
@@ -31,7 +31,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -42,19 +42,19 @@ const table = useDataTable({
 </script>
 
 <template>
-	<TableRoot :table="table" label="People" class="ui-table">
-		<TableHeader>
-			<TableHeaderRow v-slot="{ columns }">
-				<TableHeaderCell v-for="column in columns" :key="column.key" :column="column">
-					<TableHeaderContent />
-					<TableSortIndicator />
-				</TableHeaderCell>
-			</TableHeaderRow>
-		</TableHeader>
-		<TableBody v-slot="{ rows }">
-			<TableRow v-for="row in rows" :key="row.key" :row="row">
-				<TableCells />
-			</TableRow>
-		</TableBody>
-	</TableRoot>
+	<GridRoot :grid="grid" label="People" class="ui-grid">
+		<GridHeader>
+			<GridHeaderRow v-slot="{ columns }">
+				<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">
+					<GridHeaderContent />
+					<GridSortIndicator />
+				</GridHeaderCell>
+			</GridHeaderRow>
+		</GridHeader>
+		<GridBody v-slot="{ rows }">
+			<GridRow v-for="row in rows" :key="row.key" :row="row">
+				<GridCells />
+			</GridRow>
+		</GridBody>
+	</GridRoot>
 </template>

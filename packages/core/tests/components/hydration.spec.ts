@@ -4,16 +4,16 @@ import { renderToString } from 'vue/server-renderer';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
-	TableGroupCell,
-	TableGroupContent,
-	TableGroupRow,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-} from '../../src/components/table-header';
-import { TableRoot } from '../../src/components/table-root';
-import { useDataTable } from '../../src/data-table/use-data-table';
+	GridGroupCell,
+	GridGroupContent,
+	GridGroupRow,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+} from '../../src/components/grid-header';
+import { GridRoot } from '../../src/components/grid-root';
+import { useDataGrid } from '../../src/data-grid/use-data-grid';
 
 interface Row {
 	id: string;
@@ -30,22 +30,22 @@ const groups = defineColumnGroups({
 	person: { children: ['name'], label: 'Person' },
 });
 
-/** A table whose header shows content parts, as a styled header does, next to nothing else. */
+/** A grid whose header shows content parts, as a styled header does, next to nothing else. */
 const App = defineComponent({
 	setup() {
-		const table = useDataTable({ columns, groups, rows: [{ id: 'a', name: 'Ann' }], rowKey: 'id', rowHeight: 30 });
+		const grid = useDataGrid({ columns, groups, rows: [{ id: 'a', name: 'Ann' }], rowKey: 'id', rowHeight: 30 });
 
-		return () => h(TableRoot, { table, label: 'People' }, {
-			default: () => h(TableHeader, null, {
+		return () => h(GridRoot, { grid, label: 'People' }, {
+			default: () => h(GridHeader, null, {
 				default: ({ groups: levels }: { groups: readonly (readonly RenderedGroup[])[] }) => [
-					...levels.map((_cells, level) => h(TableGroupRow, { key: `level-${level}`, level }, {
-						default: ({ cells }: { cells: readonly RenderedGroup[] }) => cells.map(cell => h(TableGroupCell, { key: cell.key, cell }, {
-							default: () => [h(TableGroupContent)],
+					...levels.map((_cells, level) => h(GridGroupRow, { key: `level-${level}`, level }, {
+						default: ({ cells }: { cells: readonly RenderedGroup[] }) => cells.map(cell => h(GridGroupCell, { key: cell.key, cell }, {
+							default: () => [h(GridGroupContent)],
 						})),
 					})),
-					h(TableHeaderRow, { key: 'columns' }, {
-						default: ({ columns: shown }: { columns: readonly RenderedColumn[] }) => shown.map(column => h(TableHeaderCell, { key: column.key, column }, {
-							default: () => [h(TableHeaderContent)],
+					h(GridHeaderRow, { key: 'columns' }, {
+						default: ({ columns: shown }: { columns: readonly RenderedColumn[] }) => shown.map(column => h(GridHeaderCell, { key: column.key, column }, {
+							default: () => [h(GridHeaderContent)],
 						})),
 					}),
 				],

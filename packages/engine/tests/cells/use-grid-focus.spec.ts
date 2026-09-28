@@ -6,7 +6,7 @@ import type { GridSection } from '../../src/cells/grid-move';
 import { type GridFocusOptions, useGridFocus } from '../../src/cells/use-grid-focus';
 import { type AnyColumn, type ColumnsInput, toColumnList } from '../../src/columns/column';
 import { defineColumns } from '../../src/columns/define-columns';
-import { useTableEngine } from '../../src/engine/use-table-engine';
+import { useGridEngine } from '../../src/engine/use-grid-engine';
 import { createScroller } from '../support/dom';
 
 interface Row {
@@ -17,7 +17,7 @@ const value = (row: Row) => row.id;
 
 const allColumns = defineColumns({ x: { value }, y: { value }, z: { value } });
 
-type Engine = ReturnType<typeof useTableEngine<Row>>;
+type Engine = ReturnType<typeof useGridEngine<Row>>;
 
 function setup(ids: readonly string[] = ['a', 'b', 'c'], options: Omit<GridFocusOptions, 'onFocus'> = {}) {
 	const rows = shallowRef<Row[]>(ids.map(id => ({ id })));
@@ -29,7 +29,7 @@ function setup(ids: readonly string[] = ['a', 'b', 'c'], options: Omit<GridFocus
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			engine = useTableEngine({ columns, rows, root, rowKey: 'id', rowHeight: 36, virtual: { overscan: 0 } });
+			engine = useGridEngine({ columns, rows, root, rowKey: 'id', rowHeight: 36, virtual: { overscan: 0 } });
 			focus = useGridFocus(engine.scope, { ...options, onFocus });
 
 			return () => null;
@@ -228,7 +228,7 @@ describe('useGridFocus — scrolling and windows', () => {
 		const wrapper = mount(defineComponent({
 			setup() {
 				const rows = shallowRef<Row[]>([{ id: 'a' }, { id: 'b' }]);
-				const engine = useTableEngine({ columns: allColumns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 36 });
+				const engine = useGridEngine({ columns: allColumns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 36 });
 				const keepRendered = engine.scope.keepRendered;
 
 				engine.scope.keepRendered = (options) => {

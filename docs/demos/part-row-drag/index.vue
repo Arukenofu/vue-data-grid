@@ -2,24 +2,24 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
 	moveRow,
 	navigation,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import {
 	type DragIndicator,
-	TableDragHandle,
-	TableDragPreview,
-	type TableRowDropEvent,
-	type TableRowDropTarget,
-	TableRowDrag,
+	GridDragHandle,
+	GridDragPreview,
+	type GridRowDropEvent,
+	type GridRowDropTarget,
+	GridRowDrag,
 } from '@vue-data-grid/core/drag-and-drop';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 import IconLock from '~icons/lucide/lock';
@@ -54,7 +54,7 @@ const rows = shallowRef<readonly Track[]>(tracks);
 const handle = shallowRef(true);
 const indicator = shallowRef<DragIndicator>('gap');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -78,11 +78,11 @@ function canDrag(_row: unknown, key: string) {
 	return !locked.has(key);
 }
 
-function canDrop({ index }: TableRowDropTarget<unknown>) {
+function canDrop({ index }: GridRowDropTarget<unknown>) {
 	return index > 0 && index < rows.value.length - 1;
 }
 
-function drop({ key, index }: TableRowDropEvent<unknown>) {
+function drop({ key, index }: GridRowDropEvent<unknown>) {
 	const row = rows.value.find(track => track.id === key);
 
 	if (row) {
@@ -100,29 +100,29 @@ function drop({ key, index }: TableRowDropEvent<unknown>) {
 			<UiStat label="Playlist" :value="length" />
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Playlist" class="ui-table" data-size="auto">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableRowDrag :handle="handle" :indicator="indicator" :can-drag="canDrag" :can-drop="canDrop" @drop="drop">
-				<TableBody v-slot="{ rows: bodyRows }">
-					<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-						<TableCells v-slot="{ column }">
-							<TableDragHandle v-if="column.name === 'grip'" v-slot="{ disabled }" class="ui-cell-button">
+		<GridRoot :grid="grid" label="Playlist" class="ui-grid" data-size="auto">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridRowDrag :handle="handle" :indicator="indicator" :can-drag="canDrag" :can-drop="canDrop" @drop="drop">
+				<GridBody v-slot="{ rows: bodyRows }">
+					<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+						<GridCells v-slot="{ column }">
+							<GridDragHandle v-if="column.name === 'grip'" v-slot="{ disabled }" class="ui-cell-button">
 								<IconLock v-if="disabled" />
 								<IconGripVertical v-else />
-							</TableDragHandle>
-						</TableCells>
-					</TableRow>
-				</TableBody>
-				<TableDragPreview v-slot="{ label }">
+							</GridDragHandle>
+						</GridCells>
+					</GridRow>
+				</GridBody>
+				<GridDragPreview v-slot="{ label }">
 					<IconMusic class="ghost-icon" aria-hidden="true" />
 					{{ label }}
-				</TableDragPreview>
-			</TableRowDrag>
-		</TableRoot>
+				</GridDragPreview>
+			</GridRowDrag>
+		</GridRoot>
 	</div>
 </template>
 

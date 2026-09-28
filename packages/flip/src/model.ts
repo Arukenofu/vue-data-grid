@@ -11,7 +11,7 @@ export interface MotionMove {
  * is shown, a leave is a still element standing where the thing that left was.
  */
 export interface MotionTransition {
-	/** What changed, named by whoever changed it: `'rows'` of a table, `'gap'` of a drag, your own. */
+	/** What changed, named by whoever changed it: `'rows'` of a grid, `'gap'` of a drag, your own. */
 	kind: string;
 	/** Elements that changed places. */
 	moves: readonly MotionMove[];

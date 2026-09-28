@@ -1,5 +1,5 @@
 import type { ColumnPinSide, RenderedColumn } from '../columns/column';
-import { getColumnToken, type TableCellStyles } from './geometry';
+import { getColumnToken, type GridCellStyles } from './geometry';
 
 /** A cell of a column span: a run of shown columns on one pin side, in the span or around it. */
 export interface ColumnSpanCell {
@@ -20,7 +20,7 @@ export interface ColumnSpanOptions {
 	insets: { start: number; end: number };
 	getPinOffset: (name: string) => number;
 	getGrow: (name: string) => number;
-	cellStyles: TableCellStyles;
+	cellStyles: GridCellStyles;
 }
 
 /** The geometry of a cell over a run of neighbouring shown columns on one pin side. */
@@ -81,7 +81,7 @@ function isSameCell(current: ColumnSpanCell, next: ColumnSpanCell) {
 		&& current.props['data-dg-columns'] === next.props['data-dg-columns'];
 }
 
-function createInset(side: ColumnPinSide, width: number, cellStyles: TableCellStyles): ColumnSpanCell {
+function createInset(side: ColumnPinSide, width: number, cellStyles: GridCellStyles): ColumnSpanCell {
 	const key = `dg-inset-${side}`;
 
 	return {
@@ -95,7 +95,7 @@ function createInset(side: ColumnPinSide, width: number, cellStyles: TableCellSt
 }
 
 /**
- * A row across the table that spans shown columns `[start, end)` of `columns`: the span split by pin
+ * A row across the grid that spans shown columns `[start, end)` of `columns`: the span split by pin
  * side, between cells holding the place of the columns around it and of the insets. Each cell is
  * styled as a group cell of its columns (`cellStyles.group`), so it lays out, sticks and resizes with
  * the cells under it without a render. Overlays over the body, such as cell ranges, are drawn on it.

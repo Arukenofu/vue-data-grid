@@ -9,7 +9,7 @@ import {
 	selectionColumn,
 	sorting,
 	toCsv,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconDownload from '~icons/lucide/download';
 import IconTrash from '~icons/lucide/trash-2';
@@ -22,7 +22,7 @@ import {
 	UiBadge,
 	UiButton,
 	UiColumnsMenu,
-	UiDataTable,
+	UiDataGrid,
 	UiInput,
 	UiToggleGroup,
 	UiToolbar,
@@ -157,7 +157,7 @@ const filtered = computed(() => {
 		&& (text === '' || `${account.company} ${account.contact} ${account.email}`.toLowerCase().includes(text)));
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: filtered,
 	rowKey: 'id',
@@ -171,14 +171,14 @@ const table = useDataTable({
 	},
 });
 
-const selectedCount = table.selection.selectedCount;
+const selectedCount = grid.selection.selectedCount;
 
 function exportCsv(rows: readonly Account[], name: string) {
-	downloadCsv(toCsv({ columns: getCellColumns(table.scope.columns.value), rows }), { name });
+	downloadCsv(toCsv({ columns: getCellColumns(grid.scope.columns.value), rows }), { name });
 }
 
 function exportSelected() {
-	exportCsv(table.rows.value.filter(account => selected.value.includes(account.id)), 'accounts-selected');
+	exportCsv(grid.rows.value.filter(account => selected.value.includes(account.id)), 'accounts-selected');
 }
 
 const narrow = shallowRef(false);
@@ -196,7 +196,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => narrowQuery?.removeEventListener('change', followWidth));
 
-watch(narrow, value => table.scope.pinColumn('account', value ? null : 'start'));
+watch(narrow, value => grid.scope.pinColumn('account', value ? null : 'start'));
 </script>
 
 <template>
@@ -207,8 +207,8 @@ watch(narrow, value => table.scope.pinColumn('account', value ? null : 'start'))
 				<UiToggleGroup v-model="status" :options="STATUS_FILTERS" label="Status" />
 				<span class="ui-spacer" />
 				<UiToggleGroup v-model="density" :options="DENSITIES" label="Density" />
-				<UiColumnsMenu :scope="table.scope" @reset="table.state.reset()" />
-				<UiButton @click="exportCsv(table.rows.value, 'accounts')">
+				<UiColumnsMenu :scope="grid.scope" @reset="grid.state.reset()" />
+				<UiButton @click="exportCsv(grid.rows.value, 'accounts')">
 					<IconDownload aria-hidden="true" />
 					Export
 				</UiButton>
@@ -233,8 +233,8 @@ watch(narrow, value => table.scope.pinColumn('account', value ? null : 'start'))
 			</Transition>
 		</div>
 
-		<UiDataTable
-			:table="table"
+		<UiDataGrid
+			:grid="grid"
 			label="Accounts"
 			:density="density"
 			:messages="{ empty: 'No accounts match these filters' }"

@@ -29,35 +29,35 @@ away the columns you do not need right now.
 ```vue
 <script setup lang="ts">
 import {
-	TableGroupCell,
-	TableGroupContent,
-	TableGroupRow,
-	TableGroupToggle,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
+	GridGroupCell,
+	GridGroupContent,
+	GridGroupRow,
+	GridGroupToggle,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
 } from '@vue-data-grid/core';
 </script>
 
 <template>
-	<TableHeader v-slot="{ groups }">
-		<TableGroupRow v-for="(cells, level) in groups" :key="level" :level="level">
-			<TableGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
-				<TableGroupContent />
-				<TableGroupToggle />
-			</TableGroupCell>
-		</TableGroupRow>
-		<TableHeaderRow v-slot="{ columns }">
-			<TableHeaderCell v-for="column in columns" :key="column.key" :column="column" />
-		</TableHeaderRow>
-	</TableHeader>
+	<GridHeader v-slot="{ groups }">
+		<GridGroupRow v-for="(cells, level) in groups" :key="level" :level="level">
+			<GridGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
+				<GridGroupContent />
+				<GridGroupToggle />
+			</GridGroupCell>
+		</GridGroupRow>
+		<GridHeaderRow v-slot="{ columns }">
+			<GridHeaderCell v-for="column in columns" :key="column.key" :column="column" />
+		</GridHeaderRow>
+	</GridHeader>
 </template>
 ```
 
-Groups are declared next to the columns, with `defineColumnGroups`, and passed to `useDataTable`:
+Groups are declared next to the columns, with `defineColumnGroups`, and passed to `useDataGrid`:
 
 ```ts
-import { defineColumnGroups, useDataTable } from '@vue-data-grid/core';
+import { defineColumnGroups, useDataGrid } from '@vue-data-grid/core';
 
 const groups = defineColumnGroups({
 	item: { label: 'Product', children: ['product', 'category'] },
@@ -66,22 +66,22 @@ const groups = defineColumnGroups({
 	secondHalf: { label: 'Second half', children: ['q3', 'q4', 'h2'], showWhen: { q3: 'expanded', q4: 'expanded' } },
 });
 
-const table = useDataTable({ columns, groups, rows, rowKey: 'id', rowHeight: 40 });
+const grid = useDataGrid({ columns, groups, rows, rowKey: 'id', rowHeight: 40 });
 ```
 
 `children` lists columns and other groups by name, so `revenue` above holds two halves, each of
 three columns. The engine lays the groups out in `scope.headerGroups`, one array of cells per row,
-from the top; `TableHeader` hands them to its slot as `groups`.
+from the top; `GridHeader` hands them to its slot as `groups`.
 
 ## API reference
 
-### TableGroupRow
+### GridGroupRow
 
 A row of group cells, `level` rows from the top.
 
 <PropsTable
 	:data="[
-		{ name: 'level', type: 'number', required: true, description: 'The level from the top, an index into `groups` of the `TableHeader` slot.' },
+		{ name: 'level', type: 'number', required: true, description: 'The level from the top, an index into `groups` of the `GridHeader` slot.' },
 		{ name: 'as', type: 'string | Component', default: '\'div\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
 	]"
@@ -89,7 +89,7 @@ A row of group cells, `level` rows from the top.
 
 <SlotsTable
 	:data="[
-		{ name: 'default', scope: '{ cells: RenderedGroup[] }', description: 'The cells of the row, for a `TableGroupCell` each: the same array as `groups[level]`.' },
+		{ name: 'default', scope: '{ cells: RenderedGroup[] }', description: 'The cells of the row, for a `GridGroupCell` each: the same array as `groups[level]`.' },
 	]"
 />
 
@@ -99,16 +99,16 @@ A row of group cells, `level` rows from the top.
 	]"
 />
 
-### TableGroupCell
+### GridGroupCell
 
 A cell over the columns of one group, or over the columns without a group at this level. It carries
 the geometry of its columns, so it grows as they resize and sticks when they are pinned. It gives
-the parts inside, such as a `TableGroupToggle`, their cell. Without a slot it shows its content as
-`TableGroupContent` does.
+the parts inside, such as a `GridGroupToggle`, their cell. Without a slot it shows its content as
+`GridGroupContent` does.
 
 <PropsTable
 	:data="[
-		{ name: 'cell', type: 'RenderedGroup', required: true, description: 'The cell, from the slot of `TableGroupRow` or from `scope.headerGroups`.' },
+		{ name: 'cell', type: 'RenderedGroup', required: true, description: 'The cell, from the slot of `GridGroupRow` or from `scope.headerGroups`.' },
 		{ name: 'as', type: 'string | Component', default: '\'div\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
 	]"
@@ -134,7 +134,7 @@ the parts inside, such as a `TableGroupToggle`, their cell. Without a slot it sh
 	]"
 />
 
-### TableGroupContent
+### GridGroupContent
 
 The content of the group cell it is in: the group's `header` field when it has one, else its
 `label` (or name) on one line with an ellipsis. It renders no element of its own.
@@ -145,7 +145,7 @@ The content of the group cell it is in: the group's `header` field when it has o
 	]"
 />
 
-### TableGroupToggle
+### GridGroupToggle
 
 The button that folds and unfolds the group of the cell it is in. It renders nothing for a group
 that cannot collapse, that is one without `showWhen`, so you can put it in every cell.
@@ -183,7 +183,7 @@ What `defineColumnGroups` takes for each group:
 		{ name: 'collapsedByDefault', type: 'boolean', default: 'false', description: 'Start collapsed. What the user sets later is kept in `layout.collapsed`.' },
 		{ name: 'keepTogether', type: 'boolean', default: 'false', description: 'Moves never split the group\'s columns, and no other column lands between them.' },
 		{ name: 'header', type: '(context: { group, collapsed }) => VNodeChild', description: 'The content of the group cell, when the label is not enough.' },
-		{ name: 'meta', type: 'unknown', description: 'Your data; the table never reads it.' },
+		{ name: 'meta', type: 'unknown', description: 'Your data; the grid never reads it.' },
 	]"
 />
 
@@ -207,14 +207,14 @@ const groups = defineColumnGroups({
 ### Fold groups from your own controls
 
 The scope knows whether a group is folded and flips it. `batch` writes every change to the layout
-at once, so the table lays out once:
+at once, so the grid lays out once:
 
 ```ts
 function setCollapsed(collapsed: boolean) {
-	table.scope.batch(() => {
+	grid.scope.batch(() => {
 		for (const name of ['firstHalf', 'secondHalf']) {
-			if (table.scope.isGroupCollapsed(name) !== collapsed) {
-				table.scope.toggleGroup(name);
+			if (grid.scope.isGroupCollapsed(name) !== collapsed) {
+				grid.scope.toggleGroup(name);
 			}
 		}
 	});
@@ -223,13 +223,13 @@ function setCollapsed(collapsed: boolean) {
 
 ### An icon for the toggle
 
-The slot of `TableGroupToggle` replaces the `+` and `−`:
+The slot of `GridGroupToggle` replaces the `+` and `−`:
 
 ```vue
-<TableGroupToggle v-slot="{ collapsed }">
+<GridGroupToggle v-slot="{ collapsed }">
 	<IconPlus v-if="collapsed" />
 	<IconMinus v-else />
-</TableGroupToggle>
+</GridGroupToggle>
 ```
 
 ## Accessibility
@@ -238,9 +238,9 @@ The slot of `TableGroupToggle` replaces the `+` and `−`:
   the columns under it, so a screen reader knows which columns a group label belongs to.
 - Group rows count into `aria-rowindex` and `aria-rowcount`: the row of column headers comes after
   them.
-- The toggle is a `button` with `aria-expanded`, named by the table's messages: "Collapse Revenue",
+- The toggle is a `button` with `aria-expanded`, named by the grid's messages: "Collapse Revenue",
   "Expand Revenue". Change the words with `messages.collapseGroup` and `messages.expandGroup` of
-  [`TableRoot`](/components/root).
+  [`GridRoot`](/components/root).
 - The cell over columns without a group is a plain header cell with no text; the column header below
   it reaches up over it.
 
@@ -257,4 +257,4 @@ The slot of `TableGroupToggle` replaces the `+` and `−`:
 With the `navigation` feature, group rows are rows of the keyboard grid: ↑ from a column header
 reaches the group cell above it, ← and → move between the groups of a row, and <kbd>Enter</kbd> on a
 group cell presses its toggle. The empty cells over columns without a group are passed over. In a
-table without that feature each toggle is an ordinary Tab stop.
+grid without that feature each toggle is an ordinary Tab stop.

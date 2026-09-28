@@ -1,12 +1,12 @@
 ---
 title: useClipboard
-description: Copy, cut and paste of a table the way a spreadsheet does it, and CSV files with downloadCsv.
+description: Copy, cut and paste of a grid the way a spreadsheet does it, and CSV files with downloadCsv.
 ---
 
 # useClipboard
 
 <Description>
-The clipboard of a table, the way a spreadsheet does it: Ctrl+C copies the last range as
+The clipboard of a grid, the way a spreadsheet does it: Ctrl+C copies the last range as
 tab-separated text, and with editing Ctrl+X cuts and Ctrl+V pastes rows of cells over the selection.
 `downloadCsv` saves the same data as a file.
 </Description>
@@ -14,15 +14,15 @@ tab-separated text, and with editing Ctrl+X cuts and Ctrl+V pastes rows of cells
 <Demo name="api-use-clipboard" />
 
 Select cells and press <kbd>Ctrl</kbd>+<kbd>C</kbd>, or the button. Paste the text into a
-spreadsheet, or copy cells from a spreadsheet and paste them into the table: the numbers land in
+spreadsheet, or copy cells from a spreadsheet and paste them into the grid: the numbers land in
 their columns through each column's `parse`.
 
 ## Usage
 
 ```ts
-import { clipboard, editing, navigation, ranges, useDataTable } from '@vue-data-grid/core';
+import { clipboard, editing, navigation, ranges, useDataGrid } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -40,8 +40,8 @@ const table = useDataTable({
 });
 ```
 
-The feature is the one owner of the `copy`, `cut` and `paste` events of the table element. Without
-`editing` the table only copies. Without `ranges` it copies the focused cell.
+The feature is the one owner of the `copy`, `cut` and `paste` events of the grid element. Without
+`editing` the grid only copies. Without `ranges` it copies the focused cell.
 
 ## Options
 
@@ -72,16 +72,16 @@ with a byte order mark, so Excel reads UTF-8 correctly. Make the text with `toCs
 import { downloadCsv, toCsv } from '@vue-data-grid/core';
 
 function download() {
-	const columns = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
+	const columns = grid.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
 
-	downloadCsv(toCsv({ columns, rows: table.rows.value }), { name: 'orders' });
+	downloadCsv(toCsv({ columns, rows: grid.rows.value }), { name: 'orders' });
 }
 ```
 
 <PropsTable
 	label="Option"
 	:data="[
-		{ name: 'name', type: 'string', default: '\'table\'', description: 'The file name; `.csv` is added when it is not there.' },
+		{ name: 'name', type: 'string', default: '\'data\'', description: 'The file name; `.csv` is added when it is not there.' },
 	]"
 />
 
@@ -106,7 +106,7 @@ undo.
 
 ### Leaving the clipboard to the browser
 
-Inside a text field, an open editor included, and with text selected in the table, the clipboard is
+Inside a text field, an open editor included, and with text selected in the grid, the clipboard is
 the browser's. So a person can still copy a word out of a cell.
 
 ## Accessibility
@@ -132,5 +132,5 @@ menu do the same.
 ## See also
 
 - [Cell ranges and clipboard](/guides/cell-ranges): the guide.
-- [useTableEditing](/composables/use-table-editing): what a paste writes through.
+- [useGridEditing](/composables/use-grid-editing): what a paste writes through.
 - [The core](/composables/core): `toCsv`, `parseDelimited` and `resolvePaste`.

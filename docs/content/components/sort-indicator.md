@@ -28,24 +28,24 @@ among the columns that sort.
 
 ```vue
 <script setup lang="ts">
-import { TableHeaderCell, TableHeaderContent, TableSortIndicator } from '@vue-data-grid/core';
+import { GridHeaderCell, GridHeaderContent, GridSortIndicator } from '@vue-data-grid/core';
 </script>
 
 <template>
-	<TableHeaderCell :column="column">
-		<TableHeaderContent />
-		<TableSortIndicator />
-	</TableHeaderCell>
+	<GridHeaderCell :column="column">
+		<GridHeaderContent />
+		<GridSortIndicator />
+	</GridHeaderCell>
 </template>
 ```
 
-The indicator reads the column of the `TableHeaderCell` it is in; it needs no props. The table sorts
+The indicator reads the column of the `GridHeaderCell` it is in; it needs no props. The grid sorts
 its rows with the `sorting` feature, or leaves them to your server without it: the indicator shows
 the sort state either way.
 
 ## API reference
 
-### TableSortIndicator
+### GridSortIndicator
 
 <PropsTable
 	:data="[
@@ -75,12 +75,12 @@ The slot gets the direction and the place, and renders whatever you want. The de
 Lucide and a small badge for the place:
 
 ```vue
-<TableSortIndicator v-slot="{ direction, sortIndex }">
+<GridSortIndicator v-slot="{ direction, sortIndex }">
 	<IconArrowUpNarrowWide v-if="direction === 'asc'" />
 	<IconArrowDownWideNarrow v-else-if="direction === 'desc'" />
 	<IconArrowUpDown v-else class="idle" />
 	<span v-if="sortIndex !== undefined" class="order">{{ sortIndex }}</span>
-</TableSortIndicator>
+</GridSortIndicator>
 ```
 
 ### Styling by state
@@ -110,12 +110,12 @@ const columns = defineColumns({
 
 ### Sorting from code
 
-The sort lives in the table's column state, as a list of `{ name, direction }`. Replace it to sort
+The sort lives in the grid's column state, as a list of `{ name, direction }`. Replace it to sort
 from a menu or a button; the indicators follow:
 
 ```ts
-table.state.sort.value = [{ name: 'rating', direction: 'desc' }];
-table.state.sort.value = [];
+grid.state.sort.value = [{ name: 'rating', direction: 'desc' }];
+grid.state.sort.value = [];
 ```
 
 ## Accessibility
@@ -123,7 +123,7 @@ table.state.sort.value = [];
 - The indicator is `aria-hidden`: the header cell says the sort itself with `aria-sort`, set on the
   first column of the sort only, since ARIA has no sort levels.
 - The full multi-sort, "Sorted by Team ascending, then Rating descending", is announced by the live
-  region of [`TableRoot`](/components/root) whenever it changes. Change the words with the `sorted`
+  region of [`GridRoot`](/components/root) whenever it changes. Change the words with the `sorted`
   message.
 
 ### Keyboard interactions

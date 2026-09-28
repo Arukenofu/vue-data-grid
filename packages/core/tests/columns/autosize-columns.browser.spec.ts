@@ -1,17 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { autosizeColumns } from '../../src/columns/autosize-columns';
-import { type BrowserTable, mountBrowserTable } from '../support/browser-table';
+import { type BrowserGrid, mountBrowserGrid } from '../support/browser-grid';
 
-let table: BrowserTable | null = null;
+let grid: BrowserGrid | null = null;
 
 afterEach(() => {
-	table?.unmount();
-	table = null;
+	grid?.unmount();
+	grid = null;
 });
 
 function getCells(name: string) {
-	return [...(table?.root.querySelectorAll<HTMLElement>(`[data-dg-column="${name}"]`) ?? [])];
+	return [...(grid?.root.querySelectorAll<HTMLElement>(`[data-dg-column="${name}"]`) ?? [])];
 }
 
 const isClipped = (cell: HTMLElement) => cell.scrollWidth > cell.clientWidth;
@@ -27,15 +27,15 @@ function getTextWidth(cell: HTMLElement) {
 
 describe('autosizeColumns in a browser', () => {
 	it('fits a column to its widest rendered cell, padding included, and nothing stays clipped', async () => {
-		table = mountBrowserTable();
+		grid = mountBrowserGrid();
 		await expect.poll(() => getCells('name').some(isClipped)).toBe(true);
 
-		expect(autosizeColumns(table.scope, ['name'])).toEqual(['name']);
+		expect(autosizeColumns(grid.scope, ['name'])).toEqual(['name']);
 
 		await expect.poll(() => getCells('name').some(isClipped)).toBe(false);
 
 		const widest = Math.max(...getCells('name').map(getTextWidth));
-		const width = table.scope.getWidth('name');
+		const width = grid.scope.getWidth('name');
 
 		// The cell padding of the structural styles is 8px on each side.
 		expect(width).toBeGreaterThanOrEqual(Math.floor(widest + 16));
@@ -43,45 +43,45 @@ describe('autosizeColumns in a browser', () => {
 	});
 
 	it('with `rows: all` also fits the text of rows outside the row window', async () => {
-		table = mountBrowserTable();
+		grid = mountBrowserGrid();
 		await expect.poll(() => getCells('name').length).toBeGreaterThan(0);
 
-		autosizeColumns(table.scope, ['name'], { rows: 'all' });
-		table.scope.scrollToRow(196, 'center');
+		autosizeColumns(grid.scope, ['name'], { rows: 'all' });
+		grid.scope.scrollToRow(196, 'center');
 
-		await expect.poll(() => table?.cell(196, 'name') ?? null).not.toBeNull();
+		await expect.poll(() => grid?.cell(196, 'name') ?? null).not.toBeNull();
 
-		const cell = table.cell(196, 'name') as HTMLElement;
+		const cell = grid.cell(196, 'name') as HTMLElement;
 
 		expect(cell.textContent).toBe('A considerably longer name 196');
 		await expect.poll(() => isClipped(cell)).toBe(false);
 	});
 
 	it('keeps the padding a theme gives the cells through `--dg-cell-padding`', async () => {
-		table = mountBrowserTable();
-		table.root.style.setProperty('--dg-cell-padding', '0 24px');
+		grid = mountBrowserGrid();
+		grid.root.style.setProperty('--dg-cell-padding', '0 24px');
 		await expect.poll(() => getCells('name').length).toBeGreaterThan(0);
 
-		autosizeColumns(table.scope, ['name']);
+		autosizeColumns(grid.scope, ['name']);
 
 		const widest = Math.max(...getCells('name').map(getTextWidth));
 
-		expect(table.scope.getWidth('name')).toBeGreaterThanOrEqual(Math.floor(widest + 48));
+		expect(grid.scope.getWidth('name')).toBeGreaterThanOrEqual(Math.floor(widest + 48));
 		await expect.poll(() => getCells('name').some(isClipped)).toBe(false);
 	});
 
 	it('fits a `flex` column by its content, not by the room it grows into', async () => {
-		table = mountBrowserTable({
+		grid = mountBrowserGrid({
 			columns: {
 				name: { value: (row: { name: string }) => row.name, label: 'Name', width: 60, flex: 1, resizable: true },
 			},
 		});
 		await expect.poll(() => getCells('name').length).toBeGreaterThan(0);
 
-		autosizeColumns(table.scope, ['name']);
+		autosizeColumns(grid.scope, ['name']);
 
 		const widest = Math.max(...getCells('name').map(getTextWidth));
 
-		expect(table.scope.getWidth('name')).toBeLessThanOrEqual(Math.ceil(widest + 16) + 1);
+		expect(grid.scope.getWidth('name')).toBeLessThanOrEqual(Math.ceil(widest + 16) + 1);
 	});
 });

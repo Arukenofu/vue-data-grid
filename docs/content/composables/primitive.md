@@ -13,28 +13,28 @@ exactly as the built-in parts do.
 
 <Demo name="as-child" />
 
-The checkboxes of this table are plain buttons of your own, rendered with `asChild`; the part merges
-its role, state and handlers into them. The sort marks are icons in the slot of `TableSortIndicator`.
+The checkboxes of this grid are plain buttons of your own, rendered with `asChild`; the part merges
+its role, state and handlers into them. The sort marks are icons in the slot of `GridSortIndicator`.
 
 ## `as` and `asChild`
 
 Every part takes two props:
 
 - **`as`** is the element or component the part renders; `div` for most parts, `button`, `span` or
-  `input` for some. `<TableRow as="li">` renders a list item with every prop of a row.
+  `input` for some. `<GridRow as="li">` renders a list item with every prop of a row.
 - **`asChild`** renders no element of its own. The part takes the one child of its slot and merges its
   props into it: attributes the child sets itself win; classes, styles, refs and event handlers of
   both are kept.
 
 ```vue
-<TableSelectionCheckbox as-child>
+<GridSelectionCheckbox as-child>
 	<MyCheckbox class="row-check" />
-</TableSelectionCheckbox>
+</GridSelectionCheckbox>
 ```
 
 The child gets `role="checkbox"`, `aria-checked`, the click that toggles the row and the rest, and
 keeps its own class. With `asChild` the part takes the first element of its slot, so give it one; a
-development build warns when there is none. `TableCells` and `TableRangeOverlay` render many elements, so they take only `as`.
+development build warns when there is none. `GridCells` and `GridRangeOverlay` render many elements, so they take only `as`.
 
 ## API
 
@@ -53,21 +53,21 @@ A part in the manner of the built-in ones: it takes `as` and `asChild`, renders 
 `data-dg-part`, and gives its slot what it knows.
 
 ```ts
-import { primitiveProps, renderPrimitive, useDataTableContext } from '@vue-data-grid/core';
+import { primitiveProps, renderPrimitive, useDataGridContext } from '@vue-data-grid/core';
 import { defineComponent, type SlotsType, type VNodeChild } from 'vue';
 
-export const TableSelectedCount = defineComponent({
-	name: 'TableSelectedCount',
+export const GridSelectedCount = defineComponent({
+	name: 'GridSelectedCount',
 	props: {
 		...primitiveProps,
 		as: { ...primitiveProps.as, default: 'span' },
 	},
 	slots: Object as SlotsType<{ default?: (context: { count: number }) => VNodeChild }>,
 	setup(props, { slots }) {
-		const table = useDataTableContext();
+		const grid = useDataGridContext();
 
 		return () => {
-			const count = table.selection?.selectedCount.value ?? 0;
+			const count = grid.selection?.selectedCount.value ?? 0;
 
 			return renderPrimitive(props, { 'data-dg-part': 'selected-count' }, () => (
 				slots.default ? slots.default({ count }) : `${count} selected`
@@ -78,11 +78,11 @@ export const TableSelectedCount = defineComponent({
 ```
 
 ```vue
-<TableSelectedCount />
+<GridSelectedCount />
 
-<TableSelectedCount v-slot="{ count }" as-child>
+<GridSelectedCount v-slot="{ count }" as-child>
 	<strong class="count">{{ count }} rows</strong>
-</TableSelectedCount>
+</GridSelectedCount>
 ```
 
 With `asChild` the slot is the element: the part merges its props into the `<strong>` and renders
@@ -111,7 +111,7 @@ on each one.
 slot:
 
 ```vue
-<TableRoot :table="table" :as="Card" label="Invoices">…</TableRoot>
+<GridRoot :grid="grid" :as="Card" label="Invoices">…</GridRoot>
 ```
 
 ## Accessibility
@@ -126,6 +126,6 @@ slot:
 
 ## See also
 
-- [Contexts](/composables/contexts): how a part finds its table, row and cell.
-- [Your own markup](/guides/custom-markup): `as`, `asChild` and parts of your own in a real table.
+- [Contexts](/composables/contexts): how a part finds its grid, row and cell.
+- [Your own markup](/guides/custom-markup): `as`, `asChild` and parts of your own in a real grid.
 - [Selection checkbox](/components/selection-checkbox): a checkbox of Reka UI through `asChild`.

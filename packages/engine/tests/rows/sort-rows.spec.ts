@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { toColumnList } from '../../src/columns/column';
 import { defineColumns } from '../../src/columns/define-columns';
-import type { TableSort } from '../../src/columns/sort';
+import type { GridSort } from '../../src/columns/sort';
 import { resolveSortedRows, sortRows } from '../../src/rows/sort-rows';
 
 interface Row {
@@ -24,7 +24,7 @@ const row = (id: string, price: number | null, sector = 'tech'): Row => ({ id, p
 
 const ids = (rows: readonly Row[]) => rows.map(item => item.id);
 
-const byPrice = (direction: TableSort['direction']): TableSort[] => [{ name: 'price', direction }];
+const byPrice = (direction: GridSort['direction']): GridSort[] => [{ name: 'price', direction }];
 
 describe('sortRows', () => {
 	const rows = [row('a', 3), row('b', 1), row('c', 2)];
@@ -53,7 +53,7 @@ describe('sortRows', () => {
 
 	it('the second column decides only where the first one gave a tie', () => {
 		const rowsBySector = [row('a', 1, 'tech'), row('b', 2, 'energy'), row('c', 3, 'tech')];
-		const sort: TableSort[] = [{ name: 'sector', direction: 'asc' }, { name: 'price', direction: 'desc' }];
+		const sort: GridSort[] = [{ name: 'sector', direction: 'asc' }, { name: 'price', direction: 'desc' }];
 
 		expect(ids(sortRows(rowsBySector, sort, columns))).toEqual(['b', 'c', 'a']);
 	});

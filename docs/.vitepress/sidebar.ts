@@ -78,27 +78,27 @@ const components: DefaultTheme.SidebarItem[] = [
 
 const composables: DefaultTheme.SidebarItem[] = [
 	{
-		text: 'The table',
+		text: 'The grid',
 		items: [
-			{ text: 'useDataTable', link: '/composables/use-data-table' },
+			{ text: 'useDataGrid', link: '/composables/use-data-grid' },
 			{ text: 'Features', link: '/composables/features' },
-			{ text: 'useTableMotion', link: '/composables/use-table-motion' },
-			{ text: 'useTableProps', link: '/composables/use-table-props' },
+			{ text: 'useGridMotion', link: '/composables/use-grid-motion' },
+			{ text: 'useGridProps', link: '/composables/use-grid-props' },
 		],
 	},
 	{
 		text: 'Behaviour',
 		items: [
-			{ text: 'useGridNavigation', link: '/composables/use-grid-navigation' },
+			{ text: 'useCellNavigation', link: '/composables/use-cell-navigation' },
 			{ text: 'useHeaderCell', link: '/composables/use-header-cell' },
 			{ text: 'useColumnResize', link: '/composables/use-column-resize' },
 			{ text: 'useRangeSelection', link: '/composables/use-range-selection' },
 			{ text: 'useClipboard', link: '/composables/use-clipboard' },
-			{ text: 'useTableEditing', link: '/composables/use-table-editing' },
-			{ text: 'useTableHistory', link: '/composables/use-table-history' },
-			{ text: 'useTableFill', link: '/composables/use-table-fill' },
-			{ text: 'useTableRowDrag', link: '/composables/use-table-row-drag' },
-			{ text: 'useTableColumnDrag', link: '/composables/use-table-column-drag' },
+			{ text: 'useGridEditing', link: '/composables/use-grid-editing' },
+			{ text: 'useGridHistory', link: '/composables/use-grid-history' },
+			{ text: 'useGridFill', link: '/composables/use-grid-fill' },
+			{ text: 'useGridRowDrag', link: '/composables/use-grid-row-drag' },
+			{ text: 'useGridColumnDrag', link: '/composables/use-grid-column-drag' },
 		],
 	},
 	{
@@ -106,7 +106,7 @@ const composables: DefaultTheme.SidebarItem[] = [
 		items: [
 			{ text: 'autosizeColumns', link: '/composables/autosize-columns' },
 			{ text: 'useStickyOffset', link: '/composables/use-sticky-offset' },
-			{ text: 'useTableAnnouncer', link: '/composables/use-table-announcer' },
+			{ text: 'useGridAnnouncer', link: '/composables/use-grid-announcer' },
 			{ text: 'Messages', link: '/composables/messages' },
 			{ text: 'Render memo', link: '/composables/render-memo' },
 			{ text: 'Grid attributes', link: '/composables/grid-attributes' },
@@ -156,6 +156,6 @@ export const sidebar: DefaultTheme.Sidebar = {
 export const nav: DefaultTheme.NavItem[] = [
 	{ text: 'Docs', link: '/overview/introduction', activeMatch: '^/(overview|guides)/' },
 	{ text: 'Components', link: '/components/root', activeMatch: '^/components/' },
-	{ text: 'Composables', link: '/composables/use-data-table', activeMatch: '^/composables/' },
+	{ text: 'Composables', link: '/composables/use-data-grid', activeMatch: '^/composables/' },
 	{ text: 'Examples', link: '/examples/', activeMatch: '^/examples/' },
 ];

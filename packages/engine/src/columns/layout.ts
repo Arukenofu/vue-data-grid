@@ -1,6 +1,6 @@
 import type { ColumnLayout, ColumnPinSide } from './column';
 
-export interface TableLayout {
+export interface GridLayout {
 	order: string[];
 	hidden: string[];
 	widths: Record<string, number>;
@@ -24,7 +24,7 @@ function getDefaultPins(columns: readonly ColumnLayout[]) {
 	return pinned;
 }
 
-function createLayout(columns: readonly ColumnLayout[]): TableLayout {
+function createLayout(columns: readonly ColumnLayout[]): GridLayout {
 	return {
 		order: columns.map(column => column.name),
 		hidden: columns.filter(column => column.hiddenByDefault).map(column => column.name),
@@ -67,14 +67,14 @@ function mergeOrder(columns: readonly ColumnLayout[], order: readonly string[]) 
  * column the layout does not know takes its declared place, right after the nearest known column
  * declared before it, rather than going to the end.
  */
-export function resolveLayout(columns: readonly ColumnLayout[], layout: TableLayout | null): TableLayout {
+export function resolveLayout(columns: readonly ColumnLayout[], layout: GridLayout | null): GridLayout {
 	if (!layout) {
 		return createLayout(columns);
 	}
 
 	const known = new Set(layout.order);
 	const added = columns.filter(column => !known.has(column.name));
-	const stored: Partial<TableLayout> = layout;
+	const stored: Partial<GridLayout> = layout;
 	const pinned = stored.pinned ?? getDefaultPins(columns);
 
 	if (added.length === 0 && pinned === layout.pinned) {

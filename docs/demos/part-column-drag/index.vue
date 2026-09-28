@@ -2,18 +2,18 @@
 import {
 	defineColumn,
 	defineColumns,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	useDataTable,
-	useTableMotion,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
-import { type DragIndicator, TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
+import { type DragIndicator, GridColumnDrag, GridDragPreview } from '@vue-data-grid/core/drag-and-drop';
 import IconColumns from '~icons/lucide/columns-3';
 import { computed, shallowRef } from 'vue';
 
@@ -44,18 +44,18 @@ const columns = defineColumns({
 	volume: column(stock => stock.volume, { label: 'Volume', width: 96, align: 'right', format: volume => compact.format(volume) }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
 	rowHeight: 40,
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
 const indicator = shallowRef<DragIndicator>('gap');
 
-const order = computed(() => table.scope.columns.value.map(item => item.column?.label).join(' · '));
+const order = computed(() => grid.scope.columns.value.map(item => item.column?.label).join(' · '));
 </script>
 
 <template>
@@ -63,29 +63,29 @@ const order = computed(() => table.scope.columns.value.map(item => item.column?.
 		<UiToolbar>
 			<UiToggleGroup v-model="indicator" :options="INDICATORS" label="Show the place as" />
 			<span class="ui-spacer" />
-			<UiButton size="sm" variant="ghost" @click="table.state.reset()">Reset order</UiButton>
+			<UiButton size="sm" variant="ghost" @click="grid.state.reset()">Reset order</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Stocks" class="ui-table" data-size="sm">
-			<TableColumnDrag :indicator="indicator">
-				<TableHeader>
-					<TableHeaderRow v-slot="{ columns: headers }">
-						<TableHeaderCell v-for="header in headers" :key="header.key" :column="header">
-							<TableHeaderContent />
-						</TableHeaderCell>
-					</TableHeaderRow>
-				</TableHeader>
-				<TableDragPreview v-slot="{ label }" for="columns">
+		<GridRoot :grid="grid" label="Stocks" class="ui-grid" data-size="sm">
+			<GridColumnDrag :indicator="indicator">
+				<GridHeader>
+					<GridHeaderRow v-slot="{ columns: headers }">
+						<GridHeaderCell v-for="header in headers" :key="header.key" :column="header">
+							<GridHeaderContent />
+						</GridHeaderCell>
+					</GridHeaderRow>
+				</GridHeader>
+				<GridDragPreview v-slot="{ label }" for="columns">
 					<IconColumns class="ghost-icon" aria-hidden="true" />
 					{{ label }}
-				</TableDragPreview>
-			</TableColumnDrag>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+				</GridDragPreview>
+			</GridColumnDrag>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 
 		<p class="order">{{ order }}</p>
 	</div>

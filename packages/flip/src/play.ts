@@ -22,7 +22,7 @@ interface Run extends SharedRun {
 
 /**
  * The transition each element is in. A global symbol rather than a module variable: two copies of the
- * package on a page, such as one bundled by a table and one by the app, still see each other's
+ * package on a page, such as one bundled by a grid and one by the app, still see each other's
  * transitions, so that a new one cuts the running one short rather than playing on top of it. The
  * key names the version of `SharedRun`, so that copies that disagree on it keep apart.
  */

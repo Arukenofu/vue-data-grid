@@ -2,7 +2,7 @@ import { type Ref, type ShallowRef, shallowRef, watch } from 'vue';
 
 import { useMountedElement } from './use-mounted-element';
 
-/** Scroll position and visible size of the table root, shared by the row and column windows. */
+/** Scroll position and visible size of the grid root, shared by the row and column windows. */
 export interface ScrollViewport {
 	/** The scroll container once mounted; `null` on the server and before mount. */
 	element: Readonly<ShallowRef<HTMLElement | null>>;

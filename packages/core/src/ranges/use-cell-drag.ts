@@ -1,16 +1,16 @@
-import type { CellPosition, TableScope } from '@vue-data-grid/engine';
+import type { CellPosition, GridScope } from '@vue-data-grid/engine';
 import { onScopeDispose, type Ref, shallowReadonly, shallowRef } from 'vue';
 
 import { isRtl } from '../keyboard/keys';
 import { BODY_SECTION, findGridRow } from '../navigation/grid-attributes';
 import { type AutoScrollOptions, type AutoScrollPoint, useAutoScroll } from '../scroll/use-auto-scroll';
 
-/** What a drag across cells needs of a table; the table of `useDataTable` fits. */
-export interface CellDragTable {
-	scope: TableScope;
+/** What a drag across cells needs of a grid; the grid of `useDataGrid` fits. */
+export interface CellDragGrid {
+	scope: GridScope;
 	/** The scroll container. */
 	root: Readonly<Ref<HTMLElement | null>>;
-	/** The body block, with the rows in the `body` section of `useTableProps`. */
+	/** The body block, with the rows in the `body` section of `useGridProps`. */
 	body: Readonly<Ref<HTMLElement | null>>;
 	/** The heights of the sticky header and footer: a pointer over them reaches the rows at the edge. */
 	headHeight?: Readonly<Ref<number>>;
@@ -43,15 +43,15 @@ function getCellId(cell: CellPosition) {
 }
 
 /**
- * A pointer drag across the body cells of a table, such as selecting a range or pulling a fill: the
- * pointer is followed on the window, so the drag goes on past the table's edges; near an edge the
- * table scrolls, over its sticky header, footer and pinned columns; and each cell the pointer reaches
+ * A pointer drag across the body cells of a grid, such as selecting a range or pulling a fill: the
+ * pointer is followed on the window, so the drag goes on past the grid's edges; near an edge the
+ * grid scrolls, over its sticky header, footer and pinned columns; and each cell the pointer reaches
  * is reported once. The row under a point is found by the heights of the rows, and its cell by the
  * element there, else by the nearest cell of that row: a point past an edge, or over a column the drag
  * does not reach, gives the nearest cell.
  */
-export function useCellDrag(table: CellDragTable, options: CellDragOptions) {
-	const { scope } = table;
+export function useCellDrag(grid: CellDragGrid, options: CellDragOptions) {
+	const { scope } = grid;
 	const dragging = shallowRef(false);
 	let columns: ReadonlySet<string> = new Set();
 	let last: string | null = null;
@@ -71,7 +71,7 @@ export function useCellDrag(table: CellDragTable, options: CellDragOptions) {
 			}
 		}
 
-		return isRtl(table.root.value) ? { left: end, right: start } : { left: start, right: end };
+		return isRtl(grid.root.value) ? { left: end, right: start } : { left: start, right: end };
 	}
 
 	/** The row index at a height in the body: past the rows, the first or the last one. */
@@ -125,16 +125,16 @@ export function useCellDrag(table: CellDragTable, options: CellDragOptions) {
 
 	/** The cell nearest to a point in the viewport; `null` without rows or a rendered row there. */
 	function findCellAt(point: AutoScrollPoint): CellPosition | null {
-		const root = table.root.value;
-		const body = table.body.value;
+		const root = grid.root.value;
+		const body = grid.body.value;
 
 		if (!root || !body || scope.rows.value.length === 0) {
 			return null;
 		}
 
 		const view = root.getBoundingClientRect();
-		const top = view.top + root.clientTop + (table.headHeight?.value ?? 0);
-		const bottom = view.top + root.clientTop + root.clientHeight - (table.footHeight?.value ?? 0);
+		const top = view.top + root.clientTop + (grid.headHeight?.value ?? 0);
+		const bottom = view.top + root.clientTop + root.clientHeight - (grid.footHeight?.value ?? 0);
 		const y = clamp(point.y, top, bottom - 1);
 		const index = findRow(y - body.getBoundingClientRect().top);
 		const row = findGridRow(body, BODY_SECTION, index);
@@ -153,8 +153,8 @@ export function useCellDrag(table: CellDragTable, options: CellDragOptions) {
 		}
 	}
 
-	const autoScroll = useAutoScroll(() => table.root.value, {
-		margin: () => ({ top: table.headHeight?.value ?? 0, bottom: table.footHeight?.value ?? 0, ...getPinnedWidths() }),
+	const autoScroll = useAutoScroll(() => grid.root.value, {
+		margin: () => ({ top: grid.headHeight?.value ?? 0, bottom: grid.footHeight?.value ?? 0, ...getPinnedWidths() }),
 		...(options.autoScroll === false ? undefined : options.autoScroll),
 		onScroll: follow,
 	});

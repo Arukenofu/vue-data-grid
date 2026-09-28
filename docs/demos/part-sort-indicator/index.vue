@@ -2,17 +2,17 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	GridSortIndicator,
 	sorting,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	TableSortIndicator,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconArrowDownWideNarrow from '~icons/lucide/arrow-down-wide-narrow';
 import IconArrowUpNarrowWide from '~icons/lucide/arrow-up-narrow-wide';
@@ -31,7 +31,7 @@ const columns = defineColumns({
 	rating: column(person => person.rating, { label: 'Rating', width: 110, align: 'right', format: rating => rating.toFixed(1) }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -41,7 +41,7 @@ const table = useDataTable({
 	features: { sorting: sorting() },
 });
 
-const { multiSort, sort } = table.state;
+const { multiSort, sort } = grid.state;
 
 function clearSort() {
 	sort.value = [];
@@ -56,26 +56,26 @@ function clearSort() {
 			<UiButton size="sm" :disabled="sort.length === 0" @click="clearSort">Clear sort</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="People" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" class="is-sortable">
-						<TableHeaderContent />
-						<TableSortIndicator v-slot="{ direction, sortIndex }" class="indicator">
+		<GridRoot :grid="grid" label="People" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" class="is-sortable">
+						<GridHeaderContent />
+						<GridSortIndicator v-slot="{ direction, sortIndex }" class="indicator">
 							<IconArrowUpNarrowWide v-if="direction === 'asc'" />
 							<IconArrowDownWideNarrow v-else-if="direction === 'desc'" />
 							<IconArrowUpDown v-else class="idle" />
 							<span v-if="sortIndex !== undefined" class="order">{{ sortIndex }}</span>
-						</TableSortIndicator>
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+						</GridSortIndicator>
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

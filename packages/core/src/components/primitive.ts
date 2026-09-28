@@ -12,7 +12,7 @@ import {
 	type VNodeChild,
 } from 'vue';
 
-/** The props every part of the table takes: which element it renders, or none of its own. */
+/** The props every part of the grid takes: which element it renders, or none of its own. */
 export const primitiveProps = {
 	/** The element or component the part renders; `div` unless the part says otherwise. */
 	as: { type: [String, Object, Function] as PropType<string | Component>, default: 'div' },

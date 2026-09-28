@@ -6,7 +6,7 @@ description: Ready columns for row selection, row numbers, trees and drag handle
 # Service columns
 
 <Description>
-Ready columns for the furniture of a table: a checkbox to select rows, row numbers, the indent and
+Ready columns for the furniture of a grid: a checkbox to select rows, row numbers, the indent and
 toggle of a tree, and a handle to drag rows by.
 </Description>
 
@@ -18,7 +18,7 @@ toggle of a tree, and a handle to drag rows by.
 	:features="[
 		'Real columns: they pin, resize and move like any other, and take part in the layout.',
 		'`kind: \'service\'`: CSV, cell ranges, cell changes and autosize leave them out.',
-		'Each renders its parts in its cells, so the parts find the table and the row themselves.',
+		'Each renders its parts in its cells, so the parts find the grid and the row themselves.',
 		'Change their label, width, pin and rights; the rest is theirs.',
 	]"
 />
@@ -43,15 +43,15 @@ const leaderboard = defineColumns({
 ```
 
 Each factory returns a column declaration to put among your columns. They need their feature on the
-table: `selectionColumn()` the `selection` feature, `treeColumn()` the `tree` feature, and
-`dragHandleColumn()` a [`TableRowDrag`](/components/row-drag) with `handle`.
+grid: `selectionColumn()` the `selection` feature, `treeColumn()` the `tree` feature, and
+`dragHandleColumn()` a [`GridRowDrag`](/components/row-drag) with `handle`.
 
 ## API reference
 
 ### selectionColumn
 
-The checkbox column of the row selection: a [`TableSelectAllCheckbox`](/components/selection-checkbox)
-in the header and a `TableSelectionCheckbox` in every cell. Pinned to the start by default, 40 px wide,
+The checkbox column of the row selection: a [`GridSelectAllCheckbox`](/components/selection-checkbox)
+in the header and a `GridSelectionCheckbox` in every cell. Pinned to the start by default, 40 px wide,
 centred.
 
 ```ts
@@ -67,13 +67,13 @@ number names the row for assistive technology, as in a spreadsheet.
 rowNumberColumn(options?: ServiceColumnOptions & { rowHeader?: boolean }): ColumnInput<TRow, null>
 ```
 
-The number is the row's place, not a fact about the row: sort the table and the column still counts
+The number is the row's place, not a fact about the row: sort the grid and the column still counts
 from 1, top to bottom.
 
 <Demo name="part-row-numbers" />
 
 ::: tip Numbers that travel with their rows
-In a table whose rows are dragged, such as the one at the top of this page, a place number changes
+In a grid whose rows are dragged, such as the one at the top of this page, a place number changes
 under every row a drag passes. When the number belongs to the row, an id, a track number, a line of
 an order, it is data: show it with a column of your own that reads it from the row, and it moves
 with the row.
@@ -82,7 +82,7 @@ with the row.
 ### treeColumn
 
 Turns a data column into the column of the tree: each cell starts with an indent of
-`--dg-tree-indent` per level and a [`TableTreeToggle`](/components/tree-toggle), then the column's own
+`--dg-tree-indent` per level and a [`GridTreeToggle`](/components/tree-toggle), then the column's own
 content. It stays a data column, and it is marked `tree`, so → and ← expand and collapse rows in it.
 
 ```ts
@@ -91,7 +91,7 @@ treeColumn(column: ColumnInput<TRow, TValue>): ColumnInput<TRow, TValue>
 
 ### dragHandleColumn
 
-The column of drag handles: a [`TableDragHandle`](/components/row-drag) in every cell and an empty
+The column of drag handles: a [`GridDragHandle`](/components/row-drag) in every cell and an empty
 header. Pinned to the start by default, 32 px wide. Import it from `@vue-data-grid/core/drag-and-drop`.
 
 ```ts
@@ -171,7 +171,7 @@ The demo reorders the tree with `moveRow`, which puts the row under its new pare
 ```ts
 import { moveRow } from '@vue-data-grid/core';
 
-function drop({ key, parent, index }: TableRowDropEvent<unknown>) {
+function drop({ key, parent, index }: GridRowDropEvent<unknown>) {
 	const row = rows.value.find(item => item.id === key);
 
 	if (row) {
@@ -186,7 +186,7 @@ function drop({ key, parent, index }: TableRowDropEvent<unknown>) {
   so a screen reader counts them.
 - The first data column names each row, `role="rowheader"`, never a service column, unless you mark
   one with `rowHeader: true`. A row of a checkbox, a number and a title is named by its title.
-- The checkboxes, toggles and handles inside are named by the table's messages: "Select row",
+- The checkboxes, toggles and handles inside are named by the grid's messages: "Select row",
   "Expand", "Drag Build the landing page".
 - With the `navigation` feature, <kbd>Enter</kbd> or <kbd>Space</kbd> on a cell whose only content is
   a checkbox or a button presses it, so a selection column is used without leaving the grid.

@@ -13,10 +13,10 @@ import type { BodyCellFocus } from '../navigation/body-cell-focus';
 import { BODY_SECTION, readGridPosition } from '../navigation/grid-attributes';
 import { CONTROL_SELECTOR, DRAG_HANDLE_SELECTOR, DRAGGABLE_ATTRIBUTE } from '../pointer/controls';
 import type { AutoScrollOptions } from '../scroll/use-auto-scroll';
-import { type CellDragTable, useCellDrag } from './use-cell-drag';
+import { type CellDragGrid, useCellDrag } from './use-cell-drag';
 
-/** What range selection needs of a table; the table of `useDataTable` fits. */
-export type RangeSelectionTable = CellDragTable;
+/** What range selection needs of a grid; the grid of `useDataGrid` fits. */
+export type RangeSelectionGrid = CellDragGrid;
 
 export interface RangeSelectionOptions {
 	/** The ranges, `useCellRanges()`. */
@@ -24,7 +24,7 @@ export interface RangeSelectionOptions {
 	/**
 	 * Focus of the body cells: `cells` of the grid navigation, or `useCellFocus()` for a grid that keeps
 	 * DOM focus on itself. A press focuses its cell through it, and focus moved by a key collapses the
-	 * ranges to the focused cell, as the active cell of a spreadsheet does. Without it the table
+	 * ranges to the focused cell, as the active cell of a spreadsheet does. Without it the grid
 	 * element takes focus on a press, and Shift with the keys goes from the last range.
 	 */
 	focus?: BodyCellFocus;
@@ -61,7 +61,7 @@ function getCellId(cell: CellAddress | null) {
 }
 
 /**
- * The gestures of cell ranges over a table: a press selects a cell, Shift extends the last range to it
+ * The gestures of cell ranges over a grid: a press selects a cell, Shift extends the last range to it
  * and Ctrl or ⌘ adds a new one, or takes cells out of the selection when the cell is selected, as in
  * Excel; a drag extends the range, or the cells taken out, cell by cell, scrolling near the edges;
  * Shift with the arrows, Home, End, PageUp and PageDown extends the range from the focused cell, and
@@ -70,14 +70,14 @@ function getCellId(cell: CellAddress | null) {
  *
  * The focused cell stays where the range started, as the active cell of a spreadsheet does: Shift
  * moves the other corner, scrolled into view. The keys are taken on the cells in the capture phase,
- * before the navigation's, so the arrows without Shift still move focus; with DOM focus on the table
+ * before the navigation's, so the arrows without Shift still move focus; with DOM focus on the grid
  * element, as a grid on `aria-activedescendant` keeps it, they are taken there, on the cell of
  * `focus`. Presses on controls inside cells, a list of an editor included, on a drag handle and on
  * rows dragged as a whole are left to them.
  */
-export function useRangeSelection(table: RangeSelectionTable, options: RangeSelectionOptions) {
+export function useRangeSelection(grid: RangeSelectionGrid, options: RangeSelectionOptions) {
 	const { ranges, focus } = options;
-	const { scope } = table;
+	const { scope } = grid;
 	let warned = false;
 
 	function isEnabled() {
@@ -98,9 +98,9 @@ export function useRangeSelection(table: RangeSelectionTable, options: RangeSele
 			: null;
 	}
 
-	/** Puts DOM focus in the table, where a press that selects cells leaves it. */
-	function focusTable() {
-		const root = table.root.value;
+	/** Puts DOM focus in the grid, where a press that selects cells leaves it. */
+	function focusGrid() {
+		const root = grid.root.value;
 
 		if (root && !root.contains(document.activeElement)) {
 			root.focus({ preventScroll: true });
@@ -141,7 +141,7 @@ export function useRangeSelection(table: RangeSelectionTable, options: RangeSele
 		ranges.select(edge, 'extend');
 	}
 
-	const drag = useCellDrag(table, {
+	const drag = useCellDrag(grid, {
 		getColumns,
 		autoScroll: options.autoScroll,
 		onCell: cell => ranges.select(ranges.edgeAt(cell), 'extend'),
@@ -169,7 +169,7 @@ export function useRangeSelection(table: RangeSelectionTable, options: RangeSele
 		const edge = ranges.edgeAt(cell);
 		const modified = event.ctrlKey || event.metaKey;
 
-		focusTable();
+		focusGrid();
 
 		if (event.shiftKey) {
 			extendTo(edge);
@@ -272,7 +272,7 @@ export function useRangeSelection(table: RangeSelectionTable, options: RangeSele
 	}
 
 	/**
-	 * The cell a key is on: the focused cell itself, or with focus on the table element, as a grid on
+	 * The cell a key is on: the focused cell itself, or with focus on the grid element, as a grid on
 	 * `aria-activedescendant` keeps it, the focused cell of `focus`. Keys inside the content of a cell
 	 * are the content's.
 	 */
@@ -281,7 +281,7 @@ export function useRangeSelection(table: RangeSelectionTable, options: RangeSele
 			return readCell(target);
 		}
 
-		const focused = target === table.root.value ? focus?.focused.value : null;
+		const focused = target === grid.root.value ? focus?.focused.value : null;
 
 		return focused && getColumns().includes(focused.column) ? { index: focused.index, column: focused.column } : null;
 	}
@@ -295,7 +295,7 @@ export function useRangeSelection(table: RangeSelectionTable, options: RangeSele
 		}
 
 		const modified = event.ctrlKey || event.metaKey;
-		const move = KEY_MOVES[isRtl(table.root.value) ? MIRRORED_KEYS[event.key] ?? event.key : event.key];
+		const move = KEY_MOVES[isRtl(grid.root.value) ? MIRRORED_KEYS[event.key] ?? event.key : event.key];
 
 		if (move && event.shiftKey && !event.altKey) {
 			event.preventDefault();
@@ -323,7 +323,7 @@ export function useRangeSelection(table: RangeSelectionTable, options: RangeSele
 		}, { flush: 'sync' });
 	}
 
-	watch(() => table.root.value, (root, _previous, onCleanup) => {
+	watch(() => grid.root.value, (root, _previous, onCleanup) => {
 		if (!root) {
 			return;
 		}

@@ -2,7 +2,7 @@ import { shallowRef } from 'vue';
 import { describe, expect, it, vi } from 'vitest';
 
 import { defineColumns } from '../../src/columns/define-columns';
-import type { TableSort } from '../../src/columns/sort';
+import type { GridSort } from '../../src/columns/sort';
 import { useSortedRows } from '../../src/rows/use-sorted-rows';
 
 interface Row {
@@ -18,7 +18,7 @@ const createRows = (count: number) => Array.from({ length: count }, (_, index) =
 
 describe('useSortedRows', () => {
 	it('sorts by the model and re-sorts when it changes', () => {
-		const sort = shallowRef<TableSort[]>([{ name: 'price', direction: 'desc' }]);
+		const sort = shallowRef<GridSort[]>([{ name: 'price', direction: 'desc' }]);
 		const sorted = useSortedRows({ rows: createRows(3), sort, columns });
 
 		expect(sorted.value.map(row => row.id)).toEqual(['r2', 'r1', 'r0']);

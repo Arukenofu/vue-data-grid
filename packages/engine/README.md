@@ -1,6 +1,6 @@
 # @vue-data-grid/engine
 
-Headless table core for Vue 3. It models columns (declaration, groups, order, widths, pinning,
+Headless grid core for Vue 3. It models columns (declaration, groups, order, widths, pinning,
 hiding, group collapse and sort state), keeps that state in a store of your choice, and turns it into
 geometry: `flex`, `position: sticky` and CSS custom properties. It also windows rows and columns, and
 ships optional composables for work on rows and cells: sorting, streaming updates, grouping with
@@ -8,7 +8,7 @@ aggregates, trees, selection, cell focus, cell ranges, editing with undo, paste 
 cell changes and CSV.
 
 There is no markup here: no components, no templates, no `h()` calls, no render types. The engine
-gives you a `TableScope`, and your own markup renders the table from it. It is the low-level layer:
+gives you a `GridScope`, and your own markup renders the grid from it. It is the low-level layer:
 [`@vue-data-grid/core`](../core), the main package, builds on it with the render fields of columns,
 keyboard navigation, autosize from content and more.
 
@@ -28,9 +28,9 @@ import {
 	defineColumn,
 	defineColumns,
 	getCellText,
-	createTableScopeContext,
-	useTableEngine,
-	useTableGeometry,
+	createGridScopeContext,
+	useGridEngine,
+	useGridGeometry,
 } from '@vue-data-grid/engine';
 
 interface Instrument {
@@ -51,7 +51,7 @@ export default defineComponent({
 	setup(props) {
 		const root = shallowRef<HTMLElement | null>(null);
 
-		const engine = useTableEngine({
+		const engine = useGridEngine({
 			columns,
 			rows: () => props.rows,
 			root,
@@ -60,8 +60,8 @@ export default defineComponent({
 			virtual: true,
 		});
 
-		createTableScopeContext(engine.scope);
-		useTableGeometry(root, engine.layers);
+		createGridScopeContext(engine.scope);
+		useGridGeometry(root, engine.layers);
 
 		return () => h('div', { ref: root, style: 'overflow: auto; height: 400px' }, [
 			h('div', { style: { position: 'relative', height: `${engine.totalSize.value}px` } },
@@ -80,14 +80,14 @@ export default defineComponent({
 });
 ```
 
-A real table also renders a header from `headerProps`, handles gestures and memoizes rows. The core
+A real grid also renders a header from `headerProps`, handles gestures and memoizes rows. The core
 styles only the geometry of a cell: its width, grow factor and pin. `align` becomes a `data-dg-align`
 attribute, and the layout of a cell, alignment included, comes from CSS: the structural styles of
 `@vue-data-grid/core` (`@vue-data-grid/core/style.css`), or rules of your own on `[data-dg-column]` and
 `[data-dg-align]`. Without them the `price` column above is not right-aligned.
 The documentation site in [`docs/`](../../docs) documents `@vue-data-grid/core`, which re-exports this
 core: its [core page](../../docs/content/composables/core.md) maps the exports, and a guide on
-[your own markup](../../docs/content/guides/custom-markup.md) renders a table from the engine. Run it
+[your own markup](../../docs/content/guides/custom-markup.md) renders a grid from the engine. Run it
 with `pnpm docs` from the repository root. Every export carries JSDoc with the details.
 
 ## Service columns and row headers
@@ -98,7 +98,7 @@ Service columns are real columns, pinned, resized and moved like any other, but 
 otherwise (`includeService`, or naming the columns).
 
 One column names each row for assistive technology: the first shown data column, or every column
-with `rowHeader: true`; `rowHeader: false` on the first data column leaves the table without one.
+with `rowHeader: true`; `rowHeader: false` on the first data column leaves the grid without one.
 `RenderedColumn.rowHeader` marks it, and the column window always renders it in its place, with
 spacers on both sides, so a row keeps its accessible name while scrolled sideways. Spacers are told
 apart by `key` (`dg-spacer-start`, `dg-spacer-start-1`, …); every rendered column and group cell
@@ -127,7 +127,7 @@ The engine learns about the right-hand side through `insets`, `rows`, and what m
 ## Entry points
 
 - `@vue-data-grid/engine` is the stable API. Everything in the guides is imported from here.
-- `@vue-data-grid/engine/internals` exposes the building blocks `useTableEngine` is made of, for
+- `@vue-data-grid/engine/internals` exposes the building blocks `useGridEngine` is made of, for
   those who assemble their own engine. It is not covered by semver: signatures there change together
   with the engine, including in minor releases. Nothing from the root entry is repeated there.
 
@@ -138,7 +138,7 @@ src/
 	persist/        stores and usePersistedState: keeping any state between visits
 	columns/        column declaration, order, layout, header sort, column state
 	column-groups/  column groups: declaration, header rows, collapse
-	engine/         useTableEngine and TableScope; column reconciliation, fit, resize
+	engine/         useGridEngine and GridScope; column reconciliation, fit, resize
 	virtual/        row and column windows, scrolling, viewport
 	render/         what markup uses: CSS variables, cell styles
 	rows/           row pipeline: sorting, streaming, grouping with aggregates, trees, selection, row keys

@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import {
 	downloadCsv,
+	GridBody,
+	GridCells,
+	GridEmpty,
+	GridRoot,
+	GridRow,
 	localStorageStore,
 	navigation,
 	selection,
 	sorting,
-	TableBody,
-	TableCells,
-	TableEmpty,
-	TableRoot,
-	TableRow,
 	toCsv,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
-import { TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
+import { GridColumnDrag, GridDragPreview } from '@vue-data-grid/core/drag-and-drop';
 import IconDownload from '~icons/lucide/download';
 import IconMail from '~icons/lucide/mail';
 import IconUserX from '~icons/lucide/user-x';
@@ -22,7 +22,7 @@ import IconX from '~icons/lucide/x';
 import { computed, shallowRef } from 'vue';
 
 import { people as initialPeople, type Person, type Team } from '@/data/people';
-import { type SelectOption, UiButton, UiDataTableHeader, UiInput, UiSelect, UiStat, UiToolbar } from '@/ui';
+import { type SelectOption, UiButton, UiDataGridHeader, UiInput, UiSelect, UiStat, UiToolbar } from '@/ui';
 
 import { columns } from './columns';
 import ColumnsMenu from './ColumnsMenu.vue';
@@ -49,7 +49,7 @@ const filtered = computed(() => {
 		&& `${person.name} ${person.email} ${person.role}`.toLowerCase().includes(text));
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: filtered,
 	rowKey: 'id',
@@ -63,9 +63,9 @@ const table = useDataTable({
 	},
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
-const selected = computed(() => people.value.filter(person => table.selection.isSelected(person.id)));
+const selected = computed(() => people.value.filter(person => grid.selection.isSelected(person.id)));
 
 function clearFilters() {
 	query.value = '';
@@ -73,7 +73,7 @@ function clearFilters() {
 }
 
 function exportCsv() {
-	const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
+	const shown = grid.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
 
 	downloadCsv(toCsv({ columns: shown, rows: selected.value }), { name: 'team' });
 }
@@ -83,8 +83,8 @@ async function copyEmails() {
 }
 
 function remove() {
-	people.value = people.value.filter(person => !table.selection.isSelected(person.id));
-	table.selection.clear();
+	people.value = people.value.filter(person => !grid.selection.isSelected(person.id));
+	grid.selection.clear();
 }
 </script>
 
@@ -95,27 +95,27 @@ function remove() {
 			<UiSelect v-model="team" :options="TEAMS" label="Team" />
 			<span class="ui-spacer" />
 			<UiStat label="People" :value="filtered.length" />
-			<ColumnsMenu :scope="table.scope" @reset="table.state.reset()" />
+			<ColumnsMenu :scope="grid.scope" @reset="grid.state.reset()" />
 		</UiToolbar>
 
-		<div class="directory-table">
-			<TableRoot :table="table" label="Team directory" class="ui-table" data-size="lg">
-				<TableColumnDrag>
-					<UiDataTableHeader />
-					<TableDragPreview />
-				</TableColumnDrag>
-				<TableBody v-slot="{ rows }">
-					<TableRow v-for="row in rows" :key="row.key" :row="row">
-						<TableCells />
-					</TableRow>
-				</TableBody>
-				<TableEmpty>
+		<div class="directory-grid">
+			<GridRoot :grid="grid" label="Team directory" class="ui-grid" data-size="lg">
+				<GridColumnDrag>
+					<UiDataGridHeader />
+					<GridDragPreview />
+				</GridColumnDrag>
+				<GridBody v-slot="{ rows }">
+					<GridRow v-for="row in rows" :key="row.key" :row="row">
+						<GridCells />
+					</GridRow>
+				</GridBody>
+				<GridEmpty>
 					<span class="directory-empty">
 						No one matches these filters.
 						<UiButton size="sm" @click="clearFilters">Clear filters</UiButton>
 					</span>
-				</TableEmpty>
-			</TableRoot>
+				</GridEmpty>
+			</GridRoot>
 
 			<Transition name="bulk">
 				<div v-if="selected.length > 0" class="bulk" role="region" aria-label="Actions for the selected people">
@@ -132,7 +132,7 @@ function remove() {
 						<IconUserX aria-hidden="true" />
 						Remove
 					</UiButton>
-					<UiButton size="sm" variant="ghost" icon aria-label="Clear the selection" @click="table.selection.clear()">
+					<UiButton size="sm" variant="ghost" icon aria-label="Clear the selection" @click="grid.selection.clear()">
 						<IconX aria-hidden="true" />
 					</UiButton>
 				</div>
@@ -142,7 +142,7 @@ function remove() {
 </template>
 
 <style scoped>
-.directory-table {
+.directory-grid {
 	position: relative;
 	display: flex;
 }

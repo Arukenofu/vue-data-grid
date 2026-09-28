@@ -1,13 +1,13 @@
 import type { AnyColumnInput } from '@vue-data-grid/engine';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { type BrowserRow, type BrowserTable, mountBrowserTable } from './support/browser-table';
+import { type BrowserGrid, type BrowserRow, mountBrowserGrid } from './support/browser-grid';
 
-let table: BrowserTable | null = null;
+let grid: BrowserGrid | null = null;
 
 afterEach(() => {
-	table?.unmount();
-	table = null;
+	grid?.unmount();
+	grid = null;
 });
 
 const COLUMNS: Record<string, AnyColumnInput> = {
@@ -18,13 +18,13 @@ const COLUMNS: Record<string, AnyColumnInput> = {
 
 describe('style.css in a browser', () => {
 	it('keeps the resize handle of a column scrolled under a pinned one under it too', async () => {
-		table = mountBrowserTable({ columns: COLUMNS, width: 300 });
+		grid = mountBrowserGrid({ columns: COLUMNS, width: 300 });
 
-		const pinned = table.head.querySelector('[data-dg-column="pinned"]') as HTMLElement;
-		const handle = table.head.querySelector('[data-dg-column="name"] [data-dg-part="resize-handle"]') as HTMLElement;
+		const pinned = grid.head.querySelector('[data-dg-column="pinned"]') as HTMLElement;
+		const handle = grid.head.querySelector('[data-dg-column="name"] [data-dg-part="resize-handle"]') as HTMLElement;
 
 		// The end edge of `name`, and its handle, go under the pinned cell.
-		table.root.scrollLeft = 200;
+		grid.root.scrollLeft = 200;
 		await expect.poll(() => handle.getBoundingClientRect().right).toBeLessThan(pinned.getBoundingClientRect().right);
 
 		const box = handle.getBoundingClientRect();
@@ -34,7 +34,7 @@ describe('style.css in a browser', () => {
 	});
 
 	it('lines up the cells of a `flex` column in every row, whatever the length of their text', async () => {
-		table = mountBrowserTable({
+		grid = mountBrowserGrid({
 			width: 360,
 			columns: {
 				name: { value: (row: BrowserRow) => row.name, label: 'Name', width: 120, flex: 1 },
@@ -42,10 +42,10 @@ describe('style.css in a browser', () => {
 				value: { value: (row: BrowserRow) => row.value, label: 'Value', width: 90 },
 			},
 		});
-		await expect.poll(() => table?.cell(7, 'code') ?? null).not.toBeNull();
+		await expect.poll(() => grid?.cell(7, 'code') ?? null).not.toBeNull();
 
-		const lefts = [0, 1, 7, 14].map(index => table?.cell(index, 'code')?.getBoundingClientRect().left);
-		const rows = [0, 1, 7, 14].map(index => table?.row(index)?.getBoundingClientRect().width);
+		const lefts = [0, 1, 7, 14].map(index => grid?.cell(index, 'code')?.getBoundingClientRect().left);
+		const rows = [0, 1, 7, 14].map(index => grid?.row(index)?.getBoundingClientRect().width);
 
 		expect(new Set(lefts).size).toBe(1);
 		expect(new Set(rows).size).toBe(1);

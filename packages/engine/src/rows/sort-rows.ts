@@ -5,7 +5,7 @@ import {
 	toColumnList,
 	toRuntimeColumn,
 } from '../columns/column';
-import type { TableSort } from '../columns/sort';
+import type { GridSort } from '../columns/sort';
 import { compareValues, isEmptyValue } from './compare';
 
 export interface SortKey {
@@ -22,7 +22,7 @@ export interface SortFrame<TRow> {
 	values: Map<TRow, readonly unknown[]> | null;
 }
 
-function resolveKeys(sort: readonly TableSort[], columns: readonly AnyColumn[]) {
+function resolveKeys(sort: readonly GridSort[], columns: readonly AnyColumn[]) {
 	const byName = new Map(columns.map(column => [column.name, column]));
 	const keys: SortKey[] = [];
 
@@ -153,7 +153,7 @@ function sortChanged<TRow>(previous: SortFrame<TRow>, rows: readonly TRow[], val
 export function resolveSortedRows<TRow>(
 	previous: SortFrame<TRow> | null,
 	rows: readonly TRow[],
-	sort: readonly TableSort[],
+	sort: readonly GridSort[],
 	columns: readonly AnyColumn[],
 	delta: boolean,
 ): SortFrame<TRow> {
@@ -181,7 +181,7 @@ export function resolveSortedRows<TRow>(
  */
 export function sortRows<TRow>(
 	rows: readonly TRow[],
-	sort: readonly TableSort[],
+	sort: readonly GridSort[],
 	columns: ColumnsInput | readonly AnyColumn[],
 ) {
 	return resolveSortedRows(null, rows, sort, toColumnList(columns), false).rows;

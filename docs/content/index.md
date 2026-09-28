@@ -1,7 +1,7 @@
 ---
 layout: home
 markdownStyles: false
-title: Headless tables for Vue 3
+title: Headless grids for Vue 3
 ---
 
 <HomePage>
@@ -9,7 +9,7 @@ title: Headless tables for Vue 3
 
 ```vue
 <script setup lang="ts">
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -19,22 +19,22 @@ const table = useDataTable({
 </script>
 
 <template>
-	<TableRoot :table="table" label="Team">
-		<TableHeader>
-			<TableHeaderRow v-slot="{ columns }">
-				<TableHeaderCell v-for="column in columns" :key="column.key" :column="column">
-					<TableHeaderContent />
-					<TableSortIndicator />
-					<TableResizeHandle />
-				</TableHeaderCell>
-			</TableHeaderRow>
-		</TableHeader>
-		<TableBody v-slot="{ rows }">
-			<TableRow v-for="row in rows" :key="row.key" :row="row">
-				<TableCells />
-			</TableRow>
-		</TableBody>
-	</TableRoot>
+	<GridRoot :grid="grid" label="Team">
+		<GridHeader>
+			<GridHeaderRow v-slot="{ columns }">
+				<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">
+					<GridHeaderContent />
+					<GridSortIndicator />
+					<GridResizeHandle />
+				</GridHeaderCell>
+			</GridHeaderRow>
+		</GridHeader>
+		<GridBody v-slot="{ rows }">
+			<GridRow v-for="row in rows" :key="row.key" :row="row">
+				<GridCells />
+			</GridRow>
+		</GridBody>
+	</GridRoot>
 </template>
 ```
 

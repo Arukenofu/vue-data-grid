@@ -6,20 +6,20 @@ import {
 	defineColumns,
 	editing,
 	fill,
+	GridBody,
+	GridCells,
+	GridFillHandle,
+	GridFillPreview,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRangeOverlay,
+	GridRoot,
+	GridRow,
 	navigation,
 	numberField,
 	ranges,
-	TableBody,
-	TableCells,
-	TableFillHandle,
-	TableFillPreview,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRangeOverlay,
-	TableRoot,
-	TableRow,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { computed, shallowRef } from 'vue';
 
@@ -80,7 +80,7 @@ const selection = shallowRef<readonly CellRange[]>([
 	{ anchor: { key: 'cloud', column: 'jan' }, focus: { key: 'travel', column: 'mar' } },
 ]);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -107,7 +107,7 @@ const totals = computed(() => {
 	let sum = 0;
 	let count = 0;
 
-	for (const cell of table.ranges.getCells()) {
+	for (const cell of grid.ranges.getCells()) {
 		const line = lines.get(cell.key);
 
 		if (line && isMonth(cell.column)) {
@@ -122,22 +122,22 @@ const totals = computed(() => {
 
 <template>
 	<div>
-		<TableRoot :table="table" label="Budget" class="ui-table" data-size="auto">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows: bodyRows }">
-				<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-				<TableRangeOverlay v-slot="{ corner }">
-					<TableFillHandle v-if="corner" />
-				</TableRangeOverlay>
-				<TableFillPreview />
-			</TableBody>
-		</TableRoot>
+		<GridRoot :grid="grid" label="Budget" class="ui-grid" data-size="auto">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows: bodyRows }">
+				<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+				<GridRangeOverlay v-slot="{ corner }">
+					<GridFillHandle v-if="corner" />
+				</GridRangeOverlay>
+				<GridFillPreview />
+			</GridBody>
+		</GridRoot>
 
 		<UiToolbar class="status">
 			<UiStat label="Cells" :value="totals.count" />

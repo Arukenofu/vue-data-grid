@@ -2,20 +2,20 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridResizeHandle,
+	GridRoot,
+	GridRow,
+	GridSortIndicator,
 	selection,
 	selectionColumn,
 	sorting,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableResizeHandle,
-	TableRoot,
-	TableRow,
-	TableSortIndicator,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { computed, h, shallowRef } from 'vue';
 
@@ -76,7 +76,7 @@ const columns = defineColumns({
 
 const theme = shallowRef<Theme>('kit');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
@@ -84,7 +84,7 @@ const table = useDataTable({
 	features: { sorting: sorting(), selection: selection() },
 });
 
-const selectedCount = table.selection.selectedCount;
+const selectedCount = grid.selection.selectedCount;
 </script>
 
 <template>
@@ -102,24 +102,24 @@ const selectedCount = table.selection.selectedCount;
 				</span>
 			</div>
 
-			<TableRoot :table="table" label="Watchlist" :class="{ 'ui-table': theme === 'kit' }">
-				<TableHeader>
-					<TableHeaderRow v-slot="{ columns }">
-						<TableHeaderCell v-for="column in columns" :key="column.key" :column="column">
-							<TableHeaderContent />
-							<TableSortIndicator v-slot="{ direction, sortIndex }">
+			<GridRoot :grid="grid" label="Watchlist" :class="{ 'ui-grid': theme === 'kit' }">
+				<GridHeader>
+					<GridHeaderRow v-slot="{ columns }">
+						<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">
+							<GridHeaderContent />
+							<GridSortIndicator v-slot="{ direction, sortIndex }">
 								<UiSortIcon :direction="direction" :sort-index="sortIndex" />
-							</TableSortIndicator>
-							<TableResizeHandle />
-						</TableHeaderCell>
-					</TableHeaderRow>
-				</TableHeader>
-				<TableBody v-slot="{ rows }">
-					<TableRow v-for="row in rows" :key="row.key" :row="row">
-						<TableCells />
-					</TableRow>
-				</TableBody>
-			</TableRoot>
+							</GridSortIndicator>
+							<GridResizeHandle />
+						</GridHeaderCell>
+					</GridHeaderRow>
+				</GridHeader>
+				<GridBody v-slot="{ rows }">
+					<GridRow v-for="row in rows" :key="row.key" :row="row">
+						<GridCells />
+					</GridRow>
+				</GridBody>
+			</GridRoot>
 		</div>
 	</div>
 </template>

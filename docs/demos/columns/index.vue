@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, rowNumberColumn, useDataTable } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, rowNumberColumn, useDataGrid } from '@vue-data-grid/core';
 import { h } from 'vue';
 
-import { type BadgeTone, UiBadge, UiDataTable, UiProgress } from '@/ui';
+import { type BadgeTone, UiBadge, UiDataGrid, UiProgress } from '@/ui';
 
 import CustomerCell from './CustomerCell.vue';
 import { type Invoice, type InvoiceStatus, invoices } from './data';
@@ -65,7 +65,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: invoices,
 	rowKey: 'id',
@@ -74,5 +74,5 @@ const table = useDataTable({
 </script>
 
 <template>
-	<UiDataTable :table="table" label="Invoices" footer />
+	<UiDataGrid :grid="grid" label="Invoices" footer />
 </template>

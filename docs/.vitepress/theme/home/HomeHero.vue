@@ -15,12 +15,12 @@ const INSTALL = 'pnpm add @vue-data-grid/core';
 
 		<a href="/overview/introduction" class="home-pill" data-reveal>
 			<span class="home-pill-dot" aria-hidden="true" />
-			Headless tables for Vue 3
+			Headless grids for Vue 3
 			<IconArrowRight aria-hidden="true" />
 		</a>
 
 		<h1 class="home-title">
-			<span class="home-title-line" data-reveal>Accessible Vue tables,</span>
+			<span class="home-title-line" data-reveal>Accessible Vue grids,</span>
 			<span class="home-title-line home-title-accent" data-reveal>assembled from parts.</span>
 		</h1>
 

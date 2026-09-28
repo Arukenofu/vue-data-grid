@@ -20,7 +20,7 @@ export interface Example {
 export const EXAMPLES: readonly Example[] = [
 	{
 		title: 'Stock screener',
-		text: 'Prices stream in, cells flash up and down, and a sorted table re-sorts only the rows that moved.',
+		text: 'Prices stream in, cells flash up and down, and a sorted grid re-sorts only the rows that moved.',
 		link: '/examples/screener',
 		icon: IconChartCandlestick,
 		colors: ['#12a594', '#30a46c'],
@@ -36,7 +36,7 @@ export const EXAMPLES: readonly Example[] = [
 	},
 	{
 		title: 'Task board',
-		text: 'Two tables that trade rows by drag and drop, with a bin to drop tasks in and rows that move into place.',
+		text: 'Two grids that trade rows by drag and drop, with a bin to drop tasks in and rows that move into place.',
 		link: '/examples/task-board',
 		icon: IconKanban,
 		colors: ['#7c3aed', '#db2777'],

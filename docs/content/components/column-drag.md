@@ -6,7 +6,7 @@ description: Reordering columns by dragging their headers.
 # Column drag
 
 <Description>
-Reordering columns by dragging their headers. The order is part of the table's layout, so a drop
+Reordering columns by dragging their headers. The order is part of the grid's layout, so a drop
 moves the column itself, and the layout remembers it.
 </Description>
 
@@ -19,8 +19,8 @@ moves the column itself, and the layout remembers it.
 		'Only `movable` columns drag, and only to places the layout allows: within their pinned side, around a group that keeps together.',
 		'The columns move apart to make room, each as a whole column, header and cells together.',
 		'The drop moves the column in the layout for you; `drop` tells you where it went.',
-		'The table scrolls near its edges while a column is dragged.',
-		'With `useTableMotion` the columns slide into place after a drop.',
+		'The grid scrolls near its edges while a column is dragged.',
+		'With `useGridMotion` the columns slide into place after a drop.',
 	]"
 />
 
@@ -28,23 +28,23 @@ moves the column itself, and the layout remembers it.
 
 ```vue
 <script setup lang="ts">
-import { TableHeader, TableHeaderCell, TableHeaderRow } from '@vue-data-grid/core';
-import { TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
+import { GridHeader, GridHeaderCell, GridHeaderRow } from '@vue-data-grid/core';
+import { GridColumnDrag, GridDragPreview } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
-	<TableColumnDrag>
-		<TableHeader>
-			<TableHeaderRow v-slot="{ columns }">
-				<TableHeaderCell v-for="column in columns" :key="column.key" :column="column" />
-			</TableHeaderRow>
-		</TableHeader>
-		<TableDragPreview for="columns" />
-	</TableColumnDrag>
+	<GridColumnDrag>
+		<GridHeader>
+			<GridHeaderRow v-slot="{ columns }">
+				<GridHeaderCell v-for="column in columns" :key="column.key" :column="column" />
+			</GridHeaderRow>
+		</GridHeader>
+		<GridDragPreview for="columns" />
+	</GridColumnDrag>
 </template>
 ```
 
-`TableColumnDrag` renders no element: put it around the `TableHeader`, inside the `TableRoot`. The
+`GridColumnDrag` renders no element: put it around the `GridHeader`, inside the `GridRoot`. The
 header cells under it register themselves. Columns say whether they move:
 
 ```ts
@@ -58,19 +58,19 @@ const columns = defineColumns({
 
 ## API reference
 
-### TableColumnDrag
+### GridColumnDrag
 
-`useTableColumnDrag` as a part.
+`useGridColumnDrag` as a part.
 
 <PropsTable
 	:data="[
 		{ name: 'indicator', type: '\'gap\' | \'line\' | \'mark\'', default: '\'gap\'', description: 'How the place is shown: the columns move apart, a line stands between the headers, or only attributes mark it.' },
 		{ name: 'enabled', type: 'boolean', default: 'true', description: 'Whether columns can be dragged now.' },
 		{ name: 'canDrop', type: '(name, index) => boolean', description: 'Whether a column may go to a place among the shown columns, on top of what the layout allows.' },
-		{ name: 'bounds', type: '\'table\' | \'window\' | HTMLElement', default: '\'table\'', description: 'What neither the pointer nor the ghost leaves.' },
+		{ name: 'bounds', type: '\'grid\' | \'window\' | HTMLElement', default: '\'grid\'', description: 'What neither the pointer nor the ghost leaves.' },
 		{ name: 'getLabel', type: '(column) => string', description: 'The name of a column for screen readers; its label by default.' },
 		{ name: 'motion', type: 'MotionEngine | false', description: 'The engine of the gap and the ghost; `webAnimations()` by default.' },
-		{ name: 'autoScroll', type: 'DragAutoScroll | false', description: 'How the table scrolls near its start and end.' },
+		{ name: 'autoScroll', type: 'DragAutoScroll | false', description: 'How the grid scrolls near its start and end.' },
 		{ name: 'touchDelay', type: 'number', default: '250', description: 'How long a finger rests on a header before it drags, ms.' },
 		{ name: 'ignore', type: 'string', description: 'A selector of what inside a header never starts a drag, on top of the controls.' },
 		{ name: 'announcements', type: 'Partial<DragAnnouncements>', description: 'What screen readers hear.' },
@@ -109,12 +109,12 @@ const columns = defineColumns({
 ### Animating the drop
 
 The gap already shows the columns at their new places while the header is dragged. With the line
-indicator, or with the keys, the columns jump on the drop; `useTableMotion` slides them there:
+indicator, or with the keys, the columns jump on the drop; `useGridMotion` slides them there:
 
 ```ts
-import { useTableMotion } from '@vue-data-grid/core';
+import { useGridMotion } from '@vue-data-grid/core';
 
-useTableMotion(table);
+useGridMotion(grid);
 ```
 
 ### Where the order lives
@@ -123,9 +123,9 @@ The order is `order` of the layout in the column state, next to widths, pins and
 it back with `reset`, or keep it between visits with `persist`:
 
 ```ts
-import { localStorageStore, useDataTable } from '@vue-data-grid/core';
+import { localStorageStore, useDataGrid } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -133,31 +133,31 @@ const table = useDataTable({
 	persist: localStorageStore('stocks'),
 });
 
-table.state.reset();
+grid.state.reset();
 ```
 
 ### Hiding a column by dragging it away
 
-A [`TableDropZone`](/components/drop-zone) with `accept="columns"` takes headers dragged out of the
-table, with `bounds="window"` on the drag, and can hide the column it gets, when the column is
+A [`GridDropZone`](/components/drop-zone) with `accept="columns"` takes headers dragged out of the
+grid, with `bounds="window"` on the drag, and can hide the column it gets, when the column is
 `hideable`:
 
 ```vue
-<TableColumnDrag bounds="window">
-	<TableHeader>
-		<TableHeaderRow v-slot="{ columns }">
-			<TableHeaderCell v-for="column in columns" :key="column.key" :column="column" />
-		</TableHeaderRow>
-	</TableHeader>
-</TableColumnDrag>
-<TableDropZone accept="columns" @drop="({ key }) => table.scope.toggleColumn(key)" />
+<GridColumnDrag bounds="window">
+	<GridHeader>
+		<GridHeaderRow v-slot="{ columns }">
+			<GridHeaderCell v-for="column in columns" :key="column.key" :column="column" />
+		</GridHeaderRow>
+	</GridHeader>
+</GridColumnDrag>
+<GridDropZone accept="columns" @drop="({ key }) => grid.scope.toggleColumn(key)" />
 ```
 
 ## Accessibility
 
 - Columns do not drag with the keyboard: a header cell moves its column with <kbd>Alt</kbd>+<kbd>←</kbd>
   and <kbd>Alt</kbd>+<kbd>→</kbd> instead, one place at a time, and the focus stays on the header.
-- The column window keeps the dragged header rendered while the table scrolls under it.
+- The column window keeps the dragged header rendered while the grid scrolls under it.
 - After a move, `aria-colindex` of every cell follows the new order, so a screen reader reads the
   columns where they now are.
 

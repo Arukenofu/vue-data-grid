@@ -1,7 +1,7 @@
 import { shallowReadonly, shallowRef, watch } from 'vue';
 
 import type { RuntimeColumn } from '../columns/column';
-import type { TableScope } from '../engine/scope';
+import type { GridScope } from '../engine/scope';
 import { stableComputed } from '../shared/stable-computed';
 import { useRowToken } from '../shared/use-row-token';
 import { type CellAddress, type CellGrid, getCellColumns } from './cell-address';
@@ -83,7 +83,7 @@ export interface EditingCell<TRow = unknown> extends CellAddress {
 export interface CellEditingOptions<TRow = unknown> {
 	/**
 	 * Writes a commit into your rows, such as `rows.value = commit.apply(rows.value)`, and saves it.
-	 * The table shows the new values once its rows have them.
+	 * The grid shows the new values once its rows have them.
 	 */
 	onCommit: (commit: CellCommit<TRow>) => void;
 	/**
@@ -169,7 +169,7 @@ function toSingleWrites(writes: readonly CellWrite[]) {
  * value. Cells are addressed by row key and column name, so edits follow their rows through sorting
  * and streaming. `isEditing` and `getEditingColumn` are reactive per row.
  */
-export function useCellEditing<TRow = unknown>(scope: TableScope<TRow>, options: CellEditingOptions<TRow>) {
+export function useCellEditing<TRow = unknown>(scope: GridScope<TRow>, options: CellEditingOptions<TRow>) {
 	const target = shallowRef<EditTarget | null>(null);
 	const lastCommit = shallowRef<CellCommit<TRow> | null>(null);
 	const editingRows = useRowToken(() => (target.value ? { row: target.value.key, token: target.value.column } : null));

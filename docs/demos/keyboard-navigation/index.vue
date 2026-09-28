@@ -6,11 +6,11 @@ import {
 	selection,
 	selectionColumn,
 	sorting,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { computed, h, shallowRef } from 'vue';
 
-import { type BadgeTone, UiBadge, UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';
+import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiStat, UiToolbar } from '@/ui';
 
 import { type BuildStatus, type Release, releases } from './data';
 import ReleaseActions from './ReleaseActions.vue';
@@ -69,7 +69,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -82,19 +82,19 @@ const table = useDataTable({
 });
 
 const focused = computed(() => {
-	const cell = table.navigation.focused.value;
+	const cell = grid.navigation.focused.value;
 
 	if (!cell) {
 		return 'Nowhere yet';
 	}
 
-	const label = table.scope.getColumn(cell.cell)?.column?.label ?? cell.cell;
+	const label = grid.scope.getColumn(cell.cell)?.column?.label ?? cell.cell;
 
-	return cell.section === 'body' ? `${table.rows.value[cell.row]?.version} › ${label}` : `Header › ${label}`;
+	return cell.section === 'body' ? `${grid.rows.value[cell.row]?.version} › ${label}` : `Header › ${label}`;
 });
 
 async function focusFirstCell() {
-	await table.navigation.focusCell({ section: 'body', row: 0, cell: 'version' });
+	await grid.navigation.focusCell({ section: 'body', row: 0, cell: 'version' });
 }
 </script>
 
@@ -107,7 +107,7 @@ async function focusFirstCell() {
 			<UiStat label="Last action" :value="lastAction" />
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Releases" />
+		<UiDataGrid :grid="grid" label="Releases" />
 	</div>
 </template>
 

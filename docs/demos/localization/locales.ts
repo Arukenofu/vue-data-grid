@@ -1,4 +1,4 @@
-import type { SortMessageItem, TableMessages } from '@vue-data-grid/core';
+import type { GridMessages, SortMessageItem } from '@vue-data-grid/core';
 
 export type LocaleName = 'en' | 'de' | 'ru' | 'kk' | 'ar';
 
@@ -9,7 +9,7 @@ export interface Locale {
 	dir: 'ltr' | 'rtl';
 	title: string;
 	columns: { selection: string; name: string; team: string; location: string; started: string; salary: string };
-	messages: TableMessages;
+	messages: GridMessages;
 }
 
 function joinSort(sort: readonly SortMessageItem[], describe: (item: SortMessageItem) => string, separator: string) {

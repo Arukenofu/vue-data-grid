@@ -9,10 +9,10 @@ export interface SortMessageItem {
 }
 
 /**
- * The strings of the table's interface: accessible names of its controls, the empty and loading
- * states, and what it announces to screen readers. English by default; give `TableRoot` your own.
+ * The strings of the grid's interface: accessible names of its controls, the empty and loading
+ * states, and what it announces to screen readers. English by default; give `GridRoot` your own.
  */
-export interface TableMessages {
+export interface GridMessages {
 	selectRow: string;
 	selectAllRows: string;
 	expandRow: string;
@@ -36,7 +36,7 @@ export interface TableMessages {
 
 const DIRECTIONS: Readonly<Record<SortDirection, string>> = { asc: 'ascending', desc: 'descending' };
 
-export const DEFAULT_MESSAGES: TableMessages = Object.freeze({
+export const DEFAULT_MESSAGES: GridMessages = Object.freeze({
 	selectRow: 'Select row',
 	selectAllRows: 'Select all rows',
 	expandRow: 'Expand',
@@ -55,10 +55,10 @@ export const DEFAULT_MESSAGES: TableMessages = Object.freeze({
 	selected: (count: number) => (count === 1 ? '1 row selected' : `${count} rows selected`),
 });
 
-const MESSAGES: InjectionKey<TableMessages> = Symbol('@vue-data-grid/core messages');
+const MESSAGES: InjectionKey<GridMessages> = Symbol('@vue-data-grid/core messages');
 
-/** Gives the parts below these messages, over the defaults. `TableRoot` calls it with its `messages`. */
-export function createTableMessagesContext(messages: Partial<TableMessages> | undefined) {
+/** Gives the parts below these messages, over the defaults. `GridRoot` calls it with its `messages`. */
+export function createGridMessagesContext(messages: Partial<GridMessages> | undefined) {
 	const resolved = messages ? { ...DEFAULT_MESSAGES, ...messages } : DEFAULT_MESSAGES;
 
 	provide(MESSAGES, resolved);
@@ -66,7 +66,7 @@ export function createTableMessagesContext(messages: Partial<TableMessages> | un
 	return resolved;
 }
 
-/** The messages of the table a part is in; the defaults outside one. */
-export function useTableMessagesContext(): TableMessages {
+/** The messages of the grid a part is in; the defaults outside one. */
+export function useGridMessagesContext(): GridMessages {
 	return inject(MESSAGES, DEFAULT_MESSAGES);
 }

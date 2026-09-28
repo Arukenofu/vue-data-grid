@@ -6,7 +6,7 @@ import type { CellWriteResult } from '../../src/cells/use-cell-editing';
 import { type ChangeHistoryOptions, type ChangeStep, useChangeHistory } from '../../src/cells/use-change-history';
 import { useCellEditing } from '../../src/cells/use-cell-editing';
 import { defineColumn, defineColumns } from '../../src/columns/define-columns';
-import { useTableEngine } from '../../src/engine/use-table-engine';
+import { useGridEngine } from '../../src/engine/use-grid-engine';
 
 interface Row {
 	id: string;
@@ -34,7 +34,7 @@ function setup(options: ChangeHistoryOptions = {}) {
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			const engine = useTableEngine<Row>({ columns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 30 });
+			const engine = useGridEngine<Row>({ columns, rows, root: shallowRef(null), rowKey: 'id', rowHeight: 30 });
 			const editing = useCellEditing(engine.scope, {
 				onCommit: (commit) => {
 					rows.value = [...commit.apply(rows.value)];

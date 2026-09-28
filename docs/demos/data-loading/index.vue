@@ -2,21 +2,21 @@
 import {
 	defineColumn,
 	defineColumns,
-	TableBody,
-	TableCells,
-	TableEmpty,
-	TableLoading,
-	TableRoot,
-	TableRow,
-	type TableSort,
-	useDataTable,
+	GridBody,
+	GridCells,
+	GridEmpty,
+	GridLoading,
+	GridRoot,
+	GridRow,
+	type GridSort,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconLoaderCircle from '~icons/lucide/loader-circle';
 import IconSearchX from '~icons/lucide/search-x';
 import { onMounted, shallowRef, watch } from 'vue';
 
 import type { Person } from '@/data/people';
-import { UiDataTableHeader, UiInput, UiSlider, UiStat, UiToolbar } from '@/ui';
+import { UiDataGridHeader, UiInput, UiSlider, UiStat, UiToolbar } from '@/ui';
 
 import { fetchPeople } from './api';
 
@@ -44,10 +44,10 @@ const people = shallowRef<readonly Person[]>([]);
 const total = shallowRef(0);
 const loading = shallowRef(true);
 const query = shallowRef('');
-const sort = shallowRef<readonly TableSort[]>([]);
+const sort = shallowRef<readonly GridSort[]>([]);
 const latency = shallowRef(800);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -84,7 +84,7 @@ watch([query, sort], () => {
 	void load(0);
 });
 
-watch(() => table.scope.visibleRange.value.end, (end) => {
+watch(() => grid.scope.visibleRange.value.end, (end) => {
 	const more = people.value.length < total.value;
 
 	if (more && !loading.value && end >= people.value.length - PREFETCH_ROWS) {
@@ -101,24 +101,24 @@ watch(() => table.scope.visibleRange.value.end, (end) => {
 			<span class="ui-spacer" />
 			<UiStat label="Loaded" :value="`${people.length} of ${total}`" />
 		</UiToolbar>
-		<TableRoot :table="table" label="People from the server" class="ui-table">
-			<UiDataTableHeader />
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-			<TableEmpty v-if="!loading">
+		<GridRoot :grid="grid" label="People from the server" class="ui-grid">
+			<UiDataGridHeader />
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+			<GridEmpty v-if="!loading">
 				<span class="state">
 					<IconSearchX aria-hidden="true" />
 					No one matches “{{ query }}”
 				</span>
-			</TableEmpty>
-			<TableLoading v-if="loading">
+			</GridEmpty>
+			<GridLoading v-if="loading">
 				<IconLoaderCircle class="spinner" aria-hidden="true" />
 				Loading people…
-			</TableLoading>
-		</TableRoot>
+			</GridLoading>
+		</GridRoot>
 	</div>
 </template>
 

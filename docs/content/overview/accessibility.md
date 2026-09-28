@@ -1,39 +1,39 @@
 ---
 title: Accessibility
-description: What the table does for people who use a keyboard, a screen reader or reduced motion, and what is left to you.
+description: What the grid does for people who use a keyboard, a screen reader or reduced motion, and what is left to you.
 ---
 
 # Accessibility
 
 <Description>
-A table built from the parts follows the WAI-ARIA grid and treegrid patterns out of the box: roles,
+A grid built from the parts follows the WAI-ARIA grid and treegrid patterns out of the box: roles,
 counts, states, focus, keys and announcements. This page is the map of what you get, how it works
 under virtualization, and the few things only you can do.
 </Description>
 
 <Demo name="showcase" />
 
-Put the mouse away and try the table above: <kbd>Tab</kbd> into it, walk the cells with the arrows,
+Put the mouse away and try the grid above: <kbd>Tab</kbd> into it, walk the cells with the arrows,
 sort a column with <kbd>Enter</kbd> on its header, select rows with <kbd>Shift</kbd>+<kbd>Space</kbd>.
 With a screen reader on, each move names the cell, its row and its column.
 
 ## The patterns it follows
 
-| Table | Pattern | When |
+| Grid | Pattern | When |
 | --- | --- | --- |
-| `role="grid"` | [Grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) | The default: a table people move through and act in. |
+| `role="grid"` | [Grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) | The default: a grid people move through and act in. |
 | `role="treegrid"` | [Treegrid](https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/) | Automatic with the `tree` feature: rows nest and expand. |
-| `role="table"` | [Table](https://www.w3.org/WAI/ARIA/apg/patterns/table/) | Pass `role: 'table'` to `useDataTable` for a static table that is only read. |
+| `role="table"` | [Table](https://www.w3.org/WAI/ARIA/apg/patterns/table/) | Pass `role: 'table'` to `useDataGrid` for a static table that is only read. |
 
-A grid is one stop in the Tab order, and the arrow keys move inside it. That is what makes a table
+A grid is one stop in the Tab order, and the arrow keys move inside it. That is what makes a grid
 of a thousand rows and twenty columns usable from the keyboard: Tab does not walk every button in
 every cell.
 
 ## Structure and roles
 
-The prop-getters of the table put a role on every element, and the parts apply them for you:
+The prop-getters of the grid put a role on every element, and the parts apply them for you:
 
-- the table element is `grid`, `treegrid` or `table`;
+- the grid element is `grid`, `treegrid` or `table`;
 - the header, the body and the footer are `rowgroup`s, and every row is a `row`;
 - a column header is a `columnheader`, and a group header cell spans its columns with
   `aria-colspan`;
@@ -45,15 +45,15 @@ The prop-getters of the table put a role on every element, and the parts apply t
 
 ## Counts and positions under virtualization
 
-A windowed table renders a few dozen rows out of thousands. A screen reader still needs to know
-where it is, so the counts describe the whole table, not what is rendered:
+A windowed grid renders a few dozen rows out of thousands. A screen reader still needs to know
+where it is, so the counts describe the whole grid, not what is rendered:
 
 - `aria-rowcount` counts every row: header rows, body rows and footer rows;
 - `aria-colcount` counts the shown columns;
 - every row has `aria-rowindex` and every cell `aria-colindex`, from `1`, so "row 1,204 of 50,002"
   is read right even though row 1,204 is the tenth element in the DOM.
 
-When the rows are loaded page by page, pass `rowCount` to `useDataTable` with the size of the whole
+When the rows are loaded page by page, pass `rowCount` to `useDataGrid` with the size of the whole
 set, or `-1` while it is unknown. See [Loading and empty states](/guides/data-loading).
 
 ## States
@@ -62,18 +62,18 @@ set, or `-1` while it is unknown. See [Loading and empty states](/guides/data-lo
 | --- | --- | --- |
 | `aria-sort` | The header of the first sort column | The `sorting` state. ARIA has no sort levels, so the rest of a multi-sort is announced instead. |
 | `aria-selected` | Rows, or cells with cell ranges | The `selection` or `ranges` feature. |
-| `aria-multiselectable` | The table | While more than one row or cell can be selected. |
+| `aria-multiselectable` | The grid | While more than one row or cell can be selected. |
 | `aria-level`, `aria-posinset`, `aria-setsize` | Rows of a tree | The `tree` feature: depth and place among siblings. |
 | `aria-expanded` | Rows that have children, group toggles | The `tree` feature and collapsible column groups. |
-| `aria-busy` | The table | While a `TableLoading` is shown. |
+| `aria-busy` | The grid | While a `GridLoading` is shown. |
 | `aria-valuenow`, `aria-valuetext` | Resize handles, `role="separator"` | The width of the column, read as "240 px". |
 | `aria-invalid`, `aria-describedby` | Editors | The column's `validate`, pointing at the error text. |
 
 ## Names
 
-- **The table** is named by `label` on `TableRoot`, or by a visible heading through
+- **The grid** is named by `label` on `GridRoot`, or by a visible heading through
   `aria-labelledby`. Always give it one.
-- **Controls** are named from the table's `messages`: "Select row", "Expand", "Resize Price",
+- **Controls** are named from the grid's `messages`: "Select row", "Expand", "Resize Price",
   "Drag Invoice 1043". Give the selection checkbox a `label` of its own when rows have a clearer name.
 - **Rows** are named by their row header cell, which is why the first data column should name the
   row: a person's name, an invoice number, a file name.
@@ -82,7 +82,7 @@ set, or `-1` while it is unknown. See [Loading and empty states](/guides/data-lo
 
 With the `navigation` feature, focus is managed for you:
 
-- the table is a single Tab stop, and Tab from inside it leaves the table instead of walking cells;
+- the grid is a single Tab stop, and Tab from inside it leaves the grid instead of walking cells;
 - coming back with Tab lands on the cell focused last;
 - the focused row and column stay rendered while they are scrolled out of the windows, so focus is
   never lost to virtualization;
@@ -96,14 +96,14 @@ the structural styles set it through `--dg-focus-ring`.
 
 ## Announcements
 
-`TableRoot` renders a polite live region next to the table. It says what the markup cannot:
+`GridRoot` renders a polite live region next to the grid. It says what the markup cannot:
 
 - the whole sort when it changes, such as "Sorted by Team ascending, then Salary descending";
 - the number of selected rows when it changes;
-- that the table is loading.
+- that the grid is loading.
 
 During a keyboard drag the drag says where the row is and where it lands. Every string comes from
-`messages` and can be translated; `useTableAnnouncer` lets you announce your own text through the
+`messages` and can be translated; `useGridAnnouncer` lets you announce your own text through the
 same region. See [Localization](/guides/localization).
 
 ## Keyboard interactions
@@ -115,10 +115,10 @@ detail.
 
 <KeyboardTable
 	:data="[
-		{ keys: ['Tab', 'Shift+Tab'], description: 'Moves focus into the table, to the cell focused last, or out of it.' },
-		{ keys: ['↑', '↓', '←', '→'], description: 'Moves focus one cell. In a right-to-left table the horizontal arrows follow the reading direction.' },
+		{ keys: ['Tab', 'Shift+Tab'], description: 'Moves focus into the grid, to the cell focused last, or out of it.' },
+		{ keys: ['↑', '↓', '←', '→'], description: 'Moves focus one cell. In a right-to-left grid the horizontal arrows follow the reading direction.' },
 		{ keys: ['Home', 'End'], description: 'Moves focus to the first or the last cell of the row.' },
-		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves focus to the first or the last cell of the table.' },
+		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves focus to the first or the last cell of the grid.' },
 		{ keys: ['Ctrl+↑', 'Ctrl+↓'], description: 'Moves focus to the first or the last row, in the same column.' },
 		{ keys: ['PageUp', 'PageDown'], description: 'Moves focus by as many rows as fit between the header and the footer.' },
 		{ keys: ['Enter', 'F2'], description: 'Moves focus into the content of the cell; a cell with a single button or checkbox presses it at once.' },
@@ -196,11 +196,11 @@ Some things no library can do for you:
 - **Contrast.** The theme is yours: keep text, focus rings and selection tints at a contrast of at
   least 4.5:1 for text and 3:1 for the rest.
 - **Colour alone.** A red number for a loss also needs a minus sign or an arrow.
-- **Names.** Label the table, and make the first data column something that names the row.
+- **Names.** Label the grid, and make the first data column something that names the row.
 - **Custom controls.** A button in a cell needs an accessible name; an icon alone does not have one.
 - **Target size.** Checkboxes, handles and toggles should be at least 24 by 24 pixels to hit with a
   finger.
-- **Testing.** Try your table with a keyboard alone, and with a screen reader: NVDA or JAWS on
+- **Testing.** Try your grid with a keyboard alone, and with a screen reader: NVDA or JAWS on
   Windows, VoiceOver on macOS and iOS, TalkBack on Android.
 
 ## See also

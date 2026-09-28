@@ -1,12 +1,12 @@
 ---
 title: Body
-description: The rows of the table and their cells, rendered from the row window with one component per row.
+description: The rows of the grid and their cells, rendered from the row window with one component per row.
 ---
 
 # Body
 
 <Description>
-The rows of the table and their cells. One component per row, however many columns it has, and a row
+The rows of the grid and their cells. One component per row, however many columns it has, and a row
 renders again only when its own data changes.
 </Description>
 
@@ -29,27 +29,27 @@ renders again only when its own data changes.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableCells, TableRow } from '@vue-data-grid/core';
+import { GridBody, GridCells, GridRow } from '@vue-data-grid/core';
 </script>
 
 <template>
-	<TableBody v-slot="{ rows }">
-		<TableRow v-for="row in rows" :key="row.key" :row="row">
-			<TableCells />
-		</TableRow>
-	</TableBody>
+	<GridBody v-slot="{ rows }">
+		<GridRow v-for="row in rows" :key="row.key" :row="row">
+			<GridCells />
+		</GridRow>
+	</GridBody>
 </template>
 ```
 
 Overlays that draw over the rows, such as the [range overlay](/components/range-overlay), go inside
-`TableBody` after the rows.
+`GridBody` after the rows.
 
 ## API reference
 
-### TableBody
+### GridBody
 
 The block of body rows. With positioned rows, the default, it is as tall as all the rows together,
-so the scrollbar is right even when only the rows in view are rendered. It also binds the table's
+so the scrollbar is right even when only the rows in view are rendered. It also binds the grid's
 `body` element, which dragging rows and selecting cells work on.
 
 <PropsTable
@@ -61,7 +61,7 @@ so the scrollbar is right even when only the rows in view are rendered. It also 
 
 <SlotsTable
 	:data="[
-		{ name: 'default', scope: '{ rows: TableBodyRow[] }', description: 'The rendered rows, for a `TableRow` each. A row is `{ key, index, item, original, node }`: its key, its index in `rows`, its place in the row window, the row itself and its tree node.' },
+		{ name: 'default', scope: '{ rows: GridBodyRow[] }', description: 'The rendered rows, for a `GridRow` each. A row is `{ key, index, item, original, node }`: its key, its index in `rows`, its place in the row window, the row itself and its tree node.' },
 	]"
 />
 
@@ -72,16 +72,16 @@ so the scrollbar is right even when only the rows in view are rendered. It also 
 	]"
 />
 
-### TableRow
+### GridRow
 
 A body row, placed at its offset under the row window, with the role and the attributes of its
 index, tree level and selection. With `measureRows` it is measured, so rows of any height work. It
 gives the parts inside, such as a selection checkbox or a drag handle, their row. Inside a
-[`TableRowDrag`](/components/row-drag) it also registers itself, so the row can be dragged.
+[`GridRowDrag`](/components/row-drag) it also registers itself, so the row can be dragged.
 
 <PropsTable
 	:data="[
-		{ name: 'row', type: 'TableBodyRow', required: true, description: 'The row, from the slot of `TableBody`.' },
+		{ name: 'row', type: 'GridBodyRow', required: true, description: 'The row, from the slot of `GridBody`.' },
 		{ name: 'as', type: 'string | Component', default: '\'div\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
 	]"
@@ -89,7 +89,7 @@ gives the parts inside, such as a selection checkbox or a drag handle, their row
 
 <SlotsTable
 	:data="[
-		{ name: 'default', scope: '{ row: TableBodyRow; columns: RenderedColumn[] }', description: 'The row and the rendered columns. Put a `TableCells` here.' },
+		{ name: 'default', scope: '{ row: GridBodyRow; columns: RenderedColumn[] }', description: 'The row and the rendered columns. Put a `GridCells` here.' },
 	]"
 />
 
@@ -99,16 +99,16 @@ gives the parts inside, such as a selection checkbox or a drag handle, their row
 		{ attribute: '[data-dg-index]', values: 'The index of the row in `rows`, by which rows are measured; the `indexAttribute` option renames it.' },
 		{ attribute: '[data-dg-grid-section]', values: ['body'] },
 		{ attribute: '[data-dg-grid-row]', values: 'The index of the row in its section, for the keyboard navigation.' },
-		{ attribute: '[data-dg-draggable]', values: 'Present while the row can be dragged, inside a `TableRowDrag`; `steps` when Alt with the arrows moves it too.' },
+		{ attribute: '[data-dg-draggable]', values: 'Present while the row can be dragged, inside a `GridRowDrag`; `steps` when Alt with the arrows moves it too.' },
 	]"
 />
 
-### TableCells
+### GridCells
 
 The cells of the row it is in: one plain element per rendered column, with its role,
 `aria-colindex`, width and pin, and the column's `cellClass`. Attributes you put on the part go to
 every cell. There is no component per cell on purpose: mounting and updating a body of components
-per cell costs about twice as much, and a table is mostly cells.
+per cell costs about twice as much, and a grid is mostly cells.
 
 The default slot renders the content of each cell. When it renders nothing for a cell, for example
 because its `v-if` is false, the cell shows its own content, just as a `<slot>` shows its fallback:
@@ -154,19 +154,19 @@ Every cell of the demo above comes from one of three places, in this order of pr
 
 1. **The column's `cell` field**, typed by the row: the status badge and the assignee. It is the same
    wherever the column is shown, and the type of `row` and `value` comes from the column.
-2. **The slot of `TableCells`**, for markup that belongs to this one table: the progress bar. The
-   slot is typed loosely, since the parts find the table through `inject` and do not know its rows,
+2. **The slot of `GridCells`**, for markup that belongs to this one grid: the progress bar. The
+   slot is typed loosely, since the parts find the grid through `inject` and do not know its rows,
    so read `value` rather than the row.
 3. **The fallback**: the text of the value through `format`, cut to one line. The due date needs
    nothing more.
 
 ```vue
-<TableCells v-slot="{ column, value }">
+<GridCells v-slot="{ column, value }">
 	<span v-if="column.name === 'progress'" class="progress">
 		<UiProgress :value="Number(value)" />
 		{{ value }}%
 	</span>
-</TableCells>
+</GridCells>
 ```
 
 ### Classes from the data
@@ -184,8 +184,8 @@ const columns = defineColumns({
 
 ### Rows that render only when they change
 
-`TableBody` hands out the same row object while the row's data, place and node hold, and
-`TableRow` renders again only when that object changes. Update your rows immutably, a new object
+`GridBody` hands out the same row object while the row's data, place and node hold, and
+`GridRow` renders again only when that object changes. Update your rows immutably, a new object
 for a changed row and the old object for the rest, and a change touches one row:
 
 ```ts

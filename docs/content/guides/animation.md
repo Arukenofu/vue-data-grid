@@ -7,7 +7,7 @@ description: Rows and columns move into place instead of jumping, with the Web A
 
 <Description>
 When rows are sorted, dragged, filtered or streamed in, they can move into place instead of jumping.
-The table measures what moved, came and went; an engine of your choice plays it: the Web Animations
+The grid measures what moved, came and went; an engine of your choice plays it: the Web Animations
 API, GSAP, Motion, anime.js, or a function of your own.
 </Description>
 
@@ -19,27 +19,27 @@ engine differs: open the code and compare `gsap.ts`, `motion.ts` and `anime.ts`,
 ## One line to turn it on
 
 ```ts
-import { useDataTable, useTableMotion } from '@vue-data-grid/core';
+import { useDataGrid, useGridMotion } from '@vue-data-grid/core';
 
-const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
+const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 40 });
 
-useTableMotion(table);
+useGridMotion(grid);
 ```
 
-From then on, whatever changes the order of the table animates, wherever the change comes from: a
+From then on, whatever changes the order of the grid animates, wherever the change comes from: a
 header click, a drag, a group expanded, new data from a server, your own code.
 
 - Rows that **stay** slide from where they were drawn to their new place.
 - Rows that **come** fade in where they stand.
 - Rows that **go** fade out where they stood, as still copies of themselves: the real row is already
-  gone from the table.
+  gone from the grid.
 - **Columns** that change order slide sideways, every cell of them, the header included.
 - **Widths** that the layout changes, by fitting the columns, an autosize or a reset, grow and
   shrink to the new ones. A resize with the pointer is never animated: the edge follows the pointer.
 
 ### How it works
 
-The technique is called FLIP. Just before Vue renders a change, the table measures where the rows
+The technique is called FLIP. Just before Vue renders a change, the grid measures where the rows
 are drawn. After the render, it measures them again at their new places, and hands the engine each
 element with the distance it moved. The engine plays the element back from the old place to the new
 one.
@@ -53,7 +53,7 @@ and starts from wherever the rows are drawn at that moment.
 By default every change of the order animates. Two options narrow that down:
 
 ```ts
-const motion = useTableMotion(table, {
+const motion = useGridMotion(grid, {
 	trigger: 'change',
 	when: change => change.kind !== 'rows' || rows.value.length < 500,
 });
@@ -72,7 +72,7 @@ await motion.skip(() => {
 });
 
 await motion.run(() => {
-	table.state.sort.value = [{ name: 'points', direction: 'desc' }];
+	grid.state.sort.value = [{ name: 'points', direction: 'desc' }];
 }, { reason: 'leaderboard' });
 ```
 
@@ -82,7 +82,7 @@ jumps to its place.
 
 ### Widths
 
-Width changes of the layout play frame by frame through the table's own geometry, without rendering a
+Width changes of the layout play frame by frame through the grid's own geometry, without rendering a
 cell. They take `widths: { duration, easing }`, 200 ms with a quick start that slows into place by
 default, or `widths: false` to apply new widths at once.
 
@@ -92,14 +92,14 @@ An engine is the part that decides how movement looks. The default is `webAnimat
 browser's Web Animations API, with no dependency:
 
 ```ts
-import { useTableMotion, webAnimations } from '@vue-data-grid/core';
+import { useGridMotion, webAnimations } from '@vue-data-grid/core';
 
-useTableMotion(table, {
+useGridMotion(grid, {
 	engine: webAnimations({ duration: 320, easing: 'cubic-bezier(0.2, 0, 0, 1)', fade: true }),
 });
 ```
 
-`engine` also takes a `ref`, so the engine can change while the table is on screen, as in the demo.
+`engine` also takes a `ref`, so the engine can change while the grid is on screen, as in the demo.
 
 ### Your own with `defineMotionEngine`
 
@@ -173,7 +173,7 @@ export const motionEngine = defineMotionEngine({
 ### anime.js
 
 [anime.js](https://animejs.com) 4 animations are thenable too. `revert` on completion takes away the
-inline styles it wrote, so a row is left exactly as the table drew it:
+inline styles it wrote, so a row is left exactly as the grid drew it:
 
 ```ts
 import { defineMotionEngine } from '@vue-data-grid/core';
@@ -199,7 +199,7 @@ export const animeEngine = defineMotionEngine({
 ```
 
 ::: tip Leave the styles as they were
-The table positions rows by their `top` and moves dragged rows by `translate`. An engine animates
+The grid positions rows by their `top` and moves dragged rows by `translate`. An engine animates
 over them and leaves them alone: `clearProps` in GSAP, `revert` in anime.js. A row left with a
 `transform` of its own gets its own stacking context, and an editor's message or list that should
 hang over the rows below would then be covered by them.
@@ -220,9 +220,9 @@ const rowsOnly: MotionEngine = transition => (transition.kind === 'rows' ? gsapE
 Returning nothing ends the transition at once. `() => undefined` is the engine that animates
 nothing, the "None" of the demo.
 
-## The height of the table
+## The height of the grid
 
-A table that grows with its rows, instead of scrolling, changes its height when rows come and go.
+A grid that grows with its rows, instead of scrolling, changes its height when rows come and go.
 The rows glide, but the container would jump to its new height at once, and the page under it with
 it. The demo animates the container too, with the same technique as the rows, applied to one
 element: measure its height before the change, let Vue render, measure again, and play the
@@ -232,8 +232,8 @@ difference with the selected engine.
 import { prefersReducedMotion } from '@vue-data-grid/core';
 import { nextTick, watch } from 'vue';
 
-watch(() => table.totalSize.value, async () => {
-	const element = table.root.value;
+watch(() => grid.totalSize.value, async () => {
+	const element = grid.root.value;
 
 	if (!element || prefersReducedMotion()) {
 		return;
@@ -249,29 +249,29 @@ watch(() => table.totalSize.value, async () => {
 }, { flush: 'pre' });
 ```
 
-`table.totalSize` is the height of all body rows, so it changes exactly when rows are added or
-removed, not when they are sorted or shuffled. The watcher runs before the render, while the table
-still has its old height; after `nextTick` the table has its new one, and the tween plays from the
-old to the new, then clears its inline height so the table follows its content again. Open
+`grid.totalSize` is the height of all body rows, so it changes exactly when rows are added or
+removed, not when they are sorted or shuffled. The watcher runs before the render, while the grid
+still has its old height; after `nextTick` the grid has its new one, and the tween plays from the
+old to the new, then clears its inline height so the grid follows its content again. Open
 `height.ts` in the demo for the version of each engine: `element.animate()` for Web Animations,
 `animate()` of Motion and anime.js, and nothing for "None".
 
 Two details keep the page still:
 
-- the table does not scroll vertically, `overflow-y: hidden`, so no scrollbar flashes while its
+- the grid does not scroll vertically, `overflow-y: hidden`, so no scrollbar flashes while its
   height catches up with the rows;
-- the area around it keeps the height of the table at its largest, so the page under the demo does
-  not move while the table grows or shrinks inside it.
+- the area around it keeps the height of the grid at its largest, so the page under the demo does
+  not move while the grid grows or shrinks inside it.
 
 ## Drags
 
 Dragging has an engine of its own: the gap that opens where a row would land, the ghost, and the row
 settling after the drop. Pass it to the drag parts with `motion`, or `false` for none. With
-`useTableMotion` as well, a dropped row still moves only once: the later transition cuts the earlier
+`useGridMotion` as well, a dropped row still moves only once: the later transition cuts the earlier
 one short.
 
 ```vue
-<TableRowDrag :motion="gsapEngine" @drop="reorder">
+<GridRowDrag :motion="gsapEngine" @drop="reorder">
 ```
 
 ## Reduced motion
@@ -293,6 +293,6 @@ anyway, such as a gentle fade, says `reducedMotion: 'play'`. A hand-written engi
 
 ## See also
 
-- [`useTableMotion`](/composables/use-table-motion): the options and the handle in full.
+- [`useGridMotion`](/composables/use-grid-motion): the options and the handle in full.
 - [Drag and drop](/guides/drag-and-drop): the movement of drags.
 - [Live data](/guides/live-data): streaming updates, where you may want `when` to skip large batches.

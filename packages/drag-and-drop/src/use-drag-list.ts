@@ -55,7 +55,7 @@ export interface DragOffer {
 }
 
 export interface DragListOptions {
-	/** What the list holds, such as `'table-row'`: a list accepts only its own kind. */
+	/** What the list holds, such as `'grid-row'`: a list accepts only its own kind. */
 	kind: string;
 	axis: DragAxis;
 	/** Keys of the shown items in display order. */
@@ -131,7 +131,7 @@ export interface DragListOptions {
 	/**
 	 * Draws the items that the gap moves, by key, each `offset` px from its place, with `engine` or at
 	 * once, instead of the list setting the `translate` of their elements: for an item drawn by more
-	 * than one element, such as a column of a table, whose cells all move. One call gets every item
+	 * than one element, such as a column of a grid, whose cells all move. One call gets every item
 	 * that moved, so that the DOM is read and written once; `{ x: 0, y: 0 }` puts an item back. Move
 	 * the registered element by `translate` too, which the list measures the layout without.
 	 */
@@ -450,7 +450,7 @@ export function useDragList(options: DragListOptions) {
 
 	/**
 	 * The item laid out across a point along the list, wherever the point is across it: a column of a
-	 * table under the pointer over its body cells, a row under the pointer past the end of its cells.
+	 * grid under the pointer over its body cells, a row under the pointer past the end of its cells.
 	 * By the layout: with a gap the items are drawn away from it, and the item drawn under the pointer
 	 * would move the gap away from it, and back, on every frame.
 	 */

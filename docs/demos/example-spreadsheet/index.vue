@@ -17,7 +17,7 @@ import {
 	selectEditor,
 	toColumnList,
 	toCsv,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import IconCopy from '~icons/lucide/copy';
@@ -26,7 +26,7 @@ import IconRedo from '~icons/lucide/redo-2';
 import IconUndo from '~icons/lucide/undo-2';
 import { computed, h, shallowRef } from 'vue';
 
-import { UiButton, UiDataTable, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiToolbar } from '@/ui';
 
 import ColumnHeader from './ColumnHeader.vue';
 import { type BudgetLine, CATEGORIES, createBudget, getTotal } from './data';
@@ -114,7 +114,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: lines,
 	rowKey: 'id',
@@ -133,12 +133,12 @@ const table = useDataTable({
 	},
 });
 
-const { canUndo, canRedo } = table.history;
+const { canUndo, canRedo } = grid.history;
 
 const active = computed(() => {
-	const cell = table.navigation.cells.focused.value;
-	const rendered = cell ? table.scope.getColumn(cell.column)?.column : undefined;
-	const line = cell ? table.rows.value[cell.index] : undefined;
+	const cell = grid.navigation.cells.focused.value;
+	const rendered = cell ? grid.scope.getColumn(cell.column)?.column : undefined;
+	const line = cell ? grid.rows.value[cell.index] : undefined;
 
 	if (!cell || !rendered || line === undefined || letterOf(cell.column) === '') {
 		return { reference: '', content: '' };
@@ -148,7 +148,7 @@ const active = computed(() => {
 });
 
 const draft = computed(() => {
-	const cell = table.editing.cell.value;
+	const cell = grid.editing.cell.value;
 
 	if (!cell) {
 		return null;
@@ -158,9 +158,9 @@ const draft = computed(() => {
 });
 
 const selected = computed(() => {
-	const values = table.ranges.getCells().map((cell) => {
-		const line = table.rows.value[table.scope.getRowIndex(cell.key)];
-		const rendered = table.scope.getColumn(cell.column)?.column;
+	const values = grid.ranges.getCells().map((cell) => {
+		const line = grid.rows.value[grid.scope.getRowIndex(cell.key)];
+		const rendered = grid.scope.getColumn(cell.column)?.column;
 
 		return line && rendered ? rendered.value(line) : undefined;
 	});
@@ -172,25 +172,25 @@ const selected = computed(() => {
 });
 
 function download() {
-	downloadCsv(toCsv({ columns: toColumnList(columns), rows: table.rows.value }), { name: 'budget' });
+	downloadCsv(toCsv({ columns: toColumnList(columns), rows: grid.rows.value }), { name: 'budget' });
 }
 </script>
 
 <template>
 	<div class="sheet">
 		<UiToolbar>
-			<UiButton icon aria-label="Undo" :disabled="!canUndo" @click="table.history.undo()">
+			<UiButton icon aria-label="Undo" :disabled="!canUndo" @click="grid.history.undo()">
 				<IconUndo />
 			</UiButton>
-			<UiButton icon aria-label="Redo" :disabled="!canRedo" @click="table.history.redo()">
+			<UiButton icon aria-label="Redo" :disabled="!canRedo" @click="grid.history.redo()">
 				<IconRedo />
 			</UiButton>
 			<span class="ui-separator" />
-			<UiButton @click="table.fill.fillDown()">
+			<UiButton @click="grid.fill.fillDown()">
 				<IconArrowDownToLine />
 				Fill down
 			</UiButton>
-			<UiButton @click="table.clipboard.copy()">
+			<UiButton @click="grid.clipboard.copy()">
 				<IconCopy />
 				Copy
 			</UiButton>
@@ -203,7 +203,7 @@ function download() {
 
 		<FormulaBar :reference="active.reference" :content="draft ?? active.content" :editing="draft !== null" />
 
-		<UiDataTable :table="table" label="Budget" density="compact" style="height: 520px" />
+		<UiDataGrid :grid="grid" label="Budget" density="compact" style="height: 520px" />
 
 		<StatusBar :cells="selected.cells" :numbers="selected.numbers" />
 	</div>

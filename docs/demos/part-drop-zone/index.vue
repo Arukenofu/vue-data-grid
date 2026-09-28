@@ -2,22 +2,22 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
 	moveRow,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import {
-	TableDragPreview,
-	TableDropZone,
-	type TableDropZoneEvent,
-	type TableRowDropEvent,
-	TableRowDrag,
+	GridDragPreview,
+	GridDropZone,
+	type GridDropZoneEvent,
+	type GridRowDropEvent,
+	GridRowDrag,
 } from '@vue-data-grid/core/drag-and-drop';
 import IconFile from '~icons/lucide/file';
 import IconStar from '~icons/lucide/star';
@@ -50,14 +50,14 @@ const columns = defineColumns({
 	modified: column(file => file.modified, { label: 'Modified', width: 90, format: modified => day.format(new Date(modified)) }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
 	rowHeight: 38,
 });
 
-function reorder({ key, index }: TableRowDropEvent<unknown>) {
+function reorder({ key, index }: GridRowDropEvent<unknown>) {
 	const row = rows.value.find(file => file.id === key);
 
 	if (row) {
@@ -65,11 +65,11 @@ function reorder({ key, index }: TableRowDropEvent<unknown>) {
 	}
 }
 
-function star({ key }: TableDropZoneEvent) {
+function star({ key }: GridDropZoneEvent) {
 	starred.value = new Set([...starred.value, key]);
 }
 
-function remove({ key }: TableDropZoneEvent) {
+function remove({ key }: GridDropZoneEvent) {
 	rows.value = rows.value.filter(file => file.id !== key);
 }
 
@@ -88,40 +88,40 @@ function restore() {
 		</UiToolbar>
 
 		<div class="layout">
-			<TableRoot :table="table" label="Files" class="ui-table" data-size="sm">
-				<TableHeader>
-					<TableHeaderRow v-slot="{ columns: headers }">
-						<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-					</TableHeaderRow>
-				</TableHeader>
-				<TableRowDrag bounds="window" @drop="reorder">
-					<TableBody v-slot="{ rows: bodyRows }">
-						<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-							<TableCells />
-						</TableRow>
-					</TableBody>
-					<TableDragPreview v-slot="{ label }">
+			<GridRoot :grid="grid" label="Files" class="ui-grid" data-size="sm">
+				<GridHeader>
+					<GridHeaderRow v-slot="{ columns: headers }">
+						<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+					</GridHeaderRow>
+				</GridHeader>
+				<GridRowDrag bounds="window" @drop="reorder">
+					<GridBody v-slot="{ rows: bodyRows }">
+						<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+							<GridCells />
+						</GridRow>
+					</GridBody>
+					<GridDragPreview v-slot="{ label }">
 						<IconFile class="ghost-icon" aria-hidden="true" />
 						{{ label }}
-					</TableDragPreview>
-				</TableRowDrag>
-			</TableRoot>
+					</GridDragPreview>
+				</GridRowDrag>
+			</GridRoot>
 
 			<div class="zones">
-				<TableDropZone v-slot="{ ready, over }" class="zone" data-kind="star" @drop="star">
+				<GridDropZone v-slot="{ ready, over }" class="zone" data-kind="star" @drop="star">
 					<IconStar class="zone-icon" aria-hidden="true" />
 					<strong>Starred</strong>
 					<span v-if="over">Release to star</span>
 					<span v-else-if="ready">Drop a file here</span>
 					<span v-else>{{ starred.size }} starred</span>
-				</TableDropZone>
-				<TableDropZone v-slot="{ ready, over }" class="zone" data-kind="trash" @drop="remove">
+				</GridDropZone>
+				<GridDropZone v-slot="{ ready, over }" class="zone" data-kind="trash" @drop="remove">
 					<IconTrash class="zone-icon" aria-hidden="true" />
 					<strong>Trash</strong>
 					<span v-if="over">Release to delete</span>
 					<span v-else-if="ready">Drop a file here</span>
 					<span v-else>Drag files here</span>
-				</TableDropZone>
+				</GridDropZone>
 			</div>
 		</div>
 	</div>

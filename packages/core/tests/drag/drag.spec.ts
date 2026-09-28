@@ -4,24 +4,24 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, type ShallowRef, shallowRef, toValue, type VNodeChild } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useDataTableContext } from '../../src/components/context';
-import { TableRoot } from '../../src/components/table-root';
-import { useTableMotion } from '../../src/motion/use-table-motion';
-import { sorting, tree } from '../../src/data-table/factories';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import { useDataGridContext } from '../../src/components/context';
+import { GridRoot } from '../../src/components/grid-root';
+import { useGridMotion } from '../../src/motion/use-grid-motion';
+import { sorting, tree } from '../../src/data-grid/factories';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { dragHandleColumn } from '../../src/drag/drag-handle-column';
 import { createPreviewHolder } from '../../src/drag/shared';
-import { TableColumnDrag, TableRowDrag } from '../../src/drag/table-drag';
+import { GridColumnDrag, GridRowDrag } from '../../src/drag/grid-drag';
 import {
-	TableDragOverlay,
-	type TableDragOverlayContext,
-	TableDragPreview,
-	TableDropZone,
-	type TableDropZoneEvent,
-	type TableDropZoneSlotContext,
-} from '../../src/drag/table-drag-parts';
-import type { TableRowDropEvent } from '../../src/drag/use-table-row-drag';
-import { at, key, place, placeTable, pointer, stubFrames, stubLayout } from '../support/drag';
+	GridDragOverlay,
+	type GridDragOverlayContext,
+	GridDragPreview,
+	GridDropZone,
+	type GridDropZoneEvent,
+	type GridDropZoneSlotContext,
+} from '../../src/drag/grid-drag-parts';
+import type { GridRowDropEvent } from '../../src/drag/use-grid-row-drag';
+import { at, key, place, placeGrid, pointer, stubFrames, stubLayout } from '../support/drag';
 import { renderBody, renderHeader } from '../support/parts';
 
 interface Task {
@@ -61,9 +61,9 @@ interface Setup {
 	inRows?: () => VNodeChild;
 	/** Rendered inside the column drag, next to the header. */
 	inColumns?: () => VNodeChild;
-	bounds?: 'table' | 'window';
+	bounds?: 'grid' | 'window';
 	left?: number;
-	/** The table animates its order with `useTableMotion`. */
+	/** The grid animates its order with `useGridMotion`. */
 	motion?: boolean;
 	/** What inside a row never starts a drag. */
 	ignore?: string;
@@ -76,16 +76,16 @@ let frames: ReturnType<typeof stubFrames>;
 
 function setup(options: Setup = {}) {
 	const rows: ShallowRef<Task[]> = shallowRef(options.rows ?? tasks);
-	const drops: TableRowDropEvent<unknown>[] = [];
+	const drops: GridRowDropEvent<unknown>[] = [];
 	const columnDrops: unknown[] = [];
-	let table: DataTable | null = null;
+	let grid: DataGrid | null = null;
 	const host = document.createElement('div');
 
 	document.body.append(host);
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			table = useDataTable({
+			grid = useDataGrid({
 				columns: options.handle ? withHandles : plain,
 				rows,
 				rowKey: 'id',
@@ -95,20 +95,20 @@ function setup(options: Setup = {}) {
 					sorting: sorting(),
 					tree: options.tree ? tree({ parentKey: 'parent', defaultExpanded: -1 }) : undefined,
 				},
-			}) as DataTable;
+			}) as DataGrid;
 
 			if (options.motion) {
-				useTableMotion(table);
+				useGridMotion(grid);
 			}
 
-			return () => h(TableRoot, { table: table as DataTable }, {
+			return () => h(GridRoot, { grid: grid as DataGrid }, {
 				default: () => [
 					options.columns
-						? h(TableColumnDrag, { animation: false, onDrop: (event: unknown) => columnDrops.push(event) }, {
+						? h(GridColumnDrag, { animation: false, onDrop: (event: unknown) => columnDrops.push(event) }, {
 							default: () => [renderHeader(), options.inColumns?.()],
 						})
 						: renderHeader(),
-					h(TableRowDrag, {
+					h(GridRowDrag, {
 						handle: options.handle ?? false,
 						...(options.group ? { group: options.group } : {}),
 						...(options.canDrag ? { canDrag: options.canDrag as (row: unknown) => boolean } : {}),
@@ -116,14 +116,14 @@ function setup(options: Setup = {}) {
 						...(options.ignore ? { ignore: options.ignore } : {}),
 						...(options.autoScroll === undefined ? {} : { autoScroll: options.autoScroll }),
 						animation: false,
-						onDrop: (event: TableRowDropEvent<unknown>) => {
+						onDrop: (event: GridRowDropEvent<unknown>) => {
 							drops.push(event);
-							rows.value = moveRow(rows.value, event as TableRowDropEvent<Task>, { rowKey: 'id', parentKey: 'parent' });
+							rows.value = moveRow(rows.value, event as GridRowDropEvent<Task>, { rowKey: 'id', parentKey: 'parent' });
 						},
 					}, {
 						default: () => [
 							renderBody(),
-							options.preview ? h(TableDragPreview, null, { default: options.preview }) : null,
+							options.preview ? h(GridDragPreview, null, { default: options.preview }) : null,
 							options.inRows?.(),
 						],
 					}),
@@ -135,15 +135,15 @@ function setup(options: Setup = {}) {
 
 	wrappers.push(wrapper);
 
-	const root = wrapper.get('[data-dg-part="table"]').element;
+	const root = wrapper.get('[data-dg-part="grid"]').element;
 
-	placeTable(root, options.left);
+	placeGrid(root, options.left);
 
 	const row = (id: string) => root.querySelector(`[data-dg-part="row"][data-dg-index="${rows.value.findIndex(item => item.id === id)}"]`) as HTMLElement;
 	const header = (name: string) => root.querySelector(`[role="columnheader"][data-dg-column="${name}"]`) as HTMLElement;
 	const names = () => rows.value.map(item => item.id);
 
-	return { table: table as unknown as DataTable, rows, drops, columnDrops, root, row, header, names };
+	return { grid: grid as unknown as DataGrid, rows, drops, columnDrops, root, row, header, names };
 }
 
 /** Drags from one element to a point, frame by frame, and releases there. */
@@ -170,15 +170,15 @@ afterEach(() => {
 });
 
 describe('row drag — the pointer', () => {
-	it('drops a row where it goes, with the row and the table it comes from', async () => {
-		const { table, drops, row, names } = setup();
+	it('drops a row where it goes, with the row and the grid it comes from', async () => {
+		const { grid, drops, row, names } = setup();
 
 		drag(row('a'), at(row('d'), 0.25));
 		await nextTick();
 
 		expect(drops).toEqual([expect.objectContaining({ key: 'a', parent: null, index: 2, external: false })]);
 		expect(drops[0].row).toEqual(tasks[0]);
-		expect(drops[0].source).toBe(table);
+		expect(drops[0].source).toBe(grid);
 		expect(names()).toEqual(['b', 'c', 'a', 'd']);
 	});
 
@@ -252,7 +252,7 @@ describe('row drag — the pointer', () => {
 });
 
 describe('row drag — scrolling', () => {
-	/** The table's root scrolls: `scrollBy` moves its `scrollTop`. */
+	/** The grid's root scrolls: `scrollBy` moves its `scrollTop`. */
 	function scrollable(root: Element) {
 		let top = 0;
 
@@ -275,7 +275,7 @@ describe('row drag — scrolling', () => {
 		}
 	}
 
-	it('scrolls the table near its bottom edge as `autoScroll` says', () => {
+	it('scrolls the grid near its bottom edge as `autoScroll` says', () => {
 		const { root, row } = setup({ autoScroll: { threshold: 40, speed: 1000, curve: depth => depth } });
 		const top = scrollable(root);
 
@@ -304,21 +304,21 @@ describe('row drag — a group of a tree', () => {
 	];
 
 	/** A row by where it is shown: in a tree that is not where it is in the data. */
-	function shownRow(table: DataTable, root: Element, id: string) {
-		return root.querySelector(`[data-dg-part="row"][data-dg-index="${table.scope.getRowIndex(id)}"]`) as HTMLElement;
+	function shownRow(grid: DataGrid, root: Element, id: string) {
+		return root.querySelector(`[data-dg-part="row"][data-dg-index="${grid.scope.getRowIndex(id)}"]`) as HTMLElement;
 	}
 
 	it('closes while it is dragged, and opens again at its new place', async () => {
-		const { table, root, drops } = setup({ tree: true, rows: tree });
-		const shown = () => table.scope.rowKeys.value;
-		const row = (id: string) => shownRow(table, root, id);
+		const { grid, root, drops } = setup({ tree: true, rows: tree });
+		const shown = () => grid.scope.rowKeys.value;
+		const row = (id: string) => shownRow(grid, root, id);
 		const start = at(row('folder'));
 
 		pointer('pointerdown', row('folder'), start);
 		pointer('pointermove', window, { x: start.x, y: start.y + 8 });
 		frames.run();
 		await nextTick();
-		placeTable(root);
+		placeGrid(root);
 
 		expect(shown()).toEqual(['folder', 'loose']);
 
@@ -332,15 +332,15 @@ describe('row drag — a group of a tree', () => {
 	});
 
 	it('leaves a group closed by the user closed', async () => {
-		const { table, root } = setup({ tree: true, rows: tree });
-		const row = (id: string) => shownRow(table, root, id);
+		const { grid, root } = setup({ tree: true, rows: tree });
+		const row = (id: string) => shownRow(grid, root, id);
 
-		table.tree?.setExpanded('folder', false);
+		grid.tree?.setExpanded('folder', false);
 		await nextTick();
 		drag(row('folder'), at(row('loose'), 0.75));
 		await nextTick();
 
-		expect(table.tree?.isExpanded('folder')).toBe(false);
+		expect(grid.tree?.isExpanded('folder')).toBe(false);
 	});
 });
 
@@ -391,8 +391,8 @@ describe('row drag — the keyboard', () => {
 	});
 });
 
-describe('row drag — between tables', () => {
-	it('drops a row of one table of a group on another, with the row it carries', async () => {
+describe('row drag — between grids', () => {
+	it('drops a row of one grid of a group on another, with the row it carries', async () => {
 		const first = setup({ group: 'tasks' });
 		const second = setup({ group: 'tasks', rows: [{ id: 'x', name: 'Other' }], left: 800 });
 
@@ -402,11 +402,11 @@ describe('row drag — between tables', () => {
 		expect(first.drops).toEqual([]);
 		expect(second.drops).toEqual([expect.objectContaining({ key: 'b', index: 1, external: true })]);
 		expect(second.drops[0].row).toEqual(tasks[1]);
-		expect(second.drops[0].source).toBe(first.table);
+		expect(second.drops[0].source).toBe(first.grid);
 		expect(second.names()).toEqual(['x', 'b']);
 	});
 
-	it('keeps a row of a table without a group inside it', async () => {
+	it('keeps a row of a grid without a group inside it', async () => {
 		const first = setup();
 		const second = setup({ rows: [{ id: 'x', name: 'Other' }], left: 800 });
 
@@ -418,12 +418,12 @@ describe('row drag — between tables', () => {
 });
 
 describe('row drag — the ghost', () => {
-	it('renders the template of `TableDragPreview` in the ghost, inside the table’s context', async () => {
+	it('renders the template of `GridDragPreview` in the ghost, inside the grid’s context', async () => {
 		const Inner = defineComponent({
 			setup() {
-				const table = useDataTableContext();
+				const grid = useDataGridContext();
 
-				return () => h('i', `${table.rows.value.length} rows`);
+				return () => h('i', `${grid.rows.value.length} rows`);
 			},
 		});
 		const { row, rows } = setup({
@@ -469,7 +469,7 @@ describe('row drag — bounds', () => {
 		await nextTick();
 	}
 
-	it('keeps the ghost inside the table by default', async () => {
+	it('keeps the ghost inside the grid by default', async () => {
 		const { row } = setup({ preview: () => 'Ghost' });
 
 		await dragFar(row('a'));
@@ -477,7 +477,7 @@ describe('row drag — bounds', () => {
 		expect(ghostLeft()).toBeLessThanOrEqual(600);
 	});
 
-	it('lets the ghost out in a group, for the row to reach another table', async () => {
+	it('lets the ghost out in a group, for the row to reach another grid', async () => {
 		const { row } = setup({ group: 'tasks', preview: () => 'Ghost' });
 
 		await dragFar(row('a'));
@@ -488,7 +488,7 @@ describe('row drag — bounds', () => {
 
 describe('column drag', () => {
 	it('moves a movable column by its header, and leaves the others', async () => {
-		const { table, header, columnDrops } = setup({ columns: true });
+		const { grid, header, columnDrops } = setup({ columns: true });
 
 		await nextTick();
 
@@ -499,11 +499,11 @@ describe('column drag', () => {
 		await nextTick();
 
 		expect(columnDrops).toEqual([{ name: 'name', index: 1 }]);
-		expect(table.scope.columns.value.map(item => item.column?.name)).toEqual(['id', 'name', 'fixed']);
+		expect(grid.scope.columns.value.map(item => item.column?.name)).toEqual(['id', 'name', 'fixed']);
 	});
 
 	it('moves the columns apart as whole columns while dragging, and drops without a jump', async () => {
-		const { table, root, header, columnDrops } = setup({ columns: true });
+		const { grid, root, header, columnDrops } = setup({ columns: true });
 		const shifts = (name: string) => [...root.querySelectorAll<HTMLElement>(`[data-dg-column="${name}"]`)]
 			.map(cell => cell.style.getPropertyValue('translate'));
 
@@ -523,11 +523,11 @@ describe('column drag', () => {
 		await nextTick();
 
 		expect(columnDrops).toEqual([{ name: 'name', index: 1 }]);
-		expect(table.scope.columns.value.map(item => item.column?.name)).toEqual(['id', 'name', 'fixed']);
+		expect(grid.scope.columns.value.map(item => item.column?.name)).toEqual(['id', 'name', 'fixed']);
 		expect([...shifts('id'), ...shifts('name')]).toEqual(Array(10).fill(''));
 	});
 
-	it('with `useTableMotion`, a column dropped from the gap stays where it stands', async () => {
+	it('with `useGridMotion`, a column dropped from the gap stays where it stands', async () => {
 		const { root, header } = setup({ columns: true, motion: true });
 		const animate = vi.spyOn(Element.prototype, 'animate');
 
@@ -541,7 +541,7 @@ describe('column drag', () => {
 
 		pointer('pointerup', window, { x: 170, y: 15 });
 		// The re-render lays the header out in the new order.
-		void nextTick(() => placeTable(root));
+		void nextTick(() => placeGrid(root));
 		await nextTick();
 		await nextTick();
 
@@ -551,17 +551,17 @@ describe('column drag', () => {
 	});
 
 	it('does not sort a column dropped after a drag', async () => {
-		const { table, header } = setup({ columns: true });
+		const { grid, header } = setup({ columns: true });
 
 		drag(header('name'), { x: 170, y: 15 });
 		header('name').click();
 		await nextTick();
 
-		expect(table.scope.sort.value).toEqual([]);
+		expect(grid.scope.sort.value).toEqual([]);
 	});
 });
 
-describe('TableDragPreview', () => {
+describe('GridDragPreview', () => {
 	it('fades where it is by default, and stands outside the pointer', () => {
 		const holder = createPreviewHolder();
 		const render = () => undefined;
@@ -582,16 +582,16 @@ describe('TableDragPreview', () => {
 	});
 });
 
-describe('TableDropZone', () => {
+describe('GridDropZone', () => {
 	it('takes a row dragged onto it, and says when it is ready and when the row is over it', async () => {
-		const dropped: TableDropZoneEvent[] = [];
-		const { table, row } = setup({
+		const dropped: GridDropZoneEvent[] = [];
+		const { grid, row } = setup({
 			group: 'tasks',
-			extra: () => h(TableDropZone, { class: 'bin', onDrop: (event: TableDropZoneEvent) => dropped.push(event) }, { default: () => 'Bin' }),
+			extra: () => h(GridDropZone, { class: 'bin', onDrop: (event: GridDropZoneEvent) => dropped.push(event) }, { default: () => 'Bin' }),
 		});
 		const bin = document.querySelector('.bin') as HTMLElement;
 
-		placeTable(document.querySelector('[data-dg-part="table"]') as Element);
+		placeGrid(document.querySelector('[data-dg-part="grid"]') as Element);
 		place(bin, { left: 900, top: 0, right: 1000, bottom: 100 });
 
 		expect(bin.getAttribute('data-dg-state')).toBe('idle');
@@ -611,7 +611,7 @@ describe('TableDropZone', () => {
 
 		pointer('pointerup', window, { x: 950, y: 50 });
 
-		expect(dropped).toEqual([expect.objectContaining({ key: 'a', row: tasks[0], source: table })]);
+		expect(dropped).toEqual([expect.objectContaining({ key: 'a', row: tasks[0], source: grid })]);
 	});
 });
 
@@ -625,7 +625,7 @@ describe('dragHandleColumn', () => {
 	});
 });
 
-describe('TableDragOverlay', () => {
+describe('GridDragOverlay', () => {
 	/** Starts a drag of `from`, and moves the pointer to `to` once it has started. */
 	async function start(from: Element, to = at(from)) {
 		pointer('pointerdown', from, at(from));
@@ -641,18 +641,18 @@ describe('TableDragOverlay', () => {
 	}
 
 	function messages(label: string) {
-		return () => h(TableDragOverlay, null, {
-			default: ({ source, own, over, allowed, label: item }: TableDragOverlayContext) => `${label}:${(source.rows.value as Task[])[0]?.id}:${own}:${over}:${allowed}:${item}`,
+		return () => h(GridDragOverlay, null, {
+			default: ({ source, own, over, allowed, label: item }: GridDragOverlayContext) => `${label}:${(source.rows.value as Task[])[0]?.id}:${own}:${over}:${allowed}:${item}`,
 		});
 	}
 
-	it('shows on another table of the group, with where the row comes from, and follows the pointer', async () => {
+	it('shows on another grid of the group, with where the row comes from, and follows the pointer', async () => {
 		const first = setup({ group: 'tasks', inRows: messages('first') });
 		const second = setup({ group: 'tasks', rows: [{ id: 'x', name: 'Other' }], left: 800, inRows: messages('second') });
 
 		await start(first.row('b'));
 
-		// The table the row comes from shows nothing of its own drag.
+		// The grid the row comes from shows nothing of its own drag.
 		expect(overlays(first.root)).toBeNull();
 		expect(overlays(second.root)?.getAttribute('data-dg-state')).toBe('ready');
 		expect(overlays(second.root)?.textContent).toBe('second:a:false:false:false:Beta');
@@ -670,14 +670,14 @@ describe('TableDragOverlay', () => {
 		expect(overlays(second.root)).toBeNull();
 	});
 
-	it('shows nothing on a table the drag cannot reach, kept to its own table', async () => {
-		const zones: TableDropZoneSlotContext[] = [];
-		const first = setup({ group: 'tasks', bounds: 'table' });
+	it('shows nothing on a grid the drag cannot reach, kept to its own grid', async () => {
+		const zones: GridDropZoneSlotContext[] = [];
+		const first = setup({ group: 'tasks', bounds: 'grid' });
 
-		// A zone outside the table, which the drag kept to the table cannot reach.
+		// A zone outside the grid, which the drag kept to the grid cannot reach.
 		wrappers.push(mount(defineComponent({
-			setup: () => () => h(TableDropZone, { class: 'zone', group: 'tasks' }, {
-				default: (context: TableDropZoneSlotContext) => {
+			setup: () => () => h(GridDropZone, { class: 'zone', group: 'tasks' }, {
+				default: (context: GridDropZoneSlotContext) => {
 					zones.push({ ready: context.ready, over: context.over, item: context.item });
 
 					return 'Zone';
@@ -695,8 +695,8 @@ describe('TableDragOverlay', () => {
 		expect(zones.every(zone => zone.item === null && !zone.ready)).toBe(true);
 	});
 
-	it('shows for the table’s own rows with `own`, and as `when` decides', async () => {
-		const own = setup({ inRows: () => h(TableDragOverlay, { own: true }, { default: () => 'own' }) });
+	it('shows for the grid’s own rows with `own`, and as `when` decides', async () => {
+		const own = setup({ inRows: () => h(GridDragOverlay, { own: true }, { default: () => 'own' }) });
 
 		await start(own.row('a'));
 
@@ -707,7 +707,7 @@ describe('TableDragOverlay', () => {
 
 		const picky = setup({
 			left: 800,
-			inRows: () => h(TableDragOverlay, { when: (context: TableDragOverlayContext) => context.key === 'c' }, { default: () => 'only c' }),
+			inRows: () => h(GridDragOverlay, { when: (context: GridDragOverlayContext) => context.key === 'c' }, { default: () => 'only c' }),
 		});
 
 		await start(picky.row('a'));
@@ -722,17 +722,17 @@ describe('TableDragOverlay', () => {
 	});
 
 	it('stays rendered as `idle` with `forceMount`, for animations of your own', () => {
-		const { root } = setup({ inRows: () => h(TableDragOverlay, { forceMount: true }, { default: () => 'message' }) });
+		const { root } = setup({ inRows: () => h(GridDragOverlay, { forceMount: true }, { default: () => 'message' }) });
 
 		expect(overlays(root)?.getAttribute('data-dg-state')).toBe('idle');
 		expect(overlays(root)?.textContent).toBe('');
 	});
 
-	it('shows for a column dragged in its own table by default', async () => {
+	it('shows for a column dragged in its own grid by default', async () => {
 		const { header, root } = setup({
 			columns: true,
-			inColumns: () => h(TableDragOverlay, { for: 'columns' }, {
-				default: ({ column, over }: TableDragOverlayContext) => `${column?.name}:${over}`,
+			inColumns: () => h(GridDragOverlay, { for: 'columns' }, {
+				default: ({ column, over }: GridDragOverlayContext) => `${column?.name}:${over}`,
 			}),
 		});
 

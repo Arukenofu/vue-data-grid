@@ -18,13 +18,13 @@ from a different side: how to build parts, what a data grid must do, and how to 
 Vue, and this library follows it in almost every way a part can be built:
 
 - **Small parts, written out.** A Reka UI dialog is a root, a trigger, a content and a close
-  button, each a component you place yourself. A table here is a root, a header, header cells, a
+  button, each a component you place yourself. A grid here is a root, a header, header cells, a
   body, rows and cells, placed the same way. A part never renders another part on its own.
 - **`as` and `asChild`.** Every part renders the element you choose, or merges its props onto your
   own element, as Reka UI's `Primitive` does. A selection checkbox can become the checkbox of your
   design system without losing its behaviour.
 - **Context you can reach.** Parts share state through provide and inject, and the helpers are
-  exported, `useDataTableContext`, `useBodyRowContext` and the rest, so a part of your own can stand
+  exported, `useDataGridContext`, `useBodyRowContext` and the rest, so a part of your own can stand
   in for any built-in one.
 - **State as data attributes.** `data-state` in Reka UI, `data-dg-state` here: one attribute that
   says what an interactive part is doing, for CSS to read.
@@ -33,8 +33,8 @@ Vue, and this library follows it in almost every way a part can be built:
 
 This documentation site borrows its layout from Reka UI's too.
 
-Where it differs: a table has far more parts on the screen than a dialog, so the cells of a row are
-not a component each. `TableCells` renders them all in one pass, which halves the cost of the body.
+Where it differs: a grid has far more parts on the screen than a dialog, so the cells of a row are
+not a component each. `GridCells` renders them all in one pass, which halves the cost of the body.
 
 ## AG Grid
 
@@ -59,13 +59,13 @@ yours from the first line.
 
 ## TanStack Table
 
-[TanStack Table](https://tanstack.com/table) made headless tables mainstream, and showed how far a
-table's logic can go without any markup:
+[TanStack Table](https://tanstack.com/table) made headless grids mainstream, and showed how far a
+grid's logic can go without any markup:
 
 - **Headless logic.** The core of this library, `@vue-data-grid/engine`, holds no markup at all, as
   TanStack Table holds none: columns, rows, sorting, grouping and windows are data and functions.
 - **Features as plugins.** TanStack Table's row models are opted into one by one; features here are
-  functions passed to `useDataTable`, and what is not used is not bundled.
+  functions passed to `useDataGrid`, and what is not used is not bundled.
 - **Types from the data.** A column helper bound to the row type, `createColumnHelper` there and
   `defineColumn` here, makes every accessor, formatter and cell typed without generics.
 - **Controlled state.** Sort and layout can live in refs you own, as TanStack's state can be
@@ -75,12 +75,12 @@ table's logic can go without any markup:
 
 Where it differs: TanStack Table stops at logic, and leaves roles, keys, focus and rendering to you.
 This library goes on to the markup: parts, prop-getters, keyboard navigation and announcements, and
-it is built for Vue's reactivity, so a change wakes one row rather than the table.
+it is built for Vue's reactivity, so a change wakes one row rather than the grid.
 
 ## And more
 
 - The [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/) for the grid, treegrid and
-  table patterns, and for every key.
+  grid patterns, and for every key.
 - Spreadsheets, Excel and Google Sheets, for how ranges, the fill handle and editing should feel.
 - The [FLIP technique](https://aerotwist.com/blog/flip-your-animations/) of Paul Lewis, which
   `@vue-data-grid/flip` is built on, and [GSAP](https://gsap.com) and [Motion](https://motion.dev),

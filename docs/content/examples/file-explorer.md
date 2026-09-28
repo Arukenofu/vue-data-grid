@@ -23,9 +23,9 @@ move to another folder when you drop them on it.
   content after them.
 - An order of your own, folders first, while the headers still sort: [Sorting](/guides/sorting).
 - Dragging into a folder, with the keyboard too: [Drag and drop](/guides/drag-and-drop),
-  [`useTableRowDrag`](/composables/use-table-row-drag).
+  [`useGridRowDrag`](/composables/use-grid-row-drag).
 - Folders that open and close, and files that change places, with motion: [Animation](/guides/animation).
-- A details panel for the row you pick, beside the table on a wide screen and a sheet over it on a
+- A details panel for the row you pick, beside the grid on a wide screen and a sheet over it on a
   narrow one, with focus that goes in and comes back: [Keyboard navigation](/guides/keyboard-navigation).
 
 Click a file or a folder to see its details, or press <kbd>Space</kbd> on its row. Drag a file by its
@@ -37,7 +37,7 @@ the folders stay on top either way. Make the window narrow to see the panel beco
 ### Sizes that add up
 
 The data is a flat list of entries, each with the key of its parent folder. A folder has no size of
-its own, so before the table sees the rows, a small pure function walks each folder and adds up the
+its own, so before the grid sees the rows, a small pure function walks each folder and adds up the
 files under it, on every level:
 
 ```ts
@@ -53,13 +53,13 @@ objects with fresh totals whenever the files change, which for a tree of this si
 ### A tree from a flat list
 
 The `tree` feature reads the parent of each row from `parentKey` and flattens the expanded part of
-the tree into the rows the table shows. `expanded` is a model: the table writes to it when a folder
+the tree into the rows the grid shows. `expanded` is a model: the grid writes to it when a folder
 opens or closes, and the buttons of the toolbar write to it too.
 
 ```ts
 const expanded = ref<string[]>();
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -77,7 +77,7 @@ function expandAll() {
 ```
 
 `treeColumn()` turns the name column into the column of the tree. It puts the indent of the level
-and a `TableTreeToggle` in front of your own content, and marks the column, so → and ← of the
+and a `GridTreeToggle` in front of your own content, and marks the column, so → and ← of the
 navigation open and close folders in it:
 
 ```ts
@@ -95,17 +95,17 @@ columns do not know. So the tree is told not to sort (`sort: false`), and keeps 
 rows it gets, and the rows come sorted by `sortFiles`: folders before files, then by the first
 column of the sort, in its direction.
 
-The sort itself is still the table's. `sort` is a ref given to `useDataTable` as a model: a click on a
+The sort itself is still the grid's. `sort` is a ref given to `useDataGrid` as a model: a click on a
 header writes the new sort into it, the rows computed from it re-sort, and the headers show the
 direction with `aria-sort`.
 
 ### Dropping files into folders
 
-This example uses the composable `useTableRowDrag` rather than the `TableRowDrag` part. Called in
-the component that renders the table, it works the same way, and its callbacks get your rows typed:
+This example uses the composable `useGridRowDrag` rather than the `GridRowDrag` part. Called in
+the component that renders the grid, it works the same way, and its callbacks get your rows typed:
 
 ```ts
-useTableRowDrag(table, {
+useGridRowDrag(grid, {
 	handle: true,
 	enabled: true,
 	stepKeys: false,
@@ -134,11 +134,11 @@ useTableRowDrag(table, {
 The panel shows the row whose key is in `openKey`. A click on a row opens it, unless the click was on
 one of the row's buttons, the grip or the toggle. From the keyboard, <kbd>Space</kbd> on any cell of
 the row opens it, and so does <kbd>Enter</kbd> on a cell without a button of its own; <kbd>Enter</kbd>
-on the name of a folder still opens the folder. The handlers sit on `TableRow`, so they run before
-the navigation of the table, which leaves a key alone once it is handled:
+on the name of a folder still opens the folder. The handlers sit on `GridRow`, so they run before
+the navigation of the grid, which leaves a key alone once it is handled:
 
 ```vue
-<TableRow
+<GridRow
 	v-for="row in shown"
 	:key="row.key"
 	:row="row"
@@ -146,8 +146,8 @@ the navigation of the table, which leaves a key alone once it is handled:
 	@click="onRowClick($event, row.key)"
 	@keydown="onRowKeydown($event, row.key)"
 >
-	<TableCells />
-</TableRow>
+	<GridCells />
+</GridRow>
 ```
 
 `aria-current` marks the row the panel is about, and the theme draws it from that attribute, so what
@@ -155,16 +155,16 @@ a screen reader hears and what you see agree. The folders of the path come from 
 walking the parents of the file up to the top.
 
 Opened from the keyboard, the panel takes focus on its title. Closing it, with its button or
-<kbd>Escape</kbd>, gives focus back to the row through the navigation of the table:
+<kbd>Escape</kbd>, gives focus back to the row through the navigation of the grid:
 
 ```ts
 function closeDetails() {
-	const row = openKey.value === null ? -1 : table.scope.getRowIndex(openKey.value);
+	const row = openKey.value === null ? -1 : grid.scope.getRowIndex(openKey.value);
 
 	openKey.value = null;
 
 	if (row !== -1) {
-		void table.navigation.focusCell({ section: 'body', row, cell: 'name' });
+		void grid.navigation.focusCell({ section: 'body', row, cell: 'name' });
 	}
 }
 ```
@@ -172,14 +172,14 @@ function closeDetails() {
 ### Wide and narrow
 
 The demo is a CSS container: `container: explorer / inline-size`. While it is wide, the panel stands
-beside the table and slides open by its width. Below 720 pixels of the container, not of the
-window, a container query turns the same panel into a sheet over the bottom of the table, with a
+beside the grid and slides open by its width. Below 720 pixels of the container, not of the
+window, a container query turns the same panel into a sheet over the bottom of the grid, with a
 backdrop that closes it. There is one panel and one piece of state; only the CSS changes, so the
 layout follows the space the demo actually gets, in a sidebar or on a phone alike.
 
 ## Accessibility
 
-- The table is a `treegrid`: each row says its level, its place among the rows of its folder and,
+- The grid is a `treegrid`: each row says its level, its place among the rows of its folder and,
   for a folder, whether it is open, with `aria-level`, `aria-posinset`, `aria-setsize` and
   `aria-expanded`.
 - The name column is the row header, so moving along a row keeps the name of the file in reach of a

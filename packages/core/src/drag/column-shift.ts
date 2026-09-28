@@ -3,7 +3,7 @@ import { captureLayout, type MotionEngine, stopMotion } from '@vue-data-grid/fli
 import { type GeometryLayer, getColumnCellSelector } from '@vue-data-grid/engine';
 import { computed, onScopeDispose, shallowRef } from 'vue';
 
-import type { DataTable } from '../data-table/use-data-table';
+import type { DataGrid } from '../data-grid/use-data-grid';
 
 /**
  * Columns a drag moves apart as whole columns: the header, the body and the footer cells of each
@@ -11,7 +11,7 @@ import type { DataTable } from '../data-table/use-data-table';
  * only while a column is moved, gives it to the cells that mount mid-gesture, such as rows scrolled
  * into view.
  */
-export function createColumnShift(table: DataTable) {
+export function createColumnShift(grid: DataGrid) {
 	const shifts = shallowRef<ReadonlyMap<string, number>>(new Map());
 	const layers = computed(() => {
 		const result: GeometryLayer[] = [];
@@ -42,7 +42,7 @@ export function createColumnShift(table: DataTable) {
 		shifts.value = next;
 
 		if (next.size > 0) {
-			release ??= table.addLayers(layers);
+			release ??= grid.addLayers(layers);
 		} else {
 			release?.();
 			release = null;
@@ -51,7 +51,7 @@ export function createColumnShift(table: DataTable) {
 		const cells: HTMLElement[] = [];
 		const offsets: number[] = [];
 
-		for (const cell of table.root.value?.querySelectorAll<HTMLElement>('[data-dg-column]') ?? []) {
+		for (const cell of grid.root.value?.querySelectorAll<HTMLElement>('[data-dg-column]') ?? []) {
 			const change = changes.get(cell.dataset.dgColumn ?? '');
 
 			if (change) {
@@ -60,7 +60,7 @@ export function createColumnShift(table: DataTable) {
 			}
 		}
 
-		// Every read before the first write, or the browser would restyle the table for each cell.
+		// Every read before the first write, or the browser would restyle the grid for each cell.
 		const capture = engine ? captureLayout(cells) : null;
 
 		if (!capture) {

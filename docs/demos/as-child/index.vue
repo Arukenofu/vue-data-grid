@@ -2,22 +2,22 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	GridSelectAllCheckbox,
+	GridSelectionCheckbox,
+	GridSortIndicator,
 	navigation,
 	selection,
 	selectionColumn,
 	sorting,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	TableSelectAllCheckbox,
-	TableSelectionCheckbox,
-	TableSortIndicator,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconArrowDown from '~icons/lucide/arrow-down';
 import IconArrowUp from '~icons/lucide/arrow-up';
@@ -38,7 +38,7 @@ const columns = defineColumns({
 	location: column(person => person.location, { label: 'Office', width: 100 }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people.slice(0, 16),
 	rowKey: 'id',
@@ -53,42 +53,42 @@ const table = useDataTable({
 
 <template>
 	<div>
-		<TableRoot :table="table" label="People" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns }">
-					<TableHeaderCell v-for="column in columns" :key="column.key" :column="column" :class="{ 'is-sortable': column.column?.sortable }">
-						<TableSelectAllCheckbox v-if="column.key === 'select'" v-slot="{ selected, partly }" as-child>
+		<GridRoot :grid="grid" label="People" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns }">
+					<GridHeaderCell v-for="column in columns" :key="column.key" :column="column" :class="{ 'is-sortable': column.column?.sortable }">
+						<GridSelectAllCheckbox v-if="column.key === 'select'" v-slot="{ selected, partly }" as-child>
 							<button class="check">
 								<IconMinus v-if="partly" aria-hidden="true" />
 								<IconCheck v-else-if="selected" aria-hidden="true" />
 							</button>
-						</TableSelectAllCheckbox>
+						</GridSelectAllCheckbox>
 						<template v-else>
-							<TableHeaderContent />
-							<TableSortIndicator v-slot="{ direction }">
+							<GridHeaderContent />
+							<GridSortIndicator v-slot="{ direction }">
 								<IconArrowUp v-if="direction === 'asc'" />
 								<IconArrowDown v-else-if="direction === 'desc'" />
-							</TableSortIndicator>
+							</GridSortIndicator>
 						</template>
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells v-slot="{ column, value }">
-						<TableSelectionCheckbox v-if="column.name === 'select'" v-slot="{ selected }" as-child>
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells v-slot="{ column, value }">
+						<GridSelectionCheckbox v-if="column.name === 'select'" v-slot="{ selected }" as-child>
 							<button class="check">
 								<IconCheck v-if="selected" aria-hidden="true" />
 							</button>
-						</TableSelectionCheckbox>
+						</GridSelectionCheckbox>
 						<template v-else-if="column.name === 'name'">
 							<PresenceDot />
 							<span data-dg-part="cell-text">{{ value }}</span>
 						</template>
-					</TableCells>
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+					</GridCells>
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

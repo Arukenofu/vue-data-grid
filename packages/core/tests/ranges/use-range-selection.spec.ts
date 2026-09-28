@@ -3,12 +3,12 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, type ShallowRef, shallowRef } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableRangeOverlay } from '../../src/components/table-range-overlay';
-import { TableRoot } from '../../src/components/table-root';
-import { navigation, ranges } from '../../src/data-table/factories';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import type { GridBodyRow } from '../../src/components/context';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridRangeOverlay } from '../../src/components/grid-range-overlay';
+import { GridRoot } from '../../src/components/grid-root';
+import { navigation, ranges } from '../../src/data-grid/factories';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { useRangeSelection } from '../../src/ranges/use-range-selection';
 
 interface Row {
@@ -35,15 +35,15 @@ const columns = defineColumns({
 
 const initial: Row[] = ['a', 'b', 'c', 'd'].map((id, index) => ({ id, price: index }));
 
-function createTable(rows: ShallowRef<Row[]>, withNavigation: boolean) {
+function createGrid(rows: ShallowRef<Row[]>, withNavigation: boolean) {
 	const options = { columns, rows, rowKey: 'id', rowHeight: 30 } as const;
 
 	return withNavigation
-		? useDataTable({ ...options, features: { navigation: navigation(), ranges: ranges() } })
-		: useDataTable({ ...options, features: { ranges: ranges() } });
+		? useDataGrid({ ...options, features: { navigation: navigation(), ranges: ranges() } })
+		: useDataGrid({ ...options, features: { ranges: ranges() } });
 }
 
-type Table = ReturnType<typeof createTable>;
+type Grid = ReturnType<typeof createGrid>;
 
 let wrapper: ReturnType<typeof mount> | null = null;
 
@@ -56,24 +56,24 @@ afterEach(() => {
 
 function setup(withNavigation = true) {
 	const rows = shallowRef(initial);
-	let table: Table | null = null;
+	let grid: Grid | null = null;
 
 	wrapper = mount(defineComponent({
 		setup() {
-			table = createTable(rows, withNavigation);
+			grid = createGrid(rows, withNavigation);
 
-			return () => h(TableRoot, { table: table as DataTable }, {
-				default: () => h(TableBody, null, {
-					default: ({ rows: bodyRows }: { rows: readonly TableBodyRow[] }) => [
-						...bodyRows.map(row => h(TableRow, { key: row.key, row }, { default: () => h(TableCells), $stable: true })),
-						h(TableRangeOverlay, { key: 'ranges' }),
+			return () => h(GridRoot, { grid: grid as DataGrid }, {
+				default: () => h(GridBody, null, {
+					default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => [
+						...bodyRows.map(row => h(GridRow, { key: row.key, row }, { default: () => h(GridCells), $stable: true })),
+						h(GridRangeOverlay, { key: 'ranges' }),
 					],
 				}),
 			});
 		},
 	}), { attachTo: document.body });
 
-	return { rows, table: table as unknown as Table };
+	return { rows, grid: grid as unknown as Grid };
 }
 
 function cell(row: number, column: string) {
@@ -100,7 +100,7 @@ function selectedCells() {
 
 describe('useRangeSelection — the pointer', () => {
 	it('a press selects the cell and focuses it; Shift extends the range to another', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(1, 'id'));
 		await vi.waitFor(() => expect(document.activeElement).toBe(cell(1, 'id')));
@@ -108,27 +108,27 @@ describe('useRangeSelection — the pointer', () => {
 		press(cell(2, 'price'), { shiftKey: true });
 		await nextTick();
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 1, rowEnd: 3, columnStart: 0, columnEnd: 2 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 1, rowEnd: 3, columnStart: 0, columnEnd: 2 }]);
 		expect(selectedCells()).toEqual(['1:id', '1:price', '2:id', '2:price']);
 		// The focused cell stays where the range started.
 		expect(document.activeElement).toBe(cell(1, 'id'));
 	});
 
 	it('Ctrl adds another range, a plain press replaces them all', () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(0, 'id'));
 		press(cell(3, 'cap'), { ctrlKey: true });
 
-		expect(table.ranges.selectedRanges.value).toHaveLength(2);
+		expect(grid.ranges.selectedRanges.value).toHaveLength(2);
 
 		press(cell(2, 'price'));
 
-		expect(table.ranges.selectedRanges.value).toHaveLength(1);
+		expect(grid.ranges.selectedRanges.value).toHaveLength(1);
 	});
 
 	it('Ctrl on a selected cell takes it out, and focus stays where it was', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(0, 'id'));
 		press(cell(1, 'price'), { shiftKey: true });
@@ -139,11 +139,11 @@ describe('useRangeSelection — the pointer', () => {
 
 		expect(selectedCells()).toEqual(['0:id', '0:price', '1:id']);
 		expect(document.activeElement).toBe(cell(0, 'id'));
-		expect(table.ranges.selectedRanges.value).toHaveLength(2);
+		expect(grid.ranges.selectedRanges.value).toHaveLength(2);
 	});
 
 	it('Ctrl presses on one cell switch it in and out: ranges never pile up on it', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(0, 'id'));
 
@@ -153,7 +153,7 @@ describe('useRangeSelection — the pointer', () => {
 
 		await nextTick();
 
-		const covered = table.ranges.bounds.value
+		const covered = grid.ranges.bounds.value
 			.map(bounds => (bounds.rowEnd - bounds.rowStart) * (bounds.columnEnd - bounds.columnStart))
 			.reduce((sum, size) => sum + size, 0);
 
@@ -167,13 +167,13 @@ describe('useRangeSelection — the pointer', () => {
 	});
 
 	it('corners are row keys, so a range stays on its rows through a new order', async () => {
-		const { table, rows } = setup();
+		const { grid, rows } = setup();
 
 		press(cell(0, 'id'));
 		rows.value = [...rows.value].reverse();
 		await nextTick();
 
-		expect(table.ranges.selectedRanges.value[0].anchor).toEqual({ key: 'a', column: 'id' });
+		expect(grid.ranges.selectedRanges.value[0].anchor).toEqual({ key: 'a', column: 'id' });
 		expect(selectedCells()).toEqual(['3:id']);
 	});
 
@@ -185,20 +185,20 @@ describe('useRangeSelection — the pointer', () => {
 	});
 
 	it('a press on a service column or on a control in a cell is left alone', () => {
-		const { table } = setup();
+		const { grid } = setup();
 		const button = document.createElement('button');
 
 		cell(1, 'price').append(button);
 		press(cell(1, 'number'));
 		press(button);
 
-		expect(table.ranges.selectedRanges.value).toEqual([]);
+		expect(grid.ranges.selectedRanges.value).toEqual([]);
 	});
 });
 
 describe('useRangeSelection — the keys', () => {
 	it('Shift with the arrows moves the other corner, and focus stays', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(0, 'id'));
 		await vi.waitFor(() => expect(document.activeElement).toBe(cell(0, 'id')));
@@ -207,21 +207,21 @@ describe('useRangeSelection — the keys', () => {
 		key(cell(0, 'id'), 'ArrowRight', { shiftKey: true });
 		await nextTick();
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 2, columnStart: 0, columnEnd: 2 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 2, columnStart: 0, columnEnd: 2 }]);
 		expect(document.activeElement).toBe(cell(0, 'id'));
 	});
 
 	it('Ctrl+Shift with an arrow extends to the edge', () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(1, 'id'));
 		key(cell(1, 'id'), 'ArrowDown', { shiftKey: true, ctrlKey: true });
 
-		expect(table.ranges.bounds.value[0]).toMatchObject({ rowStart: 1, rowEnd: 4 });
+		expect(grid.ranges.bounds.value[0]).toMatchObject({ rowStart: 1, rowEnd: 4 });
 	});
 
 	it('an arrow without Shift moves focus and the range goes with it', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(0, 'id'));
 		await vi.waitFor(() => expect(document.activeElement).toBe(cell(0, 'id')));
@@ -229,40 +229,40 @@ describe('useRangeSelection — the keys', () => {
 		key(cell(0, 'id'), 'ArrowRight');
 		await vi.waitFor(() => expect(document.activeElement).toBe(cell(0, 'price')));
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 1, columnStart: 1, columnEnd: 2 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 1, columnStart: 1, columnEnd: 2 }]);
 	});
 
 	it('Ctrl+A selects every cell, Ctrl+Space whole columns, Escape the focused cell alone', () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(1, 'price'));
 		key(cell(1, 'price'), 'a', { ctrlKey: true });
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 4, columnStart: 0, columnEnd: 3 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 4, columnStart: 0, columnEnd: 3 }]);
 
 		press(cell(1, 'price'));
 		key(cell(1, 'price'), ' ', { ctrlKey: true });
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 4, columnStart: 1, columnEnd: 2 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 4, columnStart: 1, columnEnd: 2 }]);
 
 		expect(key(cell(1, 'price'), 'Escape').defaultPrevented).toBe(true);
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 1, rowEnd: 2, columnStart: 1, columnEnd: 2 }]);
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 1, rowEnd: 2, columnStart: 1, columnEnd: 2 }]);
 		// Collapsed already: Escape is left to whatever else takes it.
 		expect(key(cell(1, 'price'), 'Escape').defaultPrevented).toBe(false);
 	});
 
-	it('works without the navigation: the table element takes focus', () => {
-		const { table } = setup(false);
+	it('works without the navigation: the grid element takes focus', () => {
+		const { grid } = setup(false);
 
 		press(cell(0, 'id'));
 		press(cell(1, 'price'), { shiftKey: true });
 
-		expect(table.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 2, columnStart: 0, columnEnd: 2 }]);
-		expect(document.activeElement).toBe(document.querySelector('[data-dg-part="table"]'));
+		expect(grid.ranges.bounds.value).toEqual([{ rowStart: 0, rowEnd: 2, columnStart: 0, columnEnd: 2 }]);
+		expect(document.activeElement).toBe(document.querySelector('[data-dg-part="grid"]'));
 	});
 });
 
-describe('TableRangeOverlay and the cells', () => {
+describe('GridRangeOverlay and the cells', () => {
 	it('draws each range as a row of pieces, and cells of a range get `aria-selected`', async () => {
 		setup();
 
@@ -275,22 +275,22 @@ describe('TableRangeOverlay and the cells', () => {
 		expect(range?.getAttribute('aria-hidden')).toBe('true');
 		expect(range?.querySelectorAll('[data-dg-part="range-cell"]')).toHaveLength(1);
 		expect(cell(0, 'id').getAttribute('aria-selected')).toBe('false');
-		expect(document.querySelector('[data-dg-part="table"]')?.getAttribute('aria-multiselectable')).toBe('true');
+		expect(document.querySelector('[data-dg-part="grid"]')?.getAttribute('aria-multiselectable')).toBe('true');
 	});
 
 	it('a range that grows renders no row: `aria-selected` of its cells is written without a render', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
 		press(cell(0, 'id'));
 		await nextTick();
 		renders.clear();
 
-		table.ranges.select({ key: 'b', column: 'id' }, 'extend');
+		grid.ranges.select({ key: 'b', column: 'id' }, 'extend');
 		await nextTick();
 
 		expect(selectedCells()).toEqual(['0:id', '1:id']);
 
-		table.ranges.select({ key: 'd', column: 'cap' }, 'extend');
+		grid.ranges.select({ key: 'd', column: 'cap' }, 'extend');
 		await nextTick();
 
 		expect(selectedCells()).toHaveLength(12);
@@ -298,9 +298,9 @@ describe('TableRangeOverlay and the cells', () => {
 	});
 
 	it('cells a render brings back keep their `aria-selected`', async () => {
-		const { table, rows } = setup();
+		const { grid, rows } = setup();
 
-		table.ranges.select({ key: 'a', column: 'id' });
+		grid.ranges.select({ key: 'a', column: 'id' });
 		await nextTick();
 		rows.value = [{ ...rows.value[0], price: 99 }, ...rows.value.slice(1)];
 		await nextTick();
@@ -330,18 +330,18 @@ describe('useRangeSelection — around the press', () => {
 
 		wrapper = mount(defineComponent({
 			setup() {
-				const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30 });
+				const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 });
 
-				focus = useCellFocus(table.scope);
-				selection = useCellRanges(table.scope);
-				useRangeSelection(table, { ranges: selection, focus });
+				focus = useCellFocus(grid.scope);
+				selection = useCellRanges(grid.scope);
+				useRangeSelection(grid, { ranges: selection, focus });
 
-				return () => h(TableRoot, { table: table as DataTable }, {
-					default: () => h(TableBody, null, {
-						default: ({ rows: bodyRows }: { rows: readonly TableBodyRow[] }) => bodyRows.map(row => h(
-							TableRow,
+				return () => h(GridRoot, { grid: grid as DataGrid }, {
+					default: () => h(GridBody, null, {
+						default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => bodyRows.map(row => h(
+							GridRow,
 							{ key: row.key, row },
-							{ default: () => h(TableCells), $stable: true },
+							{ default: () => h(GridCells), $stable: true },
 						)),
 					}),
 				});

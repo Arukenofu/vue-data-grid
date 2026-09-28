@@ -3,13 +3,13 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, type ShallowRef, shallowRef, type VNodeChild } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { type CellSlotContext, TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableFooter } from '../../src/components/table-footer';
-import { TableGroupToggle, TableHeader, TableHeaderCell, TableHeaderRow } from '../../src/components/table-header';
-import { TableRoot } from '../../src/components/table-root';
-import { navigation, sorting, tree } from '../../src/data-table/factories';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import type { GridBodyRow } from '../../src/components/context';
+import { type CellSlotContext, GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridFooter } from '../../src/components/grid-footer';
+import { GridGroupToggle, GridHeader, GridHeaderCell, GridHeaderRow } from '../../src/components/grid-header';
+import { GridRoot } from '../../src/components/grid-root';
+import { navigation, sorting, tree } from '../../src/data-grid/factories';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { renderBody, renderFooter, renderHeader } from '../support/parts';
 
 interface Row {
@@ -44,10 +44,10 @@ const initial: Row[] = [
 
 type Rows = ShallowRef<Row[]>;
 
-/** Makes the table for a test; without features by default. */
-type CreateTable = (rows: Rows) => DataTable<Row>;
+/** Makes the grid for a test; without features by default. */
+type CreateGrid = (rows: Rows) => DataGrid<Row>;
 
-const plainTable: CreateTable = rows => useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30 });
+const plainGrid: CreateGrid = rows => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 });
 
 let wrapper: ReturnType<typeof mount> | null = null;
 
@@ -58,14 +58,14 @@ afterEach(() => {
 	document.body.innerHTML = '';
 });
 
-function render(content: () => VNodeChild, create: CreateTable = plainTable) {
+function render(content: () => VNodeChild, create: CreateGrid = plainGrid) {
 	const rows = shallowRef(initial);
 
 	wrapper = mount(defineComponent({
 		setup() {
-			const table = create(rows) as DataTable;
+			const grid = create(rows) as DataGrid;
 
-			return () => h(TableRoot, { table, label: 'Quotes' }, { default: content });
+			return () => h(GridRoot, { grid, label: 'Quotes' }, { default: content });
 		},
 	}), { attachTo: document.body });
 
@@ -76,13 +76,13 @@ const whole = () => [renderHeader(), renderBody(), renderFooter()];
 
 const texts = (selector: string) => wrapper?.findAll(selector).map(element => element.text()) ?? [];
 
-describe('table parts — composed', () => {
-	it('render the whole table from the table object, roles and counts included', async () => {
+describe('grid parts — composed', () => {
+	it('render the whole grid from the grid object, roles and counts included', async () => {
 		render(whole);
 		// The footer row counts itself once mounted.
 		await nextTick();
 
-		const grid = wrapper?.get('[data-dg-part="table"]');
+		const grid = wrapper?.get('[data-dg-part="grid"]');
 
 		expect(grid?.attributes()).toMatchObject({ role: 'grid', 'aria-label': 'Quotes', 'aria-rowcount': '5' });
 		expect(texts('[role="columnheader"]')).toEqual(['Id', 'Price']);
@@ -94,7 +94,7 @@ describe('table parts — composed', () => {
 	});
 
 	it('a header click sorts, and Shift adds the column to the sort', async () => {
-		render(whole, rows => useDataTable({
+		render(whole, rows => useDataGrid({
 			columns,
 			rows,
 			rowKey: 'id',
@@ -114,24 +114,24 @@ describe('table parts — composed', () => {
 
 		render(() => [renderBody(), shown.value ? renderFooter() : null]);
 		await nextTick();
-		expect(wrapper?.get('[data-dg-part="table"]').attributes('aria-rowcount')).toBe('5');
+		expect(wrapper?.get('[data-dg-part="grid"]').attributes('aria-rowcount')).toBe('5');
 
 		shown.value = false;
 		await nextTick();
 
-		expect(wrapper?.get('[data-dg-part="table"]').attributes('aria-rowcount')).toBe('4');
+		expect(wrapper?.get('[data-dg-part="grid"]').attributes('aria-rowcount')).toBe('4');
 	});
 });
 
-describe('table parts — composition', () => {
+describe('grid parts — composition', () => {
 	it('the default slot of each part gets its context and replaces its content', () => {
 		render(() => [
-			h(TableHeader, {}, {
+			h(GridHeader, {}, {
 				default: ({ columns: shown }: { columns: readonly RenderedColumn[] }) => `${shown.length} columns`,
 			}),
-			h(TableBody, {}, {
-				default: ({ rows }: { rows: readonly TableBodyRow[] }) => rows.map(row => h(TableRow, { key: row.key, row }, {
-					default: () => h(TableCells, null, {
+			h(GridBody, {}, {
+				default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, {
+					default: () => h(GridCells, null, {
 						default: ({ key, value }: CellSlotContext) => `${key}=${String(value)}`,
 					}),
 				})),
@@ -144,9 +144,9 @@ describe('table parts — composition', () => {
 
 	it('`as` renders another element, `asChild` merges the part into its only child', () => {
 		render(() => [
-			h(TableHeader, { as: 'section' }),
-			h(TableBody, {}, {
-				default: ({ rows }: { rows: readonly TableBodyRow[] }) => rows.map(row => h(TableRow, { key: row.key, row, asChild: true }, {
+			h(GridHeader, { as: 'section' }),
+			h(GridBody, {}, {
+				default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row, asChild: true }, {
 					default: () => h('article', { class: 'mine', role: 'listitem' }, 'row'),
 				})),
 			}),
@@ -167,7 +167,7 @@ describe('table parts — composition', () => {
 			}),
 		});
 
-		render(whole, rows => useDataTable({
+		render(whole, rows => useDataGrid({
 			columns: fields,
 			rows,
 			rowKey: 'id',
@@ -181,63 +181,63 @@ describe('table parts — composition', () => {
 		expect(texts('[data-dg-part="foot"] [role="row"]')).toEqual(['foot:id']);
 	});
 
-	it('the table refs get the root element of a component rendered through `as`', () => {
+	it('the grid refs get the root element of a component rendered through `as`', () => {
 		const Box = defineComponent({
 			setup: (_props, { slots }) => () => h('div', { class: 'box' }, slots.default?.()),
 		});
-		let table: DataTable | null = null;
+		let grid: DataGrid | null = null;
 
-		render(() => [h(TableHeader, { as: Box }), renderBody(), h(TableFooter, { as: Box })], (rows) => {
-			const created = plainTable(rows);
+		render(() => [h(GridHeader, { as: Box }), renderBody(), h(GridFooter, { as: Box })], (rows) => {
+			const created = plainGrid(rows);
 
-			table = created as DataTable;
+			grid = created as DataGrid;
 
 			return created;
 		});
 
-		const current = table as DataTable | null;
+		const current = grid as DataGrid | null;
 
 		expect(current?.head.value).toBeInstanceOf(HTMLElement);
 		expect(current?.head.value?.getAttribute('data-dg-part')).toBe('head');
 		expect(current?.foot.value?.getAttribute('data-dg-part')).toBe('foot');
 	});
 
-	it('the table takes its accessible name from `label`, else from an `aria-label` attribute', () => {
+	it('the grid takes its accessible name from `label`, else from an `aria-label` attribute', () => {
 		wrapper = mount(defineComponent({
 			setup() {
-				const table = plainTable(shallowRef(initial)) as DataTable;
+				const grid = plainGrid(shallowRef(initial)) as DataGrid;
 
-				return () => h(TableRoot, { table, 'aria-label': 'Orders' }, { default: whole });
+				return () => h(GridRoot, { grid, 'aria-label': 'Orders' }, { default: whole });
 			},
 		}), { attachTo: document.body });
 
-		expect(wrapper.get('[data-dg-part="table"]').attributes('aria-label')).toBe('Orders');
+		expect(wrapper.get('[data-dg-part="grid"]').attributes('aria-label')).toBe('Orders');
 	});
 
 	it('cells outside a row say where they belong', () => {
-		expect(() => render(() => h(TableCells)))
-			.toThrow('useBodyRowContext() must be called inside <TableRow>');
+		expect(() => render(() => h(GridCells)))
+			.toThrow('useBodyRowContext() must be called inside <GridRow>');
 	});
 
 	it('a part renders no other part by itself: its slot holds them', async () => {
-		render(() => [h(TableHeader), h(TableBody), h(TableFooter)]);
+		render(() => [h(GridHeader), h(GridBody), h(GridFooter)]);
 		await nextTick();
 
 		expect(wrapper?.get('[data-dg-part="head"]').element.children).toHaveLength(0);
 		expect(wrapper?.get('[data-dg-part="body"]').element.children).toHaveLength(0);
-		expect(wrapper?.get('[data-dg-part="table"]').attributes('aria-rowcount')).toBe('4');
+		expect(wrapper?.get('[data-dg-part="grid"]').attributes('aria-rowcount')).toBe('4');
 	});
 
 	it('a cell shows its own content where the slot renders nothing for it', () => {
 		render(() => [
-			h(TableHeader, null, {
-				default: () => h(TableHeaderRow, null, {
-					default: ({ columns: shown }: { columns: readonly RenderedColumn[] }) => shown.map(item => h(TableHeaderCell, { key: item.key, column: item })),
+			h(GridHeader, null, {
+				default: () => h(GridHeaderRow, null, {
+					default: ({ columns: shown }: { columns: readonly RenderedColumn[] }) => shown.map(item => h(GridHeaderCell, { key: item.key, column: item })),
 				}),
 			}),
-			h(TableBody, null, {
-				default: ({ rows }: { rows: readonly TableBodyRow[] }) => rows.map(row => h(TableRow, { key: row.key, row }, {
-					default: () => h(TableCells, { as: 'span', class: 'mine' }, {
+			h(GridBody, null, {
+				default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, {
+					default: () => h(GridCells, { as: 'span', class: 'mine' }, {
 						default: ({ column: own, value }: CellSlotContext) => (own.name === 'id' ? `#${String(value)}` : null),
 					}),
 				})),
@@ -249,11 +249,11 @@ describe('table parts — composition', () => {
 		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['#a$3', '#b$1', '#c$2']);
 		// Each cell is a plain element, with the part's attributes.
 		expect(wrapper?.findAll('[data-dg-part="body"] span.mine[data-dg-column]')).toHaveLength(6);
-		expect(wrapper?.findAllComponents(TableCells)).toHaveLength(3);
+		expect(wrapper?.findAllComponents(GridCells)).toHaveLength(3);
 	});
 });
 
-describe('table parts — the row memo', () => {
+describe('grid parts — the row memo', () => {
 	it('a new row object renders its own row again, and no other', async () => {
 		const { rows } = render(whole);
 
@@ -267,7 +267,7 @@ describe('table parts — the row memo', () => {
 	});
 
 	it('in a tree too, where the rows read their own nodes', async () => {
-		const { rows } = render(whole, source => useDataTable({
+		const { rows } = render(whole, source => useDataGrid({
 			columns,
 			rows: source,
 			rowKey: 'id',
@@ -287,20 +287,20 @@ describe('table parts — the row memo', () => {
 	});
 });
 
-describe('table parts — groups and navigation', () => {
+describe('grid parts — groups and navigation', () => {
 	it('a group row shows its groups, and the toggle collapses one', async () => {
 		const groups = defineColumnGroups({ quote: { children: ['id', 'price'], showWhen: { price: 'expanded' } } });
 
-		render(whole, rows => useDataTable({ columns, groups, rows, rowKey: 'id', rowHeight: 30 }));
+		render(whole, rows => useDataGrid({ columns, groups, rows, rowKey: 'id', rowHeight: 30 }));
 
-		const toggle = wrapper?.getComponent(TableGroupToggle);
+		const toggle = wrapper?.getComponent(GridGroupToggle);
 
 		expect(toggle?.attributes()).toMatchObject({ type: 'button', 'aria-expanded': 'true', 'aria-label': 'Collapse quote' });
 
 		await toggle?.trigger('click');
 
 		expect(texts('[role="columnheader"][data-dg-column]')).toEqual(['Id']);
-		expect(wrapper?.getComponent(TableGroupToggle).attributes()).toMatchObject({
+		expect(wrapper?.getComponent(GridGroupToggle).attributes()).toMatchObject({
 			'aria-expanded': 'false',
 			'data-dg-part': 'group-toggle',
 			'data-dg-state': 'collapsed',
@@ -310,7 +310,7 @@ describe('table parts — groups and navigation', () => {
 	it('a group that cannot collapse gets no toggle', () => {
 		const groups = defineColumnGroups({ quote: { children: ['id', 'price'] } });
 
-		render(whole, rows => useDataTable({ columns, groups, rows, rowKey: 'id', rowHeight: 30 }));
+		render(whole, rows => useDataGrid({ columns, groups, rows, rowKey: 'id', rowHeight: 30 }));
 
 		expect(wrapper?.find('[data-dg-part="group-toggle"]').exists()).toBe(false);
 		expect(texts('[data-dg-part="head"] [role="row"]')[0]).toBe('quote');
@@ -319,7 +319,7 @@ describe('table parts — groups and navigation', () => {
 	it('with the navigation the keys reach a group cell, and Enter collapses the group', async () => {
 		const groups = defineColumnGroups({ quote: { children: ['id', 'price'], showWhen: { price: 'expanded' } } });
 
-		render(whole, rows => useDataTable({
+		render(whole, rows => useDataGrid({
 			columns,
 			groups,
 			rows,
@@ -340,8 +340,8 @@ describe('table parts — groups and navigation', () => {
 		expect(texts('[role="columnheader"][data-dg-column]')).toEqual(['Id']);
 	});
 
-	it('with the navigation the table takes focus first and renders the exit after itself', () => {
-		render(whole, rows => useDataTable({
+	it('with the navigation the grid takes focus first and renders the exit after itself', () => {
+		render(whole, rows => useDataGrid({
 			columns,
 			rows,
 			rowKey: 'id',
@@ -349,22 +349,22 @@ describe('table parts — groups and navigation', () => {
 			features: { navigation: navigation() },
 		}));
 
-		const grid = wrapper?.get('[data-dg-part="table"]');
+		const grid = wrapper?.get('[data-dg-part="grid"]');
 
 		expect(grid?.attributes('tabindex')).toBe('0');
 		expect(grid?.element.nextElementSibling?.getAttribute('tabindex')).toBe('0');
-		expect(wrapper?.findComponent(TableHeaderCell).attributes('tabindex')).toBe('-1');
+		expect(wrapper?.findComponent(GridHeaderCell).attributes('tabindex')).toBe('-1');
 	});
 });
 
-describe('table parts — the resize handle', () => {
+describe('grid parts — the resize handle', () => {
 	const resizable = defineColumns({
 		id: column(row => row.id, { label: 'Id', resizable: true }),
 		price: column(row => row.price, { label: 'Price' }),
 	});
 
 	it('a handle renders for a resizable column only, and a click on it does not sort', async () => {
-		render(whole, rows => useDataTable({ columns: resizable, rows, rowKey: 'id', rowHeight: 30 }));
+		render(whole, rows => useDataGrid({ columns: resizable, rows, rowKey: 'id', rowHeight: 30 }));
 
 		const handles = wrapper?.findAll('[role="columnheader"] [data-dg-part="resize-handle"]') ?? [];
 

@@ -2,10 +2,10 @@ import type { AggregateName, ColumnAggregate, ColumnInput } from '@vue-data-grid
 import { h } from 'vue';
 
 import {
-	TableSelectAllCheckbox,
-	TableSelectionCheckbox,
-	TableTreeToggle,
-} from '../components/table-service-parts';
+	GridSelectAllCheckbox,
+	GridSelectionCheckbox,
+	GridTreeToggle,
+} from '../components/grid-service-parts';
 
 /** What a service column can change of its declaration: its place, size and rights. */
 export type ServiceColumnOptions = Pick<
@@ -15,8 +15,8 @@ export type ServiceColumnOptions = Pick<
 
 /**
  * The checkbox column of the row selection: a real column, `kind: 'service'`, pinned to the start
- * by default, with a `TableSelectAllCheckbox` in its header and a `TableSelectionCheckbox` in every
- * cell. The checkboxes find the selection in the table they are rendered in, so the table needs the
+ * by default, with a `GridSelectAllCheckbox` in its header and a `GridSelectionCheckbox` in every
+ * cell. The checkboxes find the selection in the grid they are rendered in, so the grid needs the
  * `selection` feature; CSV, ranges and autosize leave the column out.
  */
 export function selectionColumn<TRow>(options: ServiceColumnOptions = {}): ColumnInput<TRow, null> {
@@ -29,8 +29,8 @@ export function selectionColumn<TRow>(options: ServiceColumnOptions = {}): Colum
 		...options,
 		kind: 'service',
 		value: () => null,
-		header: () => h(TableSelectAllCheckbox),
-		cell: ({ key }) => h(TableSelectionCheckbox, { row: key }),
+		header: () => h(GridSelectAllCheckbox),
+		cell: ({ key }) => h(GridSelectionCheckbox, { row: key }),
 	};
 }
 
@@ -54,9 +54,9 @@ export function rowNumberColumn<TRow>(options: ServiceColumnOptions & { rowHeade
 
 /**
  * Makes a data column the column of the tree: each cell starts with an indent for the row's level,
- * from level 1, and a `TableTreeToggle`, which expands a group row and leaves room on a leaf while the
+ * from level 1, and a `GridTreeToggle`, which expands a group row and leaves room on a leaf while the
  * tree has groups, then the column's own content. The indent is `--dg-tree-indent` per level in the structural styles. The toggle finds the
- * tree in the table it is rendered in, so the table needs the `tree` feature. The column is marked
+ * tree in the grid it is rendered in, so the grid needs the `tree` feature. The column is marked
  * `tree`, so → and ← of the navigation expand and collapse rows in it.
  */
 export function treeColumn<
@@ -74,7 +74,7 @@ export function treeColumn<
 			context.node?.level
 				? h('span', { 'aria-hidden': 'true', 'data-dg-part': 'tree-indent', style: `--dg-level:${context.node.level}` })
 				: null,
-			h(TableTreeToggle, { row: context.key }),
+			h(GridTreeToggle, { row: context.key }),
 			cell?.(context) ?? h('span', { 'data-dg-part': 'cell-text' }, formatValue(column, context.value, context.row)),
 		],
 	};

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ColumnLayout, ColumnPinSide } from '../../src/columns/column';
-import { resolveLayout, type TableLayout } from '../../src/columns/layout';
+import { type GridLayout, resolveLayout } from '../../src/columns/layout';
 
 interface ColumnOptions {
 	hiddenByDefault?: boolean;
@@ -18,7 +18,7 @@ function column(name: string, options: ColumnOptions = {}): ColumnLayout {
 	};
 }
 
-function layout(value: Partial<TableLayout> = {}): TableLayout {
+function layout(value: Partial<GridLayout> = {}): GridLayout {
 	return { order: [], hidden: [], widths: {}, pinned: {}, ...value };
 }
 
@@ -152,13 +152,13 @@ describe('resolveLayout — new columns take their declared place', () => {
 describe('resolveLayout — a record without `pinned`', () => {
 	it('a record of the old schema gets the default pins', () => {
 		const columns = [column('a', { pinned: 'start', pinnable: true }), column('b')];
-		const stored = { order: ['a', 'b'], hidden: [], widths: {} } as unknown as TableLayout;
+		const stored = { order: ['a', 'b'], hidden: [], widths: {} } as unknown as GridLayout;
 
 		expect(resolveLayout(columns, stored).pinned).toEqual({ a: 'start' });
 	});
 
 	it('such a record is rebuilt rather than returned as is', () => {
-		const stored = { order: ['a'], hidden: [], widths: {} } as unknown as TableLayout;
+		const stored = { order: ['a'], hidden: [], widths: {} } as unknown as GridLayout;
 
 		expect(resolveLayout([column('a')], stored)).not.toBe(stored);
 	});

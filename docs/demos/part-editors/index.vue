@@ -5,18 +5,18 @@ import {
 	defineColumn,
 	defineColumns,
 	editing,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
 	navigation,
 	numberField,
 	selectEditor,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
 	textEditor,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconPencil from '~icons/lucide/pencil';
 import { shallowRef } from 'vue';
@@ -101,12 +101,12 @@ function save(commit: CellCommit<Product>) {
 	rows.value = commit.apply(rows.value);
 
 	const [edit] = commit.edits;
-	const label = table.scope.getColumn(edit.column)?.column?.label ?? edit.column;
+	const label = grid.scope.getColumn(edit.column)?.column?.label ?? edit.column;
 
 	lastEdit.value = `${label} of ${edit.row.name} changed.`;
 }
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -127,18 +127,18 @@ const table = useDataTable({
 			</span>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Products" class="ui-table" data-size="auto">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows: bodyRows }">
-				<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+		<GridRoot :grid="grid" label="Products" class="ui-grid" data-size="auto">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows: bodyRows }">
+				<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

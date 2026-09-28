@@ -21,7 +21,7 @@ const LEVELS = [
 	{
 		icon: IconCode,
 		title: 'Utilities',
-		text: 'Prop-getters for roles, indexes and states, for tables you write from scratch.',
+		text: 'Prop-getters for roles, indexes and states, for grids you write from scratch.',
 	},
 ];
 </script>
@@ -32,7 +32,7 @@ const LEVELS = [
 			<p class="home-eyebrow" data-reveal>Built from parts</p>
 			<h2 class="home-heading" data-reveal>Compose it like a form. Replace any piece.</h2>
 			<p class="home-subheading" data-reveal>
-				A table is a tree of small parts. Each takes what it needs from the one around it, so you
+				A grid is a tree of small parts. Each takes what it needs from the one around it, so you
 				add a resize handle by writing one, and swap a part for your own without forking anything.
 			</p>
 			<ul class="home-levels">

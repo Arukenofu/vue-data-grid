@@ -3,25 +3,25 @@ import {
 	defineColumn,
 	defineColumnGroups,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridFooter,
+	GridFooterCell,
+	GridFooterRow,
+	GridGroupCell,
+	GridGroupContent,
+	GridGroupRow,
+	GridGroupToggle,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	GridSortIndicator,
 	sorting,
-	TableBody,
-	TableCells,
-	TableFooter,
-	TableFooterCell,
-	TableFooterRow,
-	TableGroupCell,
-	TableGroupContent,
-	TableGroupRow,
-	TableGroupToggle,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	TableSortIndicator,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
@@ -85,7 +85,7 @@ const groups = defineColumnGroups({
 
 const HALVES = ['firstHalf', 'secondHalf'];
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	groups,
 	rows: productYears,
@@ -94,13 +94,13 @@ const table = useDataTable({
 	features: { sorting: sorting() },
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
 function setCollapsed(collapsed: boolean) {
-	table.scope.batch(() => {
+	grid.scope.batch(() => {
 		for (const name of HALVES) {
-			if (table.scope.isGroupCollapsed(name) !== collapsed) {
-				table.scope.toggleGroup(name);
+			if (grid.scope.isGroupCollapsed(name) !== collapsed) {
+				grid.scope.toggleGroup(name);
 			}
 		}
 	});
@@ -119,36 +119,36 @@ function setCollapsed(collapsed: boolean) {
 				Show halves
 			</UiButton>
 		</UiToolbar>
-		<TableRoot :table="table" label="Revenue by product" class="ui-table" data-size="auto">
-			<TableHeader v-slot="{ groups: levels }">
-				<TableGroupRow v-for="(cells, level) in levels" :key="level" :level="level">
-					<TableGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
-						<TableGroupContent />
-						<TableGroupToggle v-slot="{ collapsed }" class="ui-cell-button">
+		<GridRoot :grid="grid" label="Revenue by product" class="ui-grid" data-size="auto">
+			<GridHeader v-slot="{ groups: levels }">
+				<GridGroupRow v-for="(cells, level) in levels" :key="level" :level="level">
+					<GridGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
+						<GridGroupContent />
+						<GridGroupToggle v-slot="{ collapsed }" class="ui-cell-button">
 							<IconChevronRight v-if="collapsed" aria-hidden="true" />
 							<IconChevronLeft v-else aria-hidden="true" />
-						</TableGroupToggle>
-					</TableGroupCell>
-				</TableGroupRow>
-				<TableHeaderRow v-slot="{ columns: shown }">
-					<TableHeaderCell v-for="rendered in shown" :key="rendered.key" :column="rendered">
-						<TableHeaderContent />
-						<TableSortIndicator v-slot="{ direction, sortIndex }">
+						</GridGroupToggle>
+					</GridGroupCell>
+				</GridGroupRow>
+				<GridHeaderRow v-slot="{ columns: shown }">
+					<GridHeaderCell v-for="rendered in shown" :key="rendered.key" :column="rendered">
+						<GridHeaderContent />
+						<GridSortIndicator v-slot="{ direction, sortIndex }">
 							<UiSortIcon :direction="direction" :sort-index="sortIndex" />
-						</TableSortIndicator>
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-			<TableFooter>
-				<TableFooterRow v-slot="{ columns: shown }">
-					<TableFooterCell v-for="rendered in shown" :key="rendered.key" :column="rendered" />
-				</TableFooterRow>
-			</TableFooter>
-		</TableRoot>
+						</GridSortIndicator>
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+			<GridFooter>
+				<GridFooterRow v-slot="{ columns: shown }">
+					<GridFooterCell v-for="rendered in shown" :key="rendered.key" :column="rendered" />
+				</GridFooterRow>
+			</GridFooter>
+		</GridRoot>
 	</div>
 </template>

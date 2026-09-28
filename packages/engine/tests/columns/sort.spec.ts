@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { type TableSort, toggleSort } from '../../src/columns/sort';
+import { type GridSort, toggleSort } from '../../src/columns/sort';
 
-const asc = (name: string): TableSort => ({ name, direction: 'asc' });
-const desc = (name: string): TableSort => ({ name, direction: 'desc' });
+const asc = (name: string): GridSort => ({ name, direction: 'asc' });
+const desc = (name: string): GridSort => ({ name, direction: 'desc' });
 
 describe('toggleSort — single sort', () => {
 	it('the first click sets desc', () => {

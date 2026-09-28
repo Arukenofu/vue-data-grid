@@ -6,12 +6,12 @@ import {
 	selection,
 	selectionColumn,
 	sorting,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { computed, shallowRef } from 'vue';
 
 import { type Person, people } from '@/data/people';
-import { UiDataTable, UiToggleGroup, UiToolbar } from '@/ui';
+import { UiDataGrid, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { type Locale, type LocaleName, LOCALES } from './locales';
 
@@ -55,7 +55,7 @@ const COLUMNS: Readonly<Record<LocaleName, ReturnType<typeof createColumns>>> = 
 const locale = shallowRef<LocaleName>('en');
 const current = computed(() => LOCALES[locale.value]);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns: () => COLUMNS[locale.value],
 	rows: people,
 	rowKey: 'id',
@@ -74,6 +74,6 @@ const table = useDataTable({
 		<UiToolbar>
 			<UiToggleGroup v-model="locale" :options="LANGUAGES" label="Language" />
 		</UiToolbar>
-		<UiDataTable :key="locale" :table="table" :label="current.title" :messages="current.messages" />
+		<UiDataGrid :key="locale" :grid="grid" :label="current.title" :messages="current.messages" />
 	</div>
 </template>

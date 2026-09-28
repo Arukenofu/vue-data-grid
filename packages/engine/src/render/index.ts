@@ -2,8 +2,8 @@ export type { ColumnRunGeometry, ColumnSpanCell, ColumnSpanOptions } from './col
 export { getColumnRunGeometry, getColumnRunGrow, resolveColumnSpan } from './column-span';
 export type {
 	GeometryLayer,
+	GridCellStyles,
 	GroupGeometry,
-	TableCellStyles,
 } from './geometry';
 export {
 	compileCellStyle,
@@ -20,4 +20,4 @@ export {
 	getPinVariable,
 	getWidthVariable,
 } from './geometry';
-export { useTableGeometry } from './use-table-geometry';
+export { useGridGeometry } from './use-grid-geometry';

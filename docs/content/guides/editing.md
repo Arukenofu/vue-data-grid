@@ -6,7 +6,7 @@ description: Editable cells with the keys of a spreadsheet, validation, paste, t
 # Editing
 
 <Description>
-Make a column editable with two fields, and the table brings the rest: editors for text, numbers,
+Make a column editable with two fields, and the grid brings the rest: editors for text, numbers,
 dates and choices, the keys of a spreadsheet, validation, paste, the fill handle, and undo.
 </Description>
 
@@ -36,22 +36,22 @@ const columns = defineColumns({
 ```
 
 `setValue` returns a **new** row rather than changing the old one. That is not a matter of taste:
-the table finds out what to re-render by comparing rows by reference, so a row changed in place
+the grid finds out what to re-render by comparing rows by reference, so a row changed in place
 would never show its new value. `editable` can also be a function of the row, such as
 `product => !product.archived`, and `defineColumn<Product>({ editable: true })` makes every column of
 the builder editable at once.
 
 ## 2. Write the changes back
 
-The table never touches your data. It hands you a **commit** and you decide what to do with it: put
+The grid never touches your data. It hands you a **commit** and you decide what to do with it: put
 it into your rows, send it to a server, or both. That is the `editing` feature:
 
 ```ts
-import { editing, navigation, ranges, useDataTable } from '@vue-data-grid/core';
+import { editing, navigation, ranges, useDataGrid } from '@vue-data-grid/core';
 
 const rows = shallowRef(products);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -110,7 +110,7 @@ column as `number | null` and let `validate` refuse `NaN`.
 ### An editor of your own
 
 An editor is a function of its context that renders the element to type in. Spread
-`context.inputProps` on that element: they focus it, give it the keys of the table, a label, and the
+`context.inputProps` on that element: they focus it, give it the keys of the grid, a label, and the
 error state.
 
 ```ts
@@ -218,15 +218,15 @@ Put the handle in the corner of the range overlay, and the preview of the range 
 to it:
 
 ```vue
-<TableBody v-slot="{ rows }">
-	<TableRow v-for="row in rows" :key="row.key" :row="row">
-		<TableCells />
-	</TableRow>
-	<TableRangeOverlay v-slot="{ corner }">
-		<TableFillHandle v-if="corner" />
-	</TableRangeOverlay>
-	<TableFillPreview />
-</TableBody>
+<GridBody v-slot="{ rows }">
+	<GridRow v-for="row in rows" :key="row.key" :row="row">
+		<GridCells />
+	</GridRow>
+	<GridRangeOverlay v-slot="{ corner }">
+		<GridFillHandle v-if="corner" />
+	</GridRangeOverlay>
+	<GridFillPreview />
+</GridBody>
 ```
 
 A fill needs both `ranges` and `editing`, and TypeScript says so when one is missing.
@@ -246,7 +246,7 @@ features: {
 
 <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes, <kbd>Ctrl</kbd>+<kbd>Y</kbd> or
 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> redoes, and the handle has the same for buttons:
-`table.history.undo()`, `redo()`, `canUndo`, `canRedo` and `clear()`. An undo is an ordinary commit
+`grid.history.undo()`, `redo()`, `canUndo`, `canRedo` and `clear()`. An undo is an ordinary commit
 with the source `'undo'`, so it reaches your `onCommit` and your server like any other edit.
 
 History survives sorting and streaming: steps are held by row key, and an undo writes the old value
@@ -259,9 +259,9 @@ The handle of the feature writes cells the same way the keys do, through validat
 `onCommit`:
 
 ```ts
-table.editing.write([{ key: 'p3', column: 'stock', value: 20 }], 'restock');
-table.editing.writeText([{ key: 'p3', column: 'price', text: '219.90' }], 'import');
-table.editing.start({ key: 'p3', column: 'name' });
+grid.editing.write([{ key: 'p3', column: 'stock', value: 20 }], 'restock');
+grid.editing.writeText([{ key: 'p3', column: 'price', text: '219.90' }], 'import');
+grid.editing.start({ key: 'p3', column: 'name' });
 ```
 
 The second argument is the source of the commit, any string you like, so `onCommit` can tell a
@@ -313,7 +313,7 @@ In an editor:
 ## See also
 
 - [Editors](/components/editors): every editor and its options.
-- [`useTableEditing`](/composables/use-table-editing), [`useTableHistory`](/composables/use-table-history)
-  and [`useTableFill`](/composables/use-table-fill): the features for markup of your own.
+- [`useGridEditing`](/composables/use-grid-editing), [`useGridHistory`](/composables/use-grid-history)
+  and [`useGridFill`](/composables/use-grid-fill): the features for markup of your own.
 - [Cell ranges and clipboard](/guides/cell-ranges): selecting what to paste over and fill.
 - [Spreadsheet](/examples/spreadsheet): all of it together.

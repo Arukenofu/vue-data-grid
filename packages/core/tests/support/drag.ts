@@ -121,10 +121,10 @@ export function key(target: EventTarget, name: string, init: KeyboardEventInit =
 }
 
 /**
- * Places the rows of a table's body one under another, 30 px each, and its column header cells and
+ * Places the rows of a grid's body one under another, 30 px each, and its column header cells and
  * the cells of each row side by side, 100 px each, `left` px from the origin.
  */
-export function placeTable(root: Element, left = 0) {
+export function placeGrid(root: Element, left = 0) {
 	const rows = [...root.querySelectorAll('[data-dg-part="body"] > [data-dg-part="row"]')];
 	const headers = [...root.querySelectorAll('[data-dg-part="head"] [role="columnheader"][data-dg-column]')];
 

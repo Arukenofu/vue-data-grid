@@ -1,5 +1,5 @@
 import {
-	createTableScopeContext,
+	createGridScopeContext,
 	type RenderedColumn,
 	type RenderedGroup,
 	type RowNode,
@@ -7,10 +7,10 @@ import {
 } from '@vue-data-grid/engine';
 import { inject, type InjectionKey, provide } from 'vue';
 
-import type { DataTable } from '../data-table/use-data-table';
+import type { DataGrid } from '../data-grid/use-data-grid';
 
 /** A body row as the parts of the body take it: one object per row while its item, data and node hold. */
-export interface TableBodyRow<TRow = unknown> {
+export interface GridBodyRow<TRow = unknown> {
 	key: string;
 	/** Position in `rows`. */
 	index: number;
@@ -18,13 +18,13 @@ export interface TableBodyRow<TRow = unknown> {
 	item: VirtualItem;
 	/** The row itself, from `rows`. */
 	original: TRow;
-	/** The row's node in a tree; `undefined` in a flat table. */
+	/** The row's node in a tree; `undefined` in a flat grid. */
 	node: RowNode | undefined;
 }
 
-const DATA_TABLE: InjectionKey<DataTable> = Symbol('@vue-data-grid/core');
+const DATA_GRID: InjectionKey<DataGrid> = Symbol('@vue-data-grid/core');
 
-const BODY_ROW: InjectionKey<() => TableBodyRow> = Symbol('@vue-data-grid/core row');
+const BODY_ROW: InjectionKey<() => GridBodyRow> = Symbol('@vue-data-grid/core row');
 
 const HEADER_CELL: InjectionKey<() => RenderedColumn> = Symbol('@vue-data-grid/core header cell');
 
@@ -48,29 +48,29 @@ function injectContext<TValue>(key: InjectionKey<TValue>, fallback: unknown[], n
 }
 
 /**
- * Provides the table to the parts below, and its scope to `useTableScopeContext()`. `TableRoot` calls it;
+ * Provides the grid to the parts below, and its scope to `useGridScopeContext()`. `GridRoot` calls it;
  * call it yourself for parts under markup of your own.
  */
-export function createDataTableContext<TRow>(table: DataTable<TRow>) {
-	provide(DATA_TABLE, table as DataTable);
-	createTableScopeContext(table.scope);
+export function createDataGridContext<TRow>(grid: DataGrid<TRow>) {
+	provide(DATA_GRID, grid as DataGrid);
+	createGridScopeContext(grid.scope);
 
-	return table;
+	return grid;
 }
 
 /**
- * The table of the `TableRoot` around. `TRow` is not checked against the provided table, just as with
- * `inject`. Throws outside a table, unless given a `fallback`.
+ * The grid of the `GridRoot` around. `TRow` is not checked against the provided grid, just as with
+ * `inject`. Throws outside a grid, unless given a `fallback`.
  */
-export function useDataTableContext<TRow = unknown>(): DataTable<TRow>;
-export function useDataTableContext<TRow = unknown, TFallback = null>(fallback: TFallback): DataTable<TRow> | TFallback;
-export function useDataTableContext(...fallback: unknown[]) {
-	return injectContext(DATA_TABLE, fallback, 'useDataTableContext', 'TableRoot');
+export function useDataGridContext<TRow = unknown>(): DataGrid<TRow>;
+export function useDataGridContext<TRow = unknown, TFallback = null>(fallback: TFallback): DataGrid<TRow> | TFallback;
+export function useDataGridContext(...fallback: unknown[]) {
+	return injectContext(DATA_GRID, fallback, 'useDataGridContext', 'GridRoot');
 }
 
-/** Gives the parts inside a body row their row, as a getter that follows the row's props. `TableRow` calls it. */
-export function createBodyRowContext<TRow>(row: () => TableBodyRow<TRow>) {
-	provide(BODY_ROW, row as () => TableBodyRow);
+/** Gives the parts inside a body row their row, as a getter that follows the row's props. `GridRow` calls it. */
+export function createBodyRowContext<TRow>(row: () => GridBodyRow<TRow>) {
+	provide(BODY_ROW, row as () => GridBodyRow);
 
 	return row;
 }
@@ -79,13 +79,13 @@ export function createBodyRowContext<TRow>(row: () => TableBodyRow<TRow>) {
  * The body row a part is in, as a getter: its data, key, index and node. Throws outside a row, unless
  * given a `fallback`, such as `null` for a part that can also take its row from a prop.
  */
-export function useBodyRowContext<TRow = unknown>(): () => TableBodyRow<TRow>;
-export function useBodyRowContext<TRow = unknown, TFallback = null>(fallback: TFallback): (() => TableBodyRow<TRow>) | TFallback;
+export function useBodyRowContext<TRow = unknown>(): () => GridBodyRow<TRow>;
+export function useBodyRowContext<TRow = unknown, TFallback = null>(fallback: TFallback): (() => GridBodyRow<TRow>) | TFallback;
 export function useBodyRowContext(...fallback: unknown[]) {
-	return injectContext(BODY_ROW, fallback, 'useBodyRowContext', 'TableRow');
+	return injectContext(BODY_ROW, fallback, 'useBodyRowContext', 'GridRow');
 }
 
-/** Gives the parts inside a column header cell their column. `TableHeaderCell` calls it. */
+/** Gives the parts inside a column header cell their column. `GridHeaderCell` calls it. */
 export function createHeaderCellContext(column: () => RenderedColumn) {
 	provide(HEADER_CELL, column);
 
@@ -96,10 +96,10 @@ export function createHeaderCellContext(column: () => RenderedColumn) {
 export function useHeaderCellContext(): () => RenderedColumn;
 export function useHeaderCellContext<TFallback>(fallback: TFallback): (() => RenderedColumn) | TFallback;
 export function useHeaderCellContext(...fallback: unknown[]) {
-	return injectContext(HEADER_CELL, fallback, 'useHeaderCellContext', 'TableHeaderCell');
+	return injectContext(HEADER_CELL, fallback, 'useHeaderCellContext', 'GridHeaderCell');
 }
 
-/** Gives the parts inside a group cell their cell. `TableGroupCell` calls it. */
+/** Gives the parts inside a group cell their cell. `GridGroupCell` calls it. */
 export function createGroupCellContext(cell: () => RenderedGroup) {
 	provide(GROUP_CELL, cell);
 
@@ -110,69 +110,69 @@ export function createGroupCellContext(cell: () => RenderedGroup) {
 export function useGroupCellContext(): () => RenderedGroup;
 export function useGroupCellContext<TFallback>(fallback: TFallback): (() => RenderedGroup) | TFallback;
 export function useGroupCellContext(...fallback: unknown[]) {
-	return injectContext(GROUP_CELL, fallback, 'useGroupCellContext', 'TableGroupCell');
+	return injectContext(GROUP_CELL, fallback, 'useGroupCellContext', 'GridGroupCell');
 }
 
-/** Gives the parts inside a footer cell their column. `TableFooterCell` calls it. */
+/** Gives the parts inside a footer cell their column. `GridFooterCell` calls it. */
 export function createFooterCellContext(column: () => RenderedColumn) {
 	provide(FOOTER_CELL, column);
 
 	return column;
 }
 
-/** The column of the footer cell a part is in, such as `TableFooterContent`. */
+/** The column of the footer cell a part is in, such as `GridFooterContent`. */
 export function useFooterCellContext(): () => RenderedColumn;
 export function useFooterCellContext<TFallback>(fallback: TFallback): (() => RenderedColumn) | TFallback;
 export function useFooterCellContext(...fallback: unknown[]) {
-	return injectContext(FOOTER_CELL, fallback, 'useFooterCellContext', 'TableFooterCell');
+	return injectContext(FOOTER_CELL, fallback, 'useFooterCellContext', 'GridFooterCell');
 }
 
 /**
  * What the parts register their elements with while dragging is on: a drag list of rows or of
- * column headers, such as `useTableRowDrag` of `@vue-data-grid/core/drag-and-drop` gives.
+ * column headers, such as `useGridRowDrag` of `@vue-data-grid/core/drag-and-drop` gives.
  */
-export interface TableDragItems {
+export interface GridDragItems {
 	/** Connects the element of item `key`, a row key or a column name; returns the disconnect. */
 	register: (element: HTMLElement, key: string) => () => void;
 	/**
 	 * The attributes of the element of item `key`, for its render: `data-dg-draggable` while it may be
-	 * dragged. Give the row of a row, as `TableRow` does, so that the render follows that row alone.
+	 * dragged. Give the row of a row, as `GridRow` does, so that the render follows that row alone.
 	 * The same frozen object for the same answer.
 	 */
 	getItemProps: (key: string, row?: unknown) => Readonly<Record<string, string>>;
 }
 
-const ROW_DRAG: InjectionKey<TableDragItems> = Symbol('@vue-data-grid/core row drag');
+const ROW_DRAG: InjectionKey<GridDragItems> = Symbol('@vue-data-grid/core row drag');
 
-const COLUMN_DRAG: InjectionKey<TableDragItems> = Symbol('@vue-data-grid/core column drag');
+const COLUMN_DRAG: InjectionKey<GridDragItems> = Symbol('@vue-data-grid/core column drag');
 
-/** Gives the rows below a drag list: each `TableRow` registers its element with it. */
-export function createRowDragContext<TItems extends TableDragItems>(items: TItems) {
+/** Gives the rows below a drag list: each `GridRow` registers its element with it. */
+export function createRowDragContext<TItems extends GridDragItems>(items: TItems) {
 	provide(ROW_DRAG, items);
 
 	return items;
 }
 
 /**
- * The row drag list of the parts around, such as a `TableRowDrag`. `TItems` is not checked against
+ * The row drag list of the parts around, such as a `GridRowDrag`. `TItems` is not checked against
  * the provided list, just as with `inject`. Throws without one, unless given a `fallback`.
  */
-export function useRowDragContext<TItems extends TableDragItems = TableDragItems>(): TItems;
-export function useRowDragContext<TItems extends TableDragItems = TableDragItems, TFallback = null>(fallback: TFallback): TItems | TFallback;
+export function useRowDragContext<TItems extends GridDragItems = GridDragItems>(): TItems;
+export function useRowDragContext<TItems extends GridDragItems = GridDragItems, TFallback = null>(fallback: TFallback): TItems | TFallback;
 export function useRowDragContext(...fallback: unknown[]) {
-	return injectContext(ROW_DRAG, fallback, 'useRowDragContext', 'TableRowDrag');
+	return injectContext(ROW_DRAG, fallback, 'useRowDragContext', 'GridRowDrag');
 }
 
-/** Gives the column header cells below a drag list: each `TableHeaderCell` registers its element with it. */
-export function createColumnDragContext<TItems extends TableDragItems>(items: TItems) {
+/** Gives the column header cells below a drag list: each `GridHeaderCell` registers its element with it. */
+export function createColumnDragContext<TItems extends GridDragItems>(items: TItems) {
 	provide(COLUMN_DRAG, items);
 
 	return items;
 }
 
-/** The column drag list of the parts around, such as a `TableColumnDrag`. */
-export function useColumnDragContext<TItems extends TableDragItems = TableDragItems>(): TItems;
-export function useColumnDragContext<TItems extends TableDragItems = TableDragItems, TFallback = null>(fallback: TFallback): TItems | TFallback;
+/** The column drag list of the parts around, such as a `GridColumnDrag`. */
+export function useColumnDragContext<TItems extends GridDragItems = GridDragItems>(): TItems;
+export function useColumnDragContext<TItems extends GridDragItems = GridDragItems, TFallback = null>(fallback: TFallback): TItems | TFallback;
 export function useColumnDragContext(...fallback: unknown[]) {
-	return injectContext(COLUMN_DRAG, fallback, 'useColumnDragContext', 'TableColumnDrag');
+	return injectContext(COLUMN_DRAG, fallback, 'useColumnDragContext', 'GridColumnDrag');
 }

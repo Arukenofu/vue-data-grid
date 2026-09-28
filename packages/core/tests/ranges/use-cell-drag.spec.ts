@@ -3,10 +3,10 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableRoot } from '../../src/components/table-root';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import type { GridBodyRow } from '../../src/components/context';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridRoot } from '../../src/components/grid-root';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { type CellDragEnd, useCellDrag } from '../../src/ranges/use-cell-drag';
 
 interface Row {
@@ -37,26 +37,26 @@ function setup() {
 
 	wrapper = mount(defineComponent({
 		setup() {
-			const table = useDataTable({
+			const grid = useDataGrid({
 				columns,
 				rows: ['a', 'b', 'c', 'd'].map((id, index) => ({ id, price: index })),
 				rowKey: 'id',
 				rowHeight: ROW_HEIGHT,
 			});
 
-			drag = useCellDrag(table, {
+			drag = useCellDrag(grid, {
 				getColumns: () => ['price'],
 				autoScroll: false,
 				onCell: cell => cells.push(cell),
 				onEnd: end => ends.push(end),
 			});
 
-			return () => h(TableRoot, { table: table as DataTable }, {
-				default: () => h(TableBody, null, {
-					default: ({ rows }: { rows: readonly TableBodyRow[] }) => rows.map(row => h(
-						TableRow,
+			return () => h(GridRoot, { grid: grid as DataGrid }, {
+				default: () => h(GridBody, null, {
+					default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(
+						GridRow,
 						{ key: row.key, row },
-						{ default: () => h(TableCells), $stable: true },
+						{ default: () => h(GridCells), $stable: true },
 					)),
 				}),
 			});
@@ -81,7 +81,7 @@ function placeCells() {
 		cell.getBoundingClientRect = () => new DOMRect(left, row * ROW_HEIGHT, 100, ROW_HEIGHT);
 	}
 
-	const root = document.querySelector('[data-dg-part="table"]') as HTMLElement;
+	const root = document.querySelector('[data-dg-part="grid"]') as HTMLElement;
 
 	root.getBoundingClientRect = () => new DOMRect(0, 0, 200, ROW_HEIGHT * 4);
 	Object.defineProperty(root, 'clientHeight', { value: ROW_HEIGHT * 4 });

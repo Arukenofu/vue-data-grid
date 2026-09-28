@@ -2,7 +2,7 @@ import type { ComputedRef, InjectionKey, Ref } from 'vue';
 
 import type { RenderedGroup } from '../column-groups/column-groups';
 import type { AnyColumn, ColumnPinSide, RenderedColumn } from '../columns/column';
-import type { SortDirection, TableSort } from '../columns/sort';
+import type { GridSort, SortDirection } from '../columns/sort';
 import type { ColumnSpanCell } from '../render/column-span';
 import type { PageDirection } from '../virtual/item-metrics';
 import type { ScrollAlign } from '../virtual/scroll';
@@ -22,12 +22,12 @@ export interface KeepRendered {
 }
 
 /**
- * Everything the markup renders the table from; `TRow` is the row type of the engine. Methods that
- * change the table by a column name warn once in development about a name that is not a declared
+ * Everything the markup renders the grid from; `TRow` is the row type of the engine. Methods that
+ * change the grid by a column name warn once in development about a name that is not a declared
  * column; queries answer for it quietly.
  */
-export interface TableScope<TRow = unknown> {
-	/** The scroll container of the table, for both axes. */
+export interface GridScope<TRow = unknown> {
+	/** The scroll container of the grid, for both axes. */
 	root: Ref<HTMLElement | null>;
 
 	rows: ComputedRef<readonly TRow[]>;
@@ -36,7 +36,7 @@ export interface TableScope<TRow = unknown> {
 	 * same array while the keys hold, so new data under the same rows wakes none of its readers.
 	 */
 	rowKeys: ComputedRef<readonly string[]>;
-	// A method, not a property: its parameter stays bivariant, so `TableScope<TRow>` fits `TableScope`.
+	// A method, not a property: its parameter stays bivariant, so `GridScope<TRow>` fits `GridScope`.
 	getRowKey(row: TRow): string;
 	/** The index of the row with this key in `rows`; `-1` without one. */
 	getRowIndex: (key: string) => number;
@@ -73,14 +73,14 @@ export interface TableScope<TRow = unknown> {
 	 */
 	offsets: ComputedRef<readonly number[]>;
 	/** The sort, without columns that are not declared. */
-	sort: ComputedRef<readonly TableSort[]>;
+	sort: ComputedRef<readonly GridSort[]>;
 
 	getColumn: (name: string) => RenderedColumn | undefined;
 	getPin: (name: string) => ColumnPinSide | undefined;
 	isColumnHidden: (name: string) => boolean;
 	getWidth: (name: string) => number;
 	/**
-	 * A row across the table that spans shown columns `[start, end)` of `columns`: the span split by pin
+	 * A row across the grid that spans shown columns `[start, end)` of `columns`: the span split by pin
 	 * side, between cells holding the place of the other columns and of the insets. Each cell is styled
 	 * as a group cell of its columns, so it lays out, sticks and resizes with the cells under it without
 	 * a render; overlays over the body, such as cell ranges, are drawn on it. The same array while its
@@ -163,4 +163,4 @@ export interface TableScope<TRow = unknown> {
 	keepRendered: (source: KeepRendered) => () => void;
 }
 
-export const TABLE_SCOPE: InjectionKey<TableScope> = Symbol('@vue-data-grid/engine');
+export const GRID_SCOPE: InjectionKey<GridScope> = Symbol('@vue-data-grid/engine');

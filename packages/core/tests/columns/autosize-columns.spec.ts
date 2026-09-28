@@ -1,4 +1,4 @@
-import { defineColumns, type TableScope, useTableColumnsState, useTableEngine } from '@vue-data-grid/engine';
+import { defineColumns, type GridScope, useGridColumnsState, useGridEngine } from '@vue-data-grid/engine';
 import { defineComponent, h, shallowRef, watch } from 'vue';
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -27,12 +27,12 @@ function mockTextWidths() {
 
 function setup(html = '') {
 	const root = shallowRef<HTMLElement | null>(null);
-	const state = useTableColumnsState();
-	let scope: TableScope | null = null;
+	const state = useGridColumnsState();
+	let scope: GridScope | null = null;
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			scope = useTableEngine<Row>({ columns, rows, root, rowKey: 'id', rowHeight: 30, state }).scope;
+			scope = useGridEngine<Row>({ columns, rows, root, rowKey: 'id', rowHeight: 30, state }).scope;
 
 			return () => h('div');
 		},
@@ -45,7 +45,7 @@ function setup(html = '') {
 		root.value = element;
 	}
 
-	return { wrapper, state, scope: scope as unknown as TableScope };
+	return { wrapper, state, scope: scope as unknown as GridScope };
 }
 
 let current: ReturnType<typeof setup> | null = null;

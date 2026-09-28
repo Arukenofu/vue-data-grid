@@ -1,8 +1,8 @@
 /**
- * Headless table core: the column and column group model, layout and sort state, row and column
+ * Headless grid core: the column and column group model, layout and sort state, row and column
  * windows, geometry as CSS variables, and separate composables for rows and cells: sorting,
  * streaming, grouping with aggregates, trees, selection, cell focus, ranges, editing with undo,
- * paste, fill and CSV. There is no markup here; the consumer renders the table from `TableScope`.
+ * paste, fill and CSV. There is no markup here; the consumer renders the grid from `GridScope`.
  */
 export type {
 	AggregateName,
@@ -25,14 +25,14 @@ export type {
 	ColumnRights,
 	Columns,
 	ColumnsInput,
+	GridColumnsState,
+	GridColumnsStateOptions,
+	GridLayout,
+	GridSort,
 	RememberField,
 	RenderedColumn,
 	RuntimeColumn,
 	SortDirection,
-	TableColumnsState,
-	TableColumnsStateOptions,
-	TableLayout,
-	TableSort,
 } from './columns';
 export {
 	defineColumn,
@@ -40,7 +40,7 @@ export {
 	getCellText,
 	resolveLayout,
 	toColumnList,
-	useTableColumnsState,
+	useGridColumnsState,
 } from './columns';
 export type {
 	ColumnGroup,
@@ -56,24 +56,24 @@ export type { PersistedState, PersistedStateOptions, PersistStore } from './pers
 export { localStorageStore, memoryStore, sessionStorageStore, usePersistedState } from './persist';
 export type {
 	ColumnsInsets,
+	GridEngineOptions,
+	GridScope,
 	KeepRendered,
 	RowRange,
-	TableEngineOptions,
-	TableScope,
 	VirtualOptions,
 } from './engine';
 export {
-	createTableScopeContext,
-	TABLE_SCOPE,
-	useTableEngine,
-	useTableScopeContext,
+	createGridScopeContext,
+	GRID_SCOPE,
+	useGridEngine,
+	useGridScopeContext,
 } from './engine';
 export type { PageDirection, ScrollAlign, VirtualItem } from './virtual';
 export type {
 	ColumnSpanCell,
 	GeometryLayer,
+	GridCellStyles,
 	GroupGeometry,
-	TableCellStyles,
 } from './render';
 export {
 	compileCellStyle,
@@ -87,7 +87,7 @@ export {
 	getInsetVariable,
 	getPinVariable,
 	getWidthVariable,
-	useTableGeometry,
+	useGridGeometry,
 } from './render';
 export type {
 	ChildrenField,
@@ -162,7 +162,6 @@ export type {
 	FillOptions,
 	FocusedCell,
 	FocusedGridCell,
-	GridCell,
 	GridFocus,
 	GridFocusOptions,
 	GridFocusRequest,
@@ -176,6 +175,7 @@ export type {
 	RangeRect,
 	RangeSelectMode,
 	RangeTextOptions,
+	SectionCell,
 } from './cells';
 export {
 	canEditCell,

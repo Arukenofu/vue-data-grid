@@ -2,21 +2,21 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
 	moveRow,
 	selection,
 	selectionColumn,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
 	tree,
 	treeColumn,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
-import { dragHandleColumn, TableDragPreview, type TableRowDropEvent, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { dragHandleColumn, GridDragPreview, type GridRowDropEvent, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 import { shallowRef } from 'vue';
 
@@ -47,7 +47,7 @@ const columns = defineColumns({
 
 const rows = shallowRef<readonly WorkItem[]>(workItems);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -58,9 +58,9 @@ const table = useDataTable({
 	},
 });
 
-const { selectedCount } = table.selection;
+const { selectedCount } = grid.selection;
 
-function drop({ key, parent, index }: TableRowDropEvent<unknown>) {
+function drop({ key, parent, index }: GridRowDropEvent<unknown>) {
 	const row = rows.value.find(item => item.id === key);
 
 	if (row) {
@@ -75,23 +75,23 @@ function drop({ key, parent, index }: TableRowDropEvent<unknown>) {
 			<UiStat label="Selected tasks" :value="selectedCount" />
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Work items" class="ui-table" data-size="auto">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableRowDrag handle @drop="drop">
-				<TableBody v-slot="{ rows: bodyRows }">
-					<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-						<TableCells />
-					</TableRow>
-				</TableBody>
-				<TableDragPreview v-slot="{ label }">
+		<GridRoot :grid="grid" label="Work items" class="ui-grid" data-size="auto">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridRowDrag handle @drop="drop">
+				<GridBody v-slot="{ rows: bodyRows }">
+					<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+						<GridCells />
+					</GridRow>
+				</GridBody>
+				<GridDragPreview v-slot="{ label }">
 					<IconGripVertical aria-hidden="true" />
 					{{ label }}
-				</TableDragPreview>
-			</TableRowDrag>
-		</TableRoot>
+				</GridDragPreview>
+			</GridRowDrag>
+		</GridRoot>
 	</div>
 </template>

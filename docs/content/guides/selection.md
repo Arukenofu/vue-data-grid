@@ -13,7 +13,7 @@ selection is a list of row keys, so it survives sorting, filtering and new data.
 <Demo name="selection" />
 
 Click a checkbox, then <kbd>Shift</kbd>-click another to select the rows between. With focus in the
-table, <kbd>Shift+Space</kbd> selects the row of the focused cell and <kbd>Ctrl+A</kbd> selects every
+grid, <kbd>Shift+Space</kbd> selects the row of the focused cell and <kbd>Ctrl+A</kbd> selects every
 row. Cancelled orders cannot be selected, and their checkboxes are disabled.
 
 ## Adding the feature
@@ -22,7 +22,7 @@ Selection is the `selection` feature, and the checkboxes come with `selectionCol
 column:
 
 ```ts
-import { selection, selectionColumn, useDataTable } from '@vue-data-grid/core';
+import { selection, selectionColumn, useDataGrid } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	select: selectionColumn(),
@@ -30,7 +30,7 @@ const columns = defineColumns({
 	// …
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: orders,
 	rowKey: 'id',
@@ -43,7 +43,7 @@ const table = useDataTable({
 select-all checkbox in its header and a checkbox in every cell. Pass it options to change its label,
 width or pin. As a service column it is left out of CSV, copying and autosize.
 
-The handle of the feature is `table.selection`:
+The handle of the feature is `grid.selection`:
 
 <ReturnsTable
 	:data="[
@@ -65,14 +65,14 @@ The handle of the feature is `table.selection`:
 
 ## Checkboxes of your own
 
-`selectionColumn()` renders two parts, which you can use anywhere else: `TableSelectionCheckbox`, the
-checkbox of the row it is in, and `TableSelectAllCheckbox`. A checkbox in the first column next to
+`selectionColumn()` renders two parts, which you can use anywhere else: `GridSelectionCheckbox`, the
+checkbox of the row it is in, and `GridSelectAllCheckbox`. A checkbox in the first column next to
 the name is one `cell` field away:
 
 ```ts
 name: column(person => person.name, {
 	label: 'Name',
-	cell: ({ key, value }) => [h(TableSelectionCheckbox, { row: key }), value],
+	cell: ({ key, value }) => [h(GridSelectionCheckbox, { row: key }), value],
 }),
 ```
 
@@ -90,7 +90,7 @@ holds, so clear it when a selection made in one mode means nothing in the other:
 ```ts
 const selectionMode = shallowRef<SelectionMode>('multiple');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -98,7 +98,7 @@ const table = useDataTable({
 	features: { selection: selection({ selectionMode }) },
 });
 
-watch(selectionMode, () => table.selection.clear());
+watch(selectionMode, () => grid.selection.clear());
 ```
 
 ## Rows that cannot be selected
@@ -116,13 +116,13 @@ selection({ canSelect: key => !cancelled.value.has(key) }),
 
 ## Owning the selection
 
-Pass a `ref` of keys as `selection`, and it becomes a model: the table writes every change into it,
+Pass a `ref` of keys as `selection`, and it becomes a model: the grid writes every change into it,
 and follows what you write. That is how the demo's bulk actions know what to act on:
 
 ```ts
 const selected = shallowRef<string[]>([]);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	// …
 	features: { selection: selection({ selection: selected }) },
 });
@@ -131,7 +131,7 @@ function archive() {
 	const keys = new Set(selected.value);
 
 	orders.value = orders.value.filter(order => !keys.has(order.id));
-	table.selection.clear();
+	grid.selection.clear();
 }
 ```
 
@@ -153,7 +153,7 @@ selection({ selection: selected, selectAll }),
 
 ## Selection in a tree
 
-In a table with the `tree` feature, selecting a group selects every leaf under it, a group is checked
+In a grid with the `tree` feature, selecting a group selects every leaf under it, a group is checked
 when all its leaves are, and partly checked when some are. The model holds leaves only. See
 [Trees and grouping](/guides/trees-and-grouping).
 
@@ -168,10 +168,10 @@ cannot be selected.
 
 - Rows get `aria-selected`, and the grid `aria-multiselectable` while more than one row can be
   selected. A row that cannot be selected gets no `aria-selected` at all.
-- Every checkbox has a name: "Select row" and "Select all rows" by default, from the table's
+- Every checkbox has a name: "Select row" and "Select all rows" by default, from the grid's
   messages. Give a checkbox of your own a `label` naming the row, such as "Select order #1042", when
   you can.
-- The announcer of `TableRoot` says how many rows are selected after every change: "3 rows
+- The announcer of `GridRoot` says how many rows are selected after every change: "3 rows
   selected".
 - With the `navigation` feature, the keys below work from any cell. Without it, each checkbox is a Tab
   stop that <kbd>Space</kbd> toggles.

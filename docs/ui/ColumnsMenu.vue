@@ -1,10 +1,10 @@
 <!--
 	A menu that shows and hides columns, on reka-ui's dropdown menu. It works through the scope, so it
-	fits a table of parts (`table.scope`) and one of hand-written markup alike. Columns that are not
+	fits a grid of parts (`grid.scope`) and one of hand-written markup alike. Columns that are not
 	`hideable` are listed but locked; service columns, such as a checkbox or row actions, are not listed.
 -->
 <script setup lang="ts">
-import type { TableScope } from '@vue-data-grid/core';
+import type { GridScope } from '@vue-data-grid/core';
 import IconCheck from '~icons/lucide/check';
 import IconColumns from '~icons/lucide/columns-3';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
@@ -23,7 +23,7 @@ import {
 import Button from './Button.vue';
 
 defineProps<{
-	scope: TableScope;
+	scope: GridScope;
 }>();
 
 const emit = defineEmits<{

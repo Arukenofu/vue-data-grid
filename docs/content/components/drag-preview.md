@@ -1,12 +1,12 @@
 ---
 title: Drag preview and overlay
-description: The ghost that follows the pointer during a drag, and the message over a table a row can be dropped on.
+description: The ghost that follows the pointer during a drag, and the message over a grid a row can be dropped on.
 ---
 
 # Drag preview and overlay
 
 <Description>
-The ghost that follows the pointer while a row or a column is dragged, and the message over a table
+The ghost that follows the pointer while a row or a column is dragged, and the message over a grid
 that says a row can be dropped on it.
 </Description>
 
@@ -18,8 +18,8 @@ that says a row can be dropped on it.
 	:features="[
 		'The ghost is a template of yours, rendered through a teleport: its context, `provide` and reactivity work as anywhere in your component.',
 		'It stands outside the pointer, under it or where the item was grabbed, and fades or flies into the item\'s new place.',
-		'The overlay shows over a table only while a row it can take is dragged from elsewhere.',
-		'The overlay\'s slot knows the item, the table it comes from, and whether the pointer is over an allowed place.',
+		'The overlay shows over a grid only while a row it can take is dragged from elsewhere.',
+		'The overlay\'s slot knows the item, the grid it comes from, and whether the pointer is over an allowed place.',
 		'Both are laid out by the structural styles; restyle them into a card, a banner or a badge.',
 	]"
 />
@@ -28,24 +28,24 @@ that says a row can be dropped on it.
 
 ```vue
 <script setup lang="ts">
-import { TableDragOverlay, TableDragPreview, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { GridDragOverlay, GridDragPreview, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
-	<TableRowDrag group="sprint" @drop="drop">
-		<TableBody />
-		<TableDragPreview />
-		<TableDragOverlay />
-	</TableRowDrag>
+	<GridRowDrag group="sprint" @drop="drop">
+		<GridBody />
+		<GridDragPreview />
+		<GridDragOverlay />
+	</GridRowDrag>
 </template>
 ```
 
-Put both inside a `TableRowDrag` or a `TableColumnDrag`. They render nothing in place: the preview
+Put both inside a `GridRowDrag` or a `GridColumnDrag`. They render nothing in place: the preview
 renders into the ghost, and the overlay appears over the body only during a drag.
 
 ## API reference
 
-### TableDragPreview
+### GridDragPreview
 
 The ghost of a drag, as a template. Without a slot it shows the label of the item. It renders
 nothing in place.
@@ -72,20 +72,20 @@ nothing in place.
 	]"
 />
 
-The ghost lives outside the table, so the table's theme variables do not reach it: style it on its
+The ghost lives outside the grid, so the grid's theme variables do not reach it: style it on its
 own, by `[data-dg-part="drag-preview"]` or by a class on the content of its slot. The part renders
-through a teleport, so a class on `TableDragPreview` itself does not reach the ghost.
+through a teleport, so a class on `GridDragPreview` itself does not reach the ghost.
 
-### TableDragOverlay
+### GridDragOverlay
 
-A message over the part of the body in view while an item the table takes is dragged: "you can drop
-here", and another once the pointer is over the table. By default it shows for rows that come from
-another table of the group, and for columns always.
+A message over the part of the body in view while an item the grid takes is dragged: "you can drop
+here", and another once the pointer is over the grid. By default it shows for rows that come from
+another grid of the group, and for columns always.
 
 <PropsTable
 	:data="[
 		{ name: 'for', type: '\'rows\' | \'columns\'', description: 'What it shows the drag of; the rows when both drag.' },
-		{ name: 'own', type: 'boolean', description: 'Show while an item of this very table is dragged too; `false` for rows and `true` for columns by default.' },
+		{ name: 'own', type: 'boolean', description: 'Show while an item of this very grid is dragged too; `false` for rows and `true` for columns by default.' },
 		{ name: 'when', type: '(context) => boolean', description: 'Whether to show for what is dragged, instead of the default rule; it gets the context of the slot.' },
 		{ name: 'forceMount', type: 'boolean', default: 'false', description: 'Stay rendered while nothing is shown, with `data-dg-state=&quot;idle&quot;` and no slot, for animations of your own.' },
 		{ name: 'as', type: 'string | Component', default: '\'div\'', description: 'The element or component to render.' },
@@ -95,7 +95,7 @@ another table of the group, and for columns always.
 
 <SlotsTable
 	:data="[
-		{ name: 'default', scope: '{ key, label, row, column, source, own, over, allowed }', description: 'The item and the table it comes from, whether it is this table, whether the pointer is over the body, and whether over a place it may be dropped at.' },
+		{ name: 'default', scope: '{ key, label, row, column, source, own, over, allowed }', description: 'The item and the grid it comes from, whether it is this grid, whether the pointer is over the body, and whether over a place it may be dropped at.' },
 	]"
 />
 
@@ -108,7 +108,7 @@ another table of the group, and for columns always.
 
 <CssVariablesTable
 	:data="[
-		{ name: '--dg-view-top', description: 'Set on the overlay: how far the table is scrolled down, px.' },
+		{ name: '--dg-view-top', description: 'Set on the overlay: how far the grid is scrolled down, px.' },
 		{ name: '--dg-view-left', description: 'How far it is scrolled across, px.' },
 		{ name: '--dg-view-width', description: 'The width of the view, px.' },
 		{ name: '--dg-view-height', description: 'The height of the view, px.' },
@@ -126,13 +126,13 @@ The slot of the preview renders anything, and reads from your component as any t
 demo shows the assignee, the title and the estimate of the task:
 
 ```vue
-<TableDragPreview v-slot="{ key, label }">
+<GridDragPreview v-slot="{ key, label }">
 	<span class="card">
 		<UiAvatar :name="findTask(key)?.assignee ?? label" />
 		<strong>{{ label }}</strong>
 		<span>{{ findTask(key)?.estimate }} pts</span>
 	</span>
-</TableDragPreview>
+</GridDragPreview>
 ```
 
 ### A ghost that lands
@@ -141,27 +141,27 @@ For a ghost that looks like the row itself, start it where the row was grabbed a
 the row's new place:
 
 ```vue
-<TableDragPreview placement="source" exit="land" />
+<GridDragPreview placement="source" exit="land" />
 ```
 
 ### One message for each state
 
-The slot of the overlay knows whether the pointer is over an allowed place, and which table the row
+The slot of the overlay knows whether the pointer is over an allowed place, and which grid the row
 comes from:
 
 ```vue
-<TableDragOverlay v-slot="{ over, allowed, source }">
+<GridDragOverlay v-slot="{ over, allowed, source }">
 	<span v-if="over && !allowed">Not here</span>
 	<span v-else-if="source === archive">Restore from the archive</span>
 	<span v-else>Drop to move to this sprint</span>
-</TableDragOverlay>
+</GridDragOverlay>
 ```
 
 ## Accessibility
 
 - The ghost and the overlay are for the eyes. A keyboard drag has no pointer to follow: a live region
-  says where the row is instead, and the place shows in the table.
+  says where the row is instead, and the place shows in the grid.
 - The overlay lets the pointer through, so the drag goes on over the rows under it, and it takes no
   focus.
-- The ghost lives outside the table's grid, so it never adds a row or a cell to what assistive
+- The ghost lives outside the grid, so it never adds a row or a cell to what assistive
   technology counts.

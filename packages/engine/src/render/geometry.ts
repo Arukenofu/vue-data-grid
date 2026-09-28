@@ -59,7 +59,7 @@ const PINNED_LAYER_VARIABLE = '--dg-pinned-z-index';
 
 /**
  * Sticking to an edge of the row after the insets and the pinned columns before it. Logical rather
- * than physical sides, so that a right-to-left table pins `start` to the right.
+ * than physical sides, so that a right-to-left grid pins `start` to the right.
  */
 function getPinDeclarations(pin: ColumnPinSide, name: string, offset: number) {
 	const side = pin === 'start' ? 'inset-inline-start' : 'inset-inline-end';
@@ -140,7 +140,7 @@ export function compileGroupStyle(group: GroupGeometry) {
  * geometry changes, not once per row, and must read only its arguments: the cache key is built from
  * them, and anything else it reads will not reach the style.
  */
-export interface TableCellStyles {
+export interface GridCellStyles {
 	cell: (column: ColumnGeometry, pin: ColumnPinSide | undefined, offset: number) => string;
 	/** The header cell style; without it headers use the body style. */
 	header?: (column: ColumnGeometry, pin: ColumnPinSide | undefined, offset: number) => string;
@@ -154,7 +154,7 @@ export interface TableCellStyles {
  * Styles for a flex row: `compileCellStyle` for cells and headers, `compileGroupStyle` for groups,
  * `getFlexSpacerStyle` for spacers. Geometry only; the look of the cells is CSS.
  */
-export const FLEX_CELL_STYLES: TableCellStyles = Object.freeze({
+export const FLEX_CELL_STYLES: GridCellStyles = Object.freeze({
 	cell: compileCellStyle,
 	group: compileGroupStyle,
 	spacer: getFlexSpacerStyle,

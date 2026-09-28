@@ -1,4 +1,4 @@
-/* The prose of a page: headings, inline code, code blocks, tables and callouts. */
+/* The prose of a page: headings, inline code, code blocks, grids and callouts. */
 
 .vp-doc h1 {
 	font-size: 2.4rem;
@@ -94,8 +94,8 @@
 	}
 }
 
-/* Tables of the prose. */
-.vp-doc table {
+/* Grids of the prose. */
+.vp-doc grid {
 	border-collapse: separate;
 	border-spacing: 0;
 	overflow: auto;

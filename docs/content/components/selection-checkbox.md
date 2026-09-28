@@ -28,41 +28,41 @@ default, or the checkbox of your own design system.
 
 ```vue
 <script setup lang="ts">
-import { TableSelectAllCheckbox, TableSelectionCheckbox } from '@vue-data-grid/core';
+import { GridSelectAllCheckbox, GridSelectionCheckbox } from '@vue-data-grid/core';
 </script>
 
 <template>
-	<TableSelectAllCheckbox />
-	<TableSelectionCheckbox />
+	<GridSelectAllCheckbox />
+	<GridSelectionCheckbox />
 </template>
 ```
 
-Both need the `selection` feature of the table. The quickest way to put them in a table is the
+Both need the `selection` feature of the grid. The quickest way to put them in a grid is the
 [`selectionColumn()`](/components/service-columns): a column with the select-all box in its header
 and a row's box in each cell. Place them yourself when you want them anywhere else, or in another
 look.
 
 ```ts
-import { selection, selectionColumn, useDataTable } from '@vue-data-grid/core';
+import { selection, selectionColumn, useDataGrid } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	select: selectionColumn(),
 	name: column(person => person.name, { label: 'Name' }),
 });
 
-const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40, features: { selection: selection() } });
+const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 40, features: { selection: selection() } });
 ```
 
 ## API reference
 
-### TableSelectionCheckbox
+### GridSelectionCheckbox
 
 The checkbox of one row. A click toggles the row; with <kbd>Shift</kbd> it selects the range from the
-row toggled last. The row is its `row` prop, else the `TableRow` around it.
+row toggled last. The row is its `row` prop, else the `GridRow` around it.
 
 <PropsTable
 	:data="[
-		{ name: 'row', type: 'string | TableBodyRow', description: 'The row: its key or its body row. The row of the `TableRow` around by default.' },
+		{ name: 'row', type: 'string | GridBodyRow', description: 'The row: its key or its body row. The row of the `GridRow` around by default.' },
 		{ name: 'label', type: 'string', description: 'The accessible name; the `selectRow` message, &quot;Select row&quot;, by default.' },
 		{ name: 'as', type: 'string | Component', default: '\'input\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
@@ -83,7 +83,7 @@ row toggled last. The row is its `row` prop, else the `TableRow` around it.
 	]"
 />
 
-### TableSelectAllCheckbox
+### GridSelectAllCheckbox
 
 The checkbox that selects every row, or none: checked while all are selected, partly checked while
 some are. It is disabled in the `'single'` selection mode.
@@ -124,14 +124,14 @@ import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
 </script>
 
 <template>
-	<TableSelectionCheckbox v-slot="{ selected, partly }" as-child>
+	<GridSelectionCheckbox v-slot="{ selected, partly }" as-child>
 		<CheckboxRoot :model-value="partly ? 'indeterminate' : selected">
 			<CheckboxIndicator>
 				<IconMinus v-if="partly" />
 				<IconCheck v-else />
 			</CheckboxIndicator>
 		</CheckboxRoot>
-	</TableSelectionCheckbox>
+	</GridSelectionCheckbox>
 </template>
 ```
 
@@ -185,16 +185,16 @@ In a column of your own, put the select-all box in the header cell and the row's
 through the slots:
 
 ```vue
-<TableHeaderCell v-for="header in headers" :key="header.key" v-slot="{ column }" :column="header">
-	<TableSelectAllCheckbox v-if="column.name === 'select'" />
-	<TableHeaderContent v-else />
-</TableHeaderCell>
+<GridHeaderCell v-for="header in headers" :key="header.key" v-slot="{ column }" :column="header">
+	<GridSelectAllCheckbox v-if="column.name === 'select'" />
+	<GridHeaderContent v-else />
+</GridHeaderCell>
 ```
 
 ```vue
-<TableCells v-slot="{ column }">
-	<TableSelectionCheckbox v-if="column.name === 'select'" />
-</TableCells>
+<GridCells v-slot="{ column }">
+	<GridSelectionCheckbox v-if="column.name === 'select'" />
+</GridCells>
 ```
 
 Declare the column as `kind: 'service'`, so CSV, cell ranges and autosize leave it out.
@@ -215,11 +215,11 @@ Adheres to the [Checkbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/check
 - A native `input` is a checkbox already, with `indeterminate` for the partial state. Any other
   element gets `role="checkbox"`, `aria-checked` of `true`, `false` or `mixed`, and `aria-disabled`,
   and is focusable unless it is a `button`, which is.
-- Every box is named: "Select row" and "Select all rows" by default, from the table's messages. Use
+- Every box is named: "Select row" and "Select all rows" by default, from the grid's messages. Use
   `label` for a name of your own, such as "Select Ava Kim".
-- The rows themselves get `aria-selected`, and the table `aria-multiselectable` in the `'multiple'`
+- The rows themselves get `aria-selected`, and the grid `aria-multiselectable` in the `'multiple'`
   mode, so a screen reader hears the selection on the row as well as on the box.
-- The live region of [`TableRoot`](/components/root) announces how many rows are selected whenever
+- The live region of [`GridRoot`](/components/root) announces how many rows are selected whenever
   that changes.
 
 ### Keyboard interactions

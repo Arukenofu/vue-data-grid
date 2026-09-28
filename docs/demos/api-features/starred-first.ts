@@ -1,10 +1,10 @@
-import { createRowKeyResolver, type RowsTable, type TableRowsFeature, useTableSorting } from '@vue-data-grid/core';
+import { createRowKeyResolver, type GridRowsFeature, type RowsGrid, useGridSorting } from '@vue-data-grid/core';
 import { computed, type Ref } from 'vue';
 
 export function starredFirst(starred: Readonly<Ref<ReadonlySet<string>>>) {
-	return <TRow>(table: RowsTable<TRow>): TableRowsFeature<TRow> => {
-		const sorted = useTableSorting(table);
-		const getKey = createRowKeyResolver(table.rowKey);
+	return <TRow>(grid: RowsGrid<TRow>): GridRowsFeature<TRow> => {
+		const sorted = useGridSorting(grid);
+		const getKey = createRowKeyResolver(grid.rowKey);
 
 		return {
 			rows: computed(() => {

@@ -1,7 +1,7 @@
 import { computed, type ComputedRef, type Ref } from 'vue';
 
 import type { RuntimeColumn } from '../columns/column';
-import type { TableScope } from '../engine/scope';
+import type { GridScope } from '../engine/scope';
 import type { ColumnSpanCell } from '../render/column-span';
 import { stableComputed } from '../shared/stable-computed';
 import { useModelRef } from '../shared/use-model-ref';
@@ -58,7 +58,7 @@ export interface RangeRect {
 	/** The height of its rows, px. */
 	height: number;
 	/**
-	 * A row across the table from `scope.getColumnSpan`: the cells with `inside` are the range, one for
+	 * A row across the grid from `scope.getColumnSpan`: the cells with `inside` are the range, one for
 	 * each pin side it crosses, and the others hold the place of the columns around it.
 	 */
 	cells: readonly ColumnSpanCell[];
@@ -117,7 +117,7 @@ function isSameGrid(current: CellGrid | null, next: CellGrid): current is CellGr
  * Reactive per row: `isSelected` and `getSelectedColumns` of a row wake only when a cell of that row
  * enters or leaves a range. Drawing ranges from `rects` as one overlay re-renders no cell at all.
  */
-export function useCellRanges(scope: TableScope, options: CellRangesOptions = {}) {
+export function useCellRanges(scope: GridScope, options: CellRangesOptions = {}) {
 	const ranges = useModelRef(options.ranges, NO_RANGES);
 	const corners = options.corners ?? 'key';
 
@@ -366,7 +366,7 @@ export function useCellRanges(scope: TableScope, options: CellRangesOptions = {}
 	}
 
 	/**
-	 * The last range as TSV, values through `format` and as they are, for pasting back into a table or a
+	 * The last range as TSV, values through `format` and as they are, for pasting back into a grid or a
 	 * spreadsheet; `''` without a selection. Only the last range is copied, since a spreadsheet cannot
 	 * paste several at once.
 	 */

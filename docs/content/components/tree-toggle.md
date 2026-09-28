@@ -19,7 +19,7 @@ beside it, so their text lines up.
 		'Expands and collapses the group row it is in, or the row given by key.',
 		'On a leaf it leaves an empty placeholder of the same width while the tree has groups; in a flat list, nothing.',
 		'Any content through the slot; `▾` and `▸` without one.',
-		'A `button` named &quot;Expand&quot; or &quot;Collapse&quot;, from the table\'s messages.',
+		'A `button` named &quot;Expand&quot; or &quot;Collapse&quot;, from the grid\'s messages.',
 		'Works with the arrow keys of the tree when the column is marked `tree`.',
 	]"
 />
@@ -28,11 +28,11 @@ beside it, so their text lines up.
 
 ```vue
 <script setup lang="ts">
-import { TableTreeToggle } from '@vue-data-grid/core';
+import { GridTreeToggle } from '@vue-data-grid/core';
 </script>
 
 <template>
-	<TableTreeToggle />
+	<GridTreeToggle />
 </template>
 ```
 
@@ -40,9 +40,9 @@ The toggle needs the `tree` feature, which turns the rows into a tree by a paren
 of children:
 
 ```ts
-import { tree, useDataTable } from '@vue-data-grid/core';
+import { tree, useDataGrid } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: files,
 	rowKey: 'id',
@@ -57,11 +57,11 @@ your own design, as the demo does with a folder that opens.
 
 ## API reference
 
-### TableTreeToggle
+### GridTreeToggle
 
 <PropsTable
 	:data="[
-		{ name: 'row', type: 'string | TableBodyRow', description: 'The row: its key or its body row. The row of the `TableRow` around by default.' },
+		{ name: 'row', type: 'string | GridBodyRow', description: 'The row: its key or its body row. The row of the `GridRow` around by default.' },
 		{ name: 'as', type: 'string | Component', default: '\'button\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
 	]"
@@ -100,7 +100,7 @@ What `tree()` takes, to shape the tree the toggle opens:
 		{ name: 'childrenField', type: 'keyof TRow', description: 'The field with an array of child rows, for nested data.' },
 		{ name: 'expanded', type: 'Ref<string[] | undefined>', description: 'The keys of expanded rows, as a model: the tree writes to it and follows it.' },
 		{ name: 'defaultExpanded', type: 'number', default: '0', description: 'How many levels start expanded; a negative number expands all.' },
-		{ name: 'sort', type: 'boolean', default: 'true', description: 'Sort the siblings of every level by the table\'s sort.' },
+		{ name: 'sort', type: 'boolean', default: 'true', description: 'Sort the siblings of every level by the grid\'s sort.' },
 	]"
 />
 
@@ -124,9 +124,9 @@ const columns = defineColumns({
 ```vue
 <template>
 	<span class="indent" :style="{ width: `${(node?.level ?? 0) * 20}px` }" />
-	<TableTreeToggle v-slot="{ expanded }">
+	<GridTreeToggle v-slot="{ expanded }">
 		<IconChevronRight :class="{ turned: expanded }" />
-	</TableTreeToggle>
+	</GridTreeToggle>
 	<IconFolderOpen v-if="node?.expanded" />
 	<IconFolder v-else-if="file.kind === 'folder'" />
 	{{ file.name }}
@@ -142,7 +142,7 @@ Pass `expanded` as a ref, and the whole tree opens or closes by writing it:
 ```ts
 const expanded = shallowRef<string[] | undefined>(['design']);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: files,
 	rowKey: 'id',
@@ -158,7 +158,7 @@ expanded.value = [];
 
 Adheres to the [Treegrid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/) of WAI-ARIA.
 
-- With the `tree` feature the table is a `treegrid`, and each row has `aria-level`, `aria-posinset`
+- With the `tree` feature the grid is a `treegrid`, and each row has `aria-level`, `aria-posinset`
   and `aria-setsize`; a group row has `aria-expanded`.
 - The toggle is a `button`, named "Expand" or "Collapse" from the `expandRow` and `collapseRow`
   messages. The row it is in says which row it is, so the name stays short.

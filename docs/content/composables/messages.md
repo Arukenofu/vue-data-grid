@@ -1,22 +1,22 @@
 ---
 title: Messages
-description: Every string of the table's interface - control names, states and announcements - and how to give your own.
+description: Every string of the grid's interface - control names, states and announcements - and how to give your own.
 ---
 
 # Messages
 
 <Description>
-Every string the table shows or says: the names of its controls, the empty and loading states, and
-what it announces to screen readers. English by default; give <code>TableRoot</code> your own for any language.
+Every string the grid shows or says: the names of its controls, the empty and loading states, and
+what it announces to screen readers. English by default; give <code>GridRoot</code> your own for any language.
 </Description>
 
 ## Usage
 
 ```vue
 <script setup lang="ts">
-import type { TableMessages } from '@vue-data-grid/core';
+import type { GridMessages } from '@vue-data-grid/core';
 
-const messages: Partial<TableMessages> = {
+const messages: Partial<GridMessages> = {
 	empty: 'Nothing here yet',
 	selectRow: 'Pick this invoice',
 	selected: count => `${count} invoices picked`,
@@ -24,12 +24,12 @@ const messages: Partial<TableMessages> = {
 </script>
 
 <template>
-	<TableRoot :table="table" label="Invoices" :messages="messages">…</TableRoot>
+	<GridRoot :grid="grid" label="Invoices" :messages="messages">…</GridRoot>
 </template>
 ```
 
-`messages` is laid over `DEFAULT_MESSAGES`, so you give only the strings you change. `TableRoot` reads
-it once: to switch the language of a mounted table, give `TableRoot` a new `key`.
+`messages` is laid over `DEFAULT_MESSAGES`, so you give only the strings you change. `GridRoot` reads
+it once: to switch the language of a mounted grid, give `GridRoot` a new `key`.
 
 ## The messages
 
@@ -45,8 +45,8 @@ it once: to switch the language of a mounted table, give `TableRoot` a new `key`
 		{ name: 'resizeColumn', type: '(label: string) => string', default: 'Resize ${label}', description: 'The name of a column\'s resize handle.' },
 		{ name: 'columnWidth', type: '(width: number) => string', default: '${width} px', description: 'The width of a column as a resize handle says it, `aria-valuetext`.' },
 		{ name: 'dragRow', type: '(label: string) => string', default: 'Drag ${label}', description: 'The name of a row\'s drag handle, from the name of the row.' },
-		{ name: 'empty', type: 'string', default: '\'No rows\'', description: 'The content of `TableEmpty` without a slot.' },
-		{ name: 'loading', type: 'string', default: '\'Loading…\'', description: 'The content of `TableLoading` without a slot, and what the announcer says when the table becomes busy.' },
+		{ name: 'empty', type: 'string', default: '\'No rows\'', description: 'The content of `GridEmpty` without a slot.' },
+		{ name: 'loading', type: 'string', default: '\'Loading…\'', description: 'The content of `GridLoading` without a slot, and what the announcer says when the grid becomes busy.' },
 		{ name: 'noMatches', type: 'string', default: '\'No matches\'', description: 'The list of `selectEditor` when no choice matches what was typed.' },
 		{ name: 'sorted', type: '(sort: readonly SortMessageItem[]) => string', default: '\'Sorted by …\'', description: 'Announced when the sort changes: each column\'s `label` and `direction`, an empty list when the sort is cleared.' },
 		{ name: 'selected', type: '(count: number) => string', default: '\'1 row selected\'', description: 'Announced when the number of selected rows changes.' },
@@ -59,7 +59,7 @@ in its own order and use its own plural forms.
 ## DEFAULT_MESSAGES
 
 The English defaults, frozen. Use them to build a full set of your own, or to call a message outside
-a table:
+a grid:
 
 ```ts
 import { DEFAULT_MESSAGES } from '@vue-data-grid/core';
@@ -70,18 +70,18 @@ DEFAULT_MESSAGES.sorted([{ label: 'Price', direction: 'desc' }]);
 
 ## In parts of your own
 
-A part inside `TableRoot` reads the messages of its table from the context, the same way the
-built-in parts do; outside a table it gets the defaults:
+A part inside `GridRoot` reads the messages of its grid from the context, the same way the
+built-in parts do; outside a grid it gets the defaults:
 
 ```ts
-import { useTableMessagesContext } from '@vue-data-grid/core';
+import { useGridMessagesContext } from '@vue-data-grid/core';
 
-const messages = useTableMessagesContext();
+const messages = useGridMessagesContext();
 
 const label = computed(() => (collapsed.value ? messages.expandRow : messages.collapseRow));
 ```
 
-`createTableMessagesContext(messages)` provides a set to the parts below, as `TableRoot` does, for
+`createGridMessagesContext(messages)` provides a set to the parts below, as `GridRoot` does, for
 parts under markup of your own.
 
 ## Examples
@@ -94,7 +94,7 @@ Languages with more than one plural form fit in the functions, with `Intl.Plural
 const plural = new Intl.PluralRules('ru');
 const ROWS: Partial<Record<Intl.LDMLPluralRule, string>> = { one: 'строка выбрана', few: 'строки выбраны', many: 'строк выбрано' };
 
-const messages: Partial<TableMessages> = {
+const messages: Partial<GridMessages> = {
 	selected: count => `${count} ${ROWS[plural.select(count)] ?? 'строки выбрано'}`,
 };
 ```
@@ -102,11 +102,11 @@ const messages: Partial<TableMessages> = {
 ### Drag announcements
 
 Dragging speaks through `@vue-data-grid/drag-and-drop`, whose words are the `announcements` of
-`TableRowDrag` and `TableColumnDrag`, next to these messages.
+`GridRowDrag` and `GridColumnDrag`, next to these messages.
 
 ## Accessibility
 
-- Messages are most of what a screen reader hears from the table beyond the data: names of controls,
+- Messages are most of what a screen reader hears from the grid beyond the data: names of controls,
   their states and the announcements. Translate them with the rest of the interface.
 - Keep control names short and specific: "Select row" for a checkbox in a row is enough, since the
   screen reader also reads the row header next to it.
@@ -116,5 +116,5 @@ Dragging speaks through `@vue-data-grid/drag-and-drop`, whose words are the `ann
 ## See also
 
 - [Localization](/guides/localization): languages, formats and right-to-left.
-- [useTableAnnouncer](/composables/use-table-announcer): the announcements.
+- [useGridAnnouncer](/composables/use-grid-announcer): the announcements.
 - [Contexts](/composables/contexts): the other contexts of the parts.

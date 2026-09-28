@@ -3,17 +3,17 @@ import {
 	autosizeColumns,
 	defineColumn,
 	defineColumns,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableResizeHandle,
-	TableRoot,
-	TableRow,
-	useDataTable,
-	useTableMotion,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridResizeHandle,
+	GridRoot,
+	GridRow,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
 
 import { type Person, people } from '@/data/people';
@@ -34,25 +34,25 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
 	rowHeight: 40,
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
 function fitContent() {
-	autosizeColumns(table.scope);
+	autosizeColumns(grid.scope);
 }
 
 function fillWidth() {
-	table.scope.fitColumns();
+	grid.scope.fitColumns();
 }
 
 function reset() {
-	table.state.reset();
+	grid.state.reset();
 }
 </script>
 
@@ -66,23 +66,23 @@ function reset() {
 			<UiButton size="sm" variant="ghost" @click="reset">Reset</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="People" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header">
-						<TableHeaderContent />
-						<TableResizeHandle v-slot="{ width, resizing }">
+		<GridRoot :grid="grid" label="People" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header">
+						<GridHeaderContent />
+						<GridResizeHandle v-slot="{ width, resizing }">
 							<span v-if="resizing" class="width">{{ Math.round(width) }} px</span>
-						</TableResizeHandle>
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+						</GridResizeHandle>
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

@@ -6,10 +6,10 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, shallowRef } from 'vue';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { TableRoot } from '../../src/components/table-root';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
-import { TableColumnDrag } from '../../src/drag/table-drag';
-import { useTableMotion } from '../../src/motion/use-table-motion';
+import { GridRoot } from '../../src/components/grid-root';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
+import { GridColumnDrag } from '../../src/drag/grid-drag';
+import { useGridMotion } from '../../src/motion/use-grid-motion';
 import { renderBody, renderHeader } from '../support/parts';
 
 interface Task {
@@ -48,19 +48,19 @@ function pointer(type: string, target: EventTarget, x: number, y: number) {
 	}));
 }
 
-function mountTable() {
+function mountGrid() {
 	const rows = shallowRef<Task[]>([{ id: 'a', name: 'Alpha' }, { id: 'b', name: 'Beta' }]);
-	let table: DataTable | null = null;
+	let grid: DataGrid | null = null;
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30 }) as DataTable;
-			useTableMotion(table);
+			grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 }) as DataGrid;
+			useGridMotion(grid);
 
-			return () => h(TableRoot, { table: table as DataTable, label: 'Tasks', style: 'width: 400px; height: 200px' }, {
+			return () => h(GridRoot, { grid: grid as DataGrid, label: 'Tasks', style: 'width: 400px; height: 200px' }, {
 				default: () => [
 					// The gap moves at once: what is measured is where the columns stand, not a slide.
-					h(TableColumnDrag, { motion: false }, { default: () => renderHeader() }),
+					h(GridColumnDrag, { motion: false }, { default: () => renderHeader() }),
 					renderBody(),
 				],
 			});
@@ -69,15 +69,15 @@ function mountTable() {
 
 	wrappers.push(wrapper);
 
-	const root = wrapper.get('[data-dg-part="table"]').element as HTMLElement;
+	const root = wrapper.get('[data-dg-part="grid"]').element as HTMLElement;
 	const header = (name: string) => root.querySelector(`[role="columnheader"][data-dg-column="${name}"]`) as HTMLElement;
 
-	return { table: table as unknown as DataTable, root, header };
+	return { grid: grid as unknown as DataGrid, root, header };
 }
 
 describe('column drag in a browser', () => {
-	it('with `useTableMotion`, a column dropped from the gap stays where the gap drew it', async () => {
-		const { table, root, header } = mountTable();
+	it('with `useGridMotion`, a column dropped from the gap stays where the gap drew it', async () => {
+		const { grid, root, header } = mountGrid();
 		const start = header('name').getBoundingClientRect();
 		const target = header('id').getBoundingClientRect();
 		const y = start.top + start.height / 2;
@@ -103,7 +103,7 @@ describe('column drag in a browser', () => {
 			seen.push(header('name').getBoundingClientRect().left, cell().getBoundingClientRect().left - standing.cell + standing.header);
 		}
 
-		expect(table.scope.columns.value.map(item => item.column?.name)).toEqual(['id', 'name', 'note']);
+		expect(grid.scope.columns.value.map(item => item.column?.name)).toEqual(['id', 'name', 'note']);
 		// Neither the header nor the body cells of the column jump back to where the drag began.
 		expect(seen.every(left => Math.abs(left - standing.header) < 1)).toBe(true);
 	});

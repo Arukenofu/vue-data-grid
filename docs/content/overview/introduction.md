@@ -1,12 +1,12 @@
 ---
 title: Introduction
-description: Headless, accessible and fast tables for Vue 3, assembled from small parts.
+description: Headless, accessible and fast grids for Vue 3, assembled from small parts.
 ---
 
 # Introduction
 
 <Description>
-Vue Data Grid is a headless table library for Vue 3. You compose a table from small parts, style it
+Vue Data Grid is a headless grid library for Vue 3. You compose a grid from small parts, style it
 with your own CSS, and add behaviour one feature at a time, while the library takes care of the
 things that are hard to get right: keyboard, accessibility, virtualization and stable rendering.
 </Description>
@@ -15,11 +15,11 @@ things that are hard to get right: keyboard, accessibility, virtualization and s
 
 ## Why it exists
 
-Most table libraries sit at one of two ends.
+Most grid libraries sit at one of two ends.
 
 - **A finished grid** gives you everything at once: a thousand options, its own markup, its own look.
   It works until you need it to look or behave like the rest of your product, and then you fight it.
-- **Pure table logic** gives you sorting and row models, and nothing on the screen. The table is
+- **Pure grid logic** gives you sorting and row models, and nothing on the screen. The grid is
   yours, and so are the parts nobody enjoys writing: focus management, keyboard navigation, ARIA
   roles and counts, virtualization, sticky headers, resizing, dragging.
 
@@ -31,19 +31,19 @@ is done, as with a grid; and every piece of it can be used, restyled or replaced
 ### Headless, not markup-less
 
 The parts render plain elements, one each, with `data-dg-*` attributes that say what they are and
-what state they are in. There is no theme to fight: a small structural stylesheet makes the table
+what state they are in. There is no theme to fight: a small structural stylesheet makes the grid
 work, and everything you see comes from your own CSS. See [Styling](/overview/styling).
 
 ### Composition over configuration
 
-There is no component with forty boolean props. A table is a tree of parts you write out, and
+There is no component with forty boolean props. A grid is a tree of parts you write out, and
 behaviour arrives as **features**: `sorting()`, `selection()`, `navigation()`, `editing()`. Each is a
 small function you pass in, each is one line, and the code of a feature you do not use never reaches
 your bundle. See [How it fits together](/overview/concepts).
 
 ### Accessible by default
 
-A table built from the parts is a WAI-ARIA grid or treegrid out of the box: roles, row and column
+A grid built from the parts is a WAI-ARIA grid or treegrid out of the box: roles, row and column
 counts, sort state, selection, tree levels, a live region for announcements and the full keyboard
 model of the grid pattern. You get it without writing a single `aria-*` attribute. See
 [Accessibility](/overview/accessibility).
@@ -65,8 +65,8 @@ Everything in `@vue-data-grid/core` is public, in three levels, each built on th
 
 | Level | What it is | Use it when |
 | --- | --- | --- |
-| **Components** | Small parts in the manner of Reka UI: `TableRoot`, `TableHeaderCell`, `TableCells`, `TableResizeHandle`… Each has `as` and `asChild`. | Almost always. It is the level the guides use. |
-| **Composables** | The behaviour under the parts: `useDataTable`, `useGridNavigation`, `useColumnResize`, `useRangeSelection`, `useTableMotion`… | You render a part yourself, or need a behaviour in markup of your own. |
+| **Components** | Small parts in the manner of Reka UI: `GridRoot`, `GridHeaderCell`, `GridCells`, `GridResizeHandle`… Each has `as` and `asChild`. | Almost always. It is the level the guides use. |
+| **Composables** | The behaviour under the parts: `useDataGrid`, `useCellNavigation`, `useColumnResize`, `useRangeSelection`, `useGridMotion`… | You render a part yourself, or need a behaviour in markup of your own. |
 | **Utilities** | Prop-getters and helpers: `getRowProps`, `getCellProps`, grid attributes, `autosizeColumns`… | You write the whole markup yourself, such as a `<table>` element or a canvas of your own. |
 
 The components contain no private tricks: they are made from the same composables and utilities
@@ -83,7 +83,7 @@ one place:
   you bring GSAP, Motion or anything else.
 
 Dragging rows and columns lives in a separate entry, `@vue-data-grid/core/drag-and-drop`, on top of the
-optional peer `@vue-data-grid/drag-and-drop`, so a table that does not drag does not carry it.
+optional peer `@vue-data-grid/drag-and-drop`, so a grid that does not drag does not carry it.
 
 ## What is in the box
 
@@ -98,7 +98,7 @@ optional peer `@vue-data-grid/drag-and-drop`, so a table that does not drag does
 		'Keyboard navigation of the WAI-ARIA grid and treegrid patterns',
 		'Cell ranges, copy, cut and paste that speaks the language of spreadsheets, and CSV',
 		'Editing with editors, validation, undo and redo, and a fill handle',
-		'Dragging rows and columns, between tables and onto drop zones, by pointer, touch or keyboard',
+		'Dragging rows and columns, between grids and onto drop zones, by pointer, touch or keyboard',
 		'Animated sorts, drags and expanding rows, with any animation engine',
 		'Streaming updates that re-render only the rows that changed',
 	]"
@@ -106,6 +106,6 @@ optional peer `@vue-data-grid/drag-and-drop`, so a table that does not drag does
 
 ## Where to go next
 
-- [Getting started](/overview/getting-started): a sortable table in four small steps.
+- [Getting started](/overview/getting-started): a sortable grid in four small steps.
 - [How it fits together](/overview/concepts): the few ideas everything else builds on.
-- [Examples](/examples/): complete tables to take apart.
+- [Examples](/examples/): complete grids to take apart.

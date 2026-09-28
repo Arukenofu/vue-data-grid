@@ -7,7 +7,7 @@ export type ColumnPinSide = 'start' | 'end';
 export type AggregateName = 'sum' | 'avg' | 'min' | 'max' | 'count';
 
 /**
- * What a column holds: `'data'` is a value of the row; `'service'` is the table's own furniture, such
+ * What a column holds: `'data'` is a value of the row; `'service'` is the grid's own furniture, such
  * as a checkbox, a row number or actions. CSV, cell ranges, cell changes and autosize skip service
  * columns unless told otherwise.
  */

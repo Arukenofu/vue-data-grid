@@ -1,7 +1,7 @@
-import type { TableScope } from '@vue-data-grid/engine';
+import type { GridScope } from '@vue-data-grid/engine';
 import { computed, type ComputedRef, getCurrentScope, hasInjectionContext, type MaybeRefOrGetter, onScopeDispose, shallowRef, toValue } from 'vue';
 
-import { DEFAULT_MESSAGES, useTableMessagesContext } from '../components/messages';
+import { DEFAULT_MESSAGES, useGridMessagesContext } from '../components/messages';
 import { isRtl } from '../keyboard/keys';
 import { type AutosizeOptions, autosizeColumns } from './autosize-columns';
 
@@ -11,7 +11,7 @@ export interface ColumnResizeOptions {
 	/** How a double click fits the column to its content; `false` turns it off. */
 	autosize?: MaybeRefOrGetter<AutosizeOptions | false | undefined>;
 	/**
-	 * The accessible name of a handle; the `resizeColumn` message of the table around, `Resize <label>`
+	 * The accessible name of a handle; the `resizeColumn` message of the grid around, `Resize <label>`
 	 * by default.
 	 */
 	label?: (column: { name: string; label?: string }) => string;
@@ -27,10 +27,10 @@ const INLINE_STEPS: Readonly<Record<string, number>> = { ArrowLeft: -1, ArrowRig
 
 /**
  * How the width follows the pointer and the arrows: `1` where the handle is at the end edge and the
- * width grows towards the end, `-1` in a right-to-left table, and flipped for a column pinned to the
+ * width grows towards the end, `-1` in a right-to-left grid, and flipped for a column pinned to the
  * end, whose handle is at its start edge.
  */
-function getDirection(scope: TableScope, name: string, handle: Element) {
+function getDirection(scope: GridScope, name: string, handle: Element) {
 	return (isRtl(handle) ? -1 : 1) * (scope.getPin(name) === 'end' ? -1 : 1);
 }
 
@@ -38,7 +38,7 @@ function getDirection(scope: TableScope, name: string, handle: Element) {
  * The width the column is drawn at: a `flex` column grows past its width until it is resized, and a
  * resize starts from where its edge is, not from its declared width.
  */
-function getDrawnWidth(scope: TableScope, name: string, handle: Element) {
+function getDrawnWidth(scope: GridScope, name: string, handle: Element) {
 	const cell = handle.closest('[data-dg-column]');
 
 	return cell ? cell.getBoundingClientRect().width : scope.getWidth(name);
@@ -48,7 +48,7 @@ function getDrawnWidth(scope: TableScope, name: string, handle: Element) {
  * Resizing columns by a handle: a pointer drag with pointer capture, applied once per animation frame
  * and committed when the pointer is released or the handle goes away; a double click that fits the
  * column to its content; and the keys of a focusable `role="separator"`, which tells the screen reader
- * the width: ← and → change it by `step`, Home and End take it to its limits. In a right-to-left table
+ * the width: ← and → change it by `step`, Home and End take it to its limits. In a right-to-left grid
  * the drag and the arrows follow the reading direction.
  *
  * `getHandleProps(name)` gives everything the handle element needs, `data-dg-part="resize-handle"`
@@ -61,8 +61,8 @@ function getDrawnWidth(scope: TableScope, name: string, handle: Element) {
  * holds the width the drag started from until the drag ends: the width changes every frame, and the
  * header should not render every frame. The keys update it on each press.
  */
-export function useColumnResize(scope: TableScope, options: ColumnResizeOptions = {}) {
-	const messages = hasInjectionContext() ? useTableMessagesContext() : DEFAULT_MESSAGES;
+export function useColumnResize(scope: GridScope, options: ColumnResizeOptions = {}) {
+	const messages = hasInjectionContext() ? useGridMessagesContext() : DEFAULT_MESSAGES;
 	/** The column a drag or a key is resizing now; `null` between gestures. */
 	const resizing = shallowRef<string | null>(null);
 	const handlers = new Map<string, Handlers>();
@@ -72,7 +72,7 @@ export function useColumnResize(scope: TableScope, options: ColumnResizeOptions 
 	// A width held on a key: applied once per frame, so the next press goes on from this, not the DOM.
 	let keyed: { name: string; width: number } | null = null;
 
-	// A computed wakes its readers only when its own value changes, not on every width of the table.
+	// A computed wakes its readers only when its own value changes, not on every width of the grid.
 	function getWidth(name: string) {
 		let width = widths.get(name);
 

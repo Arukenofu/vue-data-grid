@@ -1,6 +1,6 @@
 import { computed, type MaybeRefOrGetter, shallowRef, toValue } from 'vue';
 
-import type { TableScope } from '../engine/scope';
+import type { GridScope } from '../engine/scope';
 import { stableComputed } from '../shared/stable-computed';
 import { useRowToken } from '../shared/use-row-token';
 import { getCellColumns } from './cell-address';
@@ -61,12 +61,12 @@ function isSameCell(current: FocusedGridCell | null, next: FocusedGridCell | nul
  * Focus of a grid without DOM: which cell of the header, the body or the footer has it, and where a
  * move takes it. Body rows are held by key, so focus follows its row through sorting and streaming;
  * the focused cell stays rendered under the row and column windows. Key bindings, `tabindex` and
- * `element.focus()` stay with the markup: `useGridNavigation` of `@vue-data-grid/core` binds them.
+ * `element.focus()` stay with the markup: `useCellNavigation` of `@vue-data-grid/core` binds them.
  *
  * Reactive per row: `isFocused` of a row wakes only when focus enters or leaves it, so a move wakes
  * two rows rather than every cell that asks.
  */
-export function useGridFocus(scope: TableScope, options: GridFocusOptions = {}) {
+export function useGridFocus(scope: GridScope, options: GridFocusOptions = {}) {
 	const body = options.body ?? DEFAULT_BODY;
 	const target = shallowRef<FocusTarget | null>(null);
 

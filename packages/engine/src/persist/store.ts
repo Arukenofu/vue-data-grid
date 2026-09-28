@@ -8,7 +8,7 @@ export interface PersistStore {
 	/** Stores a value that survives `JSON.stringify`; `null` removes the record. */
 	write: (value: unknown) => void;
 	/**
-	 * Calls `listener` with the new value when the record changes elsewhere: another table on the page,
+	 * Calls `listener` with the new value when the record changes elsewhere: another grid on the page,
 	 * another tab. Returns the function that unsubscribes. A store without it is not synced.
 	 */
 	subscribe?: (listener: (value: unknown) => void) => () => void;
@@ -73,7 +73,7 @@ function createWebStorageStore(getStorage: () => Storage | null, key: string): P
 				return;
 			}
 
-			// The `storage` event reaches only other tabs: tables in this one are told here, each with its
+			// The `storage` event reaches only other tabs: grids in this one are told here, each with its
 			// own copy of the value.
 			for (const listener of listeners.get(storage)?.get(key) ?? []) {
 				listener(parse(raw));
@@ -122,7 +122,7 @@ function getSessionStorage() {
 }
 
 /**
- * A record in `localStorage` under `key`, as JSON. Tables with the same key share it: a table on the
+ * A record in `localStorage` under `key`, as JSON. Grids with the same key share it: a grid on the
  * same page hears about a write at once, another tab through the `storage` event. A storage that
  * throws (a full quota, blocked site data) stores nothing and breaks nothing.
  */
@@ -136,7 +136,7 @@ export function sessionStorageStore(key: string): PersistStore {
 }
 
 /**
- * A record in memory, as JSON, like the web storages: for tests, and for tables that share state
+ * A record in memory, as JSON, like the web storages: for tests, and for grids that share state
  * without keeping it between visits. Every subscriber hears every write, its own included.
  */
 export function memoryStore(initial: unknown = null): PersistStore {

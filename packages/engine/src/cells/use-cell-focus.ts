@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 
-import type { TableScope } from '../engine/scope';
+import type { GridScope } from '../engine/scope';
 import { useRowToken } from '../shared/use-row-token';
 import type { CellAddress, CellPosition } from './cell-address';
 import type { CellMove } from './cell-focus';
@@ -33,7 +33,7 @@ function toFocusedCell(cell: FocusedGridCell): FocusedCell | null {
  * Reactive per row: `isFocused` and `getFocusedColumn` of a row wake only when focus enters or leaves
  * it, so a move wakes two rows rather than every cell that asks.
  */
-export function useCellFocus(scope: TableScope, options: CellFocusOptions = {}) {
+export function useCellFocus(scope: GridScope, options: CellFocusOptions = {}) {
 	const grid = useGridFocus(scope, {
 		onFocus: (cell) => {
 			const focused = toFocusedCell(cell);

@@ -2,16 +2,16 @@
 import {
 	defineColumn,
 	defineColumns,
-	TableBody,
-	TableCells,
-	TableEmpty,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableLoading,
-	TableRoot,
-	TableRow,
-	useDataTable,
+	GridBody,
+	GridCells,
+	GridEmpty,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridLoading,
+	GridRoot,
+	GridRow,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconLoaderCircle from '~icons/lucide/loader-circle';
 import IconRefreshCw from '~icons/lucide/refresh-cw';
@@ -43,7 +43,7 @@ const rows = computed(() => {
 	return text === '' ? loaded.value : loaded.value.filter(person => person.name.toLowerCase().includes(text));
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -73,29 +73,29 @@ onBeforeUnmount(() => clearTimeout(timer));
 			</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="People" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows: bodyRows }">
-				<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-			<TableEmpty>
+		<GridRoot :grid="grid" label="People" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows: bodyRows }">
+				<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+			<GridEmpty>
 				<span class="empty">
 					<IconSearchX class="empty-icon" aria-hidden="true" />
 					<strong>No one is called “{{ query }}”</strong>
 					<UiButton size="sm" variant="ghost" @click="query = ''">Clear the search</UiButton>
 				</span>
-			</TableEmpty>
-			<TableLoading v-if="loading">
+			</GridEmpty>
+			<GridLoading v-if="loading">
 				<IconLoaderCircle class="spinner" aria-hidden="true" />
 				Loading people…
-			</TableLoading>
-		</TableRoot>
+			</GridLoading>
+		</GridRoot>
 	</div>
 </template>
 

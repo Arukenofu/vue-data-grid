@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { clipboard, defineColumn, defineColumns, downloadCsv, navigation, ranges, toCsv, useDataTable } from '@vue-data-grid/core';
+import { clipboard, defineColumn, defineColumns, downloadCsv, navigation, ranges, toCsv, useDataGrid } from '@vue-data-grid/core';
 import IconCopy from '~icons/lucide/copy';
 import IconDownload from '~icons/lucide/download';
 import { computed, shallowRef } from 'vue';
 
-import { UiButton, UiDataTable, UiStat, UiSwitch, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiStat, UiSwitch, UiToolbar } from '@/ui';
 
 import { type BudgetLine, budget } from './data';
 
@@ -34,7 +34,7 @@ const columns = defineColumns({
 const withHeaders = shallowRef(false);
 const status = shallowRef('');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: budget,
 	rowKey: 'id',
@@ -47,10 +47,10 @@ const table = useDataTable({
 });
 
 const summary = computed(() => {
-	const cells = table.ranges.getCells();
+	const cells = grid.ranges.getCells();
 	const numbers = cells.flatMap((cell) => {
-		const row = table.rows.value[table.scope.getRowIndex(cell.key)];
-		const value = row === undefined ? undefined : table.scope.getColumn(cell.column)?.column?.value(row);
+		const row = grid.rows.value[grid.scope.getRowIndex(cell.key)];
+		const value = row === undefined ? undefined : grid.scope.getColumn(cell.column)?.column?.value(row);
 
 		return typeof value === 'number' ? [value] : [];
 	});
@@ -64,23 +64,23 @@ const summary = computed(() => {
 });
 
 async function copy() {
-	const copied = await table.clipboard.copy();
+	const copied = await grid.clipboard.copy();
 
 	status.value = copied ? 'Copied as tab-separated text: paste it into a spreadsheet.' : 'Select some cells first.';
 }
 
 function download() {
-	const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
+	const shown = grid.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
 
-	downloadCsv(toCsv({ columns: shown, rows: table.rows.value }), { name: 'budget' });
+	downloadCsv(toCsv({ columns: shown, rows: grid.rows.value }), { name: 'budget' });
 }
 </script>
 
 <template>
 	<div class="ui-stack">
 		<UiToolbar>
-			<UiButton @click="table.ranges.selectAll()">Select all</UiButton>
-			<UiButton variant="ghost" @click="table.ranges.clear()">Clear</UiButton>
+			<UiButton @click="grid.ranges.selectAll()">Select all</UiButton>
+			<UiButton variant="ghost" @click="grid.ranges.clear()">Clear</UiButton>
 			<span class="ui-separator" />
 			<UiSwitch v-model="withHeaders" label="Copy with headers" />
 			<span class="ui-spacer" />
@@ -94,7 +94,7 @@ function download() {
 			</UiButton>
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Budget by team" data-size="sm" />
+		<UiDataGrid :grid="grid" label="Budget by team" data-size="sm" />
 
 		<div class="summary" aria-live="polite">
 			<template v-if="summary.cells > 0">

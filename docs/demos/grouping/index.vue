@@ -9,12 +9,12 @@ import {
 	type RowGroupLevel,
 	tree,
 	treeColumn,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
 import { h, shallowRef } from 'vue';
 
-import { UiBadge, UiDataTable, UiToggleGroup, UiToolbar } from '@/ui';
+import { UiBadge, UiDataGrid, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { type SalesRow, salesRows } from './data';
 
@@ -100,7 +100,7 @@ function createGroup(group: RowGroup<SalesRow, ColumnAggregates<typeof columns>>
 
 const groupBy = shallowRef<GroupBy>('country');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: salesRows,
 	rowKey: 'id',
@@ -113,7 +113,7 @@ const table = useDataTable({
 	},
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 </script>
 
 <template>
@@ -122,7 +122,7 @@ useTableMotion(table);
 			<span class="ui-toolbar-text">Group by</span>
 			<UiToggleGroup v-model="groupBy" :options="GROUPINGS" label="Group by" />
 		</UiToolbar>
-		<UiDataTable :table="table" label="Sales" footer />
+		<UiDataGrid :grid="grid" label="Sales" footer />
 	</div>
 </template>
 

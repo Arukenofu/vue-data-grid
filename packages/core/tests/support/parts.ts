@@ -1,34 +1,34 @@
 import type { RenderedColumn, RenderedGroup } from '@vue-data-grid/engine';
 import { h } from 'vue';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableFooter, TableFooterCell, TableFooterRow } from '../../src/components/table-footer';
+import type { GridBodyRow } from '../../src/components/context';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridFooter, GridFooterCell, GridFooterRow } from '../../src/components/grid-footer';
 import {
-	TableGroupCell,
-	TableGroupContent,
-	TableGroupRow,
-	TableGroupToggle,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-} from '../../src/components/table-header';
-import { TableResizeHandle } from '../../src/components/table-resize-handle';
-import { TableSortIndicator } from '../../src/components/table-service-parts';
+	GridGroupCell,
+	GridGroupContent,
+	GridGroupRow,
+	GridGroupToggle,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+} from '../../src/components/grid-header';
+import { GridResizeHandle } from '../../src/components/grid-resize-handle';
+import { GridSortIndicator } from '../../src/components/grid-service-parts';
 
 /** The header composed of every part: group rows with toggles, header cells with a sort indicator and a resize handle. */
 export function renderHeader() {
-	return h(TableHeader, null, {
+	return h(GridHeader, null, {
 		default: ({ groups }: { groups: readonly (readonly RenderedGroup[])[] }) => [
-			...groups.map((_cells, level) => h(TableGroupRow, { key: `level-${level}`, level }, {
-				default: ({ cells }: { cells: readonly RenderedGroup[] }) => cells.map(cell => h(TableGroupCell, { key: cell.key, cell }, {
-					default: () => [h(TableGroupContent), h(TableGroupToggle)],
+			...groups.map((_cells, level) => h(GridGroupRow, { key: `level-${level}`, level }, {
+				default: ({ cells }: { cells: readonly RenderedGroup[] }) => cells.map(cell => h(GridGroupCell, { key: cell.key, cell }, {
+					default: () => [h(GridGroupContent), h(GridGroupToggle)],
 				})),
 			})),
-			h(TableHeaderRow, { key: 'columns' }, {
-				default: ({ columns }: { columns: readonly RenderedColumn[] }) => columns.map(column => h(TableHeaderCell, { key: column.key, column }, {
-					default: () => [h(TableHeaderContent), h(TableSortIndicator), h(TableResizeHandle)],
+			h(GridHeaderRow, { key: 'columns' }, {
+				default: ({ columns }: { columns: readonly RenderedColumn[] }) => columns.map(column => h(GridHeaderCell, { key: column.key, column }, {
+					default: () => [h(GridHeaderContent), h(GridSortIndicator), h(GridResizeHandle)],
 				})),
 			}),
 		],
@@ -40,9 +40,9 @@ export function renderHeader() {
  * it: a row whose props hold does not render again when the body does.
  */
 export function renderBody() {
-	return h(TableBody, null, {
-		default: ({ rows }: { rows: readonly TableBodyRow[] }) => rows.map(row => h(TableRow, { key: row.key, row }, {
-			default: () => h(TableCells),
+	return h(GridBody, null, {
+		default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, {
+			default: () => h(GridCells),
 			$stable: true,
 		})),
 	});
@@ -50,9 +50,9 @@ export function renderBody() {
 
 /** The footer of one row of cells. */
 export function renderFooter() {
-	return h(TableFooter, null, {
-		default: () => h(TableFooterRow, null, {
-			default: ({ columns }: { columns: readonly RenderedColumn[] }) => columns.map(column => h(TableFooterCell, { key: column.key, column })),
+	return h(GridFooter, null, {
+		default: () => h(GridFooterRow, null, {
+			default: ({ columns }: { columns: readonly RenderedColumn[] }) => columns.map(column => h(GridFooterCell, { key: column.key, column })),
 		}),
 	});
 }

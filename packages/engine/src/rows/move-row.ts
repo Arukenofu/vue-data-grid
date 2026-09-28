@@ -4,7 +4,7 @@ import { createParentKeyResolver } from './row-tree';
 /** Where a row goes: `index` among the children of `parent`, counted once the row is taken out. */
 export interface RowMove<TRow> {
 	key: string;
-	/** The row itself: the one in `rows`, or a row from elsewhere, such as another table. */
+	/** The row itself: the one in `rows`, or a row from elsewhere, such as another grid. */
 	row: TRow;
 	/** Key of the new parent; `null` for the top level. Ignored without `parentKey`. */
 	parent: string | null;

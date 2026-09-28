@@ -1,4 +1,4 @@
-import { defineColumns, type TableScope, useTableColumnsState, useTableEngine } from '@vue-data-grid/engine';
+import { defineColumns, type GridScope, useGridColumnsState, useGridEngine } from '@vue-data-grid/engine';
 import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, shallowRef, watchEffect } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -16,13 +16,13 @@ const columns = defineColumns({
 
 function setup(options: ColumnResizeOptions = {}) {
 	const root = shallowRef<HTMLElement | null>(null);
-	const state = useTableColumnsState();
-	let scope: TableScope | null = null;
+	const state = useGridColumnsState();
+	let scope: GridScope | null = null;
 	let resize: ReturnType<typeof useColumnResize> | null = null;
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			scope = useTableEngine<Row>({ columns, rows: [{ id: 'a' }], root, rowKey: 'id', rowHeight: 30, state }).scope;
+			scope = useGridEngine<Row>({ columns, rows: [{ id: 'a' }], root, rowKey: 'id', rowHeight: 30, state }).scope;
 			resize = useColumnResize(scope, options);
 
 			return () => h('div', { ref: root }, [
@@ -35,7 +35,7 @@ function setup(options: ColumnResizeOptions = {}) {
 	return {
 		wrapper,
 		state,
-		scope: scope as unknown as TableScope,
+		scope: scope as unknown as GridScope,
 		resize: resize as unknown as ReturnType<typeof useColumnResize>,
 		handle: () => wrapper.get('.handle'),
 	};
@@ -43,7 +43,7 @@ function setup(options: ColumnResizeOptions = {}) {
 
 let current: ReturnType<typeof setup> | null = null;
 
-let inCell: { scope: TableScope; unmount: () => void } | null = null;
+let inCell: { scope: GridScope; unmount: () => void } | null = null;
 
 /**
  * A handle inside the header cell of `price`, declared with `extra` on top, as the parts render it;
@@ -54,11 +54,11 @@ function mountInCell(extra: Record<string, unknown>) {
 	const declared = defineColumns({
 		price: { value: (row: Row) => row.id, label: 'Price', width: 100, minWidth: 40, maxWidth: 300, resizable: true, ...extra },
 	});
-	let scope: TableScope | null = null;
+	let scope: GridScope | null = null;
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			scope = useTableEngine<Row>({ columns: declared, rows: [{ id: 'a' }], root, rowKey: 'id', rowHeight: 30 }).scope;
+			scope = useGridEngine<Row>({ columns: declared, rows: [{ id: 'a' }], root, rowKey: 'id', rowHeight: 30 }).scope;
 
 			const resize = useColumnResize(scope);
 
@@ -70,7 +70,7 @@ function mountInCell(extra: Record<string, unknown>) {
 	const cell = wrapper.get('[data-dg-column]').element;
 
 	vi.spyOn(cell, 'getBoundingClientRect').mockReturnValue({ width: 100 } as DOMRect);
-	inCell = { scope: scope as unknown as TableScope, unmount: () => wrapper.unmount() };
+	inCell = { scope: scope as unknown as GridScope, unmount: () => wrapper.unmount() };
 
 	return wrapper.get('.handle').element as HTMLElement;
 }
@@ -214,7 +214,7 @@ describe('useColumnResize — the pointer', () => {
 		expect(values.at(-1)).toBe(150);
 	});
 
-	it('in a right-to-left table a drag toward the start widens the column', () => {
+	it('in a right-to-left grid a drag toward the start widens the column', () => {
 		current = setup();
 
 		const handle = current.handle().element as HTMLElement;

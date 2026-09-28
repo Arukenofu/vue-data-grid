@@ -2,7 +2,7 @@ import { computed } from 'vue';
 
 import type { RenderedColumn } from '../columns/column';
 import { getColumnRunGeometry, getColumnRunGrow } from '../render/column-span';
-import { getGeometryKey, type TableCellStyles } from '../render/geometry';
+import { getGeometryKey, type GridCellStyles } from '../render/geometry';
 import { stableComputed } from '../shared/stable-computed';
 import {
 	type ColumnGroup,
@@ -23,7 +23,7 @@ interface ColumnGroupsOptions {
 	rendered: () => readonly RenderedColumn[];
 	getPinOffset: (name: string) => number;
 	getGrow: (name: string) => number;
-	cellStyles: TableCellStyles;
+	cellStyles: GridCellStyles;
 }
 
 interface CacheEntry {

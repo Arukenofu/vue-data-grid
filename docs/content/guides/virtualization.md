@@ -1,13 +1,13 @@
 ---
 title: Virtualization
-description: Render only the rows and columns in view, so a table of a hundred thousand rows scrolls as smoothly as one of twenty.
+description: Render only the rows and columns in view, so a grid of a hundred thousand rows scrolls as smoothly as one of twenty.
 ---
 
 # Virtualization
 
 <Description>
-A table only needs the rows and columns people can see. With virtualization it renders those, plus a
-few around them, and swaps them as the table scrolls: a hundred thousand rows cost about as much as
+A grid only needs the rows and columns people can see. With virtualization it renders those, plus a
+few around them, and swaps them as the grid scrolls: a hundred thousand rows cost about as much as
 thirty.
 </Description>
 
@@ -19,10 +19,10 @@ DOM at any time.
 
 ## Turning it on
 
-Pass `virtual: true`, and the table windows both rows and columns:
+Pass `virtual: true`, and the grid windows both rows and columns:
 
 ```ts
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: sensors,
 	rowKey: 'id',
@@ -31,11 +31,11 @@ const table = useDataTable({
 });
 ```
 
-Nothing changes in the markup: `TableBody` already renders the rows the window gives it, and
-`TableCells` the columns. The body is as tall as all the rows together, so the scrollbar is right from
+Nothing changes in the markup: `GridBody` already renders the rows the window gives it, and
+`GridCells` the columns. The body is as tall as all the rows together, so the scrollbar is right from
 the first frame, and each row is placed at its offset.
 
-The table needs a height to have a window at all: `TableRoot` is the scroll container, and a table
+The grid needs a height to have a window at all: `GridRoot` is the scroll container, and a grid
 that grows with its rows never scrolls itself.
 
 ## Fine-tuning the windows
@@ -49,7 +49,7 @@ that grows with its rows never scrolls itself.
 		{ name: 'columns', type: 'boolean', default: 'true', description: 'Window the columns. Worth it from a few dozen columns on.' },
 		{ name: 'overscan', type: 'number', default: '6', description: 'Rows rendered past each edge of the viewport, so a fast scroll does not show blank space.' },
 		{ name: 'bufferPx', type: 'number', default: '200', description: 'Width rendered past each edge of the viewport, px. In pixels rather than columns, since columns differ in width.' },
-		{ name: 'ssrRows', type: 'number', default: '24', description: 'Rows rendered before the table is mounted: on the server, and in the frame of hydration.' },
+		{ name: 'ssrRows', type: 'number', default: '24', description: 'Rows rendered before the grid is mounted: on the server, and in the frame of hydration.' },
 	]"
 />
 
@@ -81,11 +81,11 @@ the real rows.
 ## Scrolling from code
 
 A row or a column outside the window is not in the DOM, so `scrollIntoView` cannot reach it. Ask the
-table instead:
+grid instead:
 
 ```ts
-table.scope.scrollToRow(49_999, 'center');
-table.scope.scrollToColumn('day17', 'center');
+grid.scope.scrollToRow(49_999, 'center');
+grid.scope.scrollToColumn('day17', 'center');
 ```
 
 Both take `'start'`, `'center'`, `'end'` or `'auto'`, which scrolls only as far as needed. Both keep
@@ -94,16 +94,16 @@ scrolled to.
 
 ## What stays rendered
 
-Some rows and columns must stay in the DOM wherever the table scrolls: the cell that has focus, a row
-being dragged, a column being resized. The parts of the table take care of their own, so a focused
+Some rows and columns must stay in the DOM wherever the grid scrolls: the cell that has focus, a row
+being dragged, a column being resized. The parts of the grid take care of their own, so a focused
 cell scrolled far away keeps its focus. For your own needs:
 
 - `keepRows` and `keepColumns` options keep rows, by index, and columns, by name, rendered;
-- `table.scope.keepRendered({ rows, columns })` does the same from a component, until the function it
+- `grid.scope.keepRendered({ rows, columns })` does the same from a component, until the function it
   returns is called or the component unmounts.
 
 ```ts
-const release = table.scope.keepRendered({ rows: () => [editedIndex.value] });
+const release = grid.scope.keepRendered({ rows: () => [editedIndex.value] });
 ```
 
 A column marked as a [row header](/guides/columns#service-columns-and-row-headers) is always rendered,
@@ -111,18 +111,18 @@ so a row keeps its accessible name while it is scrolled sideways.
 
 ## Rendering on a server
 
-Before the scroll container exists there is no viewport to measure. The table then renders the first
+Before the scroll container exists there is no viewport to measure. The grid then renders the first
 `ssrRows` rows, on the server and in the first frame in the browser alike, so hydration matches, and
 windows properly from the next frame on.
 
 ## Accessibility
 
-- `aria-rowcount` and `aria-colcount` give the size of the whole table, and every rendered row and
+- `aria-rowcount` and `aria-colcount` give the size of the whole grid, and every rendered row and
   cell carries its `aria-rowindex` and `aria-colindex`. A screen reader says "row 50,000 of 100,000"
   although only thirty rows exist in the DOM.
 - With the `navigation` feature, as in the demo, the arrow keys, <kbd>PageUp</kbd>,
   <kbd>PageDown</kbd>, <kbd>Ctrl+Home</kbd> and <kbd>Ctrl+End</kbd> move through all of the rows, not
-  only the rendered ones: the table scrolls the target into view, renders it and focuses it.
+  only the rendered ones: the grid scrolls the target into view, renders it and focuses it.
 - The focused cell stays rendered while it is out of view, so focus is never lost to the window.
 
 ### Keyboard interactions
@@ -130,13 +130,13 @@ windows properly from the next frame on.
 <KeyboardTable
 	:data="[
 		{ keys: ['PageUp', 'PageDown'], description: 'Moves focus by as many rows as fit between the header and the footer.' },
-		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves focus to the first or the last cell of the table, rendering it first.' },
+		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves focus to the first or the last cell of the grid, rendering it first.' },
 		{ keys: ['Ctrl+↑', 'Ctrl+↓'], description: 'Moves focus to the first or the last row of the column.' },
 	]"
 />
 
 ## See also
 
-- [Performance](/overview/performance): why a large table stays cheap.
-- [A million cells](/examples/big-data): a larger table with sorting and live stats.
+- [Performance](/overview/performance): why a large grid stays cheap.
+- [A million cells](/examples/big-data): a larger grid with sorting and live stats.
 - [Keyboard navigation](/guides/keyboard-navigation): the keys of the grid.

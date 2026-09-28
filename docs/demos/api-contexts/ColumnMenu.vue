@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { type SortDirection, useDataTableContext, useHeaderCellContext } from '@vue-data-grid/core';
+import { type SortDirection, useDataGridContext, useHeaderCellContext } from '@vue-data-grid/core';
 import IconMore from '~icons/lucide/ellipsis-vertical';
 import { computed } from 'vue';
 
 import { type MenuEntry, UiButton, UiMenu } from '@/ui';
 
-const table = useDataTableContext();
+const grid = useDataGridContext();
 const cell = useHeaderCellContext();
 
 function sortBy(name: string, direction: SortDirection | null) {
-	table.state.sort.value = direction ? [{ name, direction }] : [];
+	grid.state.sort.value = direction ? [{ name, direction }] : [];
 }
 
 const entries = computed<MenuEntry[]>(() => {
@@ -20,8 +20,8 @@ const entries = computed<MenuEntry[]>(() => {
 	}
 
 	const { name } = column;
-	const pin = table.scope.getPin(name);
-	const direction = table.scope.getSortDirection(name);
+	const pin = grid.scope.getPin(name);
+	const direction = grid.scope.getSortDirection(name);
 	const items: MenuEntry[] = [];
 
 	if (column.sortable) {
@@ -35,12 +35,12 @@ const entries = computed<MenuEntry[]>(() => {
 	if (column.pinnable) {
 		items.push(
 			{ type: 'separator', key: 'pin-line' },
-			{ type: 'checkbox', key: 'pin', label: 'Pin to the start', checked: pin === 'start', toggle: on => table.scope.pinColumn(name, on ? 'start' : null) },
+			{ type: 'checkbox', key: 'pin', label: 'Pin to the start', checked: pin === 'start', toggle: on => grid.scope.pinColumn(name, on ? 'start' : null) },
 		);
 	}
 
 	if (column.hideable) {
-		items.push({ type: 'action', key: 'hide', label: 'Hide column', select: () => table.scope.toggleColumn(name) });
+		items.push({ type: 'action', key: 'hide', label: 'Hide column', select: () => grid.scope.toggleColumn(name) });
 	}
 
 	return items;

@@ -3,13 +3,13 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, effectScope, h, nextTick, type ShallowRef, shallowRef, type VNodeChild } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { useTableAnnouncer } from '../../src/announcer/use-table-announcer';
+import { useGridAnnouncer } from '../../src/announcer/use-grid-announcer';
 import { selectionColumn } from '../../src/columns/service-columns';
-import type { TableMessages } from '../../src/components/messages';
-import { TableEmpty, TableLoading } from '../../src/components/table-overlays';
-import { TableRoot } from '../../src/components/table-root';
-import { selection, sorting } from '../../src/data-table/factories';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import type { GridMessages } from '../../src/components/messages';
+import { GridEmpty, GridLoading } from '../../src/components/grid-overlays';
+import { GridRoot } from '../../src/components/grid-root';
+import { selection, sorting } from '../../src/data-grid/factories';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { renderBody, renderFooter, renderHeader } from '../support/parts';
 
 interface Row {
@@ -35,17 +35,17 @@ afterEach(() => {
 interface Setup {
 	rows?: Row[];
 	loading?: ShallowRef<boolean>;
-	messages?: Partial<TableMessages>;
+	messages?: Partial<GridMessages>;
 	content?: () => VNodeChild;
 }
 
 function render(setup: Setup = {}) {
 	const rows = shallowRef(setup.rows ?? [{ id: 'a', price: 1 }, { id: 'b', price: 2 }]);
-	let table: DataTable | null = null;
+	let grid: DataGrid | null = null;
 
 	wrapper = mount(defineComponent({
 		setup() {
-			table = useDataTable({
+			grid = useDataGrid({
 				columns,
 				rows,
 				rowKey: 'id',
@@ -54,27 +54,27 @@ function render(setup: Setup = {}) {
 					sorting: sorting(),
 					selection: selection(),
 				},
-			}) as DataTable;
+			}) as DataGrid;
 
-			return () => h(TableRoot, { table: table as DataTable, messages: setup.messages }, {
+			return () => h(GridRoot, { grid: grid as DataGrid, messages: setup.messages }, {
 				default: setup.content ?? (() => [
 					renderHeader(),
 					renderBody(),
-					h(TableEmpty),
-					setup.loading?.value ? h(TableLoading) : null,
+					h(GridEmpty),
+					setup.loading?.value ? h(GridLoading) : null,
 					renderFooter(),
 				]),
 			});
 		},
 	}), { attachTo: document.body });
 
-	return { rows, table: table as unknown as DataTable };
+	return { rows, grid: grid as unknown as DataGrid };
 }
 
-const grid = () => wrapper?.get('[data-dg-part="table"]');
+const grid = () => wrapper?.get('[data-dg-part="grid"]');
 const announced = () => wrapper?.get('[data-dg-part="announcer"]').text();
 
-describe('TableEmpty', () => {
+describe('GridEmpty', () => {
 	it('shows one row over every column while there are no rows, counted in the rows', async () => {
 		render({ rows: [] });
 		await nextTick();
@@ -101,8 +101,8 @@ describe('TableEmpty', () => {
 	});
 });
 
-describe('TableLoading', () => {
-	it('makes the table busy while it is shown, and says so', async () => {
+describe('GridLoading', () => {
+	it('makes the grid busy while it is shown, and says so', async () => {
 		const loading = shallowRef(false);
 
 		render({ loading });
@@ -138,24 +138,24 @@ describe('TableLoading', () => {
 
 describe('announcements', () => {
 	it('say the whole sort, and the number of selected rows', async () => {
-		const { table } = render();
+		const { grid } = render();
 
-		table.state.multiSort.value = true;
-		table.scope.toggleSort('price', true);
-		table.scope.toggleSort('id', true);
+		grid.state.multiSort.value = true;
+		grid.scope.toggleSort('price', true);
+		grid.scope.toggleSort('id', true);
 		await nextTick();
 
 		expect(announced()).toBe('Sorted by Price descending, then Id descending');
 
-		table.selection?.toggle('a');
+		grid.selection?.toggle('a');
 		await nextTick();
 
 		expect(announced()).toBe('1 row selected');
 	});
 
-	it('an announcement renders the live region alone, not the table', async () => {
+	it('an announcement renders the live region alone, not the grid', async () => {
 		let renders = 0;
-		const { table } = render({
+		const { grid } = render({
 			content: () => {
 				renders += 1;
 
@@ -167,7 +167,7 @@ describe('announcements', () => {
 
 		const before = renders;
 
-		table.selection?.toggle('a');
+		grid.selection?.toggle('a');
 		await nextTick();
 
 		expect(announced()).toBe('1 row selected');
@@ -175,9 +175,9 @@ describe('announcements', () => {
 	});
 
 	it('a repeated message changes the region, so it is said again', () => {
-		const { table } = render();
+		const { grid } = render();
 		const scope = effectScope();
-		const announcer = scope.run(() => useTableAnnouncer(table)) as ReturnType<typeof useTableAnnouncer>;
+		const announcer = scope.run(() => useGridAnnouncer(grid)) as ReturnType<typeof useGridAnnouncer>;
 
 		announcer.announce('Saved');
 		const first = announcer.message.value;

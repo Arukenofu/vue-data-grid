@@ -4,12 +4,12 @@ import { defineComponent, h, nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { rowNumberColumn, selectionColumn, treeColumn } from '../../src/columns/service-columns';
-import { TableRoot } from '../../src/components/table-root';
-import { type TableBodyRow, useBodyRowContext } from '../../src/components/context';
-import { TableBody } from '../../src/components/table-body';
-import { TableSelectionCheckbox } from '../../src/components/table-service-parts';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
-import { selection, sorting, tree } from '../../src/data-table/factories';
+import { GridRoot } from '../../src/components/grid-root';
+import { type GridBodyRow, useBodyRowContext } from '../../src/components/context';
+import { GridBody } from '../../src/components/grid-body';
+import { GridSelectionCheckbox } from '../../src/components/grid-service-parts';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
+import { selection, sorting, tree } from '../../src/data-grid/factories';
 import { renderBody, renderHeader } from '../support/parts';
 
 interface Row {
@@ -40,22 +40,22 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-function render<TTable extends DataTable<Row>>(create: () => TTable) {
-	let table: TTable | null = null;
+function render<TGrid extends DataGrid<Row>>(create: () => TGrid) {
+	let grid: TGrid | null = null;
 
 	wrapper = mount(defineComponent({
 		setup() {
-			table = create();
+			grid = create();
 
-			return () => h(TableRoot, { table: table as DataTable }, { default: () => [renderHeader(), renderBody()] });
+			return () => h(GridRoot, { grid: grid as DataGrid }, { default: () => [renderHeader(), renderBody()] });
 		},
 	}), { attachTo: document.body });
 
-	return table as unknown as TTable;
+	return grid as unknown as TGrid;
 }
 
 function withFeatures() {
-	return useDataTable({
+	return useDataGrid({
 		columns,
 		rows,
 		rowKey: 'id',
@@ -101,7 +101,7 @@ describe('service columns — rendered', () => {
 	});
 
 	it('a tree without groups draws neither indents nor the room of toggles', () => {
-		render(() => useDataTable({
+		render(() => useDataGrid({
 			columns,
 			rows: rows.map(({ id, name }): Row => ({ id, name })),
 			rowKey: 'id',
@@ -127,8 +127,8 @@ describe('service columns — rendered', () => {
 	});
 
 	it('the checkboxes select rows, a group its leaves, and the header one every row', async () => {
-		const table = render(withFeatures);
-		const { selection } = table;
+		const grid = render(withFeatures);
+		const { selection } = grid;
 
 		await bodyRows()[0].get('input').trigger('click');
 
@@ -142,8 +142,8 @@ describe('service columns — rendered', () => {
 	});
 
 	it('Shift+click selects the range from the last row toggled', async () => {
-		const table = render(withFeatures);
-		const { selection } = table;
+		const grid = render(withFeatures);
+		const { selection } = grid;
 
 		await bodyRows()[1].get('input').trigger('click');
 		await bodyRows()[2].get('input').trigger('click', { shiftKey: true });
@@ -166,7 +166,7 @@ describe('service columns — rendered', () => {
 	});
 
 	it('the select-all checkbox stays unticked while there is nothing to select', async () => {
-		render(() => useDataTable({
+		render(() => useDataGrid({
 			columns,
 			rows: [],
 			rowKey: 'id',
@@ -185,20 +185,20 @@ describe('service columns — rendered', () => {
 	it('a checkbox without the selection feature renders nothing and says why in development', async () => {
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-		render(() => useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30 }));
+		render(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 }));
 		await nextTick();
 
-		expect(wrapper?.findAllComponents(TableSelectionCheckbox).length).toBeGreaterThan(0);
+		expect(wrapper?.findAllComponents(GridSelectionCheckbox).length).toBeGreaterThan(0);
 		expect(wrapper?.findAll('input')).toHaveLength(0);
 		// Once for the part, not once for each row.
-		expect(warn.mock.calls.filter(([message]) => String(message).includes('<TableSelectionCheckbox>'))).toHaveLength(1);
+		expect(warn.mock.calls.filter(([message]) => String(message).includes('<GridSelectionCheckbox>'))).toHaveLength(1);
 		expect(warn).toHaveBeenCalledWith(expect.stringContaining('needs the `selection` feature'));
 	});
 });
 
 describe('the sort indicator', () => {
 	it('keeps its place while the column is unsorted, and shows the direction once sorted', async () => {
-		render(() => useDataTable({
+		render(() => useDataGrid({
 			columns,
 			rows,
 			rowKey: 'id',
@@ -222,12 +222,12 @@ describe('the sort indicator', () => {
 
 describe('the selection checkbox on another element', () => {
 	const custom = defineColumns({
-		pick: { value: () => null, kind: 'service', cell: ({ key }) => h(TableSelectionCheckbox, { as: 'span', row: key }) },
+		pick: { value: () => null, kind: 'service', cell: ({ key }) => h(GridSelectionCheckbox, { as: 'span', row: key }) },
 		name: column(row => row.name),
 	});
 
 	it('takes the checkbox role and `aria-checked`, toggles on Space and leaves Enter alone', async () => {
-		const table = render(() => useDataTable({
+		const grid = render(() => useDataGrid({
 			columns: custom,
 			rows,
 			rowKey: 'id',
@@ -241,7 +241,7 @@ describe('the selection checkbox on another element', () => {
 
 		await box().trigger('keydown', { key: ' ' });
 
-		expect(table.selection.isSelected('a')).toBe(true);
+		expect(grid.selection.isSelected('a')).toBe(true);
 		expect(box().attributes()).toMatchObject({ 'aria-checked': 'true', 'data-dg-state': 'checked' });
 
 		const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
@@ -249,13 +249,13 @@ describe('the selection checkbox on another element', () => {
 		box().element.dispatchEvent(enter);
 
 		expect(enter.defaultPrevented).toBe(true);
-		expect(table.selection.isSelected('a')).toBe(true);
+		expect(grid.selection.isSelected('a')).toBe(true);
 	});
 
-	it('takes its row as a body row too, outside a `TableRow`', () => {
+	it('takes its row as a body row too, outside a `GridRow`', () => {
 		wrapper = mount(defineComponent({
 			setup() {
-				const table = useDataTable({
+				const grid = useDataGrid({
 					columns,
 					rows,
 					rowKey: 'id',
@@ -263,9 +263,9 @@ describe('the selection checkbox on another element', () => {
 					features: { selection: selection() },
 				});
 
-				return () => h(TableRoot, { table: table as DataTable }, {
-					default: () => h(TableBody, null, {
-						default: ({ rows: shown }: { rows: readonly TableBodyRow[] }) => shown.map(row => h(TableSelectionCheckbox, { key: row.key, row })),
+				return () => h(GridRoot, { grid: grid as DataGrid }, {
+					default: () => h(GridBody, null, {
+						default: ({ rows: shown }: { rows: readonly GridBodyRow[] }) => shown.map(row => h(GridSelectionCheckbox, { key: row.key, row })),
 					}),
 				});
 			},
@@ -291,6 +291,6 @@ describe('the selection checkbox on another element', () => {
 			},
 		})).unmount();
 
-		expect(results).toEqual([null, 'useBodyRowContext() must be called inside <TableRow>']);
+		expect(results).toEqual([null, 'useBodyRowContext() must be called inside <GridRow>']);
 	});
 });

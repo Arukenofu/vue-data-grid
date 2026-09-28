@@ -67,7 +67,7 @@ export type ColumnBuilder<TRow, TMeta = unknown> = <TValue, TName extends Aggreg
  * and then types `equals`, `format`, `compare` and the functions of `ColumnExtension`. The inferred
  * `aggregate` reaches `ColumnExtension` too; a function `aggregate` does so for the fields after it
  * in the object. `defaults` go into every column the builder makes, such as the same rights for the
- * whole table.
+ * whole grid.
  */
 export function defineColumn<TRow, TMeta = unknown>(defaults?: ColumnDefaults): ColumnBuilder<TRow, TMeta> {
 	return ((value, rest) => ({ ...defaults, ...rest, value })) as ColumnBuilder<TRow, TMeta>;

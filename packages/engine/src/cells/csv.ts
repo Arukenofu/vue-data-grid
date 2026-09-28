@@ -20,7 +20,7 @@ export interface CsvOptions<TRow> {
 	/**
 	 * Prefixes with `'` any text a spreadsheet would take for a formula: starting with `=`, `+`, `-`,
 	 * `@`, a tab or a carriage return. Numbers, negative ones included, are left alone. `true` by
-	 * default; `false` for text that goes back into a table, such as the clipboard.
+	 * default; `false` for text that goes back into a grid, such as the clipboard.
 	 */
 	escapeFormulas?: boolean;
 }

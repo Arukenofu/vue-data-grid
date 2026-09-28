@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { grouping, navigation, tree, useDataTable, useTableMotion } from '@vue-data-grid/core';
+import { grouping, navigation, tree, useDataGrid, useGridMotion } from '@vue-data-grid/core';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
 import IconUnfoldVertical from '~icons/lucide/unfold-vertical';
 import { computed, ref, shallowRef, watch } from 'vue';
 
 import { sales } from '@/data/sales';
-import { type Option, UiButton, UiDataTable, UiStat, UiSwitch, UiToggleGroup, UiToolbar } from '@/ui';
+import { type Option, UiButton, UiDataGrid, UiStat, UiSwitch, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { columns, groups } from './columns';
 import { collectGroups, getMargin, GROUPINGS, type Grouping, money, type ReportRow, toLines } from './report';
@@ -21,7 +21,7 @@ const expanded = ref<string[]>();
 
 const rows = computed(() => toLines(sales, groupBy.value));
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	groups,
 	rows,
@@ -45,18 +45,18 @@ const table = useDataTable({
 	},
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
 watch(groupBy, () => {
 	expanded.value = undefined;
 });
 
 const detailed = computed({
-	get: () => !table.scope.isGroupCollapsed('money'),
-	set: (value: boolean) => table.scope.batch(() => {
+	get: () => !grid.scope.isGroupCollapsed('money'),
+	set: (value: boolean) => grid.scope.batch(() => {
 		for (const name of Object.keys(groups)) {
-			if (table.scope.isGroupCollapsed(name) === value) {
-				table.scope.toggleGroup(name);
+			if (grid.scope.isGroupCollapsed(name) === value) {
+				grid.scope.toggleGroup(name);
 			}
 		}
 	}),
@@ -66,7 +66,7 @@ const revenue = computed(() => rows.value.reduce((sum, row) => sum + row.revenue
 const margin = computed(() => getMargin(rows.value));
 
 function expandAll() {
-	expanded.value = collectGroups(table.grouping.rows.value);
+	expanded.value = collectGroups(grid.grouping.rows.value);
 }
 
 function collapseAll() {
@@ -94,6 +94,6 @@ function collapseAll() {
 			<UiStat label="Margin" :value="margin === null ? '—' : `${(margin * 100).toFixed(1)}%`" />
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Sales report" footer data-size="lg" />
+		<UiDataGrid :grid="grid" label="Sales report" footer data-size="lg" />
 	</div>
 </template>

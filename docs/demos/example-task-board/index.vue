@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { moveRow } from '@vue-data-grid/core';
-import { TableDropZone } from '@vue-data-grid/core/drag-and-drop';
+import { GridDropZone } from '@vue-data-grid/core/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
 import IconArchiveRestore from '~icons/lucide/archive-restore';
 import { computed, shallowRef } from 'vue';
@@ -8,7 +8,7 @@ import { computed, shallowRef } from 'vue';
 import { UiBadge, UiButton, UiProgress, UiStat, UiToolbar } from '@/ui';
 
 import { type BoardTask, createBoard, type ListName, SPRINT_CAPACITY } from './board';
-import TaskTable from './TaskTable.vue';
+import TaskGrid from './TaskGrid.vue';
 
 const tasks = shallowRef<readonly BoardTask[]>(createBoard());
 const archived = shallowRef<readonly BoardTask[]>([]);
@@ -65,7 +65,7 @@ function restore() {
 		</UiToolbar>
 
 		<div class="board-lists">
-			<TaskTable
+			<TaskGrid
 				title="This sprint"
 				other="Backlog"
 				:tasks="sprint"
@@ -74,8 +74,8 @@ function restore() {
 				@archive="archive"
 			>
 				<UiBadge tone="green">{{ committed }} pts</UiBadge>
-			</TaskTable>
-			<TaskTable
+			</TaskGrid>
+			<TaskGrid
 				title="Backlog"
 				other="This sprint"
 				:tasks="backlog"
@@ -85,12 +85,12 @@ function restore() {
 			/>
 		</div>
 
-		<TableDropZone v-slot="{ ready, over }" group="tasks" class="board-bin" @drop="event => archive(event.key)">
+		<GridDropZone v-slot="{ ready, over }" group="tasks" class="board-bin" @drop="event => archive(event.key)">
 			<IconArchive aria-hidden="true" />
 			<template v-if="over">Release to archive the task</template>
 			<template v-else-if="ready">Drop a task here to archive it</template>
 			<template v-else>{{ archived.length }} archived · drag a task here to archive it</template>
-		</TableDropZone>
+		</GridDropZone>
 	</div>
 </template>
 

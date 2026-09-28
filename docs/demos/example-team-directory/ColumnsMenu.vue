@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { AnyColumn, TableScope } from '@vue-data-grid/core';
+import type { AnyColumn, GridScope } from '@vue-data-grid/core';
 import IconColumns from '~icons/lucide/columns-3-cog';
 import { computed } from 'vue';
 
 import { type MenuEntry, UiButton, UiMenu } from '@/ui';
 
-const props = defineProps<{ scope: TableScope }>();
+const props = defineProps<{ scope: GridScope }>();
 
 const emit = defineEmits<{ reset: [] }>();
 

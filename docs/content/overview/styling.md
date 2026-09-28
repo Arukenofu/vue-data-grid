@@ -1,12 +1,12 @@
 ---
 title: Styling
-description: The structural styles, the theme variables and the data attributes to style a table with.
+description: The structural styles, the theme variables and the data attributes to style a grid with.
 ---
 
 # Styling
 
 <Description>
-A table has no look of its own. A small structural stylesheet makes it work, a handful of CSS
+A grid has no look of its own. A small structural stylesheet makes it work, a handful of CSS
 variables set its colours and density, and data attributes on every part let your CSS reach anything
 else, in any state.
 </Description>
@@ -16,9 +16,9 @@ else, in any state.
 ## Two layers
 
 **The structural styles** come with the package, in `@vue-data-grid/core/style.css`. They hold what a
-table needs to work and nothing that is a matter of taste:
+grid needs to work and nothing that is a matter of taste:
 
-- the table is a scroll container, and the header and the footer stick to its edges;
+- the grid is a scroll container, and the header and the footer stick to its edges;
 - rows are flex lines of cells, as wide as their columns, positioned by the row window;
 - pinned columns stick to their edge and stay opaque, so content scrolling under them does not show
   through;
@@ -33,14 +33,14 @@ import '@vue-data-grid/core/style.css';
 ```
 
 **Your theme** is everything else: colours, fonts, spacing, borders, hover states, icons. The demo
-above switches between four themes for one and the same table; only the class on `TableRoot`
+above switches between four themes for one and the same grid; only the class on `GridRoot`
 changes:
 
 - **reka-ui**, the theme every demo of these docs uses: sage neutrals, a green accent, icons for the
   sort;
-- **Mono**, a crisp monochrome admin table: uppercase headers over a hard line, black on white, and
+- **Mono**, a crisp monochrome admin grid: uppercase headers over a hard line, black on white, and
   selection marked by a bar rather than a colour;
-- **Indigo**, a spacious product table: more padding, rounded corners and a soft shadow, with an
+- **Indigo**, a spacious product grid: more padding, rounded corners and a soft shadow, with an
   indigo accent;
 - **Ledger**, a dense data grid for numbers: small type, lines between columns, zebra rows, monospaced
   figures and arrows next to the change.
@@ -49,13 +49,13 @@ Each theme is a few dozen lines of CSS in `themes.css`, one switch away.
 
 ::: tip Colours of the system
 Without a theme at all, the structural styles use the system colours `Canvas`, `CanvasText` and
-`Highlight`. A bare table follows light and dark mode, and stays readable in forced-colours modes
+`Highlight`. A bare grid follows light and dark mode, and stays readable in forced-colours modes
 such as Windows High Contrast.
 :::
 
 ## Theme variables
 
-The structural styles read these variables. Set them on the table element, or anywhere above it:
+The structural styles read these variables. Set them on the grid element, or anywhere above it:
 
 ```css
 .invoices {
@@ -81,8 +81,8 @@ The structural styles read these variables. Set them on the table element, or an
 		{ name: '--dg-selected-background', default: 'Highlight at 18%', description: 'The cells of a selected row. Opaque, for the same reason as pinned cells.' },
 		{ name: '--dg-line-color', default: 'CanvasText at 15%', description: 'The line under a row and at the edge of pinned columns.' },
 		{ name: '--dg-line-width', default: '1px', description: 'The width of those lines.' },
-		{ name: '--dg-cell-padding', default: '0 8px', description: 'The padding of every cell: the density of the table.' },
-		{ name: '--dg-focus-ring', default: '2px solid Highlight', description: 'The outline of a focused cell or table.' },
+		{ name: '--dg-cell-padding', default: '0 8px', description: 'The padding of every cell: the density of the grid.' },
+		{ name: '--dg-focus-ring', default: '2px solid Highlight', description: 'The outline of a focused cell or grid.' },
 		{ name: '--dg-resize-handle-width', default: '8px', description: 'The grab area of a column resize handle.' },
 		{ name: '--dg-group-row-height', description: 'The height of a group row of the header. Headers of columns without a group span it only when it is set.' },
 		{ name: '--dg-tree-indent', default: '16px', description: 'The indent of a tree cell per level.' },
@@ -97,7 +97,7 @@ The structural styles read these variables. Set them on the table element, or an
 	]"
 />
 
-The table writes its geometry into variables of its own: `--dg-width-*`, `--dg-grow-*` and `--dg-pin-*`
+The grid writes its geometry into variables of its own: `--dg-width-*`, `--dg-grow-*` and `--dg-pin-*`
 for every column, `--dg-inset-start` and `--dg-inset-end`, and `--dg-pinned-z-index`. Read them if
 you need to, but do not set them: they change on every resize without a render, which is what keeps
 resizing smooth.
@@ -126,7 +126,7 @@ Every part says what it is in `data-dg-part`, and an interactive part says its s
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-dg-part=&quot;table&quot;]', values: 'The table element, the scroll container.' },
+		{ attribute: '[data-dg-part=&quot;grid&quot;]', values: 'The grid element, the scroll container.' },
 		{ attribute: '[data-dg-part=&quot;head&quot;]', values: 'The header block; `foot` is the footer block, `body` the body block.' },
 		{ attribute: '[data-dg-part=&quot;row&quot;]', values: 'Any row: a group row or the row of column headers, a body row, a footer row.' },
 		{ attribute: '[data-dg-part=&quot;cell-text&quot;]', values: 'The text a part renders in a cell by default, cut with an ellipsis.' },
@@ -135,7 +135,7 @@ Every part says what it is in `data-dg-part`, and an interactive part says its s
 		{ attribute: '[data-dg-part=&quot;group-toggle&quot;]', values: 'The button that collapses a column group.' },
 		{ attribute: '[data-dg-part=&quot;selection-checkbox&quot;]', values: 'A row checkbox, and the select-all checkbox.' },
 		{ attribute: '[data-dg-part=&quot;tree-toggle&quot;]', values: 'The button that expands a row of a tree; `tree-indent` is the indent before it.' },
-		{ attribute: '[data-dg-part=&quot;empty&quot;]', values: 'The row of an empty table; `empty-cell` is its cell.' },
+		{ attribute: '[data-dg-part=&quot;empty&quot;]', values: 'The row of an empty grid; `empty-cell` is its cell.' },
 		{ attribute: '[data-dg-part=&quot;loading&quot;]', values: 'The loading bar.' },
 		{ attribute: '[data-dg-part=&quot;range&quot;]', values: 'A cell range drawn over the body; `range-cell` is a piece of it on one pin side.' },
 		{ attribute: '[data-dg-part=&quot;fill-handle&quot;]', values: 'The fill handle at the corner of the last range.' },
@@ -143,7 +143,7 @@ Every part says what it is in `data-dg-part`, and an interactive part says its s
 		{ attribute: '[data-dg-part=&quot;cell-checkbox&quot;]', values: 'The checkbox of `checkboxCell()`.' },
 		{ attribute: '[data-dg-part=&quot;drag-handle&quot;]', values: 'The drag handle of a row.' },
 		{ attribute: '[data-dg-part=&quot;drag-preview&quot;]', values: 'The ghost under the pointer during a drag.' },
-		{ attribute: '[data-dg-part=&quot;drag-overlay&quot;]', values: 'The message over a table a drag can drop on.' },
+		{ attribute: '[data-dg-part=&quot;drag-overlay&quot;]', values: 'The message over a grid a drag can drop on.' },
 		{ attribute: '[data-dg-part=&quot;drop-zone&quot;]', values: 'An area rows or columns are dropped on.' },
 		{ attribute: '[data-dg-part=&quot;announcer&quot;]', values: 'The live region of the announcer, hidden from sight.' },
 	]"
@@ -195,12 +195,12 @@ When CSS is not enough, a part's slot lets you render its content. A sort indica
 your own, as the kit of these docs does:
 
 ```vue
-<TableSortIndicator v-slot="{ direction, sortIndex }">
+<GridSortIndicator v-slot="{ direction, sortIndex }">
 	<IconArrowUp v-if="direction === 'asc'" />
 	<IconArrowDown v-else-if="direction === 'desc'" />
 	<IconChevronsUpDown v-else class="is-idle" />
 	<span v-if="direction && sortIndex">{{ sortIndex }}</span>
-</TableSortIndicator>
+</GridSortIndicator>
 ```
 
 And with `as` or `asChild`, a part renders the element or component you choose, such as a
@@ -208,20 +208,20 @@ checkbox of your design system in place of the native one. See [Your own markup]
 
 ## Scoped styles
 
-A class on `TableRoot` goes to the table element, so a class-based theme just works. With Vue's
+A class on `GridRoot` goes to the grid element, so a class-based theme just works. With Vue's
 scoped styles, remember that parts render their own elements: reach inside them with `:deep()`.
-`TableRoot` itself has several root nodes, the table, the exit element of the navigation and the
+`GridRoot` itself has several root nodes, the grid, the exit element of the navigation and the
 live region, so style it from an element around it:
 
 ```vue
 <template>
 	<section class="invoices">
-		<TableRoot :table="table" label="Invoices">…</TableRoot>
+		<GridRoot :grid="grid" label="Invoices">…</GridRoot>
 	</section>
 </template>
 
 <style scoped>
-.invoices :deep([data-dg-part='table']) {
+.invoices :deep([data-dg-part='grid']) {
 	height: 480px;
 }
 
@@ -236,23 +236,23 @@ live region, so style it from an element around it:
 The data attributes work as Tailwind variants, and the theme variables as arbitrary values:
 
 ```vue
-<TableRoot
-	:table="table"
+<GridRoot
+	:grid="grid"
 	label="Invoices"
 	class="h-[480px] rounded-xl border border-stone-200 text-sm [--dg-cell-padding:0_12px] [--dg-line-color:var(--color-stone-200)]"
 >
-	<TableHeader class="font-medium text-stone-500">
+	<GridHeader class="font-medium text-stone-500">
 		<!-- … -->
-	</TableHeader>
-</TableRoot>
+	</GridHeader>
+</GridRoot>
 ```
 
-For states deep in the table, a small CSS file with `@apply` often reads better than long class
+For states deep in the grid, a small CSS file with `@apply` often reads better than long class
 strings: `[data-dg-part='resize-handle'][data-dg-state='resizing'] { @apply bg-emerald-500; }`.
 
 ## The kit of these docs
 
-Every demo on this site uses one theme, `class="ui-table"`, on top of the structural styles, and a
+Every demo on this site uses one theme, `class="ui-grid"`, on top of the structural styles, and a
 few controls built on Reka UI. Both live in the `docs/ui` folder of the repository: copy them into
 your app to start from the same look.
 

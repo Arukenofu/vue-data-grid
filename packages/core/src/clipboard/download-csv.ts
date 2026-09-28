@@ -1,5 +1,5 @@
 export interface DownloadCsvOptions {
-	/** The file name; `.csv` is added when it is not there. `'table'` by default. */
+	/** The file name; `.csv` is added when it is not there. `'data'` by default. */
 	name?: string;
 }
 
@@ -11,7 +11,7 @@ const REVOKE_DELAY = 40_000;
  * mark, so that Excel reads UTF-8.
  */
 export function downloadCsv(csv: string, options: DownloadCsvOptions = {}) {
-	const name = options.name ?? 'table';
+	const name = options.name ?? 'data';
 	const link = document.createElement('a');
 	const url = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
 

@@ -1,10 +1,10 @@
 /*
- * Structural styles of @vue-data-grid/core: what a table needs to work, on the attributes the core and
- * `useTableProps` put on its elements. The core's inline styles give the geometry of a cell (its
+ * Structural styles of @vue-data-grid/core: what a grid needs to work, on the attributes the core and
+ * `useGridProps` put on its elements. The core's inline styles give the geometry of a cell (its
  * width, grow factor and pinning); this file lays the parts out around it. Every rule is wrapped in
  * :where(), so it has no specificity and any rule of yours wins.
  *
- * The look comes from theme variables, each with a default on system colours, so the table follows
+ * The look comes from theme variables, each with a default on system colours, so the grid follows
  * light and dark mode with no theme at all:
  *
  *   --dg-background           body rows and cells of pinned columns, which must hide what moves under them
@@ -14,7 +14,7 @@
  *   --dg-selected-background  cells of a selected row, opaque for the same reason
  *   --dg-line-color, --dg-line-width   lines under rows and at the edges of pinned columns
  *   --dg-cell-padding         the density: padding of every cell
- *   --dg-focus-ring           the outline of a focused cell or table
+ *   --dg-focus-ring           the outline of a focused cell or grid
  *   --dg-resize-handle-width  the grab area of a column resize handle
  *   --dg-group-row-height     a group row of the header; headers of columns without a group span it
  *   --dg-tree-indent          the indent of a tree cell per level
@@ -32,9 +32,9 @@
 
 /*
  * The scroll container of both axes, the engine's `root`: a column of the header, the body, the states
- * and the footer, none of which shrinks, so that the row of an empty table can take the height left.
+ * and the footer, none of which shrinks, so that the row of an empty grid can take the height left.
  */
-:where([data-dg-part='table']) {
+:where([data-dg-part='grid']) {
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -42,11 +42,11 @@
 	color: var(--dg-foreground, CanvasText);
 }
 
-:where([data-dg-part='table'] > *) {
+:where([data-dg-part='grid'] > *) {
 	flex: none;
 }
 
-:where([data-dg-part='table']:focus-visible) {
+:where([data-dg-part='grid']:focus-visible) {
 	outline: var(--dg-focus-ring, 2px solid Highlight);
 	outline-offset: -2px;
 }
@@ -77,7 +77,7 @@
 	position: relative;
 }
 
-/* A row is a flex line of cells, at least as wide as the table, and as wide as its columns beyond. */
+/* A row is a flex line of cells, at least as wide as the grid, and as wide as its columns beyond. */
 :where([data-dg-part='row']) {
 	position: relative;
 	display: flex;
@@ -92,7 +92,7 @@
 
 /*
  * A body row is opaque: a row that slides over others, as rows do when a group opens or closes under
- * `useTableMotion`, hides them rather than mixing its text with theirs.
+ * `useGridMotion`, hides them rather than mixing its text with theirs.
  */
 :where([data-dg-part='body'] > [data-dg-part='row']) {
 	background: var(--dg-background, Canvas);
@@ -100,7 +100,7 @@
 
 /*
  * The line under a row belongs to the row rather than to its cells, so that cells moving on their
- * own, as the columns of a drag or of `useTableMotion` do, leave it whole. It lies over the cells,
+ * own, as the columns of a drag or of `useGridMotion` do, leave it whole. It lies over the cells,
  * pinned and inset ones included, and takes no room.
  */
 :where([data-dg-part='row'])::after {
@@ -214,14 +214,14 @@
 	pointer-events: none;
 }
 
-/* The focused cell of a table with cell ranges shows its outline after a click too, as the active cell of a spreadsheet does. */
+/* The focused cell of a grid with cell ranges shows its outline after a click too, as the active cell of a spreadsheet does. */
 :where([data-dg-column][aria-selected]:focus) {
 	outline: var(--dg-focus-ring, 2px solid Highlight);
 	outline-offset: -2px;
 }
 
 /*
- * The outline of a cell range, a rectangle of `useCellRanges().rects`: a row across the table at the
+ * The outline of a cell range, a rectangle of `useCellRanges().rects`: a row across the grid at the
  * rows of the range, laid out as the rows under it, which the pointer passes through. Its pieces
  * follow the cells: the one in the middle goes under pinned cells as they do, a pinned one stays over
  * them. A range changes the outline without a render of any cell.
@@ -442,7 +442,7 @@
 
 /*
  * The grab area of a resize handle, inside the cell at its end edge, so the cell can keep clipping
- * its content. `touch-action` keeps a finger drag from scrolling the table. No `z-index`: the handle
+ * its content. `touch-action` keeps a finger drag from scrolling the grid. No `z-index`: the handle
  * of a column scrolled under a pinned one must stay under it too, and pinned cells are on level 1.
  */
 :where([data-dg-part='resize-handle']) {
@@ -501,10 +501,10 @@
 }
 
 /*
- * The row of an empty table: as wide as the viewport, stuck to the start edge, and as tall as the
+ * The row of an empty grid: as wide as the viewport, stuck to the start edge, and as tall as the
  * height the header, the footer and the loading bar leave, with its content in the middle.
  */
-:where([data-dg-part='table'] > [data-dg-part='empty']) {
+:where([data-dg-part='grid'] > [data-dg-part='empty']) {
 	flex: 1 0 auto;
 }
 
@@ -523,8 +523,8 @@
 }
 
 /*
- * The loading bar: stuck to the bottom of the table over the rows, right above the footer, whose
- * height `TableLoading` puts in `inset-block-end`. It is last in the flow before the footer, so at the
+ * The loading bar: stuck to the bottom of the grid over the rows, right above the footer, whose
+ * height `GridLoading` puts in `inset-block-end`. It is last in the flow before the footer, so at the
  * end of the rows it takes its own place and covers none of them.
  */
 :where([data-dg-part='loading']) {
@@ -600,7 +600,7 @@
 }
 
 /*
- * The message of `TableDragOverlay` over the part of the body in view, which it measures into the
+ * The message of `GridDragOverlay` over the part of the body in view, which it measures into the
  * `--dg-view-*`, `--dg-head-height` and `--dg-foot-height` variables. It lets the pointer through, so
  * the drag goes on under it. Restyle it into a banner or a badge with the same variables.
  */
@@ -629,8 +629,8 @@
 }
 
 /*
- * The ghost under the pointer, when a `TableDragPreview` has no content of its own. It lives outside
- * the table, so the theme variables of the table do not reach it: style it on its own.
+ * The ghost under the pointer, when a `GridDragPreview` has no content of its own. It lives outside
+ * the grid, so the theme variables of the grid do not reach it: style it on its own.
  */
 :where([data-dg-part='drag-preview']) {
 	padding: 6px 10px;

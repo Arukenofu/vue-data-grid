@@ -6,7 +6,7 @@ description: Fits columns to their content in one layout write, from the rendere
 # autosizeColumns
 
 <Description>
-Fits columns to their content in one layout write. It measures the cells the table has rendered,
+Fits columns to their content in one layout write. It measures the cells the grid has rendered,
 or, when you ask for it, the text of every row, and gives each column the width of its widest cell.
 </Description>
 
@@ -14,16 +14,16 @@ or, when you ask for it, the text of every row, and gives each column the width 
 
 The columns start narrow on purpose. **Fit rendered rows** measures the rows in view; **Fit all 400
 rows** also measures the text of the rows the row window left out, so a long name far down the list
-gets its room too. The widths animate because the table has `useTableMotion`.
+gets its room too. The widths animate because the grid has `useGridMotion`.
 
 ## Usage
 
 ```ts
 import { autosizeColumns } from '@vue-data-grid/core';
 
-autosizeColumns(table.scope);
-autosizeColumns(table.scope, ['name', 'email']);
-autosizeColumns(table.scope, undefined, { rows: 'all' });
+autosizeColumns(grid.scope);
+autosizeColumns(grid.scope, ['name', 'email']);
+autosizeColumns(grid.scope, undefined, { rows: 'all' });
 ```
 
 Without `names`, every shown `resizable` data column is fitted, and service columns
@@ -32,14 +32,14 @@ is not `resizable` is skipped, and so is a column outside the column window: it 
 measure. The widths are written to the layout in one write, as a resize would write them, so they are
 kept, persisted and reset like any other width.
 
-`TableResizeHandle` calls it on a double click, for the column of the handle.
+`GridResizeHandle` calls it on a double click, for the column of the handle.
 
 ## Arguments
 
 <PropsTable
 	label="Argument"
 	:data="[
-		{ name: 'scope', type: 'TableScope', required: true, description: 'The scope of the table, `table.scope`.' },
+		{ name: 'scope', type: 'GridScope', required: true, description: 'The scope of the grid, `grid.scope`.' },
 		{ name: 'names', type: 'readonly string[]', description: 'The columns to fit; every shown `resizable` data column without it.' },
 		{ name: 'options', type: 'AutosizeOptions', description: 'How to measure, below.' },
 	]"
@@ -67,7 +67,7 @@ body and footer cells, as a `Map` by name, without writing anything.
 ```ts
 import { measureColumnsContent } from '@vue-data-grid/core';
 
-const widths = measureColumnsContent(table.root.value, ['name', 'email']);
+const widths = measureColumnsContent(grid.root.value, ['name', 'email']);
 
 widths.get('email');
 ```
@@ -94,7 +94,7 @@ Measure after the rows are in the DOM, such as after a fetch, on the next tick:
 ```ts
 watch(rows, async () => {
 	await nextTick();
-	autosizeColumns(table.scope);
+	autosizeColumns(grid.scope);
 }, { once: true });
 ```
 
@@ -102,17 +102,17 @@ watch(rows, async () => {
 
 ```ts
 function fitColumn(name: string) {
-	autosizeColumns(table.scope, [name], { rows: 'all' });
+	autosizeColumns(grid.scope, [name], { rows: 'all' });
 }
 ```
 
 ### Measuring text another way
 
-Pass `measureText` to measure with something other than a canvas, such as a font metrics table on
+Pass `measureText` to measure with something other than a canvas, such as a font metrics grid on
 the server, or a test double in unit tests:
 
 ```ts
-autosizeColumns(table.scope, undefined, { rows: 'all', measureText: text => text.length * 7 });
+autosizeColumns(grid.scope, undefined, { rows: 'all', measureText: text => text.length * 7 });
 ```
 
 ## Accessibility
@@ -129,4 +129,4 @@ autosizeColumns(table.scope, undefined, { rows: 'all', measureText: text => text
 
 - [useColumnResize](/composables/use-column-resize): the handle that calls it on a double click.
 - [Column layout](/guides/column-layout): widths, fitting and keeping the layout.
-- [useTableMotion](/composables/use-table-motion): animating the change of widths.
+- [useGridMotion](/composables/use-grid-motion): animating the change of widths.

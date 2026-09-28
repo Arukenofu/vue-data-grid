@@ -1,7 +1,7 @@
 {
   "name": "@vue-data-grid/engine",
   "version": "0.0.0",
-  "description": "Headless table core for Vue: column model, row and column windows, CSS-variable geometry, row pipeline.",
+  "description": "Headless data grid core for Vue: column model, row and column windows, CSS-variable geometry, row pipeline.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,

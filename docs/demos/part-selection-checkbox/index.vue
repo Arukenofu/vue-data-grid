@@ -2,19 +2,19 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	GridSelectAllCheckbox,
+	GridSelectionCheckbox,
 	selection,
 	type SelectionMode,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	TableSelectAllCheckbox,
-	TableSelectionCheckbox,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconCheck from '~icons/lucide/check';
 import IconMinus from '~icons/lucide/minus';
@@ -52,7 +52,7 @@ const columns = defineColumns({
 
 const mode = shallowRef<SelectionMode>('multiple');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -62,7 +62,7 @@ const table = useDataTable({
 	},
 });
 
-const { selectedCount, clear } = table.selection;
+const { selectedCount, clear } = grid.selection;
 </script>
 
 <template>
@@ -74,37 +74,37 @@ const { selectedCount, clear } = table.selection;
 			<UiButton size="sm" :disabled="selectedCount === 0" @click="clear">Clear</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="People" class="ui-table people" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" v-slot="{ column }" :column="header">
-						<TableSelectAllCheckbox v-if="column.name === 'select'" v-slot="{ selected, partly }" as-child>
+		<GridRoot :grid="grid" label="People" class="ui-grid people" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" v-slot="{ column }" :column="header">
+						<GridSelectAllCheckbox v-if="column.name === 'select'" v-slot="{ selected, partly }" as-child>
 							<CheckboxRoot class="check" :model-value="partly ? 'indeterminate' : selected">
 								<CheckboxIndicator class="check-mark">
 									<IconMinus v-if="partly" />
 									<IconCheck v-else />
 								</CheckboxIndicator>
 							</CheckboxRoot>
-						</TableSelectAllCheckbox>
-						<TableHeaderContent v-else />
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells v-slot="{ column }">
-						<TableSelectionCheckbox v-if="column.name === 'select'" v-slot="{ selected, partly }" as-child>
+						</GridSelectAllCheckbox>
+						<GridHeaderContent v-else />
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells v-slot="{ column }">
+						<GridSelectionCheckbox v-if="column.name === 'select'" v-slot="{ selected, partly }" as-child>
 							<CheckboxRoot class="check" :model-value="partly ? 'indeterminate' : selected">
 								<CheckboxIndicator class="check-mark">
 									<IconMinus v-if="partly" />
 									<IconCheck v-else />
 								</CheckboxIndicator>
 							</CheckboxRoot>
-						</TableSelectionCheckbox>
-					</TableCells>
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+						</GridSelectionCheckbox>
+					</GridCells>
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

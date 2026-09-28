@@ -7,7 +7,7 @@ import { nav, sidebar } from './sidebar.ts';
 export default defineConfig({
 	title: 'Vue Data Grid',
 	titleTemplate: ':title · Vue Data Grid',
-	description: 'Headless, accessible and fast tables for Vue 3, assembled from small parts.',
+	description: 'Headless, accessible and fast grids for Vue 3, assembled from small parts.',
 	srcDir: 'content',
 	cleanUrls: true,
 	lastUpdated: false,
@@ -33,7 +33,7 @@ export default defineConfig({
 		docFooter: { prev: 'Previous', next: 'Next' },
 		footer: {
 			message: 'Released under the MIT License.',
-			copyright: 'Headless tables for Vue 3.',
+			copyright: 'Headless grids for Vue 3.',
 		},
 	},
 	vite: {

@@ -212,7 +212,7 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 			const index = Number(element.getAttribute(options.indexAttribute));
 			const size = getBlockSize(entry);
 
-			// A row measured at zero is hidden along with the table, not empty: keep its height.
+			// A row measured at zero is hidden along with the grid, not empty: keep its height.
 			if (!Number.isInteger(index) || index < 0 || index >= current.count || !(size > 0)) {
 				continue;
 			}

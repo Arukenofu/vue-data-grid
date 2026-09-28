@@ -17,7 +17,7 @@ remembers until you reset it.
 
 ## What it shows
 
-- Rows filtered by your own code before the table sees them, and an empty state with a way out:
+- Rows filtered by your own code before the grid sees them, and an empty state with a way out:
   [Loading and empty states](/guides/data-loading).
 - A checkbox column and actions for the selected rows: [Row selection](/guides/selection),
   [Selection checkbox](/components/selection-checkbox).
@@ -33,8 +33,8 @@ salary, then reload the page. It comes back as you left it; "Reset layout" in th
 
 ### Filters are just rows
 
-The table has no filter feature of its own to configure. The search box and the team select are
-plain refs, and the rows the table gets are computed from them:
+The grid has no filter feature of its own to configure. The search box and the team select are
+plain refs, and the rows the grid gets are computed from them:
 
 ```ts
 const filtered = computed(() => {
@@ -44,7 +44,7 @@ const filtered = computed(() => {
 		&& `${person.name} ${person.email} ${person.role}`.toLowerCase().includes(text));
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: filtered,
 	rowKey: 'id',
@@ -59,7 +59,7 @@ const table = useDataTable({
 });
 ```
 
-When nothing matches, `TableEmpty` shows a row that spans the table, with a button that clears the
+When nothing matches, `GridEmpty` shows a row that spans the grid, with a button that clears the
 filters. It counts as a row for `aria-rowcount`, so the grid stays valid while it is empty.
 
 ### Selection and its actions
@@ -71,21 +71,21 @@ filtering: a person you selected and then filtered out stays selected.
 The bar of actions reads the selected people from the whole list, not only the rows in view:
 
 ```ts
-const selected = computed(() => people.value.filter(person => table.selection.isSelected(person.id)));
+const selected = computed(() => people.value.filter(person => grid.selection.isSelected(person.id)));
 
 function exportCsv() {
-	const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
+	const shown = grid.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
 
 	downloadCsv(toCsv({ columns: shown, rows: selected.value }), { name: 'team' });
 }
 ```
 
 `toCsv` writes each value through the column's `format`, in the order and with the columns the
-table shows, and leaves service columns such as the checkboxes out.
+grid shows, and leaves service columns such as the checkboxes out.
 
 ### A column menu on the scope
 
-`table.scope` knows every declared column, hidden ones included, and has the operations a menu
+`grid.scope` knows every declared column, hidden ones included, and has the operations a menu
 needs: `isColumnHidden` and `toggleColumn`, `getPin` and `pinColumn`, `fitColumns`. The menu of the
 example is a list of entries computed from it:
 
@@ -105,37 +105,37 @@ the name and the salary are `pinnable`, pinned to the start and to the end.
 
 ### Dragging headers
 
-`TableColumnDrag` around the header makes the `movable` headers draggable. The columns make room as
+`GridColumnDrag` around the header makes the `movable` headers draggable. The columns make room as
 you drag, and a column never leaves its pinned side:
 
 ```vue
-<TableRoot :table="table" label="Team directory">
-	<TableColumnDrag>
-		<UiDataTableHeader />
-		<TableDragPreview />
-	</TableColumnDrag>
-	<TableBody v-slot="{ rows }">
+<GridRoot :grid="grid" label="Team directory">
+	<GridColumnDrag>
+		<UiDataGridHeader />
+		<GridDragPreview />
+	</GridColumnDrag>
+	<GridBody v-slot="{ rows }">
 		<!-- … -->
-	</TableBody>
-</TableRoot>
+	</GridBody>
+</GridRoot>
 ```
 
-`UiDataTableHeader` is the header of the demo kit, the usual parts with icons of its own: a
-`TableHeaderCell` for each column, with its content, sort indicator and resize handle.
+`UiDataGridHeader` is the header of the demo kit, the usual parts with icons of its own: a
+`GridHeaderCell` for each column, with its content, sort indicator and resize handle.
 
 ### A layout that is remembered
 
 `persist: localStorageStore('team-directory')` keeps the column state in `localStorage`: the order,
 the hidden columns, the widths, the pins and the sort. The stored record is read once the component
 is mounted, so the markup rendered on the server matches, and every change is written back.
-`table.state.reset()` returns to the declared layout and removes the record.
+`grid.state.reset()` returns to the declared layout and removes the record.
 
 ## Accessibility
 
-- The table is a grid with a single Tab stop, named "Team directory". The name column is the row
+- The grid has the `grid` role and a single Tab stop, named "Team directory". The name column is the row
   header, so a screen reader names the person while you move along a row.
 - Rows have `aria-selected`, and the grid is `aria-multiselectable`. The checkboxes are native
-  inputs named "Select row" and "Select all rows", and the table announces how many rows are
+  inputs named "Select row" and "Select all rows", and the grid announces how many rows are
   selected after every change.
 - Sorting is announced in full, since `aria-sort` can only mark the first column of a multi-sort.
 - Resize handles are separators that say the width of their column; the bar of actions is a

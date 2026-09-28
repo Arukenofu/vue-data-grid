@@ -1,6 +1,6 @@
 ---
 title: Stock screener
-description: A live stock screener with streaming prices, flashing cells, a sorted table that re-sorts only what moved, and a watchlist.
+description: A live stock screener with streaming prices, flashing cells, a sorted grid that re-sorts only what moved, and a watchlist.
 pageClass: site-wide
 aside: false
 ---
@@ -8,7 +8,7 @@ aside: false
 # Stock screener
 
 <Description>
-Prices stream in several times a second. Each changed price flashes up or down, the table stays sorted
+Prices stream in several times a second. Each changed price flashes up or down, the grid stays sorted
 by the day's change and re-sorts only the rows that moved, and the rows glide to their new places.
 Star a stock to put it on the watchlist.
 </Description>
@@ -23,12 +23,12 @@ Star a stock to put it on the watchlist.
   object, and only the rows that arrived as new objects are placed again. See [Sorting](/guides/sorting).
 - **Flashing cells** with `useCellChanges`: it compares each new row with the one it replaces and
   remembers, for a second, which way each price went.
-- **Motion** with `useTableMotion`: when the order changes, the rows slide from where they were.
+- **Motion** with `useGridMotion`: when the order changes, the rows slide from where they were.
   See [Animation](/guides/animation).
-- **A watchlist on the row selection**: the stars are `TableSelectionCheckbox` parts rendered
+- **A watchlist on the row selection**: the stars are `GridSelectionCheckbox` parts rendered
   `asChild` onto a button, and the selected keys are a plain `ref` the filter reads. See
   [Row selection](/guides/selection).
-- **Pinned columns, resizing and totals**: the star and the symbol stay put while the table scrolls
+- **Pinned columns, resizing and totals**: the star and the symbol stay put while the grid scrolls
   sideways, every column can be resized, and the footer adds the volumes and caps up.
 
 ## How it works
@@ -49,19 +49,19 @@ function tick() {
 ```
 
 Every update is a new object, and every untouched stock stays the same object. That one rule is what
-the rest of the table builds on: delta sorting, cell changes and the row memo all compare by reference.
+the rest of the grid builds on: delta sorting, cell changes and the row memo all compare by reference.
 The timer starts in `onMounted` and stops when the component goes, so the page renders on the server
 without a feed.
 
 ### Filters are just a computed
 
-The toolbar narrows the stocks with an ordinary `computed`, and the table takes it as its rows:
+The toolbar narrows the stocks with an ordinary `computed`, and the grid takes it as its rows:
 
 ```ts
 const rows = computed(() => quotes.value.filter(stock => (sector.value === 'all' || stock.sector === sector.value)
 	&& (view.value === 'all' || watchlist.value.includes(stock.id))));
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -81,7 +81,7 @@ watchlist survives switching sectors.
 
 ### Cells that flash
 
-`useCellChanges` watches the rows of the table and, for each price that changed, keeps its direction
+`useCellChanges` watches the rows of the grid and, for each price that changed, keeps its direction
 and the time it arrived. The price column renders a small component with it:
 
 ```ts
@@ -111,11 +111,11 @@ click, and the button keeps its own look.
 
 ```vue
 <template>
-	<TableSelectionCheckbox v-slot="{ selected }" :row="rowKey" :label="`Watch ${symbol}`" as-child>
+	<GridSelectionCheckbox v-slot="{ selected }" :row="rowKey" :label="`Watch ${symbol}`" as-child>
 		<button type="button" class="watch" :data-watched="selected ? '' : undefined">
 			<IconStar aria-hidden="true" />
 		</button>
-	</TableSelectionCheckbox>
+	</GridSelectionCheckbox>
 </template>
 ```
 
@@ -137,7 +137,7 @@ volume: column(stock => stock.volume, {
 
 ## Accessibility
 
-- The table is a `grid` with the `navigation` feature: one Tab stop, arrow keys between cells, and
+- The grid has the `grid` role with the `navigation` feature: one Tab stop, arrow keys between cells, and
   <kbd>Space</kbd> on a star cell toggles the star, as it would on a checkbox.
 - Each star is a `role="checkbox"` button named "Watch AURA" and so on, with `aria-checked` following
   the watchlist, and the rows carry `aria-selected`. The announcer says how many stocks are starred

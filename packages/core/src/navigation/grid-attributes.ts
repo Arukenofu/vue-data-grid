@@ -5,7 +5,7 @@ const ROW_ATTRIBUTE = 'data-dg-grid-row';
 const CELL_ATTRIBUTE = 'data-dg-grid-cell';
 const COLUMN_ATTRIBUTE = 'data-dg-column';
 
-/** The section of the body rows, as `useTableProps` names it: the rows of the scope. */
+/** The section of the body rows, as `useGridProps` names it: the rows of the scope. */
 export const BODY_SECTION = 'body';
 
 export const GRID_ROW_SELECTOR = `[${SECTION_ATTRIBUTE}]`;

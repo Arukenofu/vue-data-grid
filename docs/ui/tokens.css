@@ -1,6 +1,6 @@
 /*
  * Design tokens of the styled kit: a green accent over sage neutrals, in light and dark. The kit's
- * components and table theme read only these variables, so a new palette is a new copy of this file.
+ * components and grid theme read only these variables, so a new palette is a new copy of this file.
  * Dark mode follows the `dark` class on the root, as VitePress sets it.
  */
 :root {

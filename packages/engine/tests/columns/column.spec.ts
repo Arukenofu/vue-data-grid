@@ -279,7 +279,7 @@ describe('resolveRowHeaders', () => {
 		expect(resolveRowHeaders([data('symbol', false), data('price')]).size).toBe(0);
 	});
 
-	it('a table of service columns only has no row header', () => {
+	it('a grid of service columns only has no row header', () => {
 		expect(resolveRowHeaders([service('select')]).size).toBe(0);
 	});
 });

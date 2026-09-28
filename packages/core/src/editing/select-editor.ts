@@ -1,7 +1,7 @@
 import { computed, defineComponent, h, onMounted, type PropType, shallowRef, useId, watch } from 'vue';
 
 import type { EditorContext } from '../columns/column-fields';
-import { useTableMessagesContext } from '../components/messages';
+import { useGridMessagesContext } from '../components/messages';
 import { isComposing } from '../keyboard/keys';
 import { renderError } from './editor-error';
 
@@ -26,10 +26,10 @@ function includesText(option: AnyOption, text: string) {
 /** The keys that move the highlight through the list, and where. */
 const LIST_STEPS: Readonly<Partial<Record<string, 1 | -1>>> = { ArrowDown: 1, ArrowUp: -1 };
 
-/** The room the list keeps from the edge of the table's view, px. */
+/** The room the list keeps from the edge of the grid's view, px. */
 const EDGE_GAP = 4;
 
-/** The sticky header or footer of the table, as the list must not go under them. */
+/** The sticky header or footer of the grid, as the list must not go under them. */
 function getStickyHeight(root: Element, part: string) {
 	return root.querySelector<HTMLElement>(`:scope > [data-dg-part="${part}"]`)?.offsetHeight ?? 0;
 }
@@ -52,7 +52,7 @@ export const SelectEditor = defineComponent({
 		filter: { type: Function as PropType<SelectEditorFilter<unknown>>, default: undefined },
 	},
 	setup(props) {
-		const messages = useTableMessagesContext();
+		const messages = useGridMessagesContext();
 		const id = useId();
 		// The character that started editing is the first of the text.
 		const query = shallowRef(props.context.text ?? '');
@@ -117,7 +117,7 @@ export const SelectEditor = defineComponent({
 		function place() {
 			const element = list.value;
 			const cell = element?.closest('[data-dg-column]');
-			const root = element?.closest('[data-dg-part="table"]');
+			const root = element?.closest('[data-dg-part="grid"]');
 
 			if (!element || !cell || !root) {
 				return;

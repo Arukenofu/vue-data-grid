@@ -2,21 +2,21 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridRoot,
+	GridRow,
 	navigation,
-	TableBody,
-	TableCells,
-	TableRoot,
-	TableRow,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
-import { type DragIndicator, TableColumnDrag, TableDragPreview } from '@vue-data-grid/core/drag-and-drop';
+import { type DragIndicator, GridColumnDrag, GridDragPreview } from '@vue-data-grid/core/drag-and-drop';
 import IconColumns from '~icons/lucide/columns-3';
 import IconRotateCcw from '~icons/lucide/rotate-ccw';
 import { computed, shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';
-import { type ToggleOption, UiButton, UiDataTableHeader, UiToggleGroup, UiToolbar } from '@/ui';
+import { type ToggleOption, UiButton, UiDataGridHeader, UiToggleGroup, UiToolbar } from '@/ui';
 
 const INDICATORS: readonly ToggleOption<DragIndicator>[] = [
 	{ value: 'gap', label: 'Gap' },
@@ -45,7 +45,7 @@ const columns = defineColumns({
 
 const indicator = shallowRef<DragIndicator>('gap');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
@@ -53,9 +53,9 @@ const table = useDataTable({
 	features: { navigation: navigation() },
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
-const order = computed(() => table.scope.columns.value.map(item => item.column?.label).join(' · '));
+const order = computed(() => grid.scope.columns.value.map(item => item.column?.label).join(' · '));
 </script>
 
 <template>
@@ -64,26 +64,26 @@ const order = computed(() => table.scope.columns.value.map(item => item.column?.
 			<span class="ui-toolbar-text">Show the place as</span>
 			<UiToggleGroup v-model="indicator" :options="INDICATORS" label="Show the place as" />
 			<span class="ui-spacer" />
-			<UiButton variant="ghost" @click="table.state.reset()">
+			<UiButton variant="ghost" @click="grid.state.reset()">
 				<IconRotateCcw aria-hidden="true" />
 				Reset order
 			</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Stocks" class="ui-table" data-size="sm">
-			<TableColumnDrag :indicator="indicator">
-				<UiDataTableHeader />
-				<TableDragPreview v-slot="{ label }">
+		<GridRoot :grid="grid" label="Stocks" class="ui-grid" data-size="sm">
+			<GridColumnDrag :indicator="indicator">
+				<UiDataGridHeader />
+				<GridDragPreview v-slot="{ label }">
 					<IconColumns aria-hidden="true" />
 					{{ label }}
-				</TableDragPreview>
-			</TableColumnDrag>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+				</GridDragPreview>
+			</GridColumnDrag>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 
 		<p class="order ui-muted">{{ order }}</p>
 	</div>

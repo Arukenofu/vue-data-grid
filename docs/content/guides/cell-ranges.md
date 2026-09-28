@@ -7,12 +7,12 @@ description: Select rectangles of cells with the pointer and the keys, sum them,
 
 <Description>
 Select rectangles of cells the way a spreadsheet does, read what is in them, copy them to Excel or
-Google Sheets, and export the whole table as CSV.
+Google Sheets, and export the whole grid as CSV.
 </Description>
 
 <Demo name="cell-ranges" />
 
-Drag across the numbers and watch the sum under the table. <kbd>Shift</kbd>+click extends the range,
+Drag across the numbers and watch the sum under the grid. <kbd>Shift</kbd>+click extends the range,
 <kbd>Ctrl</kbd>+click adds another one, and <kbd>Shift</kbd> with the arrow keys grows it from the
 keyboard. <kbd>Ctrl</kbd>+<kbd>C</kbd> copies the last range as text a spreadsheet pastes into cells.
 
@@ -22,9 +22,9 @@ Cell ranges are the `ranges` feature. It works best with `navigation`, which giv
 focused cell to start from, as the active cell of a spreadsheet:
 
 ```ts
-import { navigation, ranges, useDataTable } from '@vue-data-grid/core';
+import { navigation, ranges, useDataGrid } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -36,15 +36,15 @@ const table = useDataTable({
 });
 ```
 
-Then draw the ranges: put a `TableRangeOverlay` in the body, after the rows.
+Then draw the ranges: put a `GridRangeOverlay` in the body, after the rows.
 
 ```vue
-<TableBody v-slot="{ rows }">
-	<TableRow v-for="row in rows" :key="row.key" :row="row">
-		<TableCells />
-	</TableRow>
-	<TableRangeOverlay />
-</TableBody>
+<GridBody v-slot="{ rows }">
+	<GridRow v-for="row in rows" :key="row.key" :row="row">
+		<GridCells />
+	</GridRow>
+	<GridRangeOverlay />
+</GridBody>
 ```
 
 The overlay draws an outline around each range, and the structural styles tint the cells inside it.
@@ -54,7 +54,7 @@ Selecting more cells re-renders the overlay and nothing else: not the rows, not 
 
 Everything a spreadsheet user reaches for works:
 
-- **Click** a cell to select it. **Drag** to select the cells between, and the table scrolls when
+- **Click** a cell to select it. **Drag** to select the cells between, and the grid scrolls when
   the pointer nears an edge, the sticky header and pinned columns included.
 - **Shift+click** extends the last range to the cell. **Ctrl+click** (<kbd>⌘</kbd> on macOS) starts
   another range; on a selected cell it takes that cell out of the selection instead, as Excel does.
@@ -69,7 +69,7 @@ arrow without <kbd>Shift</kbd> collapses the selection to the cell it moves to.
 
 ## Reading the selection
 
-`table.ranges` holds the selection and everything computed from it. The most useful pieces:
+`grid.ranges` holds the selection and everything computed from it. The most useful pieces:
 
 <ReturnsTable
 	:data="[
@@ -77,7 +77,7 @@ arrow without <kbd>Shift</kbd> collapses the selection to the cell it moves to.
 		{ name: 'getText(options?)', type: 'string', description: 'The last range as tab-separated text, each value through its column\'s `format`; `{ headers: true }` adds a line of labels.' },
 		{ name: 'selectedRanges', type: 'ComputedRef<readonly CellRange[]>', description: 'The ranges as the model holds them: two corners each.' },
 		{ name: 'bounds', type: 'ComputedRef<readonly RangeBounds[]>', description: 'Each range as indexes of rows and columns, half-open.' },
-		{ name: 'rects', type: 'ComputedRef<readonly RangeRect[]>', description: 'Each range as a rectangle to draw over the body; what `TableRangeOverlay` renders.' },
+		{ name: 'rects', type: 'ComputedRef<readonly RangeRect[]>', description: 'Each range as a rectangle to draw over the body; what `GridRangeOverlay` renders.' },
 		{ name: 'isSelected(cell)', type: 'boolean', description: 'Whether a cell is in any range. Reactive per row: only the rows whose cells change wake up.' },
 		{ name: 'selectAll()', type: 'void', description: 'Selects every cell, and keeps every row selected through sorting and new rows.' },
 		{ name: 'selectBounds(bounds)', type: 'void', description: 'Replaces the selection with one range, such as the cells a paste wrote.' },
@@ -90,10 +90,10 @@ cell through its column:
 
 ```ts
 const summary = computed(() => {
-	const cells = table.ranges.getCells();
+	const cells = grid.ranges.getCells();
 	const numbers = cells.flatMap((cell) => {
-		const row = table.rows.value[table.scope.getRowIndex(cell.key)];
-		const value = row === undefined ? undefined : table.scope.getColumn(cell.column)?.column?.value(row);
+		const row = grid.rows.value[grid.scope.getRowIndex(cell.key)];
+		const value = row === undefined ? undefined : grid.scope.getColumn(cell.column)?.column?.value(row);
 
 		return typeof value === 'number' ? [value] : [];
 	});
@@ -109,25 +109,25 @@ const summary = computed(() => {
 <PropsTable
 	label="Option"
 	:data="[
-		{ name: 'ranges', type: 'Ref<readonly CellRange[]>', description: 'A model of your own, for `v-model` or to keep the selection in a store; without it the table keeps its own.' },
+		{ name: 'ranges', type: 'Ref<readonly CellRange[]>', description: 'A model of your own, for `v-model` or to keep the selection in a store; without it the grid keeps its own.' },
 		{ name: 'canSelectColumn', type: '(column: RuntimeColumn) => boolean', description: 'Which columns ranges can span; the data columns by default, so a checkbox or row number column stays out.' },
 		{ name: 'corners', type: '\'key\' | \'index\'', default: '\'key\'', description: 'What the corners of a range hold on to: the rows by key, so a range stays on its rows through a sort, or the places on screen by index. Read once.' },
-		{ name: 'autoScroll', type: 'AutoScrollOptions | false', description: 'How the table scrolls while a drag nears its edges; `false` turns it off.' },
-		{ name: 'focus', type: 'BodyCellFocus', description: 'The focused cell ranges start from; the `navigation` of the table by default.' },
+		{ name: 'autoScroll', type: 'AutoScrollOptions | false', description: 'How the grid scrolls while a drag nears its edges; `false` turns it off.' },
+		{ name: 'focus', type: 'BodyCellFocus', description: 'The focused cell ranges start from; the `navigation` of the grid by default.' },
 		{ name: 'enabled', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Turn the gestures off for a while.' },
 	]"
 />
 
 ## Copy and paste
 
-The `clipboard` feature owns the `copy`, `cut` and `paste` events of the table:
+The `clipboard` feature owns the `copy`, `cut` and `paste` events of the grid:
 
 ```ts
-import { clipboard, navigation, ranges, useDataTable } from '@vue-data-grid/core';
+import { clipboard, navigation, ranges, useDataGrid } from '@vue-data-grid/core';
 
 const withHeaders = shallowRef(false);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -150,7 +150,7 @@ A button cannot fire a copy event, so the handle has `copy()`, which goes throug
 
 ```ts
 async function copy() {
-	const copied = await table.clipboard.copy();
+	const copied = await grid.clipboard.copy();
 
 	status.value = copied ? 'Copied' : 'Select some cells first';
 }
@@ -170,9 +170,9 @@ order mark Excel needs to read UTF-8:
 import { downloadCsv, toCsv } from '@vue-data-grid/core';
 
 function download() {
-	const shown = table.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
+	const shown = grid.scope.columns.value.flatMap(item => (item.column ? [item.column] : []));
 
-	downloadCsv(toCsv({ columns: shown, rows: table.rows.value }), { name: 'budget' });
+	downloadCsv(toCsv({ columns: shown, rows: grid.rows.value }), { name: 'budget' });
 }
 ```
 
@@ -184,7 +184,7 @@ formula, starting with `=`, `+`, `-` or `@`, is prefixed with `'` unless you pas
 ## Accessibility
 
 - The grid gets `aria-multiselectable="true"`, and every cell a range can reach gets
-  `aria-selected`, so a screen reader says "selected" as focus moves over the range. `TableCells`
+  `aria-selected`, so a screen reader says "selected" as focus moves over the range. `GridCells`
   writes the attribute straight to the cells as the ranges change, without rendering them.
 - The overlay is decoration: it is `aria-hidden`, and the pointer passes through it.
 - Every gesture has a keyboard equivalent, and the focused cell stays visible with its own outline

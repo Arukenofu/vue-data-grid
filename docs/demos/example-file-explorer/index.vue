@@ -2,24 +2,24 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridRow,
+	type GridSort,
 	moveRow,
 	navigation,
-	TableBody,
-	TableCells,
-	TableRow,
-	type TableSort,
 	tree,
 	treeColumn,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 } from '@vue-data-grid/core';
-import { dragHandleColumn, TableDragPreview, useTableRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { dragHandleColumn, GridDragPreview, useGridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
 import IconUnfoldVertical from '~icons/lucide/unfold-vertical';
 import { computed, h, nextTick, ref, shallowRef, useTemplateRef } from 'vue';
 
 import { type FileEntry, files as initialFiles, formatSize } from '@/data/files';
-import { UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiStat, UiToolbar } from '@/ui';
 
 import { type FileRow, formatDate, getFolders, KIND_LABELS, sortFiles, withFolderTotals } from './explorer';
 import FileDetails from './FileDetails.vue';
@@ -27,7 +27,7 @@ import FileGhost from './FileGhost.vue';
 import FileName from './FileName.vue';
 
 const files = shallowRef<readonly FileEntry[]>(initialFiles);
-const sort = ref<readonly TableSort[]>([{ name: 'name', direction: 'asc' }]);
+const sort = ref<readonly GridSort[]>([{ name: 'name', direction: 'asc' }]);
 const expanded = ref<string[]>();
 const openKey = shallowRef<string | null>(null);
 const details = useTemplateRef<InstanceType<typeof FileDetails>>('details');
@@ -52,7 +52,7 @@ const columns = defineColumns({
 	modified: column(file => file.modified, { label: 'Modified', width: 140, format: formatDate }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -64,9 +64,9 @@ const table = useDataTable({
 	},
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 
-useTableRowDrag(table, {
+useGridRowDrag(grid, {
 	handle: true,
 	enabled: true,
 	stepKeys: false,
@@ -107,12 +107,12 @@ async function openDetails(key: string, moveFocus: boolean) {
 }
 
 function closeDetails() {
-	const row = openKey.value === null ? -1 : table.scope.getRowIndex(openKey.value);
+	const row = openKey.value === null ? -1 : grid.scope.getRowIndex(openKey.value);
 
 	openKey.value = null;
 
 	if (row !== -1) {
-		void table.navigation.focusCell({ section: 'body', row, cell: 'name' });
+		void grid.navigation.focusCell({ section: 'body', row, cell: 'name' });
 	}
 }
 
@@ -155,10 +155,10 @@ function onRowKeydown(event: KeyboardEvent, key: string) {
 		</UiToolbar>
 
 		<div class="explorer-body">
-			<div class="explorer-table">
-				<UiDataTable :table="table" label="Files" data-size="lg">
-					<TableBody v-slot="{ rows: shown }">
-						<TableRow
+			<div class="explorer-grid">
+				<UiDataGrid :grid="grid" label="Files" data-size="lg">
+					<GridBody v-slot="{ rows: shown }">
+						<GridRow
 							v-for="row in shown"
 							:key="row.key"
 							:row="row"
@@ -166,13 +166,13 @@ function onRowKeydown(event: KeyboardEvent, key: string) {
 							@click="onRowClick($event, row.key)"
 							@keydown="onRowKeydown($event, row.key)"
 						>
-							<TableCells />
-						</TableRow>
-					</TableBody>
-					<TableDragPreview v-slot="{ key, label }">
+							<GridCells />
+						</GridRow>
+					</GridBody>
+					<GridDragPreview v-slot="{ key, label }">
 						<FileGhost :label="label" :file="rowsById.get(key)" />
-					</TableDragPreview>
-				</UiDataTable>
+					</GridDragPreview>
+				</UiDataGrid>
 			</div>
 
 			<Transition name="details">
@@ -194,23 +194,23 @@ function onRowKeydown(event: KeyboardEvent, key: string) {
 	container: explorer / inline-size;
 }
 
-.explorer :deep(.ui-table) {
+.explorer :deep(.ui-grid) {
 	--dg-drop-color: var(--ui-accent);
 }
 
-.explorer :deep(.ui-table [data-dg-part='row'][aria-level][aria-expanded] > [data-dg-column]) {
+.explorer :deep(.ui-grid [data-dg-part='row'][aria-level][aria-expanded] > [data-dg-column]) {
 	font-weight: 400;
 }
 
-.explorer :deep(.ui-table [data-dg-part='body'] > [data-dg-part='row']) {
+.explorer :deep(.ui-grid [data-dg-part='body'] > [data-dg-part='row']) {
 	cursor: default;
 }
 
-.explorer :deep(.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-current='true'] > [data-dg-column]) {
+.explorer :deep(.ui-grid [data-dg-part='body'] > [data-dg-part='row'][aria-current='true'] > [data-dg-column]) {
 	background: color-mix(in srgb, var(--ui-accent) 10%, var(--ui-bg));
 }
 
-.explorer :deep(.ui-table [data-dg-part='body'] > [data-dg-part='row'][aria-current='true'] > [data-dg-column]:first-child) {
+.explorer :deep(.ui-grid [data-dg-part='body'] > [data-dg-part='row'][aria-current='true'] > [data-dg-column]:first-child) {
 	box-shadow: inset 2px 0 0 var(--ui-accent);
 }
 
@@ -218,7 +218,7 @@ function onRowKeydown(event: KeyboardEvent, key: string) {
 	display: flex;
 }
 
-.explorer-table {
+.explorer-grid {
 	flex: 1;
 	min-width: 0;
 }

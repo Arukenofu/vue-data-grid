@@ -1,6 +1,6 @@
 ---
 title: Task board
-description: Two tables that trade rows by drag and drop, a bin to archive into, and rows that glide into place.
+description: Two grids that trade rows by drag and drop, a bin to archive into, and rows that glide into place.
 pageClass: site-wide
 aside: false
 ---
@@ -8,32 +8,32 @@ aside: false
 # Task board
 
 <Description>
-A sprint and a backlog as two tables that trade tasks by drag and drop, a bin outside both to
-archive into, and rows that glide into their new places. One array of tasks feeds both tables.
+A sprint and a backlog as two grids that trade tasks by drag and drop, a bin outside both to
+archive into, and rows that glide into their new places. One array of tasks feeds both grids.
 </Description>
 
 <Demo name="example-task-board" />
 
 ## What it shows
 
-- Two tables in one drag group take each other's rows: [Drag and drop](/guides/drag-and-drop),
+- Two grids in one drag group take each other's rows: [Drag and drop](/guides/drag-and-drop),
   [Row drag](/components/row-drag).
 - A column of grips that also drag with the keyboard, from `dragHandleColumn()`:
   [Service columns](/components/service-columns).
-- A card that follows the pointer, and a message over the table a row can go to:
+- A card that follows the pointer, and a message over the grid a row can go to:
   [Drag preview and overlay](/components/drag-preview).
-- A bin that is not a table at all: [Drop zone](/components/drop-zone).
-- Rows that move, come and go with `useTableMotion`, whatever moved them: [Animation](/guides/animation).
+- A bin that is not a grid at all: [Drop zone](/components/drop-zone).
+- Rows that move, come and go with `useGridMotion`, whatever moved them: [Animation](/guides/animation).
 - Buttons on every row, so each move also works without dragging.
 
-Take a task by its grip and drop it anywhere in the other table, or on the bin at the bottom. The
+Take a task by its grip and drop it anywhere in the other grid, or on the bin at the bottom. The
 sprint counts its points against a capacity of 28 as you go.
 
 ## How it works
 
-### One list, two tables
+### One list, two grids
 
-The board keeps one array of tasks. Each task says which list it is in, and the two tables show the
+The board keeps one array of tasks. Each task says which list it is in, and the two grids show the
 two slices of it:
 
 ```ts
@@ -43,7 +43,7 @@ const sprint = computed(() => tasks.value.filter(task => task.list === 'sprint')
 const backlog = computed(() => tasks.value.filter(task => task.list === 'backlog'));
 ```
 
-A drop, from either table and to either table, is then one move in that array. `moveRow` from the
+A drop, from either grid and to either grid, is then one move in that array. `moveRow` from the
 core does it: `parentKey` names the field that holds the list, so the row goes `index`-th among the
 tasks of its new list, and gets its new `list` as a new object:
 
@@ -57,64 +57,64 @@ function move(list: ListName, key: string, index: number) {
 }
 ```
 
-The tables never change your data themselves. A drop only tells you where the row should go, and
-the table shows the result once your rows have it.
+The grids never change your data themselves. A drop only tells you where the row should go, and
+the grid shows the result once your rows have it.
 
-### A table that takes rows from its group
+### A grid that takes rows from its group
 
-Each list is a `TaskTable` component with its own `useDataTable`. `TableRowDrag` around the body
-makes the rows draggable; tables with the same `group` accept each other's rows, and a table in a
+Each list is a `TaskGrid` component with its own `useDataGrid`. `GridRowDrag` around the body
+makes the rows draggable; grids with the same `group` accept each other's rows, and a grid in a
 group lets the ghost leave its bounds so it can reach the other one:
 
 ```vue
-<TableRowDrag group="tasks" handle @drop="drop">
-	<TableBody v-slot="{ rows }">
-		<TableRow v-for="row in rows" :key="row.key" :row="row">
-			<TableCells />
-		</TableRow>
-	</TableBody>
-</TableRowDrag>
+<GridRowDrag group="tasks" handle @drop="drop">
+	<GridBody v-slot="{ rows }">
+		<GridRow v-for="row in rows" :key="row.key" :row="row">
+			<GridCells />
+		</GridRow>
+	</GridBody>
+</GridRowDrag>
 ```
 
 `handle` makes the grip the only place a drag starts, so a click on the rest of the row stays a
 click. The grips come from `dragHandleColumn()`, a service column pinned to the start; CSV,
 autosize and cell ranges leave it out.
 
-The `drop` event carries the key of the row, its `index` in this table and whether it came from
+The `drop` event carries the key of the row, its `index` in this grid and whether it came from
 another one. The component passes the key and the index up, and the board moves the task.
 
 ### The ghost and the message
 
-`TableDragPreview` is the card that follows the pointer. It is a template rendered into the ghost,
+`GridDragPreview` is the card that follows the pointer. It is a template rendered into the ghost,
 so it can be any component of yours; here it looks the task up by the key it gets:
 
 ```vue
-<TableDragPreview v-slot="{ key, label }">
+<GridDragPreview v-slot="{ key, label }">
 	<TaskGhost :label="label" :task="tasksByKey.get(key)" />
-</TableDragPreview>
+</GridDragPreview>
 ```
 
-`TableDragOverlay` lays a message over the part of the body in view while a row that can come here
-is dragged from the other table. It gets the label of the row and whether the pointer is already
-over the table:
+`GridDragOverlay` lays a message over the part of the body in view while a row that can come here
+is dragged from the other grid. It gets the label of the row and whether the pointer is already
+over the grid:
 
 ```vue
-<TableDragOverlay v-slot="{ label, over }">
+<GridDragOverlay v-slot="{ label, over }">
 	{{ over ? `Drop “${label}” into ${title}` : `Move to ${title}` }}
-</TableDragOverlay>
+</GridDragOverlay>
 ```
 
 ### The bin
 
-`TableDropZone` is a drop target that is not a table. It takes rows of the tables in its `group`,
+`GridDropZone` is a drop target that is not a grid. It takes rows of the grids in its `group`,
 emits `drop` with the key of the row, and describes itself with `data-dg-state`, which the styles
 use to tint it while a task is on its way:
 
 ```vue
-<TableDropZone v-slot="{ ready, over }" group="tasks" @drop="event => archive(event.key)">
+<GridDropZone v-slot="{ ready, over }" group="tasks" @drop="event => archive(event.key)">
 	<template v-if="over">Release to archive the task</template>
 	<template v-else-if="ready">Drop a task here to archive it</template>
-</TableDropZone>
+</GridDropZone>
 ```
 
 ```css
@@ -130,19 +130,19 @@ use to tint it while a task is on its way:
 
 ### Motion
 
-Each table calls `useTableMotion(table)` once. From then on every change of its rows animates: a
-task that moves within the table slides to its new place, one that comes from the other table fades
-in, and one that leaves, to the other table or the bin, fades out where it stood.
+Each grid calls `useGridMotion(grid)` once. From then on every change of its rows animates: a
+task that moves within the grid slides to its new place, one that comes from the other grid fades
+in, and one that leaves, to the other grid or the bin, fades out where it stood.
 
 ## Accessibility
 
-- Each table is a grid of its own with its title as the accessible name, and one Tab stop: the
+- Each grid has a `grid` role of its own, its title as the accessible name, and one Tab stop: the
   arrow keys move through its cells, as on the [keyboard navigation](/guides/keyboard-navigation)
   page.
 - A grip is a button named after its task, such as "Drag Audit colour contrast", and points at
   hidden instructions for the keyboard drag. Every step of a keyboard drag is announced through a
   live region: the task picked up, each place it passes and where it lands.
-- A keyboard drag moves a task within its own table. Moving it to the other list or archiving it
+- A keyboard drag moves a task within its own grid. Moving it to the other list or archiving it
   is a button at the end of each row, named after the task, so nothing on the board needs a pointer.
 - The owner avatar is decoration; the name of the owner is in the cell as visually hidden text.
 

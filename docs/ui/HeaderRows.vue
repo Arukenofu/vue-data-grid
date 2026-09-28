@@ -1,31 +1,31 @@
 <!--
-	The header rows of a table of hand-written markup, in the kit's look: group rows, sortable column
-	headers and resize handles. It takes the table from `useTableScopeContext()` and the prop-getters from
-	`tableProps`, and renders only rows: the sticky element around them belongs to the table, which
+	The header rows of a grid of hand-written markup, in the kit's look: group rows, sortable column
+	headers and resize handles. It takes the grid from `useGridScopeContext()` and the prop-getters from
+	`gridProps`, and renders only rows: the sticky element around them belongs to the grid, which
 	measures it for `scrollMargin`. Header cells take the handlers of `useHeaderCell`: a click or Enter
 	sorts, Alt+arrows move, Shift+arrows resize.
 -->
 <script setup lang="ts">
-import { type TableProps, useColumnResize, useHeaderCell, useTableScopeContext } from '@vue-data-grid/core';
+import { type GridProps, useColumnResize, useGridScopeContext, useHeaderCell } from '@vue-data-grid/core';
 import IconChevronLeft from '~icons/lucide/chevron-left';
 import IconChevronRight from '~icons/lucide/chevron-right';
 
 import SortIcon from './SortIcon.vue';
 
-const { tableProps } = defineProps<{
-	/** The prop-getters of the table: roles, positions, `aria-sort`, and `tabindex` for the navigation. */
-	tableProps: TableProps;
+const { gridProps } = defineProps<{
+	/** The prop-getters of the grid: roles, positions, `aria-sort`, and `tabindex` for the navigation. */
+	gridProps: GridProps;
 }>();
 
-const scope = useTableScopeContext();
+const scope = useGridScopeContext();
 const { headerGroups, renderedColumns } = scope;
 const header = useHeaderCell(scope);
 const resize = useColumnResize(scope);
 </script>
 
 <template>
-	<div v-for="(cells, level) in headerGroups" :key="`level-${level}`" v-bind="tableProps.getGroupRowProps(level)">
-		<div v-for="cell in cells" :key="cell.key" v-bind="tableProps.getGroupCellProps(cell)">
+	<div v-for="(cells, level) in headerGroups" :key="`level-${level}`" v-bind="gridProps.getGroupRowProps(level)">
+		<div v-for="cell in cells" :key="cell.key" v-bind="gridProps.getGroupCellProps(cell)">
 			<template v-if="cell.group">
 				<span data-dg-part="cell-text">{{ cell.group.label ?? cell.group.name }}</span>
 				<button
@@ -44,12 +44,12 @@ const resize = useColumnResize(scope);
 			</template>
 		</div>
 	</div>
-	<div v-bind="tableProps.getHeaderRowProps()">
+	<div v-bind="gridProps.getHeaderRowProps()">
 		<template v-for="item in renderedColumns" :key="item.key">
-			<div v-if="!item.column" v-bind="tableProps.getHeaderCellProps(item)" />
+			<div v-if="!item.column" v-bind="gridProps.getHeaderCellProps(item)" />
 			<div
 				v-else
-				v-bind="{ ...tableProps.getHeaderCellProps(item), ...header.getHandlers(item.column.name) }"
+				v-bind="{ ...gridProps.getHeaderCellProps(item), ...header.getHandlers(item.column.name) }"
 				:class="{ 'is-sortable': item.column.sortable }"
 			>
 				<span data-dg-part="cell-text">{{ item.column.label ?? item.column.name }}</span>

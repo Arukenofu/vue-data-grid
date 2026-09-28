@@ -192,7 +192,7 @@ describe('compileCellStyle — pinning', () => {
 		expect(style.get('inset-inline-end')).toBe('calc(var(--dg-inset-end, 0px) + var(--dg-pin-end-actions, 0px))');
 	});
 
-	it('uses no physical side, so a right-to-left table pins `start` to the right', () => {
+	it('uses no physical side, so a right-to-left grid pins `start` to the right', () => {
 		const style = declarations(compileCellStyle(geometry('symbol'), 'start', 0));
 
 		expect(style.has('left')).toBe(false);

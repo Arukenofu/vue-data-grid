@@ -1,6 +1,6 @@
 # vue-data-grid
 
-Headless table building blocks for Vue 3. MIT.
+Headless data grid building blocks for Vue 3. MIT.
 
 | Package | |
 | --- | --- |

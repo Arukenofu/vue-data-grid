@@ -20,7 +20,7 @@ export interface DragRect {
  * without knowing where it comes from.
  */
 export interface DragPayload {
-	/** What kind of thing this is, such as `'table-row'`: a list accepts only its own kind. */
+	/** What kind of thing this is, such as `'grid-row'`: a list accepts only its own kind. */
 	kind: string;
 	key: string;
 	/** The source list, one symbol for each: tells an own item from a foreign one. */

@@ -4,9 +4,9 @@ import {
 	defineColumns,
 	sorting,
 	useCellChanges,
-	useDataTable,
+	useDataGrid,
+	useGridMotion,
 	useRowStream,
-	useTableMotion,
 } from '@vue-data-grid/core';
 import IconPause from '~icons/lucide/pause';
 import IconPlay from '~icons/lucide/play';
@@ -14,7 +14,7 @@ import { h, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue';
 
 import { createRandom } from '@/data/random';
 import { getChange, type Stock, stocks, tickStock } from '@/data/stocks';
-import { UiButton, UiDataTable, UiSlider, UiSparkline, UiStat, UiSwitch, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiSlider, UiSparkline, UiStat, UiSwitch, UiToolbar } from '@/ui';
 
 const STOCKS_PER_UPDATE = 3;
 
@@ -60,7 +60,7 @@ const columns = defineColumns({
 
 const stream = useRowStream({ rows: stocks, rowKey: 'id' });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stream.rows,
 	rowKey: 'id',
@@ -69,7 +69,7 @@ const table = useDataTable({
 	features: { sorting: sorting({ delta: true }) },
 });
 
-const changes = useCellChanges(table.scope, { duration: 900, columns: ['price', 'change'] });
+const changes = useCellChanges(grid.scope, { duration: 900, columns: ['price', 'change'] });
 
 const running = shallowRef(true);
 const animated = shallowRef(true);
@@ -77,7 +77,7 @@ const perSecond = shallowRef(8);
 const updates = shallowRef(0);
 const rendered = shallowRef(0);
 
-useTableMotion(table, { when: () => animated.value });
+useGridMotion(grid, { when: () => animated.value });
 
 function update() {
 	const picked = Array.from({ length: STOCKS_PER_UPDATE }, () => random.pick(stocks).id);
@@ -133,7 +133,7 @@ onBeforeUnmount(() => {
 			<UiStat label="Renders/s" :value="rendered" />
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Live quotes" />
+		<UiDataGrid :grid="grid" label="Live quotes" />
 	</div>
 </template>
 

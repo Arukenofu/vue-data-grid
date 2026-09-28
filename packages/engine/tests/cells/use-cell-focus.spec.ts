@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useCellFocus } from '../../src/cells/use-cell-focus';
 import { type AnyColumn, type ColumnsInput, toColumnList } from '../../src/columns/column';
 import { defineColumns } from '../../src/columns/define-columns';
-import { useTableEngine } from '../../src/engine/use-table-engine';
+import { useGridEngine } from '../../src/engine/use-grid-engine';
 import { createScroller } from '../support/dom';
 
 interface Row {
@@ -23,11 +23,11 @@ function setup(ids: readonly string[] = ['a', 'b', 'c'], count = ids.length) {
 	const onFocus = vi.fn();
 	const root = shallowRef<HTMLElement | null>(null);
 	let focus: ReturnType<typeof useCellFocus> | null = null;
-	let engine: ReturnType<typeof useTableEngine<Row>> | null = null;
+	let engine: ReturnType<typeof useGridEngine<Row>> | null = null;
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			engine = useTableEngine({ columns, rows, root, rowKey: 'id', rowHeight: 36, virtual: { overscan: 0 } });
+			engine = useGridEngine({ columns, rows, root, rowKey: 'id', rowHeight: 36, virtual: { overscan: 0 } });
 			focus = useCellFocus(engine.scope, { onFocus });
 
 			return () => null;
@@ -40,7 +40,7 @@ function setup(ids: readonly string[] = ['a', 'b', 'c'], count = ids.length) {
 		root,
 		onFocus,
 		focus: focus as unknown as ReturnType<typeof useCellFocus>,
-		engine: engine as unknown as ReturnType<typeof useTableEngine<Row>>,
+		engine: engine as unknown as ReturnType<typeof useGridEngine<Row>>,
 		unmount: () => wrapper.unmount(),
 	};
 }

@@ -5,7 +5,7 @@ import { defineAsyncComponent } from 'vue';
 // After the default theme, whose variables these override.
 import '@vue-data-grid/core/style.css';
 import '@/ui/tokens.css';
-import '@/ui/table.css';
+import '@/ui/grid.css';
 import './styles/vars.css';
 import './styles/chrome.css';
 import './styles/doc.css';
@@ -46,7 +46,7 @@ export default {
 		app.component('CssVariablesTable', CssVariablesTable);
 		app.component('KeyboardTable', KeyboardTable);
 		app.component('ExampleGallery', ExampleGallery);
-		// The home page brings GSAP and a live table: loaded with the home page only, not with every page.
+		// The home page brings GSAP and a live grid: loaded with the home page only, not with every page.
 		app.component('HomePage', defineAsyncComponent(() => import('./home/HomePage.vue')));
 	},
 } satisfies Theme;

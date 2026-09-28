@@ -3,20 +3,20 @@ import {
 	defineColumn,
 	defineColumnGroups,
 	defineColumns,
-	TableBody,
-	TableCells,
-	TableGroupCell,
-	TableGroupContent,
-	TableGroupRow,
-	TableGroupToggle,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderContent,
-	TableHeaderRow,
-	TableResizeHandle,
-	TableRoot,
-	TableRow,
-	useDataTable,
+	GridBody,
+	GridCells,
+	GridGroupCell,
+	GridGroupContent,
+	GridGroupRow,
+	GridGroupToggle,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderContent,
+	GridHeaderRow,
+	GridResizeHandle,
+	GridRoot,
+	GridRow,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import IconMinus from '~icons/lucide/minus';
 import IconPlus from '~icons/lucide/plus';
@@ -71,7 +71,7 @@ const groups = defineColumnGroups({
 	},
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	groups,
 	rows: productSales,
@@ -80,10 +80,10 @@ const table = useDataTable({
 });
 
 function setCollapsed(collapsed: boolean) {
-	table.scope.batch(() => {
+	grid.scope.batch(() => {
 		for (const name of HALVES) {
-			if (table.scope.isGroupCollapsed(name) !== collapsed) {
-				table.scope.toggleGroup(name);
+			if (grid.scope.isGroupCollapsed(name) !== collapsed) {
+				grid.scope.toggleGroup(name);
 			}
 		}
 	});
@@ -97,29 +97,29 @@ function setCollapsed(collapsed: boolean) {
 			<UiButton size="sm" @click="setCollapsed(true)">Collapse all</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Revenue by product" class="ui-table" data-size="auto">
-			<TableHeader v-slot="{ groups: levels }">
-				<TableGroupRow v-for="(cells, level) in levels" :key="level" :level="level">
-					<TableGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
-						<TableGroupContent />
-						<TableGroupToggle v-slot="{ collapsed }" class="ui-cell-button">
+		<GridRoot :grid="grid" label="Revenue by product" class="ui-grid" data-size="auto">
+			<GridHeader v-slot="{ groups: levels }">
+				<GridGroupRow v-for="(cells, level) in levels" :key="level" :level="level">
+					<GridGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
+						<GridGroupContent />
+						<GridGroupToggle v-slot="{ collapsed }" class="ui-cell-button">
 							<IconPlus v-if="collapsed" />
 							<IconMinus v-else />
-						</TableGroupToggle>
-					</TableGroupCell>
-				</TableGroupRow>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header">
-						<TableHeaderContent />
-						<TableResizeHandle />
-					</TableHeaderCell>
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+						</GridGroupToggle>
+					</GridGroupCell>
+				</GridGroupRow>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header">
+						<GridHeaderContent />
+						<GridResizeHandle />
+					</GridHeaderCell>
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>

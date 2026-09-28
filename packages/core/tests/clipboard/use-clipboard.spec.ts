@@ -1,4 +1,4 @@
-import { type CellEditSource, defineColumns, useCellFocus, useCellRanges, useTableEngine } from '@vue-data-grid/engine';
+import { type CellEditSource, defineColumns, useCellFocus, useCellRanges, useGridEngine } from '@vue-data-grid/engine';
 import { mount } from '@vue/test-utils';
 import { defineComponent, h, type Ref, shallowRef } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -65,7 +65,7 @@ function setup(options: ClipboardOptions = {}, editing?: ClipboardEditing) {
 
 	wrapper = mount(defineComponent({
 		setup() {
-			const engine = useTableEngine<Row>({ columns, rows: ROWS, root, rowKey: 'id', rowHeight: 30 });
+			const engine = useGridEngine<Row>({ columns, rows: ROWS, root, rowKey: 'id', rowHeight: 30 });
 			const ranges = useCellRanges(engine.scope);
 			const focus = useCellFocus(engine.scope);
 
@@ -105,7 +105,7 @@ function select(element: Element) {
 }
 
 describe('useClipboard — copy', () => {
-	it('a copy from the table puts the last range on the clipboard as TSV through `format`', () => {
+	it('a copy from the grid puts the last range on the clipboard as TSV through `format`', () => {
 		const { root, ranges } = setup();
 
 		ranges.select({ key: 'a', column: 'id' });
@@ -145,7 +145,7 @@ describe('useClipboard — copy', () => {
 		expect(clipboard.getText()).toBe('\r\n');
 	});
 
-	it('a copy from a text field, of text selected in the table, or with nothing to copy, is left to the browser', () => {
+	it('a copy from a text field, of text selected in the grid, or with nothing to copy, is left to the browser', () => {
 		const { root, ranges } = setup();
 
 		expect(clipboardEvent('copy', root).event.defaultPrevented).toBe(false);
@@ -280,5 +280,16 @@ describe('downloadCsv', () => {
 		vi.runAllTimers();
 
 		expect(revoke).toHaveBeenCalledWith('blob:csv');
+	});
+
+	it('names the file `data.csv` by default', () => {
+		const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+
+		vi.spyOn(URL, 'createObjectURL').mockImplementation(() => 'blob:csv');
+		vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+		downloadCsv('a,b');
+
+		expect(click.mock.contexts[0]).toMatchObject({ download: 'data.csv' });
 	});
 });

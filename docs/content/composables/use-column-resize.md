@@ -8,14 +8,14 @@ description: Resizing columns by a handle — a pointer drag once per frame, a d
 <Description>
 Resizing columns by a handle: a pointer drag applied once per animation frame, a double click that
 fits the column to its content, and the keys of a focusable separator that tells the screen reader
-the width. `TableResizeHandle` is built on it.
+the width. `GridResizeHandle` is built on it.
 </Description>
 
 <Demo name="api-use-column-resize" />
 
 The handles here are your own elements with `getHandleProps` bound to them, and a bubble that shows
-the width while it changes. The first button stretches the columns to the width of the table, the
-last puts the declared widths back; `useTableMotion` animates both.
+the width while it changes. The first button stretches the columns to the width of the grid, the
+last puts the declared widths back; `useGridMotion` animates both.
 
 ## Usage
 
@@ -23,14 +23,14 @@ last puts the declared widths back; `useTableMotion` animates both.
 <script setup lang="ts">
 import { useColumnResize } from '@vue-data-grid/core';
 
-const resize = useColumnResize(table.scope, { step: 10 });
+const resize = useColumnResize(grid.scope, { step: 10 });
 </script>
 
 <template>
-	<TableHeaderCell v-for="column in columns" :key="column.key" v-slot="{ column: header }" :column="column">
-		<TableHeaderContent />
+	<GridHeaderCell v-for="column in columns" :key="column.key" v-slot="{ column: header }" :column="column">
+		<GridHeaderContent />
 		<span v-bind="resize.getHandleProps(header.name)" class="grip" />
-	</TableHeaderCell>
+	</GridHeaderCell>
 </template>
 ```
 
@@ -46,7 +46,7 @@ nothing. A click on the handle does not sort the column under it.
 	:data="[
 		{ name: 'step', type: 'MaybeRefOrGetter<number>', default: '16', description: 'How far ← and → change the width, px.' },
 		{ name: 'autosize', type: 'MaybeRefOrGetter<AutosizeOptions | false>', description: 'How a double click fits the column to its content; `false` turns the double click off.' },
-		{ name: 'label', type: '(column: { name, label? }) => string', description: 'The accessible name of a handle; the table\'s `resizeColumn` message, `Resize <label>`, by default.' },
+		{ name: 'label', type: '(column: { name, label? }) => string', description: 'The accessible name of a handle; the grid\'s `resizeColumn` message, `Resize <label>`, by default.' },
 		{ name: 'valueText', type: '(width: number) => string', description: 'The width as the screen reader says it; the `columnWidth` message, `<width> px`, by default.' },
 	]"
 />
@@ -64,11 +64,11 @@ nothing. A click on the handle does not sort the column under it.
 
 ## Examples
 
-### Why widths do not render the table
+### Why widths do not render the grid
 
 A drag changes a width many times a frame. The width goes to the DOM through CSS variables, once per
 frame, and to the layout only when the pointer is released. No row renders during a drag, which is
-why a resize stays smooth on a table of any size. For the same reason a handle's `aria-valuenow`
+why a resize stays smooth on a grid of any size. For the same reason a handle's `aria-valuenow`
 holds the width the drag started from until the drag ends.
 
 ### Limits
@@ -85,14 +85,14 @@ const columns = defineColumns({
 ### Fitting from code
 
 `autosizeColumns(scope)` fits every resizable data column in one layout write, and
-`scope.fitColumns()` stretches the columns to the width of the table. Both write the layout, so
-`useTableMotion` animates them.
+`scope.fitColumns()` stretches the columns to the width of the grid. Both write the layout, so
+`useGridMotion` animates them.
 
 ```ts
 import { autosizeColumns } from '@vue-data-grid/core';
 
-autosizeColumns(table.scope);
-table.scope.fitColumns();
+autosizeColumns(grid.scope);
+grid.scope.fitColumns();
 ```
 
 ## Accessibility
@@ -104,7 +104,7 @@ pattern of WAI-ARIA: the handle is a `separator` with a value.
 - The keys change the width and update `aria-valuenow` on every press.
 - The drag uses pointer capture, so it keeps going when the pointer leaves the handle, and ignores a
   second pointer, such as another finger.
-- In a right-to-left table, and for a column pinned to the end, whose handle is at its start edge,
+- In a right-to-left grid, and for a column pinned to the end, whose handle is at its start edge,
   the drag and the arrows follow the edge.
 
 ### Keyboard interactions

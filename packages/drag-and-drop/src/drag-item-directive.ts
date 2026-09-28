@@ -31,7 +31,7 @@ function isSame(value: DragItemValue, other: DragItemValue) {
 
 /**
  * An item of a drag list: `v-drag-item="{ list, key }"`. A directive rather than a component, since
- * the rows of a table are one template over thousands of rows, not components: the registration
+ * the rows of a grid are one template over thousands of rows, not components: the registration
  * lives with the element, goes away with it, and follows a change of key.
  */
 export const vDragItem: ObjectDirective<HTMLElement, DragItemValue> = {

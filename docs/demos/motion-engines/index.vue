@@ -4,8 +4,8 @@ import {
 	defineColumns,
 	type MotionEngine,
 	sorting,
-	useDataTable,
-	useTableMotion,
+	useDataGrid,
+	useGridMotion,
 	webAnimations,
 } from '@vue-data-grid/core';
 import IconArrowDownWideNarrow from '~icons/lucide/arrow-down-wide-narrow';
@@ -16,7 +16,7 @@ import IconUserMinus from '~icons/lucide/user-minus';
 import IconUserPlus from '~icons/lucide/user-plus';
 import { computed, shallowRef } from 'vue';
 
-import { type ToggleOption, UiButton, UiDataTable, UiToggleGroup, UiToolbar } from '@/ui';
+import { type ToggleOption, UiButton, UiDataGrid, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { animeEngine, animeHeight } from './anime';
 import { newcomers, type Player, players } from './data';
@@ -81,7 +81,7 @@ const rows = shallowRef(players);
 const bench = shallowRef(newcomers);
 const engine = shallowRef<EngineName>('gsap');
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -89,21 +89,21 @@ const table = useDataTable({
 	features: { sorting: sorting() },
 });
 
-useTableMotion(table, { engine: computed(() => ENGINES[engine.value].rows) });
+useGridMotion(grid, { engine: computed(() => ENGINES[engine.value].rows) });
 
-useHeightMotion(table.root, () => table.totalSize.value, () => ENGINES[engine.value].height);
+useHeightMotion(grid.root, () => grid.totalSize.value, () => ENGINES[engine.value].height);
 
-const sorted = computed(() => table.state.sort.value.length > 0);
-const pointsFirst = computed(() => table.scope.columns.value[1]?.column?.name === 'points');
-const fitted = computed(() => Object.keys(table.state.layout.value?.widths ?? {}).length > 0);
+const sorted = computed(() => grid.state.sort.value.length > 0);
+const pointsFirst = computed(() => grid.scope.columns.value[1]?.column?.name === 'points');
+const fitted = computed(() => Object.keys(grid.state.layout.value?.widths ?? {}).length > 0);
 
 function shuffle() {
-	table.state.sort.value = [];
+	grid.state.sort.value = [];
 	rows.value = shuffled(rows.value);
 }
 
 function toggleSort() {
-	table.state.sort.value = sorted.value ? [] : [{ name: 'points', direction: 'desc' }];
+	grid.state.sort.value = sorted.value ? [] : [{ name: 'points', direction: 'desc' }];
 }
 
 function add() {
@@ -127,16 +127,16 @@ function remove() {
 }
 
 function moveColumn() {
-	table.scope.moveColumnTo('points', pointsFirst.value ? 4 : 1);
+	grid.scope.moveColumnTo('points', pointsFirst.value ? 4 : 1);
 }
 
 function fit() {
-	const layout = table.state.layout.value;
+	const layout = grid.state.layout.value;
 
 	if (layout && fitted.value) {
-		table.state.layout.value = { ...layout, widths: {} };
+		grid.state.layout.value = { ...layout, widths: {} };
 	} else {
-		table.scope.fitColumns();
+		grid.scope.fitColumns();
 	}
 }
 </script>
@@ -174,7 +174,7 @@ function fit() {
 			</UiButton>
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Leaderboard" data-size="auto" class="leaderboard" />
+		<UiDataGrid :grid="grid" label="Leaderboard" data-size="auto" class="leaderboard" />
 	</div>
 </template>
 

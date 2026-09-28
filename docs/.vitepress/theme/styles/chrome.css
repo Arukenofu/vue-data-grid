@@ -53,19 +53,6 @@ body {
 	letter-spacing: -0.01em;
 }
 
-.VPNavBarTitle .title::after {
-	margin-inline-start: 8px;
-	padding: 1px 7px;
-	border: 1px solid var(--vp-c-brand-soft);
-	border-radius: 999px;
-	background: var(--vp-c-brand-soft);
-	color: var(--vp-c-brand-1);
-	font-size: 12px;
-	font-weight: 600;
-	line-height: 18px;
-	content: 'table';
-}
-
 .VPNavBarMenuLink {
 	font-weight: 600 !important;
 }

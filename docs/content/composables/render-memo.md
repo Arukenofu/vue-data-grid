@@ -6,11 +6,11 @@ description: keepMounted and isSameTokens - skipping the render of a row in rend
 # Render memo
 
 <Description>
-For tables rendered by render functions of your own: keep the vnode of a row while the things it
+For grids rendered by render functions of your own: keep the vnode of a row while the things it
 depends on hold, and Vue skips its whole subtree, as <code>v-memo</code> does in a template.
 </Description>
 
-`TableRow` needs none of this. It is a component whose `row` prop stays the same object while the
+`GridRow` needs none of this. It is a component whose `row` prop stays the same object while the
 row's data, place and node hold, so Vue skips it by its props. The memo is for markup of your own
 that renders rows in one render function, where there is no component per row to skip.
 
@@ -23,15 +23,15 @@ import { h, type VNode } from 'vue';
 const cache = new Map<string, { tokens: unknown[]; vnode: VNode }>();
 
 function renderRow(item: VirtualItem) {
-	const row = table.rows.value[item.index];
-	const tokens = [row, item.start, table.selection?.isSelected(item.key)];
+	const row = grid.rows.value[item.index];
+	const tokens = [row, item.start, grid.selection?.isSelected(item.key)];
 	const cached = cache.get(item.key);
 
 	if (cached && isSameTokens(cached.tokens, tokens)) {
 		return keepMounted(cached.vnode);
 	}
 
-	const vnode = h('div', { key: item.key, ...table.getRowProps(item) }, renderCells(row));
+	const vnode = h('div', { key: item.key, ...grid.getRowProps(item) }, renderCells(row));
 
 	cache.set(item.key, { tokens, vnode });
 
@@ -59,7 +59,7 @@ they hold, the previous vnode comes back marked, and Vue stops at it without wal
   index.
 - **Its state, per row.** `selection.isSelected(key)`, `ranges.getSelectedColumns(index)`: reactive
   per row, they wake only the rows whose state changed.
-- **What the whole table shares.** The rendered columns, `scope.renderedColumns.value`: when the column
+- **What the whole grid shares.** The rendered columns, `scope.renderedColumns.value`: when the column
   window moves or a column is hidden, every row renders again, which is right.
 
 A token left out is a bug that shows as a stale row; a token too many only costs a render. When in
@@ -69,10 +69,10 @@ doubt, add it.
 
 ### Clearing the cache
 
-Keep the cache as long as the table, and drop rows that leave the window, so it does not grow:
+Keep the cache as long as the grid, and drop rows that leave the window, so it does not grow:
 
 ```ts
-watch(table.items, (items) => {
+watch(grid.items, (items) => {
 	const shown = new Set(items.map(item => item.key));
 
 	for (const key of cache.keys()) {
@@ -93,5 +93,5 @@ among the tokens.
 ## See also
 
 - [Performance](/overview/performance): the row memo of the parts.
-- [Body](/components/body): `TableBody` and `TableRow`.
+- [Body](/components/body): `GridBody` and `GridRow`.
 - [Your own markup](/guides/custom-markup)

@@ -1,4 +1,4 @@
-import { getCellText, type TableScope } from '@vue-data-grid/engine';
+import { getCellText, type GridScope } from '@vue-data-grid/engine';
 
 import { measureColumnsContent, type MeasureColumnsOptions } from './measure-column';
 
@@ -20,7 +20,7 @@ export interface AutosizeOptions {
  * the column window has no cells, and one that is not `resizable` is skipped. With a row window only
  * rendered rows are measured, unless `rows` is `'all'`.
  */
-export function autosizeColumns(scope: TableScope, names?: readonly string[], options: AutosizeOptions = {}) {
+export function autosizeColumns(scope: GridScope, names?: readonly string[], options: AutosizeOptions = {}) {
 	const root = scope.root.value;
 	const wanted = names ? new Set(names) : null;
 	// Named columns are measured whatever their kind; without names, service columns keep their width.

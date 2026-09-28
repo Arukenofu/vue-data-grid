@@ -1,7 +1,7 @@
 import { type MaybeRefOrGetter, onScopeDispose, shallowReactive, toValue, watch } from 'vue';
 
 import { type RuntimeColumn, toRuntimeColumn } from '../columns/column';
-import type { TableScope } from '../engine/scope';
+import type { GridScope } from '../engine/scope';
 import { compareValues, isEmptyValue } from '../rows/compare';
 import { getCellColumns } from './cell-address';
 
@@ -43,7 +43,7 @@ function getDirection(column: RuntimeColumn, before: unknown, after: unknown): C
  * column's `equals`; a row that stays the same object costs nothing, so this pairs with `useRowStream`
  * and immutable updates. New rows are not changes. Rendering the change is up to the markup.
  */
-export function useCellChanges(scope: TableScope, options: CellChangesOptions = {}) {
+export function useCellChanges(scope: GridScope, options: CellChangesOptions = {}) {
 	const changes = shallowReactive(new Map<string, Readonly<Record<string, CellChange>>>());
 
 	let seen = new Map<string, unknown>();

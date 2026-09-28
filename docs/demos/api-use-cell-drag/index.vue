@@ -7,11 +7,11 @@ import {
 	selection,
 	selectionColumn,
 	useCellDrag,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 
 import { createPeople, type Person } from '@/data/people';
-import { UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiStat, UiToolbar } from '@/ui';
 
 const people = createPeople(300, 23);
 
@@ -25,7 +25,7 @@ const columns = defineColumns({
 	location: column(person => person.location, { label: 'Location', width: 120 }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: people,
 	rowKey: 'id',
@@ -39,12 +39,12 @@ const dataColumns = ['name', 'role', 'team', 'location'];
 let anchor: number | null = null;
 
 function selectFrom(start: number, end: number) {
-	const keys = table.scope.rowKeys.value.slice(Math.min(start, end), Math.max(start, end) + 1);
+	const keys = grid.scope.rowKeys.value.slice(Math.min(start, end), Math.max(start, end) + 1);
 
-	table.selection.set(keys);
+	grid.selection.set(keys);
 }
 
-const drag = useCellDrag(table, {
+const drag = useCellDrag(grid, {
 	getColumns: () => dataColumns,
 	onCell: (cell) => {
 		if (anchor !== null) {
@@ -78,19 +78,19 @@ function startPainting(event: PointerEvent) {
 	drag.start(event, cell);
 }
 
-const selectedCount = table.selection.selectedCount;
+const selectedCount = grid.selection.selectedCount;
 </script>
 
 <template>
 	<div class="paint">
 		<UiToolbar>
-			<span class="ui-toolbar-text">Press on a row and drag up or down; near an edge the table scrolls.</span>
+			<span class="ui-toolbar-text">Press on a row and drag up or down; near an edge the grid scrolls.</span>
 			<span class="ui-spacer" />
 			<UiStat label="Selected" :value="selectedCount" />
-			<UiButton variant="ghost" @click="table.selection.clear()">Clear</UiButton>
+			<UiButton variant="ghost" @click="grid.selection.clear()">Clear</UiButton>
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="People" data-size="sm" @pointerdown="startPainting" />
+		<UiDataGrid :grid="grid" label="People" data-size="sm" @pointerdown="startPainting" />
 	</div>
 </template>
 

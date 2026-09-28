@@ -2,18 +2,18 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridFooter,
+	GridFooterCell,
+	GridFooterRow,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
 	type RuntimeColumn,
-	TableBody,
-	TableCells,
-	TableFooter,
-	TableFooterCell,
-	TableFooterRow,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { computed, shallowRef } from 'vue';
 
@@ -88,7 +88,7 @@ const region = shallowRef<RegionFilter>('all');
 
 const rows = computed(() => (region.value === 'all' ? sales : sales.filter(sale => sale.region === region.value)));
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -122,27 +122,27 @@ function average(column: RuntimeColumn, shown: readonly unknown[]) {
 			<UiToggleGroup v-model="region" :options="REGIONS" label="Region" />
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Sales" class="ui-table">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows: bodyRows }">
-				<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-			<TableFooter>
-				<TableFooterRow v-slot="{ columns: footers }">
-					<TableFooterCell v-for="footer in footers" :key="footer.key" :column="footer" />
-				</TableFooterRow>
-				<TableFooterRow v-slot="{ columns: footers }" :index="1">
-					<TableFooterCell v-for="footer in footers" :key="footer.key" v-slot="{ column, rows: shown }" :column="footer" class="ui-cell-muted">
+		<GridRoot :grid="grid" label="Sales" class="ui-grid">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows: bodyRows }">
+				<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+			<GridFooter>
+				<GridFooterRow v-slot="{ columns: footers }">
+					<GridFooterCell v-for="footer in footers" :key="footer.key" :column="footer" />
+				</GridFooterRow>
+				<GridFooterRow v-slot="{ columns: footers }" :index="1">
+					<GridFooterCell v-for="footer in footers" :key="footer.key" v-slot="{ column, rows: shown }" :column="footer" class="ui-cell-muted">
 						{{ average(column, shown) }}
-					</TableFooterCell>
-				</TableFooterRow>
-			</TableFooter>
-		</TableRoot>
+					</GridFooterCell>
+				</GridFooterRow>
+			</GridFooter>
+		</GridRoot>
 	</div>
 </template>

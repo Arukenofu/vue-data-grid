@@ -10,7 +10,7 @@ const GROUP_PROPS = new Map<string, IndexProps>();
 
 /**
  * `aria-colindex` of a column cell from its `index` among the shown columns: one frozen object per
- * position, shared by all rows and tables. Nothing for a spacer (`-1`). Cells need it where their
+ * position, shared by all rows and grids. Nothing for a spacer (`-1`). Cells need it where their
  * order in the DOM differs from the logical one, such as under the column window.
  */
 export function getColumnIndexProps(index: number): IndexProps {

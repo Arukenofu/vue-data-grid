@@ -52,15 +52,15 @@ const columns = defineColumns({
 });
 ```
 
-The table edits with the `editing` feature, which hands every commit to you: write it into your rows,
+The grid edits with the `editing` feature, which hands every commit to you: write it into your rows,
 and save it wherever they live.
 
 ```ts
-import { editing, navigation, useDataTable } from '@vue-data-grid/core';
+import { editing, navigation, useDataGrid } from '@vue-data-grid/core';
 
 const rows = shallowRef(products);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -72,7 +72,7 @@ const table = useDataTable({
 });
 ```
 
-`TableCells` renders the editor in the cell being edited, and the rest of the table does not render.
+`GridCells` renders the editor in the cell being edited, and the rest of the grid does not render.
 A column without `editor` edits with `textEditor()`.
 
 ## API reference
@@ -264,7 +264,7 @@ restock: column(product => product.restock, {
 ```
 
 A picker is several elements rather than one: the segments of the field, a trigger, and a calendar
-in a popover outside the table. So the component spreads `inputProps` on the field, which gives it
+in a popover outside the grid. So the component spreads `inputProps` on the field, which gives it
 the keys, the name and the error, but keeps two of them for itself:
 
 - `ref`, which would focus the field: the calendar takes focus when it opens.

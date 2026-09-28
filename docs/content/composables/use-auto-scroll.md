@@ -13,7 +13,7 @@ only while it scrolls.
 
 <Demo name="api-use-cell-drag" />
 
-Press on a row and drag towards the bottom edge of the table: the drag under this demo scrolls with
+Press on a row and drag towards the bottom edge of the grid: the drag under this demo scrolls with
 `useAutoScroll`, starting inside the sticky header and footer rather than at the edges of the box.
 
 ## Usage
@@ -25,8 +25,8 @@ look at what is under it now.
 ```ts
 import { useAutoScroll } from '@vue-data-grid/core';
 
-const autoScroll = useAutoScroll(() => table.root.value, {
-	margin: () => ({ top: table.headHeight.value, bottom: table.footHeight.value }),
+const autoScroll = useAutoScroll(() => grid.root.value, {
+	margin: () => ({ top: grid.headHeight.value, bottom: grid.footHeight.value }),
 	onScroll: point => updateUnder(point),
 });
 
@@ -95,10 +95,10 @@ way starts smoothly rather than at full speed.
 ## Accessibility
 
 Scrolling near the edges is a help for pointer gestures, not a way to reach content. Make sure what
-the gesture does can be done from the keyboard too, where the table scrolls to the focused cell by
+the gesture does can be done from the keyboard too, where the grid scrolls to the focused cell by
 itself.
 
 ## See also
 
 - [useCellDrag](/composables/use-cell-drag): a drag across cells, built on it.
-- [useTableRowDrag](/composables/use-table-row-drag): row drags have an `autoScroll` of their own.
+- [useGridRowDrag](/composables/use-grid-row-drag): row drags have an `autoScroll` of their own.

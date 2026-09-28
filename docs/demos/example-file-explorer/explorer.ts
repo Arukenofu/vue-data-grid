@@ -1,4 +1,4 @@
-import type { TableSort } from '@vue-data-grid/core';
+import type { GridSort } from '@vue-data-grid/core';
 
 import type { FileEntry, FileKind } from '@/data/files';
 
@@ -87,7 +87,7 @@ function isFolder(file: FileRow) {
 }
 
 /** Folders first, then by the first column of the sort, as a file manager lists them. */
-export function sortFiles(files: readonly FileRow[], sort: readonly TableSort[]): FileRow[] {
+export function sortFiles(files: readonly FileRow[], sort: readonly GridSort[]): FileRow[] {
 	const [first] = sort;
 	const compare = COMPARE[first?.name ?? 'name'] ?? COMPARE.name;
 	const direction = first?.direction === 'desc' ? -1 : 1;

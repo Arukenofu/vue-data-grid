@@ -6,12 +6,12 @@ import { defineComponent, h, nextTick, type ShallowRef, shallowRef } from 'vue';
 import { afterEach, describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableRangeOverlay } from '../../src/components/table-range-overlay';
-import { TableRoot } from '../../src/components/table-root';
-import { clipboard, editing, history, navigation, ranges } from '../../src/data-table/factories';
-import { type DataTable, useDataTable } from '../../src/data-table/use-data-table';
+import type { GridBodyRow } from '../../src/components/context';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridRangeOverlay } from '../../src/components/grid-range-overlay';
+import { GridRoot } from '../../src/components/grid-root';
+import { clipboard, editing, history, navigation, ranges } from '../../src/data-grid/factories';
+import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { checkboxField, numberField, selectEditor } from '../../src/editing/editors';
 
 interface Row {
@@ -45,8 +45,8 @@ const columns = defineColumns({
 	note: column(row => row.id, { label: 'Note', width: 200, editable: false }),
 });
 
-function createTable(rows: ShallowRef<Row[]>) {
-	return useDataTable({
+function createGrid(rows: ShallowRef<Row[]>) {
+	return useDataGrid({
 		columns,
 		rows,
 		rowKey: 'id',
@@ -66,7 +66,7 @@ function createTable(rows: ShallowRef<Row[]>) {
 	});
 }
 
-type Table = ReturnType<typeof createTable>;
+type Grid = ReturnType<typeof createGrid>;
 
 let wrapper: ReturnType<typeof mount> | null = null;
 
@@ -83,24 +83,24 @@ function setup() {
 		sector: 'Tech',
 		active: false,
 	})));
-	let table: Table | null = null;
+	let grid: Grid | null = null;
 
 	wrapper = mount(defineComponent({
 		setup() {
-			table = createTable(rows);
+			grid = createGrid(rows);
 
-			return () => h(TableRoot, { table: table as DataTable, style: { width: '400px', height: '240px', font: '14px sans-serif' } }, {
-				default: () => h(TableBody, null, {
-					default: ({ rows: bodyRows }: { rows: readonly TableBodyRow[] }) => [
-						...bodyRows.map(row => h(TableRow, { key: row.key, row }, { default: () => h(TableCells), $stable: true })),
-						h(TableRangeOverlay, { key: 'ranges' }),
+			return () => h(GridRoot, { grid: grid as DataGrid, style: { width: '400px', height: '240px', font: '14px sans-serif' } }, {
+				default: () => h(GridBody, null, {
+					default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => [
+						...bodyRows.map(row => h(GridRow, { key: row.key, row }, { default: () => h(GridCells), $stable: true })),
+						h(GridRangeOverlay, { key: 'ranges' }),
 					],
 				}),
 			});
 		},
 	}), { attachTo: document.body });
 
-	return { rows, table: table as unknown as Table };
+	return { rows, grid: grid as unknown as Grid };
 }
 
 function cell(row: number, column: string) {
@@ -161,7 +161,7 @@ describe('editing in the browser', () => {
 		await expect.poll(() => document.querySelector('[data-dg-part="editor-list"]')?.getAttribute('data-dg-side')).toBe('top');
 
 		const list = document.querySelector('[data-dg-part="editor-list"]')!.getBoundingClientRect();
-		const view = document.querySelector('[data-dg-part="table"]')!.getBoundingClientRect();
+		const view = document.querySelector('[data-dg-part="grid"]')!.getBoundingClientRect();
 
 		expect(list.top).toBeGreaterThanOrEqual(view.top);
 		expect(list.bottom).toBeLessThanOrEqual(cell(5, 'sector').getBoundingClientRect().top + 1);
@@ -181,11 +181,11 @@ describe('editing in the browser', () => {
 	});
 
 	it('a pinned cell being edited rises over the pinned cells and the pinned pieces of a range', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
-		table.ranges.select({ key: 'r1', column: 'name' });
-		table.ranges.select({ key: 'r3', column: 'price' }, 'extend');
-		table.editing.start({ key: 'r2', column: 'name' });
+		grid.ranges.select({ key: 'r1', column: 'name' });
+		grid.ranges.select({ key: 'r3', column: 'price' }, 'extend');
+		grid.editing.start({ key: 'r2', column: 'name' });
 		await nextTick();
 
 		const layer = (element: Element) => Number(getComputedStyle(element).zIndex) || 0;
@@ -197,12 +197,12 @@ describe('editing in the browser', () => {
 	});
 
 	it('a range is tinted on its cells: overlapping ranges tint a cell once, and the outline has no fill', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
-		table.ranges.select({ key: 'r1', column: 'price' });
-		table.ranges.select({ key: 'r2', column: 'sector' }, 'extend');
-		table.ranges.select({ key: 'r2', column: 'sector' }, 'add');
-		table.ranges.select({ key: 'r3', column: 'active' }, 'extend');
+		grid.ranges.select({ key: 'r1', column: 'price' });
+		grid.ranges.select({ key: 'r2', column: 'sector' }, 'extend');
+		grid.ranges.select({ key: 'r2', column: 'sector' }, 'add');
+		grid.ranges.select({ key: 'r3', column: 'active' }, 'extend');
 		await nextTick();
 
 		const overlapped = getComputedStyle(cell(2, 'sector'), '::before').backgroundColor;
@@ -215,10 +215,10 @@ describe('editing in the browser', () => {
 	});
 
 	it('Ctrl with a drag over selected cells takes them out of the selection', async () => {
-		const { table } = setup();
+		const { grid } = setup();
 
-		table.ranges.select({ key: 'r0', column: 'price' });
-		table.ranges.select({ key: 'r3', column: 'active' }, 'extend');
+		grid.ranges.select({ key: 'r0', column: 'price' });
+		grid.ranges.select({ key: 'r3', column: 'active' }, 'extend');
 		await nextTick();
 
 		const from = centre(cell(1, 'price'));
@@ -272,7 +272,7 @@ describe('paste in the browser', () => {
 	});
 
 	it('a value pasted over a column fills it, and one undo takes it back', async () => {
-		const { rows, table } = setup();
+		const { rows, grid } = setup();
 
 		await userEvent.click(cell(0, 'note'));
 		await userEvent.keyboard('{ArrowLeft}{Shift>}{ArrowDown}{ArrowDown}{/Shift}');
@@ -280,7 +280,7 @@ describe('paste in the browser', () => {
 
 		expect(rows.value.slice(0, 4).map(row => row.active)).toEqual([true, true, true, false]);
 
-		table.history.undo();
+		grid.history.undo();
 
 		expect(rows.value.slice(0, 3).map(row => row.active)).toEqual([false, false, false]);
 	});

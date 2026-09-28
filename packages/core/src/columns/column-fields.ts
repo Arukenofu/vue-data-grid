@@ -11,7 +11,7 @@ export interface CellContext<TRow, TValue> {
 	index: number;
 	/** The column of the cell. */
 	column: RuntimeColumn;
-	/** The row's node from `useRowTree`, in a tree; `undefined` in a flat table. */
+	/** The row's node from `useRowTree`, in a tree; `undefined` in a flat grid. */
 	node?: RowNode;
 	/**
 	 * Writes a value into the cell at once, as an edit with the source `'edit'`: for a control in the
@@ -60,7 +60,7 @@ export interface EditorContext<TRow, TValue> extends CellContext<TRow, TValue> {
 	cancel: () => void;
 	/**
 	 * Props for the element that takes input: it takes focus when it mounts, and gets the keys of
-	 * `useTableEditing` (Enter commits and goes down, Tab across, Escape cancels, the arrows in the
+	 * `useGridEditing` (Enter commits and goes down, Tab across, Escape cancels, the arrows in the
 	 * `'quick'` mode save and move, F2 switches the mode), a commit when focus leaves it, its label,
 	 * `data-dg-state` with the mode, and `aria-invalid` with an error. Its keys run after an
 	 * `onKeydown` of the editor's own that comes first in an array: `event.preventDefault()` there
@@ -132,7 +132,7 @@ declare module '@vue-data-grid/engine' {
 		 */
 		footer?: (context: FooterContext<TRow, AggregateResult<TValue, TAggregate>>) => VNodeChild;
 		/**
-		 * The column shows the tree, so → and ← of `useGridNavigation` expand and collapse rows in it.
+		 * The column shows the tree, so → and ← of `useCellNavigation` expand and collapse rows in it.
 		 * `treeColumn()` sets it.
 		 */
 		tree?: boolean;

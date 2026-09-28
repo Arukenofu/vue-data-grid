@@ -94,7 +94,7 @@ describe('keepMounted — marker', () => {
 /**
  * Relies on an internal Vue field: `cloneIfMounted` returns the vnode as is for any truthy `memo`,
  * and `patch` then stops at `n1 === n2`. The field belongs to `v-memo` and is not public API: if
- * that branch changes, tables will not crash but silently stop updating. This block fails at once.
+ * that branch changes, grids will not crash but silently stop updating. This block fails at once.
  */
 describe('keepMounted — memo survives a patch', () => {
 	function render() {

@@ -1,7 +1,7 @@
 {
   "name": "@vue-data-grid/core",
   "version": "0.0.1",
-  "description": "Headless Vue table on top of @vue-data-grid/engine, which it re-exports: a table assembled in one call, headless components, ARIA grid props, service columns, keyboard navigation, column resize, autosize, structural CSS, and dragging rows and columns with @vue-data-grid/drag-and-drop.",
+  "description": "Headless Vue data grid on top of @vue-data-grid/engine, which it re-exports: a grid assembled in one call, headless components, ARIA grid props, service columns, keyboard navigation, column resize, autosize, structural CSS, and dragging rows and columns with @vue-data-grid/drag-and-drop.",
   "license": "MIT",
   "type": "module",
   "sideEffects": [

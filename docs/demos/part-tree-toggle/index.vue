@@ -2,16 +2,16 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
 	navigation,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
 	tree,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { h, shallowRef } from 'vue';
 
@@ -67,7 +67,7 @@ const columns = defineColumns({
 
 const expanded = shallowRef<string[] | undefined>(['design', 'brand']);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: files,
 	rowKey: 'id',
@@ -86,18 +86,18 @@ const table = useDataTable({
 			<UiButton size="sm" @click="expanded = []">Collapse all</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Files" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows }">
-				<TableRow v-for="row in rows" :key="row.key" :row="row">
-					<TableCells />
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+		<GridRoot :grid="grid" label="Files" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows }">
+				<GridRow v-for="row in rows" :key="row.key" :row="row">
+					<GridCells />
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

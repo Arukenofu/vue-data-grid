@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, tree, treeColumn, useDataTable } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, navigation, tree, treeColumn, useDataGrid } from '@vue-data-grid/core';
 import IconChevronsDownUp from '~icons/lucide/chevrons-down-up';
 import IconChevronsUpDown from '~icons/lucide/chevrons-up-down';
 import { h, shallowRef } from 'vue';
 
-import { UiAvatar, UiBadge, UiButton, UiDataTable, UiStat, UiToolbar } from '@/ui';
+import { UiAvatar, UiBadge, UiButton, UiDataGrid, UiStat, UiToolbar } from '@/ui';
 
 import { managers, org, type OrgMember } from './data';
 
@@ -30,7 +30,7 @@ const columns = defineColumns({
 
 const expanded = shallowRef<string[] | undefined>(undefined);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: org,
 	rowKey: 'id',
@@ -41,7 +41,7 @@ const table = useDataTable({
 	},
 });
 
-const shown = table.rows;
+const shown = grid.rows;
 </script>
 
 <template>
@@ -58,7 +58,7 @@ const shown = table.rows;
 			<span class="ui-spacer" />
 			<UiStat label="Shown" class="shown">{{ shown.length }} of {{ org.length }}</UiStat>
 		</UiToolbar>
-		<UiDataTable :table="table" label="Organization" />
+		<UiDataGrid :grid="grid" label="Organization" />
 	</div>
 </template>
 

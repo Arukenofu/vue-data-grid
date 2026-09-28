@@ -1,12 +1,12 @@
 ---
 title: Drop zone
-description: An area that rows or columns of a table are dropped on without it being a table.
+description: An area that rows or columns of a grid are dropped on without it being a grid.
 ---
 
 # Drop zone
 
 <Description>
-An area rows or columns of a table are dropped on without it being a table: a bin, a list of
+An area rows or columns of a grid are dropped on without it being a grid: a bin, a list of
 favourites, a folder in a sidebar, a column chooser.
 </Description>
 
@@ -16,10 +16,10 @@ favourites, a folder in a sidebar, a column chooser.
 
 <Highlights
 	:features="[
-		'Takes the rows of any table, or only of the tables of a `group`; or the columns, with `accept=&quot;columns&quot;`.',
+		'Takes the rows of any grid, or only of the grids of a `group`; or the columns, with `accept=&quot;columns&quot;`.',
 		'Knows whether an item it takes is being dragged, and whether it is over it, for a message of each kind.',
 		'`canDrop` refuses items by what they are and where they come from.',
-		'The dropped item comes with its row or column and the table it comes from.',
+		'The dropped item comes with its row or column and the grid it comes from.',
 	]"
 />
 
@@ -27,32 +27,32 @@ favourites, a folder in a sidebar, a column chooser.
 
 ```vue
 <script setup lang="ts">
-import { TableDropZone, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { GridDropZone, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
-	<TableRoot :table="table">
-		<TableRowDrag bounds="window">
-			<TableBody />
-		</TableRowDrag>
-	</TableRoot>
+	<GridRoot :grid="grid">
+		<GridRowDrag bounds="window">
+			<GridBody />
+		</GridRowDrag>
+	</GridRoot>
 
-	<TableDropZone @drop="remove">Trash</TableDropZone>
+	<GridDropZone @drop="remove">Trash</GridDropZone>
 </template>
 ```
 
-A drag keeps the pointer inside its table by default. Give it `bounds="window"`, or put the tables in
-a `group`, so that a row can reach a zone outside the table.
+A drag keeps the pointer inside its grid by default. Give it `bounds="window"`, or put the grids in
+a `group`, so that a row can reach a zone outside the grid.
 
 ## API reference
 
-### TableDropZone
+### GridDropZone
 
 <PropsTable
 	:data="[
 		{ name: 'accept', type: '\'rows\' | \'columns\'', default: '\'rows\'', description: 'What it takes. Read once.' },
-		{ name: 'group', type: 'string', description: 'Take only the rows of tables in this group; of any table without it.' },
-		{ name: 'canDrop', type: '(event: TableDropZoneEvent) => boolean', description: 'Whether to take an item.' },
+		{ name: 'group', type: 'string', description: 'Take only the rows of grids in this group; of any grid without it.' },
+		{ name: 'canDrop', type: '(event: GridDropZoneEvent) => boolean', description: 'Whether to take an item.' },
 		{ name: 'as', type: 'string | Component', default: '\'div\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
 	]"
@@ -60,13 +60,13 @@ a `group`, so that a row can reach a zone outside the table.
 
 <EmitsTable
 	:data="[
-		{ name: 'drop', payload: 'TableDropZoneEvent', description: 'An item was dropped on the area: `{ key, label, row, column, source }`, the key of the row or the name of the column, its name, the row or the column, and the table it comes from.' },
+		{ name: 'drop', payload: 'GridDropZoneEvent', description: 'An item was dropped on the area: `{ key, label, row, column, source }`, the key of the row or the name of the column, its name, the row or the column, and the grid it comes from.' },
 	]"
 />
 
 <SlotsTable
 	:data="[
-		{ name: 'default', scope: '{ ready: boolean; over: boolean; item: TableDragItem | null }', description: 'Whether an item it takes is being dragged and can reach it, whether it is over the area, and the item with the table it comes from.' },
+		{ name: 'default', scope: '{ ready: boolean; over: boolean; item: GridDragItem | null }', description: 'Whether an item it takes is being dragged and can reach it, whether it is over the area, and the item with the grid it comes from.' },
 	]"
 />
 
@@ -81,25 +81,25 @@ a `group`, so that a row can reach a zone outside the table.
 
 ### A bin and a list of favourites
 
-The demo has two zones next to a table of files. Each does its own thing with the key it gets:
+The demo has two zones next to a grid of files. Each does its own thing with the key it gets:
 
 ```ts
-function star({ key }: TableDropZoneEvent) {
+function star({ key }: GridDropZoneEvent) {
 	starred.value = new Set([...starred.value, key]);
 }
 
-function remove({ key }: TableDropZoneEvent) {
+function remove({ key }: GridDropZoneEvent) {
 	rows.value = rows.value.filter(file => file.id !== key);
 }
 ```
 
 ```vue
-<TableDropZone v-slot="{ ready, over }" @drop="remove">
+<GridDropZone v-slot="{ ready, over }" @drop="remove">
 	<IconTrash aria-hidden="true" />
 	<span v-if="over">Release to delete</span>
 	<span v-else-if="ready">Drop a file here</span>
 	<span v-else>Drag files here</span>
-</TableDropZone>
+</GridDropZone>
 ```
 
 The state is also in `data-dg-state`, so the look can come from CSS alone:
@@ -114,13 +114,13 @@ The state is also in `data-dg-state`, so the look can come from CSS alone:
 }
 ```
 
-### Only from some tables
+### Only from some grids
 
-A zone takes the rows of every table by default. Name a `group` to take only the rows of the tables
+A zone takes the rows of every grid by default. Name a `group` to take only the rows of the grids
 in it, or decide per item with `canDrop`:
 
 ```vue
-<TableDropZone group="tasks" :can-drop="({ source }) => source !== archive" @drop="archiveTask" />
+<GridDropZone group="tasks" :can-drop="({ source }) => source !== archive" @drop="archiveTask" />
 ```
 
 ## Accessibility
@@ -129,4 +129,4 @@ in it, or decide per item with `canDrop`:
   **Delete** button or a menu item on the row, for people who do not drag.
 - Name the zone with visible text, as in the demo, and keep its message in the slot rather than in
   a tooltip, so it can be read while the drag goes on.
-- Rows dragged with the keyboard move within their table; a keyboard drag does not reach a zone.
+- Rows dragged with the keyboard move within their grid; a keyboard drag does not reach a zone.

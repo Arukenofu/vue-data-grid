@@ -7,7 +7,7 @@ description: Sort on the client with one feature, or let a server sort and keep 
 
 <Description>
 Sorting is two separate things: the sort itself, a list of columns and directions that header clicks
-change, and the rows put in that order. The table always keeps the first; the sorting feature does
+change, and the rows put in that order. The grid always keeps the first; the sorting feature does
 the second on the client, or your server does.
 </Description>
 
@@ -33,7 +33,7 @@ const number = defineColumn<Stock>({ sortable: true, align: 'right' });
 ```
 
 `sortOrder` can also hold a single direction, for a column that only ever sorts one way. Put a
-`TableSortIndicator` in the header cell to show where a column stands; its slot takes an icon of your
+`GridSortIndicator` in the header cell to show where a column stands; its slot takes an icon of your
 own.
 
 ## Putting the rows in order
@@ -41,9 +41,9 @@ own.
 The `sorting` feature sorts the rows on the client by the current sort:
 
 ```ts
-import { sorting, useDataTable } from '@vue-data-grid/core';
+import { sorting, useDataGrid } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
@@ -76,7 +76,7 @@ rating: text(getRating, {
 }),
 ```
 
-Write `compare` for the ascending order only. The table applies the direction itself, and never
+Write `compare` for the ascending order only. The grid applies the direction itself, and never
 passes empty values to it.
 
 ## Several columns at once
@@ -88,22 +88,22 @@ equal in the first, and so on. The indicator of each column shows its place.
 ```ts
 const multiSort = shallowRef(true);
 
-const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 44, multiSort });
+const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 44, multiSort });
 ```
 
-`multiSort` takes a boolean or a `ref` of one, which the table follows: the switch in the demo turns
+`multiSort` takes a boolean or a `ref` of one, which the grid follows: the switch in the demo turns
 it off and on at run time.
 
 ## The sort as state
 
-The sort is a list of `{ name, direction }` in the table's column state, `table.state.sort`. Pass
-`sort` to start with a sort, or a `ref` of one to own it, as a model: the table writes header clicks
+The sort is a list of `{ name, direction }` in the grid's column state, `grid.state.sort`. Pass
+`sort` to start with a sort, or a `ref` of one to own it, as a model: the grid writes header clicks
 into your ref, and follows what you write into it.
 
 ```ts
-const sort = shallowRef<readonly TableSort[]>([{ name: 'marketCap', direction: 'desc' }]);
+const sort = shallowRef<readonly GridSort[]>([{ name: 'marketCap', direction: 'desc' }]);
 
-const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 44, sort });
+const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 44, sort });
 
 function sortByPrice() {
 	sort.value = [{ name: 'price', direction: 'asc' }];
@@ -112,24 +112,24 @@ function sortByPrice() {
 
 Names in a list passed as `sort` are checked against `columns` when compiling, so a typo fails the
 build. A ref may hold any names, such as a model from `defineModel`; to check them too, type it by
-the columns: `shallowRef<readonly TableSort<ColumnName<typeof columns>>[]>`.
+the columns: `shallowRef<readonly GridSort<ColumnName<typeof columns>>[]>`.
 
 Always replace the list; a list changed in place reaches no one. A sort that names a column the
-table does not have, such as one restored from an old version of your app, is left out, so it never
-breaks the table. To do what a header click does from code, call `table.scope.toggleSort(name,
+grid does not have, such as one restored from an old version of your app, is left out, so it never
+breaks the grid. To do what a header click does from code, call `grid.scope.toggleSort(name,
 additive)`: it respects `sortable`, `sortOrder` and `multiSort`.
 
 ## Sorting on a server
 
 When the rows come sorted from a server, leave the `sorting` feature out. Header clicks still change
-the sort, the indicators and `aria-sort` still follow it, and the table shows the rows in the order
+the sort, the indicators and `aria-sort` still follow it, and the grid shows the rows in the order
 you give them. Watch the sort and fetch:
 
 ```ts
-const sort = shallowRef<readonly TableSort[]>([]);
+const sort = shallowRef<readonly GridSort[]>([]);
 const orders = shallowRef<readonly Order[]>([]);
 
-const table = useDataTable({ columns, rows: orders, rowKey: 'id', rowHeight: 40, sort });
+const grid = useDataGrid({ columns, rows: orders, rowKey: 'id', rowHeight: 40, sort });
 
 watch(sort, async (next) => {
 	orders.value = await fetchOrders({ sort: next });
@@ -142,7 +142,7 @@ way.
 ## Sorting live data
 
 Prices that change many times a second would re-sort the whole list on every change. With
-`sorting({ delta: true })`, the table places again only the rows that arrived as new objects, and
+`sorting({ delta: true })`, the grid places again only the rows that arrived as new objects, and
 keeps the rest where they are. It relies on immutable updates: a row that changed is a new object,
 and a row that did not is the same one. [Live data](/guides/live-data) puts it to work.
 
@@ -150,7 +150,7 @@ and a row that did not is the same one. [Live data](/guides/live-data) puts it t
 
 - The header cell of the first sort column gets `aria-sort` with `ascending` or `descending`. ARIA
   has no sort levels, so only that one column carries it.
-- The announcer of `TableRoot` says the whole sort whenever it changes, such as "Sorted by Rating
+- The announcer of `GridRoot` says the whole sort whenever it changes, such as "Sorted by Rating
   descending, then Market cap descending", and "Not sorted" when it is cleared.
 - The indicator is `aria-hidden`: the header cell already tells its state, and the mark would only
   repeat it.

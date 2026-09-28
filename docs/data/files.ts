@@ -29,7 +29,7 @@ export const files: readonly FileEntry[] = [
 	{ id: 'router', parent: 'app', name: 'router.ts', kind: 'code', size: 5.8 * KB, modified: '2026-09-24' },
 	{ id: 'store', parent: 'app', name: 'store.ts', kind: 'code', size: 11.4 * KB, modified: '2026-09-25' },
 	{ id: 'components', parent: 'source', name: 'components', kind: 'folder', size: 0, modified: '2026-09-23' },
-	{ id: 'orders', parent: 'components', name: 'OrdersTable.vue', kind: 'code', size: 9.1 * KB, modified: '2026-09-23' },
+	{ id: 'orders', parent: 'components', name: 'OrdersGrid.vue', kind: 'code', size: 9.1 * KB, modified: '2026-09-23' },
 	{ id: 'chart', parent: 'components', name: 'RevenueChart.vue', kind: 'code', size: 7.6 * KB, modified: '2026-09-20' },
 	{ id: 'readme', parent: 'source', name: 'README.md', kind: 'document', size: 4.4 * KB, modified: '2026-09-12' },
 	{ id: 'media', parent: null, name: 'Media', kind: 'folder', size: 0, modified: '2026-09-15' },

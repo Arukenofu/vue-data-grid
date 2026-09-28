@@ -33,7 +33,7 @@ and sort by any column: every level of the tree sorts on its own.
 ### Lines, then groups
 
 The raw data is a list of sales. The report first adds them up into one line per product, country
-and quarter, and hands those lines to the table. Each line keeps its sale, so the grouping levels
+and quarter, and hands those lines to the grid. Each line keeps its sale, so the grouping levels
 can read the region, the country or the product from it:
 
 ```ts
@@ -55,7 +55,7 @@ with the group's key, its value, its children and the aggregates of the columns 
 `aggregate`, and you build the group's row from them, of the same type as a line:
 
 ```ts
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	groups,
 	rows,
@@ -89,7 +89,7 @@ const table = useDataTable({
 - Groups are rebuilt only under the lines that changed, and a group's totals are merged from its
   subgroups rather than read again from every line.
 
-`tree({ childrenField: 'children' })` then turns the groups into the rows the table shows, with
+`tree({ childrenField: 'children' })` then turns the groups into the rows the grid shows, with
 the top level open, and sorts every level by the column state. A sort by revenue orders the regions,
 the countries in each and the lines in each by their own totals.
 
@@ -121,11 +121,11 @@ one layout write:
 
 ```ts
 const detailed = computed({
-	get: () => !table.scope.isGroupCollapsed('money'),
-	set: (value: boolean) => table.scope.batch(() => {
+	get: () => !grid.scope.isGroupCollapsed('money'),
+	set: (value: boolean) => grid.scope.batch(() => {
 		for (const name of Object.keys(groups)) {
-			if (table.scope.isGroupCollapsed(name) === value) {
-				table.scope.toggleGroup(name);
+			if (grid.scope.isGroupCollapsed(name) === value) {
+				grid.scope.toggleGroup(name);
 			}
 		}
 	}),
@@ -157,7 +157,7 @@ what gives the footer its typed `aggregate`.
 
 ## Accessibility
 
-- The table is a `treegrid`: group rows have `aria-level`, `aria-expanded`, `aria-posinset` and
+- The grid is a `treegrid`: group rows have `aria-level`, `aria-expanded`, `aria-posinset` and
   `aria-setsize`, so a screen reader says "level 2, 3 of 4, expanded" as you move through the tree.
 - Group headers are column headers over their columns with `aria-colspan`. Their toggles are
   buttons named "Collapse Money" or "Expand Money", with `aria-expanded`.
@@ -165,7 +165,7 @@ what gives the footer its typed `aggregate`.
   group, and <kbd>Enter</kbd> there folds or unfolds it. The "All columns" switch in the toolbar folds
   both at once.
 - The header and the footer rows count in `aria-rowcount` and `aria-rowindex`, so the total row is
-  announced as the last row of the table.
+  announced as the last row of the grid.
 - The margin bar is decoration; the percentage next to it is the value.
 
 ### Keyboard interactions

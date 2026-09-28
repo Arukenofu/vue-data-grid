@@ -16,10 +16,10 @@ import {
 } from 'vue';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { TableBodyRow } from '../../src/components/context';
-import { TableBody, TableCells, TableRow } from '../../src/components/table-body';
-import { TableRoot } from '../../src/components/table-root';
-import { useDataTable } from '../../src/data-table/use-data-table';
+import type { GridBodyRow } from '../../src/components/context';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridRoot } from '../../src/components/grid-root';
+import { useDataGrid } from '../../src/data-grid/use-data-grid';
 
 interface Row {
 	id: string;
@@ -39,15 +39,15 @@ const KEYED_FRAGMENT = 128;
 /**
  * The body as the template compiler writes it, and not as a render function by hand would:
  *
- * <TableBody v-slot="{ rows }">
- * 	<TableRow v-for="row in rows" :key="row.key" :row="row"><TableCells /></TableRow>
- * </TableBody>
+ * <GridBody v-slot="{ rows }">
+ * 	<GridRow v-for="row in rows" :key="row.key" :row="row"><GridCells /></GridRow>
+ * </GridBody>
  */
 function renderCompiledBody() {
-	return createVNode(TableBody, null, {
-		default: withCtx(({ rows }: { rows: readonly TableBodyRow[] }) => [
-			(openBlock(true), createElementBlock(Fragment, null, renderList(rows, row => (openBlock(), createBlock(TableRow, { key: row.key, row }, {
-				default: withCtx(() => [createVNode(TableCells)]),
+	return createVNode(GridBody, null, {
+		default: withCtx(({ rows }: { rows: readonly GridBodyRow[] }) => [
+			(openBlock(true), createElementBlock(Fragment, null, renderList(rows, row => (openBlock(), createBlock(GridRow, { key: row.key, row }, {
+				default: withCtx(() => [createVNode(GridCells)]),
 				_: STABLE_SLOTS,
 			}, PROPS, ['row']))), KEYED_FRAGMENT)),
 		]),
@@ -69,15 +69,15 @@ describe('the row memo in a compiled template', () => {
 
 		wrapper = mount(defineComponent({
 			setup() {
-				const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30 });
+				const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 });
 
-				return () => h(TableRoot, { table, label: 'Prices' }, { default: renderCompiledBody });
+				return () => h(GridRoot, { grid, label: 'Prices' }, { default: renderCompiledBody });
 			},
 		}), {
 			global: {
 				mixins: [{
 					updated(this: ComponentPublicInstance) {
-						if (this.$options.name === 'TableRow') {
+						if (this.$options.name === 'GridRow') {
 							updated.push(String(this.$.vnode.key));
 						}
 					},

@@ -1,12 +1,12 @@
 ---
 title: Localization
-description: The strings of the table in any language, values formatted for the reader, and tables that read from right to left.
+description: The strings of the grid in any language, values formatted for the reader, and grids that read from right to left.
 ---
 
 # Localization
 
 <Description>
-A table speaks in three places: the names of its controls, what it announces to screen readers, and
+A grid speaks in three places: the names of its controls, what it announces to screen readers, and
 the values in its cells. The first two come from its messages, the third from the formats of your
 columns, and the whole layout turns around for languages written from right to left.
 </Description>
@@ -15,22 +15,22 @@ columns, and the whole layout turns around for languages written from right to l
 
 Switch between English, German, Russian, Kazakh and Arabic, then sort, select or resize: the
 checkboxes, the handles and the announcements speak the new language, dates and money follow its
-conventions, and Arabic lays the whole table out from right to left.
+conventions, and Arabic lays the whole grid out from right to left.
 
 ## The messages
 
-Every string the table itself shows or says is a message: the names of its checkboxes, toggles and
-handles, the empty and loading states, and the announcements. Pass your own to `TableRoot` as
+Every string the grid itself shows or says is a message: the names of its checkboxes, toggles and
+handles, the empty and loading states, and the announcements. Pass your own to `GridRoot` as
 `messages`, over the English defaults:
 
 ```vue
-<TableRoot :table="table" label="Mitarbeiter" :messages="germanMessages">
+<GridRoot :grid="grid" label="Mitarbeiter" :messages="germanMessages">
 ```
 
 ```ts
-import type { TableMessages } from '@vue-data-grid/core';
+import type { GridMessages } from '@vue-data-grid/core';
 
-const germanMessages: Partial<TableMessages> = {
+const germanMessages: Partial<GridMessages> = {
 	selectRow: 'Zeile auswählen',
 	selectAllRows: 'Alle Zeilen auswählen',
 	empty: 'Keine Zeilen',
@@ -54,8 +54,8 @@ them, handy to see what there is or to build a language on top of.
 		{ name: 'resizeColumn', type: '(label: string) => string', description: 'The name of a resize handle, from the column\'s label.' },
 		{ name: 'columnWidth', type: '(width: number) => string', description: 'The width of a column as a resize handle says it.' },
 		{ name: 'dragRow', type: '(label: string) => string', description: 'The name of a row\'s drag handle, from the name of the row.' },
-		{ name: 'empty', type: 'string', default: '\'No rows\'', description: 'What `TableEmpty` shows without a slot.' },
-		{ name: 'loading', type: 'string', default: '\'Loading…\'', description: 'What `TableLoading` shows without a slot, and what is announced.' },
+		{ name: 'empty', type: 'string', default: '\'No rows\'', description: 'What `GridEmpty` shows without a slot.' },
+		{ name: 'loading', type: 'string', default: '\'Loading…\'', description: 'What `GridLoading` shows without a slot, and what is announced.' },
 		{ name: 'noMatches', type: 'string', default: '\'No matches\'', description: 'The list of `selectEditor` when nothing matches the text typed.' },
 		{ name: 'sorted', type: '(sort: readonly SortMessageItem[]) => string', description: 'Announced when the sort changes; an empty list when it is cleared.' },
 		{ name: 'selected', type: '(count: number) => string', description: 'Announced when the number of selected rows changes.' },
@@ -69,15 +69,15 @@ direction, "Жалақы кему ретімен", as the language orders them.
 
 ### Switching the language
 
-`TableRoot` reads `messages` once, when it mounts. To switch at run time, give it a `key` that changes
-with the language, so it mounts again with the new messages. The table object stays the same: sort,
+`GridRoot` reads `messages` once, when it mounts. To switch at run time, give it a `key` that changes
+with the language, so it mounts again with the new messages. The grid object stays the same: sort,
 selection and widths survive the switch.
 
 ```vue
-<UiDataTable :key="locale" :table="table" :label="current.title" :messages="current.messages" />
+<UiDataGrid :key="locale" :grid="grid" :label="current.title" :messages="current.messages" />
 ```
 
-Your own parts read the messages of the table they are in with `useTableMessagesContext()`.
+Your own parts read the messages of the grid they are in with `useGridMessagesContext()`.
 
 ## Labels of columns
 
@@ -91,7 +91,7 @@ const COLUMNS = {
 	de: createColumns(LOCALES.de),
 };
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns: () => COLUMNS[locale.value],
 	// …
 });
@@ -117,7 +117,7 @@ order of sorting uses fixed Unicode rules for the same reason; give a column a `
 
 ## Right to left
 
-Set `dir="rtl"` on the table or anything around it. The table reads the direction of its elements, so
+Set `dir="rtl"` on the grid or anything around it. The grid reads the direction of its elements, so
 everything follows:
 
 - columns lay out from the right, and pinned `start` columns stick to the right edge;
@@ -128,20 +128,20 @@ everything follows:
 
 Use the logical properties of CSS in your own styles, `inset-inline-start` and `padding-inline`,
 rather than `left` and `padding-left`, as the structural styles do, and your theme turns around with
-the table.
+the grid.
 
 ## Accessibility
 
-- Give every control a name in the reader's language: the messages cover the table's own controls,
+- Give every control a name in the reader's language: the messages cover the grid's own controls,
   your column labels cover the rest. Screen readers read a name in the language of the page, so set
-  `lang` on the page, or on the table when it differs, as the demo does.
+  `lang` on the page, or on the grid when it differs, as the demo does.
 - Announcements are messages too. Translate `sorted` and `selected`, or a screen reader will switch
   to English in the middle of a German page.
-- In a right-to-left table the arrow keys follow the reading direction, as users of those languages
+- In a right-to-left grid the arrow keys follow the reading direction, as users of those languages
   expect.
 
 ## See also
 
 - [Root](/components/root): the `messages` and `label` props.
-- [Accessibility](/overview/accessibility): what the table announces and when.
+- [Accessibility](/overview/accessibility): what the grid announces and when.
 - [Columns](/guides/columns): `format` and `compare`.

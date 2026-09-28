@@ -1,6 +1,6 @@
 # @vue-data-grid/core
 
-Headless, accessible tables for Vue 3. A table assembled in one call, small parts in the manner of
+Headless, accessible grids for Vue 3. A grid assembled in one call, small parts in the manner of
 reka-ui, keyboard navigation of the WAI-ARIA grid, column resize and autosize, and structural CSS,
 on top of [`@vue-data-grid/engine`](../engine).
 
@@ -19,7 +19,7 @@ yarn add @vue-data-grid/core
 ```
 
 Vue 3.5 or later is a peer dependency. The package re-exports the core and
-[`@vue-data-grid/flip`](../flip), the engines that play `useTableMotion` and the drags, so a table
+[`@vue-data-grid/flip`](../flip), the engines that play `useGridMotion` and the drags, so a grid
 imports everything from `@vue-data-grid/core`. Dragging rows and columns comes from
 `@vue-data-grid/core/drag-and-drop` and needs `@vue-data-grid/drag-and-drop`, an optional peer dependency.
 
@@ -53,9 +53,9 @@ pages are Markdown files in `docs/content/`:
   [localization](../../docs/content/guides/localization.md)
 - [Components](../../docs/content/components/root.md): every part with its props, slots, data
   attributes and keys
-- [Composables](../../docs/content/composables/use-data-table.md): `useDataTable`, the features, and
+- [Composables](../../docs/content/composables/use-data-grid.md): `useDataGrid`, the features, and
   every composable under the parts
-- [Examples](../../docs/content/examples/index.md): complete tables with their source
+- [Examples](../../docs/content/examples/index.md): complete grids with their source
 
 ## License
 

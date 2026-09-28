@@ -1,13 +1,13 @@
 ---
 title: Row drag
-description: Dragging rows to reorder them, into groups of a tree and between tables, with a pointer, a finger or the keyboard.
+description: Dragging rows to reorder them, into groups of a tree and between grids, with a pointer, a finger or the keyboard.
 ---
 
 # Row drag
 
 <Description>
-Dragging rows to a new place: within the table, into and out of the groups of a tree, and between
-tables, with a pointer, a finger or the keyboard.
+Dragging rows to a new place: within the grid, into and out of the groups of a tree, and between
+grids, with a pointer, a finger or the keyboard.
 </Description>
 
 <Demo name="part-row-drag" />
@@ -17,10 +17,10 @@ tables, with a pointer, a finger or the keyboard.
 <Highlights
 	:features="[
 		'Rows make room where the dragged one would go, or a line shows the place: `indicator` of `gap` or `line`.',
-		'The table never touches your rows: `drop` says which row goes where, and you move it.',
+		'The grid never touches your rows: `drop` says which row goes where, and you move it.',
 		'Drag by the whole row, or only by a handle, which also drags with the keyboard.',
 		'Alt with ↑ and ↓ moves the row of the focused cell one place, with or without a handle.',
-		'The table scrolls near its edges, and the dragged row stays rendered under the row window.',
+		'The grid scrolls near its edges, and the dragged row stays rendered under the row window.',
 		'`canDrag`, `canDrop` and `canNest` decide what moves and where; places you refuse are never shown.',
 	]"
 />
@@ -29,55 +29,55 @@ tables, with a pointer, a finger or the keyboard.
 
 ```vue
 <script setup lang="ts">
-import { TableBody, TableCells, TableRow } from '@vue-data-grid/core';
-import { TableDragHandle, TableDragPreview, TableRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { GridBody, GridCells, GridRow } from '@vue-data-grid/core';
+import { GridDragHandle, GridDragPreview, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 </script>
 
 <template>
-	<TableRowDrag handle @drop="drop">
-		<TableBody v-slot="{ rows }">
-			<TableRow v-for="row in rows" :key="row.key" :row="row">
-				<TableCells v-slot="{ column }">
-					<TableDragHandle v-if="column.name === 'grip'" />
-				</TableCells>
-			</TableRow>
-		</TableBody>
-		<TableDragPreview />
-	</TableRowDrag>
+	<GridRowDrag handle @drop="drop">
+		<GridBody v-slot="{ rows }">
+			<GridRow v-for="row in rows" :key="row.key" :row="row">
+				<GridCells v-slot="{ column }">
+					<GridDragHandle v-if="column.name === 'grip'" />
+				</GridCells>
+			</GridRow>
+		</GridBody>
+		<GridDragPreview />
+	</GridRowDrag>
 </template>
 ```
 
 Dragging lives in the subpath `@vue-data-grid/core/drag-and-drop`, over the optional peer
-`@vue-data-grid/drag-and-drop`. Install it next to the table:
+`@vue-data-grid/drag-and-drop`. Install it next to the grid:
 
 <InstallTabs packages="@vue-data-grid/core @vue-data-grid/drag-and-drop" />
 
-`TableRowDrag` renders no element: put it around the `TableBody`, inside the `TableRoot`. The rows
-under it register themselves, and a [`TableDragPreview`](/components/drag-preview) inside it is the
+`GridRowDrag` renders no element: put it around the `GridBody`, inside the `GridRoot`. The rows
+under it register themselves, and a [`GridDragPreview`](/components/drag-preview) inside it is the
 ghost under the pointer.
 
 ## API reference
 
-### TableRowDrag
+### GridRowDrag
 
-`useTableRowDrag` as a part. Its props are the options of the composable, and its `drop` event is
+`useGridRowDrag` as a part. Its props are the options of the composable, and its `drop` event is
 `onDrop`.
 
 <PropsTable
 	:data="[
-		{ name: 'handle', type: 'boolean', default: 'false', description: 'Drags start only on a `TableDragHandle`, which also drags with the keyboard. Without it the whole row drags, and controls in its cells keep their clicks.' },
+		{ name: 'handle', type: 'boolean', default: 'false', description: 'Drags start only on a `GridDragHandle`, which also drags with the keyboard. Without it the whole row drags, and controls in its cells keep their clicks.' },
 		{ name: 'indicator', type: '\'gap\' | \'line\' | \'mark\'', default: '\'gap\'', description: 'How the place is shown: the rows move apart, a line slides between them, or only attributes mark it.' },
 		{ name: 'enabled', type: 'boolean', description: 'Whether rows can be dragged now; while the rows are not sorted by default, since their order is then the sort\'s.' },
-		{ name: 'group', type: 'string', description: 'A name shared by tables that take each other\'s rows.' },
-		{ name: 'bounds', type: '\'table\' | \'window\' | HTMLElement', description: 'What neither the pointer nor the ghost leaves: the table by default, the window in a `group`.' },
+		{ name: 'group', type: 'string', description: 'A name shared by grids that take each other\'s rows.' },
+		{ name: 'bounds', type: '\'grid\' | \'window\' | HTMLElement', description: 'What neither the pointer nor the ghost leaves: the grid by default, the window in a `group`.' },
 		{ name: 'canDrag', type: '(row, key) => boolean', description: 'Whether a row can be dragged; every row by default.' },
-		{ name: 'canDrop', type: '(target: TableRowDropTarget) => boolean', description: 'Whether a row may be dropped at a place: `{ key, row, parent, index, over, position }`.' },
-		{ name: 'canAccept', type: '(offer: { row, source }) => boolean', description: 'Whether to take a row from another table of the group; any by default.' },
+		{ name: 'canDrop', type: '(target: GridRowDropTarget) => boolean', description: 'Whether a row may be dropped at a place: `{ key, row, parent, index, over, position }`.' },
+		{ name: 'canAccept', type: '(offer: { row, source }) => boolean', description: 'Whether to take a row from another grid of the group; any by default.' },
 		{ name: 'canNest', type: '(row, key) => boolean', description: 'In a tree: whether a row takes children dropped inside it; a group row by default.' },
 		{ name: 'stepKeys', type: 'boolean', default: 'true', description: 'Alt with ↑ and ↓ on a cell moves its row one place among its siblings.' },
 		{ name: 'getLabel', type: '(row, key) => string', description: 'The name of a row for screen readers; the text of its row header cell by default.' },
 		{ name: 'motion', type: 'MotionEngine | false', description: 'The engine of the gap, the ghost and the drop; `webAnimations()` by default, `false` for none.' },
-		{ name: 'autoScroll', type: 'DragAutoScroll | false', description: 'How the table scrolls near its top and bottom: `{ threshold, speed, curve, smoothing, margin }`.' },
+		{ name: 'autoScroll', type: 'DragAutoScroll | false', description: 'How the grid scrolls near its top and bottom: `{ threshold, speed, curve, smoothing, margin }`.' },
 		{ name: 'touchDelay', type: 'number', default: '250', description: 'How long a finger rests on a row before it drags, ms.' },
 		{ name: 'ignore', type: 'string', description: 'A selector of what inside a row never starts a drag, on top of links, buttons and fields.' },
 		{ name: 'announcements', type: 'Partial<DragAnnouncements>', description: 'What screen readers hear during a keyboard drag; English by default.' },
@@ -86,13 +86,13 @@ ghost under the pointer.
 
 <EmitsTable
 	:data="[
-		{ name: 'drop', payload: 'TableRowDropEvent', description: 'A row was dropped on the table: `{ key, row, parent, index, external, source }`. Move it in your data, such as with `moveRow`. `index` is the place among the children of `parent`, counted once the row is taken out.' },
+		{ name: 'drop', payload: 'GridRowDropEvent', description: 'A row was dropped on the grid: `{ key, row, parent, index, external, source }`. Move it in your data, such as with `moveRow`. `index` is the place among the children of `parent`, counted once the row is taken out.' },
 	]"
 />
 
 <SlotsTable
 	:data="[
-		{ name: 'default', scope: '{ active, dragging, over, allowed, target, item }', description: 'The key of the row dragged from this table, whether a row the table takes is dragged, whether it is over the body and at an allowed place, where it would go, and what it is. Read only what you show: each read follows the drag.' },
+		{ name: 'default', scope: '{ active, dragging, over, allowed, target, item }', description: 'The key of the row dragged from this grid, whether a row the grid takes is dragged, whether it is over the body and at an allowed place, where it would go, and what it is. Read only what you show: each read follows the drag.' },
 	]"
 />
 
@@ -114,14 +114,14 @@ While a row is dragged the elements carry the attributes of `@vue-data-grid/drag
 	]"
 />
 
-### TableDragHandle
+### GridDragHandle
 
 The handle of a row: a `button` that drags its row with a pointer or a finger, and with `handle` on
-the row drag, with the keyboard too. The row is its `row` prop, else the `TableRow` around it.
+the row drag, with the keyboard too. The row is its `row` prop, else the `GridRow` around it.
 
 <PropsTable
 	:data="[
-		{ name: 'row', type: 'string | TableBodyRow', description: 'The row: its key or its body row. The row of the `TableRow` around by default.' },
+		{ name: 'row', type: 'string | GridBodyRow', description: 'The row: its key or its body row. The row of the `GridRow` around by default.' },
 		{ name: 'label', type: 'string', description: 'The accessible name; the `dragRow` message with the name of the row, &quot;Drag Tides of Glass&quot;, by default.' },
 		{ name: 'as', type: 'string | Component', default: '\'button\'', description: 'The element or component to render.' },
 		{ name: 'asChild', type: 'boolean', default: 'false', description: 'Render the one child of the slot instead, with the props of the part merged into it.' },
@@ -151,9 +151,9 @@ same object:
 
 ```ts
 import { moveRow } from '@vue-data-grid/core';
-import type { TableRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
+import type { GridRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 
-function drop({ key, index }: TableRowDropEvent<unknown>) {
+function drop({ key, index }: GridRowDropEvent<unknown>) {
 	const row = rows.value.find(track => track.id === key);
 
 	if (row) {
@@ -170,15 +170,15 @@ The playlist keeps its opening and closing tracks: `canDrag` refuses them, and `
 other track between them.
 
 ```vue
-<TableRowDrag :can-drag="(_row, key) => !locked.has(key)" :can-drop="({ index }) => index > 0 && index < rows.length - 1">
+<GridRowDrag :can-drag="(_row, key) => !locked.has(key)" :can-drop="({ index }) => index > 0 && index < rows.length - 1">
 ```
 
 ### Saving on a server
 
-Move the row at once, and move it back if the server refuses: the table animates both.
+Move the row at once, and move it back if the server refuses: the grid animates both.
 
 ```ts
-async function drop({ key, index }: TableRowDropEvent<unknown>) {
+async function drop({ key, index }: GridRowDropEvent<unknown>) {
 	const before = rows.value;
 	const row = before.find(track => track.id === key);
 

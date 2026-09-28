@@ -6,7 +6,7 @@ description: Widths, order, pinning and visibility, the layout people shape by h
 # Column layout
 
 <Description>
-Widths, order, pinned edges and hidden columns: the layout people shape by hand. The table keeps all
+Widths, order, pinned edges and hidden columns: the layout people shape by hand. The grid keeps all
 of it in one small object, so saving it between visits is one option away.
 </Description>
 
@@ -35,33 +35,33 @@ Everything below, from a handle to a call from code, checks the same rights, so 
 
 ## Resizing
 
-Put a `TableResizeHandle` in each header cell. It renders only for `resizable` columns, as a thin grab
+Put a `GridResizeHandle` in each header cell. It renders only for `resizable` columns, as a thin grab
 area at the end edge of the cell:
 
 ```vue
-<TableHeaderCell v-for="column in columns" :key="column.key" :column="column">
-	<TableHeaderContent />
-	<TableResizeHandle />
-</TableHeaderCell>
+<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">
+	<GridHeaderContent />
+	<GridResizeHandle />
+</GridHeaderCell>
 ```
 
 While the pointer drags, the width changes once per animation frame and goes straight to a CSS
 variable, so not a single cell renders again; the layout is written when the pointer is released.
 `minWidth` and `maxWidth` keep the column within its limits. To set widths from code, use
-`table.scope.setWidths({ email: 240 })`.
+`grid.scope.setWidths({ email: 240 })`.
 
 ## Fitting columns
 
 Two helpers size several columns at once, each in a single write of the layout:
 
-- `autosizeColumns(table.scope, names?)` fits columns to their content, measured from the cells that
+- `autosizeColumns(grid.scope, names?)` fits columns to their content, measured from the cells that
   are rendered. A double click on a resize handle does it for one column. Pass `{ rows: 'all' }` to
   also measure rows outside a [virtual window](/guides/virtualization), by the text of their `format`.
-- `table.scope.fitColumns(names?)` stretches or shrinks columns to the width of the table, in
+- `grid.scope.fitColumns(names?)` stretches or shrinks columns to the width of the grid, in
   proportion to their widths and within their limits.
 
 Both leave service columns and columns that are not `resizable` alone. With
-[`useTableMotion`](/composables/use-table-motion), as in the demo, the columns glide to their new
+[`useGridMotion`](/composables/use-grid-motion), as in the demo, the columns glide to their new
 widths instead of jumping.
 
 ## Pinning
@@ -70,9 +70,9 @@ A pinned column sticks to the start or the end edge while the rest scrolls under
 it starts with `pinned`; a `pinnable` column can then be pinned and unpinned:
 
 ```ts
-table.scope.pinColumn('email', 'start');
-table.scope.pinColumn('email', null);
-table.scope.getPin('email');
+grid.scope.pinColumn('email', 'start');
+grid.scope.pinColumn('email', null);
+grid.scope.getPin('email');
 ```
 
 A column that is not `pinnable` stays where it was declared. Pinned cells get
@@ -82,10 +82,10 @@ inner edge, and `--dg-pinned-background` sets their background.
 ## Hiding and showing
 
 `hiddenByDefault` starts a column hidden. A `hideable` column can be toggled with
-`table.scope.toggleColumn(name)`, and `table.scope.isColumnHidden(name)` says where it stands. A hidden
+`grid.scope.toggleColumn(name)`, and `grid.scope.isColumnHidden(name)` says where it stands. A hidden
 sorted column leaves the sort.
 
-To build a menu of columns, list `table.scope.orderedColumns`: every declared column in the current
+To build a menu of columns, list `grid.scope.orderedColumns`: every declared column in the current
 order, hidden ones included. The demo's `ColumnsMenu.vue` turns them into the entries of a dropdown
 menu, one checkbox for showing each column and one for pinning it.
 
@@ -95,22 +95,22 @@ People move a `movable` column with <kbd>Alt</kbd> and the arrow keys on its hea
 [dragging it](/components/column-drag). From code:
 
 ```ts
-table.scope.moveColumnTo('salary', 2);
-table.scope.moveColumnBefore('salary', 'team');
-table.scope.moveColumnBy('salary', -1);
+grid.scope.moveColumnTo('salary', 2);
+grid.scope.moveColumnBefore('salary', 'team');
+grid.scope.moveColumnBy('salary', -1);
 ```
 
 A move stays on the pinned side of the column, and never splits a
 [column group](/guides/column-groups) that keeps its columns together. `canMoveColumnTo` and
 `canMoveColumnBy` ask first. To make several changes in one go, so that everything that depends on
-the layout updates once, wrap them in `table.scope.batch(() => { … })`.
+the layout updates once, wrap them in `grid.scope.batch(() => { … })`.
 
 ## One piece of state
 
-All of the above lives in `table.state.layout`:
+All of the above lives in `grid.state.layout`:
 
 ```ts
-interface TableLayout {
+interface GridLayout {
 	order: string[];
 	hidden: string[];
 	widths: Record<string, number>;
@@ -120,35 +120,35 @@ interface TableLayout {
 ```
 
 `null` means the layout as declared. Pass a `ref` of your own as `layout` to own it, as a model: the
-table writes every change into it and follows what you write. A layout saved before you added a
+grid writes every change into it and follows what you write. A layout saved before you added a
 column still works: the new column takes its declared place, next to the column declared before it.
 
 ## Keeping it between visits
 
-Give the table a store, and the layout and the sort survive a reload:
+Give the grid a store, and the layout and the sort survive a reload:
 
 ```ts
 import { localStorageStore } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
 	rowHeight: 40,
-	persist: localStorageStore('orders-table'),
+	persist: localStorageStore('orders-grid'),
 	remember: ['order', 'hidden', 'widths', 'pinned'],
 });
 ```
 
 - `remember` picks what to keep, out of `order`, `hidden`, `widths`, `pinned`, `collapsed` and `sort`;
   everything by default.
-- The record is read after the table mounts, so a page rendered on a server hydrates with the
-  declared layout and then takes the stored one. `table.state.ready` turns `true` once it is applied.
+- The record is read after the grid mounts, so a page rendered on a server hydrates with the
+  declared layout and then takes the stored one. `grid.state.ready` turns `true` once it is applied.
 - The stored record is checked field by field and carries a version. A broken or foreign record is
-  ignored rather than breaking the table.
-- Tables with the same key share the record: a change in one reaches the others on the page at once,
+  ignored rather than breaking the grid.
+- Grids with the same key share the record: a change in one reaches the others on the page at once,
   and those in other tabs too.
-- `table.state.reset()` goes back to the declared layout and the initial sort, and removes the record.
+- `grid.state.reset()` goes back to the declared layout and the initial sort, and removes the record.
 
 `sessionStorageStore` keeps the record for the life of the tab, and `memoryStore` only in memory. A
 store is any object with `read` and `write`, and optionally `subscribe`, so the layout can live on
@@ -165,7 +165,7 @@ const serverStore: PersistStore = {
 };
 ```
 
-`read` may return a promise; the table applies the record when it arrives, unless the layout changed
+`read` may return a promise; the grid applies the record when it arrives, unless the layout changed
 in the meantime.
 
 ## Accessibility
@@ -196,4 +196,4 @@ in the meantime.
 - [Resize handle](/components/resize-handle): the part and its options.
 - [Column drag](/components/column-drag): reordering by dragging headers.
 - [Column groups](/guides/column-groups): groups that collapse and keep their columns together.
-- [`useTableMotion`](/composables/use-table-motion): animated widths and moves.
+- [`useGridMotion`](/composables/use-grid-motion): animated widths and moves.

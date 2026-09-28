@@ -44,7 +44,7 @@ A column cell needs none of this: it is found by its `data-dg-column`, which the
 	]"
 />
 
-`useTableProps` returns the sections it puts rows in as `sections`, ready for `useGridNavigation`:
+`useGridProps` returns the sections it puts rows in as `sections`, ready for `useCellNavigation`:
 the rows of the header, `body` for the rows of the scope, and `foot` for the footer rows. A row of
 your own joins one of them, or a section you add to the list.
 
@@ -52,7 +52,7 @@ your own joins one of them, or a section you add to the list.
 
 <ReturnsTable
 	:data="[
-		{ name: 'getColumnIndexProps', type: '(index: number) => Readonly<Record<string, number>>', description: '`aria-colindex` of a column cell from its index among the shown columns: one frozen object per position, shared by all rows and tables. Nothing for a spacer, `-1`.' },
+		{ name: 'getColumnIndexProps', type: '(index: number) => Readonly<Record<string, number>>', description: '`aria-colindex` of a column cell from its index among the shown columns: one frozen object per position, shared by all rows and grids. Nothing for a spacer, `-1`.' },
 		{ name: 'getGroupIndexProps', type: '(cell: { index: number; span: number }) => Readonly<Record<string, number>>', description: '`aria-colindex` and `aria-colspan` of a group cell: one frozen object per pair. Nothing for a spacer.' },
 	]"
 />
@@ -82,18 +82,18 @@ function onPointerdown(event: PointerEvent) {
 	const position = cell ? readGridPosition(cell) : null;
 
 	if (position?.section === 'body') {
-		showDetails(table.rows.value[position.row], position.cell);
+		showDetails(grid.rows.value[position.row], position.cell);
 	}
 }
 ```
 
 ### Focusing a cell yourself
 
-With the navigation feature, prefer `table.navigation.focusCell`, which scrolls the cell into view
+With the navigation feature, prefer `grid.navigation.focusCell`, which scrolls the cell into view
 and renders it first. Without it, `findGridCell` finds a rendered one:
 
 ```ts
-findGridCell(table.root.value, { section: 'body', row: 0, cell: 'name' })?.focus();
+findGridCell(grid.root.value, { section: 'body', row: 0, cell: 'name' })?.focus();
 ```
 
 ## Accessibility
@@ -107,6 +107,6 @@ findGridCell(table.root.value, { section: 'body', row: 0, cell: 'name' })?.focus
 
 ## See also
 
-- [useTableProps](/composables/use-table-props): the prop-getters that apply these.
-- [useGridNavigation](/composables/use-grid-navigation): the keyboard that reads them.
+- [useGridProps](/composables/use-grid-props): the prop-getters that apply these.
+- [useCellNavigation](/composables/use-cell-navigation): the keyboard that reads them.
 - [Your own markup](/guides/custom-markup)

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, useDataTable } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, navigation, useDataGrid } from '@vue-data-grid/core';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import { computed, shallowRef, watch } from 'vue';
 
-import { UiButton, UiDataTable, UiNumberField, UiSelect, UiStat, UiToolbar } from '@/ui';
+import { UiButton, UiDataGrid, UiNumberField, UiSelect, UiStat, UiToolbar } from '@/ui';
 
 import { DAY_COUNT, readTemperature, SENSOR_COUNT, type Sensor, sensors } from './data';
 
@@ -32,7 +32,7 @@ const columns = defineColumns({
 	...Object.fromEntries(DAYS.map((day, index) => [day.value, temperature(index)])),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: sensors,
 	rowKey: 'id',
@@ -41,18 +41,18 @@ const table = useDataTable({
 	features: { navigation: navigation() },
 });
 
-const renderedRows = computed(() => table.items.value.length);
-const renderedColumns = computed(() => table.scope.renderedColumns.value.filter(rendered => rendered.column).length);
+const renderedRows = computed(() => grid.items.value.length);
+const renderedColumns = computed(() => grid.scope.renderedColumns.value.filter(rendered => rendered.column).length);
 const renderedCells = computed(() => renderedRows.value * renderedColumns.value);
 
 const targetRow = shallowRef(50_000);
 const targetDay = shallowRef('day1');
 
 function goToRow() {
-	table.scope.scrollToRow(targetRow.value - 1, 'center');
+	grid.scope.scrollToRow(targetRow.value - 1, 'center');
 }
 
-watch(targetDay, day => table.scope.scrollToColumn(day, 'center'));
+watch(targetDay, day => grid.scope.scrollToColumn(day, 'center'));
 
 function format(value: number) {
 	return value.toLocaleString('en-US');
@@ -71,7 +71,7 @@ function format(value: number) {
 			<span class="ui-spacer" />
 			<UiStat label="Rendered cells" :value="`${format(renderedCells)} of ${format(SENSOR_COUNT * (DAY_COUNT + 2))}`" />
 		</UiToolbar>
-		<UiDataTable :table="table" label="Sensor readings" density="compact" data-size="lg" />
+		<UiDataGrid :grid="grid" label="Sensor readings" density="compact" data-size="lg" />
 	</div>
 </template>
 

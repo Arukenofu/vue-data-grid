@@ -1,10 +1,10 @@
-import type { TableSort } from '@vue-data-grid/core';
+import type { GridSort } from '@vue-data-grid/core';
 
 import { createPeople, type Person } from '@/data/people';
 
 export interface PeopleRequest {
 	query: string;
-	sort: readonly TableSort[];
+	sort: readonly GridSort[];
 	offset: number;
 	limit: number;
 	/** How long the fake server takes to answer, ms. */
@@ -25,7 +25,7 @@ const FIELDS: Readonly<Record<string, (person: Person) => string | number>> = {
 	salary: person => person.salary,
 };
 
-function compare(first: Person, second: Person, sort: readonly TableSort[]) {
+function compare(first: Person, second: Person, sort: readonly GridSort[]) {
 	for (const { name, direction } of sort) {
 		const read = FIELDS[name];
 		const a = read(first);

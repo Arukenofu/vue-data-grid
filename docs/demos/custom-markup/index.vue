@@ -6,7 +6,7 @@ import {
 	navigation,
 	type RenderedColumn,
 	sorting,
-	useDataTable,
+	useDataGrid,
 	useHeaderCell,
 } from '@vue-data-grid/core';
 import IconArrowDown from '~icons/lucide/arrow-down';
@@ -34,7 +34,7 @@ const columns = defineColumns({
 	status: column(invoice => invoice.status, { label: 'Status', width: 100 }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: invoices,
 	rowKey: 'id',
@@ -45,10 +45,10 @@ const table = useDataTable({
 	},
 });
 
-const header = useHeaderCell(table.scope);
+const header = useHeaderCell(grid.scope);
 
 function getHeaderProps(rendered: RenderedColumn) {
-	const props = table.getHeaderCellProps(rendered);
+	const props = grid.getHeaderCellProps(rendered);
 
 	return rendered.column ? { ...props, ...header.getHandlers(rendered.column.name) } : props;
 }
@@ -56,38 +56,38 @@ function getHeaderProps(rendered: RenderedColumn) {
 
 <template>
 	<div>
-		<div :ref="table.root" v-bind="table.getGridProps()" tabindex="0" aria-label="Invoices" class="ui-table" data-size="sm">
-			<div :ref="table.head" v-bind="table.getHeadProps()">
-				<div v-bind="table.getHeaderRowProps()">
+		<div :ref="grid.root" v-bind="grid.getGridProps()" tabindex="0" aria-label="Invoices" class="ui-grid" data-size="sm">
+			<div :ref="grid.head" v-bind="grid.getHeadProps()">
+				<div v-bind="grid.getHeaderRowProps()">
 					<div
-						v-for="rendered in table.scope.renderedColumns.value"
+						v-for="rendered in grid.scope.renderedColumns.value"
 						:key="rendered.key"
 						v-bind="getHeaderProps(rendered)"
 						:class="{ 'is-sortable': rendered.column?.sortable }"
 					>
 						<template v-if="rendered.column">
 							<span data-dg-part="cell-text">{{ rendered.column.label }}</span>
-							<IconArrowUp v-if="table.scope.getSortDirection(rendered.column.name) === 'asc'" class="sort" aria-hidden="true" />
-							<IconArrowDown v-else-if="table.scope.getSortDirection(rendered.column.name) === 'desc'" class="sort" aria-hidden="true" />
+							<IconArrowUp v-if="grid.scope.getSortDirection(rendered.column.name) === 'asc'" class="sort" aria-hidden="true" />
+							<IconArrowDown v-else-if="grid.scope.getSortDirection(rendered.column.name) === 'desc'" class="sort" aria-hidden="true" />
 						</template>
 					</div>
 				</div>
 			</div>
 
-			<div :ref="table.body" v-bind="table.getBodyProps()">
-				<div v-for="item in table.items.value" :key="item.key" v-bind="table.getRowProps(item)">
-					<div v-for="rendered in table.scope.renderedColumns.value" :key="rendered.key" v-bind="table.getCellProps(rendered)">
-						<UiBadge v-if="rendered.column?.name === 'status'" :tone="STATUS[table.rows.value[item.index].status]" dot>
-							{{ table.rows.value[item.index].status }}
+			<div :ref="grid.body" v-bind="grid.getBodyProps()">
+				<div v-for="item in grid.items.value" :key="item.key" v-bind="grid.getRowProps(item)">
+					<div v-for="rendered in grid.scope.renderedColumns.value" :key="rendered.key" v-bind="grid.getCellProps(rendered)">
+						<UiBadge v-if="rendered.column?.name === 'status'" :tone="STATUS[grid.rows.value[item.index].status]" dot>
+							{{ grid.rows.value[item.index].status }}
 						</UiBadge>
 						<span v-else-if="rendered.column" data-dg-part="cell-text">
-							{{ getCellText(rendered.column, table.rows.value[item.index]) }}
+							{{ getCellText(rendered.column, grid.rows.value[item.index]) }}
 						</span>
 					</div>
 				</div>
 			</div>
 		</div>
-		<span :ref="table.exit" tabindex="0" />
+		<span :ref="grid.exit" tabindex="0" />
 	</div>
 </template>
 

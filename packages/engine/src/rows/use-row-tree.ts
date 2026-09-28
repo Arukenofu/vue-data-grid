@@ -1,7 +1,7 @@
 import { computed, type MaybeRefOrGetter, type Ref, ref, toValue } from 'vue';
 
 import { type AnyColumn, type ColumnsInput, toColumnList } from '../columns/column';
-import type { TableSort } from '../columns/sort';
+import type { GridSort } from '../columns/sort';
 import { stableComputed } from '../shared/stable-computed';
 import { createRowKeyResolver, type RowKey } from './row-key';
 import {
@@ -28,7 +28,7 @@ export interface RowTreeOptions<TRow> {
 	/** How many levels start expanded; a negative number expands all. `0` by default. */
 	defaultExpanded?: MaybeRefOrGetter<number>;
 	/** Sorts siblings on every level; without it the order of `rows` and the children fields is kept. */
-	sort?: MaybeRefOrGetter<readonly TableSort[]>;
+	sort?: MaybeRefOrGetter<readonly GridSort[]>;
 	/** Columns whose `value` and `compare` sort the siblings. */
 	columns?: MaybeRefOrGetter<ColumnsInput | readonly AnyColumn[]>;
 	/** Re-sort only siblings that arrive as new objects; the same contract as in `useSortedRows`. */

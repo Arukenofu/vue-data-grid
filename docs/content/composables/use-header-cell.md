@@ -7,13 +7,13 @@ description: What a column header does — sort on click and on keys, move with 
 
 <Description>
 What a column header does: a click or Enter sorts the column, Alt with the arrows moves it, Shift
-with the arrows resizes it. Each only where the column's rights allow it. `TableHeaderCell` is built
+with the arrows resizes it. Each only where the column's rights allow it. `GridHeaderCell` is built
 on it.
 </Description>
 
-<Demo name="api-use-table-props" />
+<Demo name="api-use-grid-props" />
 
-The header cells of this table are plain elements with the handlers of `useHeaderCell` spread on
+The header cells of this grid are plain elements with the handlers of `useHeaderCell` spread on
 them. Tab to a header and press <kbd>Enter</kbd> to sort.
 
 ## Usage
@@ -22,14 +22,14 @@ them. Tab to a header and press <kbd>Enter</kbd> to sort.
 <script setup lang="ts">
 import { useHeaderCell } from '@vue-data-grid/core';
 
-const header = useHeaderCell(table.scope, { resizeStep: 24 });
+const header = useHeaderCell(grid.scope, { resizeStep: 24 });
 </script>
 
 <template>
 	<div
-		v-for="cell in table.scope.renderedColumns.value"
+		v-for="cell in grid.scope.renderedColumns.value"
 		:key="cell.key"
-		v-bind="{ ...table.getHeaderCellProps(cell), ...header.getHandlers(cell.key) }"
+		v-bind="{ ...grid.getHeaderCellProps(cell), ...header.getHandlers(cell.key) }"
 	>
 		{{ cell.column?.label }}
 	</div>
@@ -37,7 +37,7 @@ const header = useHeaderCell(table.scope, { resizeStep: 24 });
 ```
 
 Spread the handlers next to `getHeaderCellProps`, which gives the cell its `tabindex`: `0` for a
-column with keys of its own while the table has no navigation, `-1` with it.
+column with keys of its own while the grid has no navigation, `-1` with it.
 
 ## Options
 
@@ -64,12 +64,12 @@ Clicks and keys of a control inside the cell belong to that control: a menu butt
 resize handle. The cell does not sort when you press them, so put them in freely:
 
 ```vue
-<TableHeaderCell v-for="column in columns" :key="column.key" :column="column">
-	<TableHeaderContent />
-	<TableSortIndicator />
+<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">
+	<GridHeaderContent />
+	<GridSortIndicator />
 	<ColumnMenu />
-	<TableResizeHandle />
-</TableHeaderCell>
+	<GridResizeHandle />
+</GridHeaderCell>
 ```
 
 ### Sorting from code
@@ -78,7 +78,7 @@ The header only asks the scope to step through the column's `sortOrder`. From co
 of the column state directly:
 
 ```ts
-table.state.sort.value = [{ name: 'price', direction: 'asc' }];
+grid.state.sort.value = [{ name: 'price', direction: 'asc' }];
 ```
 
 ## Accessibility
@@ -89,7 +89,7 @@ table.state.sort.value = [{ name: 'price', direction: 'asc' }];
   can travel several places on one held key without losing focus.
 - A width set with the keys is one gesture, like a drag: it reaches the layout when the key is
   released or focus leaves the cell.
-- In a right-to-left table ← and → follow the reading direction.
+- In a right-to-left grid ← and → follow the reading direction.
 
 ### Keyboard interactions
 
@@ -106,5 +106,5 @@ table.state.sort.value = [{ name: 'price', direction: 'asc' }];
 
 ## See also
 
-- [Header](/components/header): `TableHeaderCell`, built on this composable.
+- [Header](/components/header): `GridHeaderCell`, built on this composable.
 - [Sorting](/guides/sorting) and [Column layout](/guides/column-layout).

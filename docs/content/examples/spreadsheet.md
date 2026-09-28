@@ -34,15 +34,15 @@ shows the active cell, and the status bar adds up the selection.
 
 ## How it works
 
-### Six features, one table
+### Six features, one grid
 
-Each capability is a feature of `useDataTable`. They are built in order, each on what the ones
+Each capability is a feature of `useDataGrid`. They are built in order, each on what the ones
 before it give: the ranges read the navigation's focused cell, editing writes over the ranges, the
 history records editing's commits, the fill writes through editing, and the clipboard pastes
 through it.
 
 ```ts
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: lines,
 	rowKey: 'id',
@@ -100,9 +100,9 @@ draft from editing, and the selected cells from the ranges:
 
 ```ts
 const selected = computed(() => {
-	const values = table.ranges.getCells().map((cell) => {
-		const line = table.rows.value[table.scope.getRowIndex(cell.key)];
-		const rendered = table.scope.getColumn(cell.column)?.column;
+	const values = grid.ranges.getCells().map((cell) => {
+		const line = grid.rows.value[grid.scope.getRowIndex(cell.key)];
+		const rendered = grid.scope.getColumn(cell.column)?.column;
 
 		return line && rendered ? rendered.value(line) : undefined;
 	});
@@ -119,13 +119,13 @@ block stays on the same data while rows move.
 
 ### The toolbar
 
-The buttons call the same handles the keys do: `table.history.undo()`, `table.fill.fillDown()`,
-`table.clipboard.copy()`. The CSV download is two utilities: `toCsv` writes the rows through each
+The buttons call the same handles the keys do: `grid.history.undo()`, `grid.fill.fillDown()`,
+`grid.clipboard.copy()`. The CSV download is two utilities: `toCsv` writes the rows through each
 column's `format`, and `downloadCsv` saves the text as a file Excel opens as UTF-8.
 
 ## Accessibility
 
-- The table is a `grid` with `aria-multiselectable`, and every cell in a range has
+- The grid has the `grid` role and `aria-multiselectable`, and every cell in a range has
   `aria-selected="true"`, so a screen reader hears which cells are selected. The outline drawn over
   a range is hidden from it.
 - The row number column is a `rowheader`: moving across a row, a screen reader says which row the

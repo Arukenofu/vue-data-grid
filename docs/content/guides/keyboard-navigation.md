@@ -1,18 +1,18 @@
 ---
 title: Keyboard navigation
-description: Move through the cells of a table with the keys of a spreadsheet, in the WAI-ARIA grid pattern.
+description: Move through the cells of a grid with the keys of a spreadsheet, in the WAI-ARIA grid pattern.
 ---
 
 # Keyboard navigation
 
 <Description>
-A table with many rows should not be a hundred Tab stops. With the <code>navigation</code> feature it is one:
-Tab brings focus into the table, the arrow keys move it from cell to cell, and Tab takes it out again.
+A grid with many rows should not be a hundred Tab stops. With the <code>navigation</code> feature it is one:
+Tab brings focus into the grid, the arrow keys move it from cell to cell, and Tab takes it out again.
 </Description>
 
 <Demo name="keyboard-navigation" />
 
-Click a cell, or press <kbd>Tab</kbd> until focus reaches the table, then use the arrow keys. The
+Click a cell, or press <kbd>Tab</kbd> until focus reaches the grid, then use the arrow keys. The
 version is a button, <kbd>Enter</kbd> presses it; the checkbox toggles with <kbd>Space</kbd>. The
 last column is a toolbar of three buttons: <kbd>Enter</kbd> moves focus into it, <kbd>←</kbd> and
 <kbd>→</kbd> move between its buttons, and <kbd>Escape</kbd> brings focus back to the cell. Try <kbd>Shift</kbd>+<kbd>Space</kbd> to select a row and <kbd>Ctrl</kbd>+<kbd>A</kbd>
@@ -20,12 +20,12 @@ to select them all.
 
 ## Turn it on
 
-Navigation is a feature, like sorting. Add it to the table and nothing else changes in the markup:
+Navigation is a feature, like sorting. Add it to the grid and nothing else changes in the markup:
 
 ```ts
-import { navigation, useDataTable } from '@vue-data-grid/core';
+import { navigation, useDataGrid } from '@vue-data-grid/core';
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -34,12 +34,12 @@ const table = useDataTable({
 });
 ```
 
-With it, `TableRoot` becomes a single Tab stop, every cell gets `tabindex="-1"` so it can take focus
-from code, and a hidden element after the table catches <kbd>Tab</kbd> on its way out. The header
+With it, `GridRoot` becomes a single Tab stop, every cell gets `tabindex="-1"` so it can take focus
+from code, and a hidden element after the grid catches <kbd>Tab</kbd> on its way out. The header
 and the footer are part of the grid too: <kbd>↑</kbd> from the first row lands on the column
 headers, where the keys of the header work.
 
-When the table has the `selection` or the `tree` feature, navigation picks them up by itself:
+When the grid has the `selection` or the `tree` feature, navigation picks them up by itself:
 <kbd>Shift</kbd>+<kbd>Space</kbd> selects the row, and <kbd>→</kbd> and <kbd>←</kbd> expand and
 collapse rows in the tree column.
 
@@ -49,7 +49,7 @@ The model follows the [grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/gr
 the habits of spreadsheets: the arrows move one cell, <kbd>Ctrl</kbd> jumps to the edge, and paging
 moves by as many rows as fit between the sticky header and footer, whatever their heights.
 
-Focus is held by the **row key**, not by the index of the row on screen. Sort the table while a cell
+Focus is held by the **row key**, not by the index of the row on screen. Sort the grid while a cell
 is focused and focus stays on the same row, now somewhere else; remove the row and focus moves to the
 row that took its place. A focused cell stays rendered while the windows of
 [virtualization](/guides/virtualization) scroll past it, and a cell that is out of view is scrolled
@@ -111,24 +111,24 @@ actions: column(() => null, {
 ```
 
 The roving focus of the toolbar keeps only one of its buttons in the Tab order, so <kbd>Enter</kbd>
-on the cell lands on the button used last, and <kbd>Tab</kbd> from it leaves the table.
+on the cell lands on the button used last, and <kbd>Tab</kbd> from it leaves the grid.
 
 ## Moving focus from code
 
-The handle of the feature, `table.navigation`, tells where focus is and moves it:
+The handle of the feature, `grid.navigation`, tells where focus is and moves it:
 
 ```ts
-const focused = computed(() => table.navigation.focused.value);
+const focused = computed(() => grid.navigation.focused.value);
 
 async function focusFirstCell() {
-	await table.navigation.focusCell({ section: 'body', row: 0, cell: 'version' });
+	await grid.navigation.focusCell({ section: 'body', row: 0, cell: 'version' });
 }
 ```
 
 A position is a section (`'head'`, `'body'` or `'foot'`), a row inside it, and the name of the
 column. `focusCell` renders the cell first when it is outside the windows, then focuses it, and
 resolves to `false` when there is no such cell. `focused` also gives the row key of a body cell, and
-stays on the last cell after focus leaves the table, so <kbd>Tab</kbd> comes back to it.
+stays on the last cell after focus leaves the grid, so <kbd>Tab</kbd> comes back to it.
 
 ::: tip Keep focus out of the rows
 `focused` is reactive, but do not read it in a row template to highlight the focused cell. Every row
@@ -139,7 +139,7 @@ the toolbar of the demo does.
 
 ## Options
 
-`navigation()` takes the options of `useGridNavigation`. The table fills in the elements, the
+`navigation()` takes the options of `useCellNavigation`. The grid fills in the elements, the
 sections and the sticky blocks; what is left is about behaviour:
 
 <PropsTable
@@ -149,14 +149,14 @@ sections and the sticky blocks; what is left is about behaviour:
 		{ name: 'onFocus', type: '(position: GridPosition) => void', description: 'Focus landed on a cell: by a key, a pointer or `focusCell`.' },
 		{ name: 'onSelectColumn', type: '(position: GridPosition, event: KeyboardEvent) => void', description: 'Ctrl+Space on a cell. The `ranges` feature selects the whole column with it by itself.' },
 		{ name: 'treeColumn', type: 'MaybeRefOrGetter<string | undefined>', description: 'The column where → and ← expand and collapse rows: the column of `treeColumn()` by default, else the row header.' },
-		{ name: 'selection', type: 'GridNavigationSelection', description: 'What Shift+Space and Ctrl+A select; the `selection` feature of the table by default.' },
-		{ name: 'tree', type: 'GridNavigationTree', description: 'What → and ← expand and collapse; the `tree` feature of the table by default.' },
-		{ name: 'exit', type: 'MaybeRefOrGetter<HTMLElement | null>', description: 'The element Tab leaves the grid through; the one `TableRoot` renders by default.' },
-		{ name: 'enabled', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Turn the keys off for a while, such as while a dialog over the table is open.' },
+		{ name: 'selection', type: 'CellNavigationSelection', description: 'What Shift+Space and Ctrl+A select; the `selection` feature of the grid by default.' },
+		{ name: 'tree', type: 'CellNavigationTree', description: 'What → and ← expand and collapse; the `tree` feature of the grid by default.' },
+		{ name: 'exit', type: 'MaybeRefOrGetter<HTMLElement | null>', description: 'The element Tab leaves the grid through; the one `GridRoot` renders by default.' },
+		{ name: 'enabled', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Turn the keys off for a while, such as while a dialog over the grid is open.' },
 	]"
 />
 
-The full reference, for markup of your own, is on the [`useGridNavigation`](/composables/use-grid-navigation)
+The full reference, for markup of your own, is on the [`useCellNavigation`](/composables/use-cell-navigation)
 page.
 
 ## Accessibility
@@ -169,10 +169,10 @@ header as focus moves.
 
 - The grid is one Tab stop. The cells have `tabindex="-1"`, and the grid and the exit element leave
   the tab order while focus is inside, so <kbd>Shift</kbd>+<kbd>Tab</kbd> from the first cell leaves
-  the table instead of stopping on it.
+  the grid instead of stopping on it.
 - Focus returns to the cell it left, even after the rows were sorted or the cell was scrolled out of
   view.
-- In a right-to-left table, <kbd>←</kbd> and <kbd>→</kbd> follow the reading direction.
+- In a right-to-left grid, <kbd>←</kbd> and <kbd>→</kbd> follow the reading direction.
 - Composite widgets in cells, such as a toolbar of actions, keep their own keyboard model inside the
   grid's: one stop in the cell, arrows within the widget, <kbd>Escape</kbd> back to the cell.
 - Keys of an input method's composition are left alone, so typing in Japanese or Chinese inside a
@@ -182,12 +182,12 @@ header as focus moves.
 
 <KeyboardTable
 	:data="[
-		{ keys: ['Tab'], description: 'Moves focus into the table, to the cell focused last or the first one; from a cell, out of the table.' },
-		{ keys: ['Shift+Tab'], description: 'Moves focus out of the table, backwards.' },
+		{ keys: ['Tab'], description: 'Moves focus into the grid, to the cell focused last or the first one; from a cell, out of the grid.' },
+		{ keys: ['Shift+Tab'], description: 'Moves focus out of the grid, backwards.' },
 		{ keys: ['→', '←'], description: 'Moves focus one cell right or left. In the tree column → expands a collapsed row and ← collapses an expanded one or goes to the parent row.' },
 		{ keys: ['↓', '↑'], description: 'Moves focus one row down or up, between the header, the body and the footer too.' },
 		{ keys: ['Home', 'End'], description: 'Moves focus to the first or the last cell of the row.' },
-		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves focus to the first or the last cell of the table.' },
+		{ keys: ['Ctrl+Home', 'Ctrl+End'], description: 'Moves focus to the first or the last cell of the grid.' },
 		{ keys: ['Ctrl+↑', 'Ctrl+↓'], description: 'Moves focus to the first or the last row, in the same column.' },
 		{ keys: ['PageUp', 'PageDown'], description: 'Moves focus by as many rows as fit in view.' },
 		{ keys: ['Enter'], description: 'Presses the only button, link or checkbox of the cell; otherwise moves focus into the cell.' },
@@ -219,5 +219,5 @@ On macOS, <kbd>⌘</kbd> works wherever <kbd>Ctrl</kbd> is listed.
 - [Row selection](/guides/selection): what <kbd>Shift</kbd>+<kbd>Space</kbd> and <kbd>Ctrl</kbd>+<kbd>A</kbd> select.
 - [Cell ranges and clipboard](/guides/cell-ranges): selecting cells with <kbd>Shift</kbd> and the arrows.
 - [Editing](/guides/editing): typing into a focused cell.
-- [`useGridNavigation`](/composables/use-grid-navigation): the navigation for markup of your own.
-- [Accessibility](/overview/accessibility): what the table does for assistive technology as a whole.
+- [`useCellNavigation`](/composables/use-cell-navigation): the navigation for markup of your own.
+- [Accessibility](/overview/accessibility): what the grid does for assistive technology as a whole.

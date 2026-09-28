@@ -1,4 +1,4 @@
-import { defineColumns, useTableColumnsState, useTableEngine } from '@vue-data-grid/engine';
+import { defineColumns, useGridColumnsState, useGridEngine } from '@vue-data-grid/engine';
 import { defineComponent, effectScope, h, nextTick, shallowRef } from 'vue';
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -34,13 +34,13 @@ beforeEach(() => {
 });
 
 function setup(rtl = false) {
-	const state = useTableColumnsState({ columns, multiSort: true });
-	let engine: ReturnType<typeof useTableEngine<Row>> | null = null;
+	const state = useGridColumnsState({ columns, multiSort: true });
+	let engine: ReturnType<typeof useGridEngine<Row>> | null = null;
 	let header: ReturnType<typeof useHeaderCell> | null = null;
 
 	const wrapper = mount(defineComponent({
 		setup() {
-			engine = useTableEngine<Row>({ columns, rows: [], root: shallowRef(null), rowKey: 'id', rowHeight: 30, state });
+			engine = useGridEngine<Row>({ columns, rows: [], root: shallowRef(null), rowKey: 'id', rowHeight: 30, state });
 			header = useHeaderCell(engine.scope);
 
 			const { renderedColumns } = engine.scope;
@@ -56,7 +56,7 @@ function setup(rtl = false) {
 		},
 	}), { attachTo: document.body });
 
-	const scope = (engine as unknown as ReturnType<typeof useTableEngine<Row>>).scope;
+	const scope = (engine as unknown as ReturnType<typeof useGridEngine<Row>>).scope;
 
 	function cell(name: string) {
 		return document.querySelector<HTMLElement>(`[data-dg-column="${name}"]`) as HTMLElement;
@@ -133,7 +133,7 @@ describe('useHeaderCell — sorting', () => {
 	it('gives each column one frozen set of handlers', () => {
 		const scope = effectScope();
 		const first = scope.run(() => {
-			const engine = useTableEngine<Row>({ columns, rows: [], root: shallowRef(null), rowKey: 'id', rowHeight: 30 });
+			const engine = useGridEngine<Row>({ columns, rows: [], root: shallowRef(null), rowKey: 'id', rowHeight: 30 });
 
 			return useHeaderCell(engine.scope);
 		});

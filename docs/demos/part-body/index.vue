@@ -2,14 +2,14 @@
 import {
 	defineColumn,
 	defineColumns,
-	TableBody,
-	TableCells,
-	TableHeader,
-	TableHeaderCell,
-	TableHeaderRow,
-	TableRoot,
-	TableRow,
-	useDataTable,
+	GridBody,
+	GridCells,
+	GridHeader,
+	GridHeaderCell,
+	GridHeaderRow,
+	GridRoot,
+	GridRow,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { computed, h, shallowRef } from 'vue';
 
@@ -61,7 +61,7 @@ const columns = defineColumns({
 
 const rows = shallowRef<readonly Task[]>(tasks);
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -94,23 +94,23 @@ function advance() {
 			<UiStat label="Done" :value="`${done} of ${rows.length}`" />
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Tasks" class="ui-table" data-size="sm">
-			<TableHeader>
-				<TableHeaderRow v-slot="{ columns: headers }">
-					<TableHeaderCell v-for="header in headers" :key="header.key" :column="header" />
-				</TableHeaderRow>
-			</TableHeader>
-			<TableBody v-slot="{ rows: bodyRows }">
-				<TableRow v-for="row in bodyRows" :key="row.key" :row="row">
-					<TableCells v-slot="{ column, value }">
+		<GridRoot :grid="grid" label="Tasks" class="ui-grid" data-size="sm">
+			<GridHeader>
+				<GridHeaderRow v-slot="{ columns: headers }">
+					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
+				</GridHeaderRow>
+			</GridHeader>
+			<GridBody v-slot="{ rows: bodyRows }">
+				<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
+					<GridCells v-slot="{ column, value }">
 						<span v-if="column.name === 'progress'" class="progress">
 							<UiProgress :value="Number(value)" />
 							<span class="progress-value">{{ value }}%</span>
 						</span>
-					</TableCells>
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+					</GridCells>
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 	</div>
 </template>
 

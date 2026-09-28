@@ -2,21 +2,21 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridRoot,
+	GridRow,
 	selection,
 	selectionColumn,
 	sorting,
-	TableBody,
-	TableCells,
-	TableRoot,
-	TableRow,
 	useCellChanges,
-	useDataTable,
+	useDataGrid,
 } from '@vue-data-grid/core';
 import { h, ref, shallowRef } from 'vue';
 
 import { createRandom } from '@/data/random';
 import { getChange, type Stock, stocks, tickStock } from '@/data/stocks';
-import { UiButton, UiDataTableHeader, UiToolbar } from '@/ui';
+import { UiButton, UiDataGridHeader, UiToolbar } from '@/ui';
 
 import FlashCell from './FlashCell.vue';
 import { useUpdateMeter } from './use-update-meter';
@@ -55,7 +55,7 @@ const columns = defineColumns({
 	renders: column(() => 0, { label: 'Renders', kind: 'service', width: 88, align: 'center', pinned: 'end', sortable: false, resizable: false }),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows,
 	rowKey: 'id',
@@ -63,7 +63,7 @@ const table = useDataTable({
 	features: { sorting: sorting(), selection: selection({ selection: selected }) },
 });
 
-const changes = useCellChanges(table.scope, { columns: ['price', 'volume'] });
+const changes = useCellChanges(grid.scope, { columns: ['price', 'volume'] });
 
 const renders = new Map<string, number>();
 let totalRenders = 0;
@@ -79,9 +79,9 @@ function countRender(key: string) {
 
 const { records, measure, follow } = useUpdateMeter(() => totalRenders);
 
-follow(() => table.state.sort.value, 'Sort');
+follow(() => grid.state.sort.value, 'Sort');
 follow(selected, 'Selection');
-follow(() => table.state.layout.value, 'Resize or layout');
+follow(() => grid.state.layout.value, 'Resize or layout');
 
 function pickIndexes(count: number) {
 	const indexes = rows.value.map((_, index) => index);
@@ -111,9 +111,9 @@ function selectRandom() {
 
 function sortByChange() {
 	measure('Sort', () => {
-		const descending = table.state.sort.value[0]?.direction !== 'desc';
+		const descending = grid.state.sort.value[0]?.direction !== 'desc';
 
-		table.state.sort.value = [{ name: 'change', direction: descending ? 'desc' : 'asc' }];
+		grid.state.sort.value = [{ name: 'change', direction: descending ? 'desc' : 'asc' }];
 	});
 }
 </script>
@@ -129,16 +129,16 @@ function sortByChange() {
 			<UiButton size="sm" @click="selectRandom">Select 5 rows</UiButton>
 		</UiToolbar>
 
-		<TableRoot :table="table" label="Render counts" class="ui-table" data-size="sm">
-			<UiDataTableHeader />
-			<TableBody v-slot="{ rows: shown }">
-				<TableRow v-for="row in shown" :key="row.key" :row="row">
-					<TableCells v-slot="{ column, key }">
+		<GridRoot :grid="grid" label="Render counts" class="ui-grid" data-size="sm">
+			<UiDataGridHeader />
+			<GridBody v-slot="{ rows: shown }">
+				<GridRow v-for="row in shown" :key="row.key" :row="row">
+					<GridCells v-slot="{ column, key }">
 						<span v-if="column.name === 'renders'" class="render-count">{{ countRender(key) }}</span>
-					</TableCells>
-				</TableRow>
-			</TableBody>
-		</TableRoot>
+					</GridCells>
+				</GridRow>
+			</GridBody>
+		</GridRoot>
 
 		<div class="meter" role="status">
 			<template v-if="records[0]">

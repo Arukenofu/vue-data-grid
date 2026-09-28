@@ -1,20 +1,20 @@
 ---
 title: useCellDrag
-description: A pointer drag across the body cells of a table — each cell reported once, the table scrolling near its edges, past its edges too.
+description: A pointer drag across the body cells of a grid — each cell reported once, the grid scrolling near its edges, past its edges too.
 ---
 
 # useCellDrag
 
 <Description>
-A pointer drag across the body cells of a table, for gestures of your own. Each cell the pointer
-reaches is reported once, the table scrolls near its edges over the sticky header and pinned
-columns, and the drag goes on past the edges of the table.
+A pointer drag across the body cells of a grid, for gestures of your own. Each cell the pointer
+reaches is reported once, the grid scrolls near its edges over the sticky header and pinned
+columns, and the drag goes on past the edges of the grid.
 </Description>
 
 <Demo name="api-use-cell-drag" />
 
 This gesture is not part of the library: press on a row and drag, and every row between the press
-and the pointer is selected. Fifty lines on top of `useCellDrag`, and it scrolls a virtual table of
+and the pointer is selected. Fifty lines on top of `useCellDrag`, and it scrolls a virtual grid of
 three hundred rows as the pointer nears its edge.
 
 ## Usage
@@ -25,7 +25,7 @@ released.
 ```ts
 import { readGridPosition, useCellDrag } from '@vue-data-grid/core';
 
-const drag = useCellDrag(table, {
+const drag = useCellDrag(grid, {
 	getColumns: () => ['name', 'role', 'team'],
 	onCell: cell => paintTo(cell.index, cell.column),
 	onEnd: ({ cancelled }) => finish(cancelled),
@@ -54,12 +54,12 @@ reach, gives the nearest cell. `useRangeSelection` and the fill handle are built
 		{ name: 'getColumns', type: '() => readonly string[]', required: true, description: 'The columns a drag reaches, in display order. Read when a drag starts.' },
 		{ name: 'onCell', type: '(cell: CellPosition) => void', required: true, description: 'The pointer reached another cell, `{ index, column }`, or the rows moved under a still pointer.' },
 		{ name: 'onEnd', type: '(end: { cancelled: boolean }) => void', description: 'The drag ended: the pointer went up, or the browser or `cancel` cancelled it.' },
-		{ name: 'autoScroll', type: 'AutoScrollOptions | false', description: 'How the table scrolls near its edges; the sticky header, footer and pinned columns are its margins. `false` turns it off.' },
+		{ name: 'autoScroll', type: 'AutoScrollOptions | false', description: 'How the grid scrolls near its edges; the sticky header, footer and pinned columns are its margins. `false` turns it off.' },
 	]"
 />
 
-The table it takes is anything with `scope`, `root` and `body`, and `headHeight` and `footHeight`
-when it has sticky blocks: the table of `useDataTable` fits.
+The grid it takes is anything with `scope`, `root` and `body`, and `headHeight` and `footHeight`
+when it has sticky blocks: the grid of `useDataGrid` fits.
 
 ## Returns
 
@@ -79,7 +79,7 @@ A drag that points at cells by index should stop when the rows under it change, 
 does:
 
 ```ts
-watch(table.scope.rowKeys, () => {
+watch(grid.scope.rowKeys, () => {
 	if (drag.dragging.value) {
 		drag.cancel();
 	}
@@ -92,7 +92,7 @@ watch(table.scope.rowKeys, () => {
 soft start suit a gesture that paints cells one by one.
 
 ```ts
-useCellDrag(table, {
+useCellDrag(grid, {
 	getColumns,
 	onCell,
 	autoScroll: { speed: 400, smoothing: 120 },
@@ -107,5 +107,5 @@ selection column select the same rows from the keyboard.
 
 ## See also
 
-- [useRangeSelection](/composables/use-range-selection) and [useTableFill](/composables/use-table-fill): the gestures built on it.
+- [useRangeSelection](/composables/use-range-selection) and [useGridFill](/composables/use-grid-fill): the gestures built on it.
 - [useAutoScroll](/composables/use-auto-scroll): the scrolling under it.

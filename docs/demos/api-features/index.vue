@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, useDataTable, useTableMotion } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, useDataGrid, useGridMotion } from '@vue-data-grid/core';
 import { h, shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';
-import { UiDataTable, UiStat, UiToolbar } from '@/ui';
+import { UiDataGrid, UiStat, UiToolbar } from '@/ui';
 
 import StarButton from './StarButton.vue';
 import { starredFirst } from './starred-first';
@@ -45,7 +45,7 @@ const columns = defineColumns({
 	}),
 });
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
@@ -54,7 +54,7 @@ const table = useDataTable({
 	features: { sorting: starredFirst(starred) },
 });
 
-useTableMotion(table);
+useGridMotion(grid);
 </script>
 
 <template>
@@ -65,6 +65,6 @@ useTableMotion(table);
 			<UiStat label="Starred" :value="starred.size" />
 		</UiToolbar>
 
-		<UiDataTable :table="table" label="Stocks" />
+		<UiDataGrid :grid="grid" label="Stocks" />
 	</div>
 </template>

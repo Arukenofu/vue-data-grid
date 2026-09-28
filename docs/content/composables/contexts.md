@@ -1,39 +1,39 @@
 ---
 title: Contexts
-description: How parts find their table, row and cell without props, and how a part of your own takes the place of a built-in one.
+description: How parts find their grid, row and cell without props, and how a part of your own takes the place of a built-in one.
 ---
 
 # Contexts
 
 <Description>
-How a part finds its table, its row and its cell without props. Every context is exported, both the
+How a part finds its grid, its row and its cell without props. Every context is exported, both the
 side that provides it and the side that reads it, so a part of your own can stand in the place of
 any built-in one.
 </Description>
 
 <Demo name="api-contexts" />
 
-The menu in each header here is not part of the library. It is a component that reads the table and
-its header cell from the context, like `TableSortIndicator` does, and sorts, pins or hides the
-column through the table's own API.
+The menu in each header here is not part of the library. It is a component that reads the grid and
+its header cell from the context, like `GridSortIndicator` does, and sorts, pins or hides the
+column through the grid's own API.
 
 ## Usage
 
-A part with parts inside it provides a context; the parts inside read it. The table comes from
-`TableRoot`, the column of a header from `TableHeaderCell`, the row from `TableRow`:
+A part with parts inside it provides a context; the parts inside read it. The grid comes from
+`GridRoot`, the column of a header from `GridHeaderCell`, the row from `GridRow`:
 
 ```vue
 <script setup lang="ts">
-import { useDataTableContext, useHeaderCellContext } from '@vue-data-grid/core';
+import { useDataGridContext, useHeaderCellContext } from '@vue-data-grid/core';
 import { computed } from 'vue';
 
-const table = useDataTableContext();
+const grid = useDataGridContext();
 const cell = useHeaderCellContext();
 
 const sorted = computed(() => {
 	const name = cell().column?.name;
 
-	return name !== undefined && table.scope.getSortDirection(name) !== undefined;
+	return name !== undefined && grid.scope.getSortDirection(name) !== undefined;
 });
 </script>
 
@@ -43,10 +43,10 @@ const sorted = computed(() => {
 ```
 
 ```vue
-<TableHeaderCell v-for="column in columns" :key="column.key" :column="column">
-	<TableHeaderContent />
+<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">
+	<GridHeaderContent />
 	<SortedDot />
-</TableHeaderCell>
+</GridHeaderCell>
 ```
 
 The contexts of cells and rows are **getters**, `cell()`: a header cell gives the same getter to its
@@ -57,43 +57,43 @@ parts while its column changes, and a part that reads it in a `computed` or a re
 <ReturnsTable
 	label="Pair"
 	:data="[
-		{ name: 'createDataTableContext / useDataTableContext', type: 'DataTable', description: 'The table object. `TableRoot` provides it, with the scope of the core for `useTableScopeContext`. Call `createDataTableContext(table)` for parts under markup of your own.' },
-		{ name: 'createBodyRowContext / useBodyRowContext', type: '() => TableBodyRow', description: 'The body row: `{ key, index, item, original, node }`. `TableRow` provides it.' },
-		{ name: 'createHeaderCellContext / useHeaderCellContext', type: '() => RenderedColumn', description: 'The column of a header cell. `TableHeaderCell` provides it.' },
-		{ name: 'createGroupCellContext / useGroupCellContext', type: '() => RenderedGroup', description: 'The group cell of a group row. `TableGroupCell` provides it.' },
-		{ name: 'createFooterCellContext / useFooterCellContext', type: '() => RenderedColumn', description: 'The column of a footer cell. `TableFooterCell` provides it.' },
-		{ name: 'createRowDragContext / useRowDragContext', type: 'TableDragItems', description: 'The row drag list rows register with. `TableRowDrag` and `useTableRowDrag` provide it.' },
-		{ name: 'createColumnDragContext / useColumnDragContext', type: 'TableDragItems', description: 'The column drag list header cells register with. `TableColumnDrag` and `useTableColumnDrag` provide it.' },
-		{ name: 'createTableMessagesContext / useTableMessagesContext', type: 'TableMessages', description: 'The strings of the interface. `TableRoot` provides its `messages` over the defaults; outside a table the defaults.' },
-		{ name: 'createTableScopeContext / useTableScopeContext', type: 'TableScope', description: 'The scope of the engine, from the core.' },
+		{ name: 'createDataGridContext / useDataGridContext', type: 'DataGrid', description: 'The grid object. `GridRoot` provides it, with the scope of the core for `useGridScopeContext`. Call `createDataGridContext(grid)` for parts under markup of your own.' },
+		{ name: 'createBodyRowContext / useBodyRowContext', type: '() => GridBodyRow', description: 'The body row: `{ key, index, item, original, node }`. `GridRow` provides it.' },
+		{ name: 'createHeaderCellContext / useHeaderCellContext', type: '() => RenderedColumn', description: 'The column of a header cell. `GridHeaderCell` provides it.' },
+		{ name: 'createGroupCellContext / useGroupCellContext', type: '() => RenderedGroup', description: 'The group cell of a group row. `GridGroupCell` provides it.' },
+		{ name: 'createFooterCellContext / useFooterCellContext', type: '() => RenderedColumn', description: 'The column of a footer cell. `GridFooterCell` provides it.' },
+		{ name: 'createRowDragContext / useRowDragContext', type: 'GridDragItems', description: 'The row drag list rows register with. `GridRowDrag` and `useGridRowDrag` provide it.' },
+		{ name: 'createColumnDragContext / useColumnDragContext', type: 'GridDragItems', description: 'The column drag list header cells register with. `GridColumnDrag` and `useGridColumnDrag` provide it.' },
+		{ name: 'createGridMessagesContext / useGridMessagesContext', type: 'GridMessages', description: 'The strings of the interface. `GridRoot` provides its `messages` over the defaults; outside a grid the defaults.' },
+		{ name: 'createGridScopeContext / useGridScopeContext', type: 'GridScope', description: 'The scope of the engine, from the core.' },
 	]"
 />
 
 A `use*Context` outside its part throws, with the name of the part it needs:
-`useBodyRowContext() must be called inside <TableRow>`. Give it a fallback, such as `null`, for a
-part that also works elsewhere — `TableSelectionCheckbox` takes its row from a prop outside a row:
+`useBodyRowContext() must be called inside <GridRow>`. Give it a fallback, such as `null`, for a
+part that also works elsewhere — `GridSelectionCheckbox` takes its row from a prop outside a row:
 
 ```ts
 const around = useBodyRowContext(null);
 const key = computed(() => props.row ?? around?.().key);
 ```
 
-`TRow` of `useDataTableContext<TRow>()` and `useBodyRowContext<TRow>()` is not checked against the
-provided table, just as with `inject`: it tells TypeScript what you know.
+`TRow` of `useDataGridContext<TRow>()` and `useBodyRowContext<TRow>()` is not checked against the
+provided grid, just as with `inject`: it tells TypeScript what you know.
 
 ## Examples
 
 ### Parts under your own markup
 
-Parts need their table from the context. Without `TableRoot`, provide it yourself in the component
-that renders the table:
+Parts need their grid from the context. Without `GridRoot`, provide it yourself in the component
+that renders the grid:
 
 ```ts
-import { createDataTableContext, useDataTable } from '@vue-data-grid/core';
+import { createDataGridContext, useDataGrid } from '@vue-data-grid/core';
 
-const table = useDataTable({ columns, rows, rowKey: 'id', rowHeight: 40 });
+const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 40 });
 
-createDataTableContext(table);
+createDataGridContext(grid);
 ```
 
 ### Replacing a built-in part
@@ -119,7 +119,7 @@ typeahead, <kbd>Escape</kbd> and focus returning to the button.
 
 ## See also
 
-- [Your own markup](/guides/custom-markup): tables without parts.
+- [Your own markup](/guides/custom-markup): grids without parts.
 - [Header](/components/header) and [Body](/components/body): the parts that provide these contexts.
 - [Primitive](/composables/primitive): `as`, `asChild` and the render of every part.
 - [Grid attributes](/composables/grid-attributes): the attributes parts put on their elements.

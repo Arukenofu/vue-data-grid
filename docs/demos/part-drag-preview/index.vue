@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { moveRow } from '@vue-data-grid/core';
-import type { TableRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
+import type { GridRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 import { type ShallowRef, shallowRef } from 'vue';
 
 import { type Task, tasks } from '@/data/tasks';
 
-import TaskTable from './TaskTable.vue';
+import TaskGrid from './TaskGrid.vue';
 
 type Lane = 'backlog' | 'sprint';
 
@@ -14,7 +14,7 @@ const lanes: Readonly<Record<Lane, ShallowRef<readonly Task[]>>> = {
 	sprint: shallowRef(tasks.filter(task => task.status === 'doing' || task.status === 'review')),
 };
 
-function drop(lane: Lane, { key, index }: TableRowDropEvent<unknown>) {
+function drop(lane: Lane, { key, index }: GridRowDropEvent<unknown>) {
 	const target = lanes[lane];
 	const source = lanes.backlog.value.some(task => task.id === key) ? lanes.backlog : lanes.sprint;
 	const task = source.value.find(item => item.id === key);
@@ -33,8 +33,8 @@ function drop(lane: Lane, { key, index }: TableRowDropEvent<unknown>) {
 
 <template>
 	<div class="board">
-		<TaskTable label="Backlog" :tasks="lanes.backlog.value" @drop="event => drop('backlog', event)" />
-		<TaskTable label="This sprint" :tasks="lanes.sprint.value" @drop="event => drop('sprint', event)" />
+		<TaskGrid label="Backlog" :tasks="lanes.backlog.value" @drop="event => drop('backlog', event)" />
+		<TaskGrid label="This sprint" :tasks="lanes.sprint.value" @drop="event => drop('sprint', event)" />
 	</div>
 </template>
 

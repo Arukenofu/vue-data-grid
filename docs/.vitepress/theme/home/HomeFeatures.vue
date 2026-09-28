@@ -57,7 +57,7 @@ const FEATURES: readonly Feature[] = [
 <template>
 	<section class="home-section">
 		<p class="home-eyebrow" data-reveal>Why it exists</p>
-		<h2 class="home-heading" data-reveal>A table you own, with the hard parts done.</h2>
+		<h2 class="home-heading" data-reveal>A grid you own, with the hard parts done.</h2>
 		<p class="home-subheading" data-reveal>
 			Finished grids are hard to make yours; pure logic leaves you rebuilding focus, keys and ARIA.
 			This sits in between.

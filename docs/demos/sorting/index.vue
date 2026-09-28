@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, sorting, type TableSort, useDataTable } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, type GridSort, sorting, useDataGrid } from '@vue-data-grid/core';
 import IconArrowDown from '~icons/lucide/arrow-down';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconX from '~icons/lucide/x';
 import { computed, h, shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';
-import { type BadgeTone, UiBadge, UiButton, UiDataTable, UiSwitch, UiToolbar } from '@/ui';
+import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiSwitch, UiToolbar } from '@/ui';
 
 type Rating = 'Strong sell' | 'Sell' | 'Hold' | 'Buy' | 'Strong buy';
 
@@ -51,7 +51,7 @@ const columns = defineColumns({
 	marketCap: number(stock => stock.marketCap, { label: 'Market cap', width: 124, format: cap => `$${cap.toFixed(1)}B` }),
 });
 
-const sort = shallowRef<readonly TableSort[]>([
+const sort = shallowRef<readonly GridSort[]>([
 	{ name: 'rating', direction: 'desc' },
 	{ name: 'marketCap', direction: 'desc' },
 ]);
@@ -64,7 +64,7 @@ const shownSort = computed(() => sort.value.slice(0, SHOWN_BADGES));
 
 const hiddenSort = computed(() => sort.value.slice(SHOWN_BADGES));
 
-const table = useDataTable({
+const grid = useDataGrid({
 	columns,
 	rows: stocks,
 	rowKey: 'id',
@@ -75,7 +75,7 @@ const table = useDataTable({
 });
 
 function getLabel(name: string) {
-	return table.scope.getColumn(name)?.column?.label ?? name;
+	return grid.scope.getColumn(name)?.column?.label ?? name;
 }
 
 function clearSort() {
@@ -106,7 +106,7 @@ function clearSort() {
 			</UiButton>
 			<UiSwitch v-model="multiSort" label="Multi-sort with Shift" />
 		</UiToolbar>
-		<UiDataTable :table="table" label="Stocks" />
+		<UiDataGrid :grid="grid" label="Stocks" />
 	</div>
 </template>
 

@@ -40,14 +40,14 @@ export type {
 	Columns,
 } from './define-columns';
 export { defineColumn, defineColumns } from './define-columns';
-export type { TableLayout } from './layout';
+export type { GridLayout } from './layout';
 export { resolveLayout } from './layout';
-export type { SortDirection, TableSort } from './sort';
+export type { GridSort, SortDirection } from './sort';
 export { DEFAULT_SORT_ORDER, toggleSort } from './sort';
 export type {
 	ColumnName,
+	GridColumnsState,
+	GridColumnsStateOptions,
 	RememberField,
-	TableColumnsState,
-	TableColumnsStateOptions,
-} from './use-table-columns-state';
-export { useTableColumnsState } from './use-table-columns-state';
+} from './use-grid-columns-state';
+export { useGridColumnsState } from './use-grid-columns-state';

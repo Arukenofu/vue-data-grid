@@ -15,10 +15,10 @@ and keep its columns together when people move them around.
 ## Declaring groups
 
 A group names its children, columns and nested groups, in order. `defineColumnGroups` takes an object
-by name, as `defineColumns` does, and the table takes it as `groups`:
+by name, as `defineColumns` does, and the grid takes it as `groups`:
 
 ```ts
-import { defineColumnGroups, useDataTable } from '@vue-data-grid/core';
+import { defineColumnGroups, useDataGrid } from '@vue-data-grid/core';
 
 const groups = defineColumnGroups({
 	item: { label: 'Product', children: ['product', 'category'] },
@@ -27,7 +27,7 @@ const groups = defineColumnGroups({
 	secondHalf: { label: 'Jul – Dec', children: ['q3', 'q4', 'h2'] },
 });
 
-const table = useDataTable({ columns, groups, rows, rowKey: 'id', rowHeight: 40 });
+const grid = useDataGrid({ columns, groups, rows, rowKey: 'id', rowHeight: 40 });
 ```
 
 A name in `children` that is also the name of a group is that group; any other name is a column. So
@@ -38,28 +38,28 @@ run of its columns.
 
 ## Rendering the header rows
 
-Each level of groups is one more row above the column headers. The slot of `TableHeader` gives the
-cells of every level; render a `TableGroupRow` for each level and a `TableGroupCell` for each cell:
+Each level of groups is one more row above the column headers. The slot of `GridHeader` gives the
+cells of every level; render a `GridGroupRow` for each level and a `GridGroupCell` for each cell:
 
 ```vue
-<TableHeader v-slot="{ groups: levels }">
-	<TableGroupRow v-for="(cells, level) in levels" :key="level" :level="level">
-		<TableGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
-			<TableGroupContent />
-			<TableGroupToggle />
-		</TableGroupCell>
-	</TableGroupRow>
-	<TableHeaderRow v-slot="{ columns }">
-		<TableHeaderCell v-for="column in columns" :key="column.key" :column="column" />
-	</TableHeaderRow>
-</TableHeader>
+<GridHeader v-slot="{ groups: levels }">
+	<GridGroupRow v-for="(cells, level) in levels" :key="level" :level="level">
+		<GridGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">
+			<GridGroupContent />
+			<GridGroupToggle />
+		</GridGroupCell>
+	</GridGroupRow>
+	<GridHeaderRow v-slot="{ columns }">
+		<GridHeaderCell v-for="column in columns" :key="column.key" :column="column" />
+	</GridHeaderRow>
+</GridHeader>
 ```
 
-- `TableGroupCell` spans the columns of its group, and grows and shrinks with them as they resize,
+- `GridGroupCell` spans the columns of its group, and grows and shrinks with them as they resize,
   without a render.
-- `TableGroupContent` shows the group's label, or its `header` field when it has one. A cell without
+- `GridGroupContent` shows the group's label, or its `header` field when it has one. A cell without
   a slot shows it on its own.
-- `TableGroupToggle` is the button that folds the group, and renders nothing for a group that cannot
+- `GridGroupToggle` is the button that folds the group, and renders nothing for a group that cannot
   fold. Its slot takes an icon of your own, as the demo's chevrons.
 
 Columns that have no group at some level get an empty cell there. When the theme sets
@@ -83,9 +83,9 @@ Expanded, the first half of the year shows its quarters; collapsed, it shows its
 visible while collapsed: a group with no columns has no cell to unfold it from. `collapsedByDefault`
 starts a group folded.
 
-From code, `table.scope.toggleGroup(name)` folds or unfolds a group and
-`table.scope.isGroupCollapsed(name)` tells where it stands. The demo's buttons fold both halves in one
-`table.scope.batch()`. What people fold is part of the [column layout](/guides/column-layout), in
+From code, `grid.scope.toggleGroup(name)` folds or unfolds a group and
+`grid.scope.isGroupCollapsed(name)` tells where it stands. The demo's buttons fold both halves in one
+`grid.scope.batch()`. What people fold is part of the [column layout](/guides/column-layout), in
 `layout.collapsed`, so it is saved with the rest of the layout.
 
 ## Keeping columns together
@@ -138,7 +138,7 @@ columns. The toggle carries `data-dg-part="group-toggle"` and `data-dg-state` of
   Jan – Jun" or "Expand Jul – Dec", from the `expandGroup` and `collapseGroup` messages.
 - With the [navigation](/guides/keyboard-navigation), group rows are rows of the keyboard grid:
   ↑ from a column header goes to the group above it, and <kbd>Enter</kbd> on a group cell presses its
-  toggle. The empty cells over columns without a group are passed over. In a table without the
+  toggle. The empty cells over columns without a group are passed over. In a grid without the
   navigation, as in the demo, each toggle is a Tab stop.
 
 ### Keyboard interactions
@@ -154,6 +154,6 @@ columns. The toggle carries `data-dg-part="group-toggle"` and `data-dg-state` of
 
 ## See also
 
-- [Column groups parts](/components/column-groups): `TableGroupRow`, `TableGroupCell` and the rest.
+- [Column groups parts](/components/column-groups): `GridGroupRow`, `GridGroupCell` and the rest.
 - [Column layout](/guides/column-layout): folding is saved with the layout.
 - [Columns](/guides/columns): aggregates and footers, as the totals of the demo.
