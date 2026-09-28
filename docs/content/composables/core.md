@@ -214,7 +214,8 @@ const csv = toCsv({ columns: shown, rows: grid.rows.value });
 const cells = parseDelimited(clipboardText, { delimiter: '\t' });
 ```
 
-`toCsv` goes through each column's `format`, leaves service columns out and guards formulas;
+`toCsv` goes through each column's `format`, leaves service columns out and guards formulas; its
+`headers` option may be a function of a `CsvColumn`, a declared column or one of `scope.columns`.
 `parseDelimited` reads quoted fields, line breaks inside them and a byte order mark as a spreadsheet
 writes them.
 

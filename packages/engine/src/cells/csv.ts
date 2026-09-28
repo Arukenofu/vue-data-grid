@@ -1,6 +1,7 @@
 import { type AnyColumn, getCellText, type RuntimeColumn } from '../columns/column';
 
-type CsvColumn = AnyColumn | RuntimeColumn;
+/** A column `toCsv` writes: a declared column, or a column of the engine, such as from `scope.columns`. */
+export type CsvColumn = AnyColumn | RuntimeColumn;
 
 export interface CsvOptions<TRow> {
 	/** Columns in column order; usually the shown ones from `scope.columns`. */

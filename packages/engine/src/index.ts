@@ -156,6 +156,7 @@ export type {
 	ChangeHistoryOptions,
 	ChangeStep,
 	ChangeStepEdit,
+	CsvColumn,
 	CsvOptions,
 	DelimitedOptions,
 	EditingCell,

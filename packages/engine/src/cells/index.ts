@@ -14,7 +14,7 @@ export {
 	isSameRangeBounds,
 	subtractRangeBounds,
 } from './cell-range';
-export type { CsvOptions } from './csv';
+export type { CsvColumn, CsvOptions } from './csv';
 export { toCsv } from './csv';
 export type { GridPosition, GridSection, SectionCell } from './grid-move';
 export { resolveGridMove } from './grid-move';
