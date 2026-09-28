@@ -2,10 +2,11 @@ import '../../src/style.css';
 
 import { defineColumn, defineColumns } from '@vue-data-grid/engine';
 import { mount } from '@vue/test-utils';
-import { defineComponent, h, nextTick, type ShallowRef, shallowRef } from 'vue';
+import { defineComponent, h, nextTick, type ShallowRef, shallowRef, Teleport } from 'vue';
 import { afterEach, describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 
+import type { CellEditor } from '../../src/columns/column-fields';
 import type { GridBodyRow } from '../../src/components/context';
 import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
 import { GridRangeOverlay } from '../../src/components/grid-range-overlay';
@@ -283,5 +284,75 @@ describe('paste in the browser', () => {
 		grid.history.undo();
 
 		expect(rows.value.slice(0, 3).map(row => row.active)).toEqual([false, false, false]);
+	});
+});
+
+describe('an editor of several elements in the browser', () => {
+	const splitEditor: CellEditor<Row, string> = context => [
+		h('div', context.inputProps, [
+			h('input', { 'data-test': 'first', value: context.draft, onInput: (event: Event) => context.setDraft((event.target as HTMLInputElement).value) }),
+			h('input', { 'data-test': 'second' }),
+		]),
+		h(Teleport, { to: 'body' }, h('div', { ref: context.ownFocus, 'data-test': 'popup' }, h('button', { type: 'button' }, 'Pick'))),
+	];
+
+	function setupSplit() {
+		const rows: ShallowRef<Row[]> = shallowRef([
+			{ id: 'a', name: 'Alpha', price: 1, sector: 'Tech', active: false },
+			{ id: 'b', name: 'Beta', price: 2, sector: 'Tech', active: false },
+		]);
+		const splitColumns = defineColumns({
+			name: column(row => row.name, { label: 'Name', width: 240, setValue: (row, name) => ({ ...row, name }), editor: splitEditor }),
+			note: column(row => row.id, { label: 'Note', width: 100, editable: false }),
+		});
+		let grid: DataGrid<Row> | null = null;
+
+		wrapper = mount(defineComponent({
+			setup() {
+				grid = useDataGrid({
+					columns: splitColumns,
+					rows,
+					rowKey: 'id',
+					rowHeight: 30,
+					features: {
+						navigation: navigation(),
+						editing: editing({
+							onCommit: (commit) => {
+								rows.value = [...commit.apply(rows.value)];
+							},
+						}),
+					},
+				});
+
+				return () => h(GridRoot, { grid: grid as DataGrid, style: { width: '400px', height: '160px', font: '14px sans-serif' } }, {
+					default: () => h(GridBody, null, {
+						default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => bodyRows.map(row => h(GridRow, { key: row.key, row }, { default: () => h(GridCells), $stable: true })),
+					}),
+				});
+			},
+		}), { attachTo: document.body });
+
+		return { rows, grid: grid as unknown as DataGrid<Row> };
+	}
+
+	const find = (name: string) => document.querySelector<HTMLElement>(`[data-test="${name}"]`) as HTMLElement;
+
+	it('stays open while focus moves between its fields and into an element of `ownFocus`, and saves when focus leaves them', async () => {
+		const { rows, grid } = setupSplit();
+
+		await userEvent.click(cell(0, 'name'));
+		await userEvent.keyboard('{F2}');
+		await userEvent.click(find('first'));
+		await userEvent.fill(find('first'), 'Gamma');
+		await userEvent.click(find('second'));
+		await userEvent.click(find('popup').querySelector('button') as HTMLElement);
+
+		expect(grid.editing?.cell.value?.key).toBe('a');
+		expect(rows.value[0].name).toBe('Alpha');
+
+		await userEvent.click(cell(1, 'note'));
+
+		expect(grid.editing?.cell.value).toBeNull();
+		expect(rows.value[0].name).toBe('Gamma');
 	});
 });

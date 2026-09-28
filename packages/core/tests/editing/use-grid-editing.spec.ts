@@ -1026,6 +1026,7 @@ describe('dateField', () => {
 			setText: () => undefined,
 			commit: () => true,
 			cancel: () => undefined,
+			ownFocus: () => undefined,
 			inputProps: {},
 		}) as unknown as { props: { value: string; onInput: (event: Event) => void } }[];
 		const input = document.createElement('input');

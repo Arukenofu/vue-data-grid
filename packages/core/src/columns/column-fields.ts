@@ -1,5 +1,5 @@
 import type { AggregateResult, ColumnGroup, RowNode, RuntimeColumn, SortDirection } from '@vue-data-grid/engine';
-import type { ClassValue, VNodeChild } from 'vue';
+import type { ClassValue, ComponentPublicInstance, VNodeChild } from 'vue';
 
 /** What a body cell renders from. */
 export interface CellContext<TRow, TValue> {
@@ -59,9 +59,16 @@ export interface EditorContext<TRow, TValue> extends CellContext<TRow, TValue> {
 	/** Ends editing without a write; focus goes back to the cell. */
 	cancel: () => void;
 	/**
+	 * Counts focus in this element as focus in the editor, such as in the calendar of a date editor in
+	 * a portal: moving there does not commit, and leaving it for anywhere else does. Bind it with
+	 * `:ref`; the element is let go when editing ends.
+	 */
+	ownFocus: (element: Element | ComponentPublicInstance | null) => void;
+	/**
 	 * Props for the element that takes input: it takes focus when it mounts, and gets the keys of
 	 * `useGridEditing` (Enter commits and goes down, Tab across, Escape cancels, the arrows in the
-	 * `'quick'` mode save and move, F2 switches the mode), a commit when focus leaves it, its label,
+	 * `'quick'` mode save and move, F2 switches the mode), a commit when focus leaves it and the
+	 * elements of `ownFocus` (moves between fields inside it stay), its label,
 	 * `data-dg-state` with the mode, and `aria-invalid` with an error. Its keys run after an
 	 * `onKeydown` of the editor's own that comes first in an array: `event.preventDefault()` there
 	 * keeps a key, as a list keeps ↑ and ↓.

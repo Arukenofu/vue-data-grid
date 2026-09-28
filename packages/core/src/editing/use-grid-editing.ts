@@ -15,9 +15,20 @@ import {
 	type RuntimeColumn,
 	useCellEditing,
 } from '@vue-data-grid/engine';
-import { type MaybeRefOrGetter, type Ref, shallowReadonly, shallowRef, toValue, useId, watch } from 'vue';
+import {
+	type ComponentPublicInstance,
+	type MaybeRefOrGetter,
+	onScopeDispose,
+	type Ref,
+	shallowReadonly,
+	shallowRef,
+	toValue,
+	useId,
+	watch,
+} from 'vue';
 
 import type { CellContext, CellEditor, EditorContext, EditorMode, EditorMove } from '../columns/column-fields';
+import { toElement } from '../components/primitive';
 import { isComposing, isRtl } from '../keyboard/keys';
 import type { BodyCellFocus } from '../navigation/body-cell-focus';
 import { BODY_SECTION, readGridPosition } from '../navigation/grid-attributes';
@@ -135,6 +146,9 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 	let tabRun: TabRun | null = null;
 	let sessions = 0;
 	let errorId = '';
+	// Elements of the editor outside its element, such as a calendar in a portal: given to `ownFocus`
+	// for the editing session.
+	const ownedElements = new Set<HTMLElement>();
 
 	function isEnabled() {
 		return toValue(enabled) ?? true;
@@ -245,6 +259,52 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 	function commitOnLeave() {
 		tabRun = null;
 		editing.commit();
+	}
+
+	/** Whether focus going to `target` stays in the editor: its element, or an element of `ownFocus`. */
+	function isInEditor(target: EventTarget | null) {
+		if (!(target instanceof Element)) {
+			return false;
+		}
+
+		const input = target.closest('[data-dg-part="editor"]');
+
+		if (input && grid.root.value?.contains(input)) {
+			return true;
+		}
+
+		for (const element of ownedElements) {
+			if (element.contains(target)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// `focusout` rather than `blur`: it bubbles, so an editor of several fields sees focus leave it,
+	// not move between its fields.
+	function leaveEditor(event: FocusEvent) {
+		if (!isInEditor(event.relatedTarget)) {
+			commitOnLeave();
+		}
+	}
+
+	function ownFocus(value: Element | ComponentPublicInstance | null) {
+		const element = toElement(value);
+
+		if (element && !ownedElements.has(element)) {
+			ownedElements.add(element);
+			element.addEventListener('focusout', leaveEditor);
+		}
+	}
+
+	function releaseOwnedElements() {
+		for (const element of ownedElements) {
+			element.removeEventListener('focusout', leaveEditor);
+		}
+
+		ownedElements.clear();
 	}
 
 	/** Ends editing without a write, and puts focus back on the cell. */
@@ -429,16 +489,20 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 		autocomplete: 'off',
 		ref: focusEditor,
 		onKeydown: handleEditorKeydown,
-		onBlur: commitOnLeave,
+		onFocusout: leaveEditor,
 	});
 
 	// A new id for each editing session: an error message of one cell never answers for another.
 	watch(() => editing.cell.value !== null && `${editing.cell.value.key}\u0000${editing.cell.value.column}`, (id) => {
+		releaseOwnedElements();
+
 		if (id) {
 			sessions += 1;
 			errorId = `${idPrefix}-editor-error-${sessions}`;
 		}
 	}, { flush: 'sync', immediate: true });
+
+	onScopeDispose(releaseOwnedElements);
 
 	/**
 	 * What the editor of a cell renders from, while that cell is edited; `null` for any other cell.
@@ -468,6 +532,7 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 			setText: editing.setText,
 			commit,
 			cancel,
+			ownFocus,
 			inputProps: current.error === null
 				? { ...inputProps, ...own }
 				: { ...inputProps, ...own, 'aria-invalid': 'true', 'aria-describedby': errorId },

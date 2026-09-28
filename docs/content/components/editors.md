@@ -182,7 +182,8 @@ What an editor of your own renders from: the cell context and the draft.
 		{ name: 'setText', type: '(text: string, draft?: TValue) => void', description: 'Sets the draft from text, through the column\'s `parse` or as `draft` says.' },
 		{ name: 'commit', type: '(move?: EditorMove) => void', description: 'Saves the draft and moves focus: `down`, `up`, `right`, `left`, `next`, `previous` or `none`.' },
 		{ name: 'cancel', type: '() => void', description: 'Ends editing without a write.' },
-		{ name: 'inputProps', type: 'Record<string, unknown>', description: 'Props for the element that takes input: focus on mount, the keys, a commit on blur, the label and `aria-invalid`.' },
+		{ name: 'ownFocus', type: '(element: Element | ComponentPublicInstance | null) => void', description: 'Counts focus in an element outside the editor\'s own, such as a calendar in a portal, as focus in the editor. Bind it with `:ref`.' },
+		{ name: 'inputProps', type: 'Record<string, unknown>', description: 'Props for the element that takes input: focus on mount, the keys, a commit when focus leaves it and the elements of `ownFocus`, the label and `aria-invalid`.' },
 		{ name: 'row, value, key, index, column, node', type: 'CellContext', description: 'The cell, as a `cell` field gets it.' },
 	]"
 />
@@ -208,7 +209,7 @@ price: column(product => product.price, {
 ### An editor of your own
 
 An editor is a function of its context that renders the field. Bind `inputProps` to the element
-that takes input: it brings focus, the keys, the commit on blur and the accessible name.
+that takes input: it brings focus, the keys, the commit when focus leaves and the accessible name.
 
 ```ts
 import type { CellEditor } from '@vue-data-grid/core';
@@ -264,26 +265,26 @@ restock: column(product => product.restock, {
 ```
 
 A picker is several elements rather than one: the segments of the field, a trigger, and a calendar
-in a popover outside the grid. So the component spreads `inputProps` on the field, which gives it
-the keys, the name and the error, but keeps two of them for itself:
+in a popover outside the grid. The component spreads `inputProps` on the field, which gives it the
+keys, the name and the error; focus moving between the segments stays in the editor. The calendar
+lives in a portal, so the component gives it to `ownFocus`: focus moving into the calendar does not
+commit, and focus leaving the field and the calendar together does.
 
-- `ref`, which would focus the field: the calendar takes focus when it opens.
-- `onBlur`, which would commit as soon as focus moved from the field to the calendar. The component
-  calls it when focus leaves the field and the calendar together:
+```vue
+<DatePickerField v-slot="{ segments }" v-bind="context.inputProps">
+	<!-- the segments and the trigger -->
+</DatePickerField>
 
-```ts
-const fieldProps = computed(() => Object.fromEntries(
-	Object.entries(props.context.inputProps).filter(([name]) => name !== 'ref' && name !== 'onBlur'),
-));
-
-function leave(event: FocusEvent) {
-	const commitOnLeave = props.context.inputProps.onBlur;
-
-	if (!isInside(event.relatedTarget) && typeof commitOnLeave === 'function') {
-		commitOnLeave(event);
-	}
-}
+<DatePickerContent>
+	<DatePickerCalendar :ref="context.ownFocus">
+		<!-- the month grid -->
+	</DatePickerCalendar>
+</DatePickerContent>
 ```
+
+Give `ownFocus` an element that covers the whole popover: focus a click leaves on its padding would
+otherwise count as leaving the editor. A component whose root is a portal, as `DatePickerContent`
+is, has no element of its own to give.
 
 The draft follows the picker through `setDraft`, and a day chosen in the calendar commits at once
 with `commit('none')`, which puts focus back on the cell. In the calendar the arrows move between

@@ -23,21 +23,14 @@ import {
 	DatePickerRoot,
 	DatePickerTrigger,
 } from 'reka-ui';
-import { computed, shallowRef, useTemplateRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 const props = defineProps<{ context: EditorContext<unknown, string | null> }>();
 
-const CALENDAR = 'date-editor-calendar';
-
-const root = useTemplateRef<HTMLElement>('root');
 const open = shallowRef(true);
 let picked = false;
 
 const value = computed(() => (props.context.draft === null ? undefined : parseDate(props.context.draft)));
-
-const fieldProps = computed(() => Object.fromEntries(
-	Object.entries(props.context.inputProps).filter(([name]) => name !== 'ref' && name !== 'onBlur'),
-));
 
 function change(date: DateValue | undefined) {
 	props.context.setDraft(date ? date.toString() : null);
@@ -51,22 +44,10 @@ function toggle(next: boolean) {
 		props.context.commit('none');
 	}
 }
-
-function isInside(target: EventTarget | null) {
-	return target instanceof Element && (root.value?.contains(target) === true || target.closest(`.${CALENDAR}`) !== null);
-}
-
-function leave(event: FocusEvent) {
-	const commitOnLeave = props.context.inputProps.onBlur;
-
-	if (!isInside(event.relatedTarget) && typeof commitOnLeave === 'function') {
-		commitOnLeave(event);
-	}
-}
 </script>
 
 <template>
-	<div ref="root" class="date-editor" @focusout="leave">
+	<div class="date-editor">
 		<DatePickerRoot
 			:model-value="value"
 			:open="open"
@@ -75,7 +56,7 @@ function leave(event: FocusEvent) {
 			@update:model-value="change"
 			@update:open="toggle"
 		>
-			<DatePickerField v-slot="{ segments }" v-bind="fieldProps" class="date-editor-field">
+			<DatePickerField v-slot="{ segments }" v-bind="context.inputProps" class="date-editor-field">
 				<template v-for="(item, index) in segments" :key="`${item.part}-${index}`">
 					<DatePickerInput :part="item.part" :class="item.part === 'literal' ? 'date-editor-literal' : 'date-editor-segment'">
 						{{ item.value }}
@@ -86,8 +67,8 @@ function leave(event: FocusEvent) {
 				</DatePickerTrigger>
 			</DatePickerField>
 
-			<DatePickerContent :class="CALENDAR" align="end" :side-offset="6" @focusout="leave">
-				<DatePickerCalendar v-slot="{ weekDays, grid }" class="date-editor-body">
+			<DatePickerContent class="date-editor-calendar" align="end" :side-offset="6">
+				<DatePickerCalendar :ref="context.ownFocus" v-slot="{ weekDays, grid }" class="date-editor-body">
 					<DatePickerHeader class="date-editor-header">
 						<DatePickerPrev class="date-editor-nav" aria-label="Previous month">
 							<IconChevronLeft aria-hidden="true" />
@@ -181,7 +162,6 @@ function leave(event: FocusEvent) {
 
 .date-editor-calendar {
 	z-index: 100;
-	padding: 12px;
 	border: 1px solid var(--ui-border);
 	border-radius: var(--ui-radius);
 	background: var(--ui-bg);
@@ -189,6 +169,11 @@ function leave(event: FocusEvent) {
 	color: var(--ui-fg);
 	font: 400 13px/1 var(--ui-font);
 	animation: ui-pop-in 0.14s ease-out;
+}
+
+.date-editor-body {
+	display: block;
+	padding: 12px;
 }
 
 .date-editor-header {
