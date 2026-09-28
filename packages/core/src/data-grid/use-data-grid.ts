@@ -237,7 +237,7 @@ export type DataGridStateSource<TColumns extends GridColumns = GridColumns> =
 export interface DataGridBaseOptions<TRow, TColumns extends GridColumns, TFeatures>
 	extends
 	Omit<GridEngineOptions<TRow>, 'columns' | 'rows' | 'root' | 'state' | 'scrollMargin' | 'scrollMarginEnd'>,
-	Pick<GridPropsOptions, 'role' | 'footerRows' | 'rowCount' | 'rowLayout'> {
+	Pick<GridPropsOptions, 'role' | 'header' | 'footerRows' | 'rowCount' | 'rowLayout'> {
 	/** Columns from `defineColumns`, as an object by name or an array. */
 	columns: MaybeRefOrGetter<TColumns>;
 	/** The source rows; features group, sort and flatten them before the engine renders them. */
@@ -459,6 +459,7 @@ export function useDataGrid<
 
 	const props = useGridProps(scope, {
 		role: options.role,
+		header: options.header,
 		navigation: features.navigation !== undefined,
 		footerRows: () => (toValue(options.footerRows) ?? 0) + addedFooterRows.value,
 		rowCount: () => toValue(options.rowCount) ?? engine.scope.rows.value.length + addedBodyRows.value,

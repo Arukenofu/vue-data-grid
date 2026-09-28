@@ -173,6 +173,16 @@ describe('useDataGrid — markup', () => {
 		expect(grid.getRowProps(second).style).toEqual({ top: '30px', height: '30px' });
 	});
 
+	it('without a header row leaves it out of the row count and the row indexes', () => {
+		const withHeader = inSetup(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 }));
+		const withoutHeader = inSetup(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30, header: false }));
+
+		expect(withHeader.getGridProps()['aria-rowcount']).toBe(4);
+		expect(withoutHeader.getGridProps()['aria-rowcount']).toBe(3);
+		expect(withHeader.getRowProps(withHeader.items.value[0])['aria-rowindex']).toBe(2);
+		expect(withoutHeader.getRowProps(withoutHeader.items.value[0])['aria-rowindex']).toBe(1);
+	});
+
 	it('with rows in flow neither the body nor the rows get geometry', () => {
 		const grid = inSetup(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30, rowLayout: 'flow' }));
 

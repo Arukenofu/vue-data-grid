@@ -98,6 +98,7 @@ are ignored, with a warning in development.
 	label="Option"
 	:data="[
 		{ name: 'role', type: 'MaybeRefOrGetter<\'grid\' | \'treegrid\' | \'table\'>', default: '\'grid\'', description: '`treegrid` by default with the `tree` feature. `table` for a grid that is only read: its cells are `cell`, not `gridcell`, and nothing is selectable.' },
+		{ name: 'header', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Whether the markup renders the row of column headers. `false` for a grid without `GridHeader`, so that `aria-rowcount` and `aria-rowindex` leave the header row out.' },
 		{ name: 'footerRows', type: 'MaybeRefOrGetter<number>', default: '0', description: 'Footer rows you render yourself, for `aria-rowcount`. A `GridFooterRow` counts itself.' },
 		{ name: 'rowCount', type: 'MaybeRefOrGetter<number>', description: 'Body rows in the whole set when not all are loaded, or `-1` when unknown: the `aria-rowcount` of a grid that pages on a server.' },
 		{ name: 'insets', type: 'MaybeRefOrGetter<{ start: number; end: number }>', description: 'Widths of decoration at each edge of a row, px, outside the columns; pinned columns stick after them. Render them with `getInsetCellProps`.' },

@@ -34,8 +34,8 @@ const archived = shallowRef<readonly Task[]>([]);
 
 const lists = { backlog, sprint };
 
-const backlogGrid = useDataGrid({ columns, rows: backlog, rowKey: 'id', rowHeight: 40 });
-const sprintGrid = useDataGrid({ columns, rows: sprint, rowKey: 'id', rowHeight: 40 });
+const backlogGrid = useDataGrid({ columns, rows: backlog, rowKey: 'id', rowHeight: 40, header: false });
+const sprintGrid = useDataGrid({ columns, rows: sprint, rowKey: 'id', rowHeight: 40, header: false });
 
 useGridMotion(backlogGrid);
 useGridMotion(sprintGrid);
