@@ -32,6 +32,8 @@ const docs: DefaultTheme.SidebarItem[] = [
 			{ text: 'Loading and empty states', link: '/guides/data-loading' },
 			{ text: 'Your own markup', link: '/guides/custom-markup' },
 			{ text: 'Localization', link: '/guides/localization' },
+			{ text: 'TypeScript', link: '/guides/typescript' },
+			{ text: 'Server rendering and Nuxt', link: '/guides/server-rendering' },
 		],
 	},
 ];
