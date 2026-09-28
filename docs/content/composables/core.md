@@ -11,12 +11,15 @@ column state, and models of rows and cells with no markup at all. `@vue-data-gri
 its stable API, so everything on this page is imported from there too.
 </Description>
 
+<Demo name="api-core" />
+
 ## When to use it
 
 `useDataGrid` assembles the core for you, and most grids never touch it directly. Reach for it
 when you need a piece on its own:
 
-- a model without a grid, such as `useRowSelection` over a list of cards, or `toCsv` in an export;
+- a model without a grid, such as `useRowSelection` over a list of cards, or `toCsv` in an export,
+  as the demo above does;
 - a row pipeline of your own order, such as filtering between grouping and sorting;
 - live data, with `useRowStream` and `useCellChanges`;
 - a grid on markup that `useDataGrid` does not fit, with `useGridEngine` and your own markup.

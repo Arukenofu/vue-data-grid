@@ -10,6 +10,8 @@ For grids rendered by render functions of your own: keep the vnode of a row whil
 depends on hold, and Vue skips its whole subtree, as <code>v-memo</code> does in a template.
 </Description>
 
+<Demo name="api-render-memo" />
+
 `GridRow` needs none of this. It is a component whose `row` prop stays the same object while the
 row's data, place and node hold, so Vue skips it by its props. The memo is for markup of your own
 that renders rows in one render function, where there is no component per row to skip.

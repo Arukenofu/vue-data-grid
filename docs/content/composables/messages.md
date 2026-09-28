@@ -10,6 +10,8 @@ Every string the grid shows or says: the names of its controls, the empty and lo
 what it announces to screen readers. English by default; give <code>GridRoot</code> your own for any language.
 </Description>
 
+<Demo name="localization" />
+
 ## Usage
 
 ```vue

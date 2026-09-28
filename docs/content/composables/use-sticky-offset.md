@@ -10,6 +10,8 @@ The height of a sticky block, such as the header or the footer of a grid, tracke
 <code>ResizeObserver</code>. The engine needs it to keep scrolled-to rows clear of what sticks over them.
 </Description>
 
+<Demo name="api-use-sticky-offset" />
+
 `useDataGrid` measures its header and footer with it and hands the heights to the engine, as
 `grid.headHeight` and `grid.footHeight`. You need it yourself when you build on the core engine, or
 when something else sticks to the top or the bottom of the grid.

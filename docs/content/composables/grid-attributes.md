@@ -11,6 +11,8 @@ says its column position with <code>aria-colindex</code>. The prop-getters put a
 helpers are for markup of your own.
 </Description>
 
+<Demo name="api-grid-attributes" />
+
 ## Usage
 
 A row of your own, such as a summary row inside the body, joins the grid with its section and index,
