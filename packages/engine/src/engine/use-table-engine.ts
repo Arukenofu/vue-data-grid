@@ -193,6 +193,33 @@ function createDuplicateKeyWatcher() {
 }
 
 /**
+ * Warns once per method and name about a name that is not a declared column: a command given a typo
+ * would otherwise do nothing without a word. Queries stay quiet, as asking about a removed column is fair.
+ */
+function createUnknownColumnWarning(getColumns: () => readonly AnyColumn[]) {
+	const warned = new Set<string>();
+
+	return (method: string, names: Iterable<string>) => {
+		const columns = getColumns();
+
+		for (const name of names) {
+			const id = `${method}\u0000${name}`;
+
+			if (warned.has(id) || columns.some(column => column.name === name)) {
+				continue;
+			}
+
+			warned.add(id);
+			// oxlint-disable-next-line no-console
+			console.warn(
+				`[@vue-data-grid/engine] scope.${method}() got "${name}", which is not a declared column, and ignored `
+				+ `it. Declared columns: ${columns.map(column => `"${column.name}"`).join(', ')}.`,
+			);
+		}
+	};
+}
+
+/**
  * Everything a table has apart from markup: the column model, row and column windows, group rows and
  * geometry as CSS variables. Call it in `setup`, pass `scope` to `createTableScopeContext` and `layers` to
  * `useTableGeometry`.
@@ -251,6 +278,7 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 
 		return next;
 	});
+	const warnUnknownColumns = __DEV__ ? createUnknownColumnWarning(() => columnList.value) : null;
 
 	const groupList = computed(() => toGroupList(toValue(options.groups)));
 	const groupsByName = computed(() => new Map(groupList.value.map(group => [group.name, group])));
@@ -419,6 +447,7 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 	const multiSort = computed(() => state.multiSort.value);
 
 	function toggleColumn(name: string) {
+		warnUnknownColumns?.('toggleColumn', [name]);
 		columns.toggleColumn(name);
 
 		if (columns.currentLayout().hidden.includes(name)) {
@@ -439,6 +468,10 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 	}
 
 	function fitColumns(names?: readonly string[]) {
+		if (names) {
+			warnUnknownColumns?.('fitColumns', names);
+		}
+
 		const root = options.root.value;
 		const targets = new Set(getResizable(names).map(column => column.name));
 
@@ -466,6 +499,8 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 	}
 
 	function scrollToColumn(name: string, align: ScrollAlign = 'auto') {
+		warnUnknownColumns?.('scrollToColumn', [name]);
+
 		const root = options.root.value;
 		const rendered = columns.getColumn(name);
 
@@ -520,6 +555,10 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 
 	function resize(name: string, width: number) {
 		const column = columnList.value.find(item => item.name === name);
+
+		if (!column) {
+			warnUnknownColumns?.('resize', [name]);
+		}
 
 		if (!column?.resizable) {
 			return columns.getWidth(name);
@@ -604,11 +643,24 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 		getWidth: columns.getWidth,
 		getColumnSpan,
 		toggleColumn,
-		pinColumn: columns.pinColumn,
-		moveColumnTo: columns.moveColumnTo,
-		moveColumnBefore: columns.moveColumnBefore,
+		pinColumn: (name, side) => {
+			warnUnknownColumns?.('pinColumn', [name]);
+			columns.pinColumn(name, side);
+		},
+		moveColumnTo: (name, index) => {
+			warnUnknownColumns?.('moveColumnTo', [name]);
+			columns.moveColumnTo(name, index);
+		},
+		moveColumnBefore: (name, before) => {
+			warnUnknownColumns?.('moveColumnBefore', before === null ? [name] : [name, before]);
+			columns.moveColumnBefore(name, before);
+		},
 		canMoveColumnTo: columns.canMoveColumnTo,
-		moveColumnBy: columns.moveColumnBy,
+		moveColumnBy: (name, delta) => {
+			warnUnknownColumns?.('moveColumnBy', [name]);
+
+			return columns.moveColumnBy(name, delta);
+		},
 		canMoveColumnBy: columns.canMoveColumnBy,
 		batch: columns.batch,
 		getSortDirection: name => activeSort.value[sortIndexes.value.get(name) ?? -1]?.direction,
@@ -621,6 +673,10 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 		toggleSort: (name, additive) => {
 			const column = columnList.value.find(item => item.name === name);
 
+			if (!column) {
+				warnUnknownColumns?.('toggleSort', [name]);
+			}
+
 			if (column?.sortable) {
 				state.sort.value = toggleSort(activeSort.value, name, additive && multiSort.value, column.sortOrder);
 			}
@@ -630,7 +686,11 @@ export function useTableEngine<TRow = unknown>(options: TableEngineOptions<TRow>
 		resize,
 		commitResize,
 		previewWidths: columns.previewWidths,
-		setWidths: columns.setWidths,
+		setWidths: (widths) => {
+			warnUnknownColumns?.('setWidths', Object.keys(widths));
+
+			return columns.setWidths(widths);
+		},
 		fitColumns,
 		scrollToRow: rowWindow.scrollToIndex,
 		scrollToColumn,

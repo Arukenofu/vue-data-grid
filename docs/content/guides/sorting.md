@@ -110,6 +110,10 @@ function sortByPrice() {
 }
 ```
 
+Names in a list passed as `sort` are checked against `columns` when compiling, so a typo fails the
+build. A ref may hold any names, such as a model from `defineModel`; to check them too, type it by
+the columns: `shallowRef<readonly TableSort<ColumnName<typeof columns>>[]>`.
+
 Always replace the list; a list changed in place reaches no one. A sort that names a column the
 table does not have, such as one restored from an old version of your app, is left out, so it never
 breaks the table. To do what a header click does from code, call `table.scope.toggleSort(name,

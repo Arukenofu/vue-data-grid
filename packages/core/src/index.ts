@@ -148,6 +148,7 @@ export type {
 	DataTableHandlesOf,
 	DataTableOptions,
 	DataTableRowRef,
+	DataTableStateOptions,
 	DataTableStateSource,
 	FeatureTable,
 	TableClipboardFeature,

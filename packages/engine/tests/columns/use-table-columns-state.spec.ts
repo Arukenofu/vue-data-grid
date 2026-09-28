@@ -1,11 +1,13 @@
 import { customRef, defineComponent, nextTick, type Ref, ref, shallowRef, watch } from 'vue';
 import { mount } from '@vue/test-utils';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { defineColumns } from '../../src/columns/define-columns';
 import type { TableLayout } from '../../src/columns/layout';
 import type { TableSort } from '../../src/columns/sort';
+import type { AnyColumn } from '../../src/columns/column';
 import {
+	type ColumnName,
 	type RememberField,
 	type TableColumnsState,
 	type TableColumnsStateOptions,
@@ -556,6 +558,11 @@ describe('useTableColumnsState — columns', () => {
 		useTableColumnsState({ columns, sort: [{ name: 'volume', direction: 'desc' }] });
 
 		expect(state.sort.value).toEqual([{ name: 'price', direction: 'desc' }]);
+	});
+
+	it('`ColumnName` gives the names of columns by name, and any name for columns in an array', () => {
+		expectTypeOf<ColumnName<typeof columns>>().toEqualTypeOf<'price' | 'cap'>();
+		expectTypeOf<ColumnName<readonly AnyColumn[]>>().toEqualTypeOf<string>();
 	});
 
 	it('a restored sort drops columns that are not declared', () => {

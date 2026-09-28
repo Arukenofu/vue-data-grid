@@ -83,7 +83,7 @@ are ignored, with a warning in development.
 <PropsTable
 	label="Option"
 	:data="[
-		{ name: 'sort', type: 'TableSort[] | Ref<TableSort[]>', default: '[]', description: 'The initial sort, or a ref of it as a model: the state writes to it and follows it, as `v-model:sort` does.' },
+		{ name: 'sort', type: 'TableSort<ColumnName>[] | Ref<TableSort[]>', default: '[]', description: 'The initial sort, its names checked against `columns` when compiling, or a ref of it as a model: the state writes to it and follows it, as `v-model:sort` does. The ref may hold any names.' },
 		{ name: 'layout', type: 'Ref<TableLayout | null>', description: 'A ref of the layout as a model; `null` in it means the declared layout.' },
 		{ name: 'multiSort', type: 'MaybeRef<boolean>', default: 'false', description: 'Whether a header click with Shift, Ctrl or ⌘ adds a column to the sort instead of replacing it.' },
 		{ name: 'persist', type: 'PersistStore', description: 'Where the state is kept between visits, such as `localStorageStore(\'people\')`. Read once.' },

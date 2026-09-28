@@ -21,7 +21,11 @@ export interface KeepRendered {
 	columns?: () => readonly string[];
 }
 
-/** Everything the markup renders the table from; `TRow` is the row type of the engine. */
+/**
+ * Everything the markup renders the table from; `TRow` is the row type of the engine. Methods that
+ * change the table by a column name warn once in development about a name that is not a declared
+ * column; queries answer for it quietly.
+ */
 export interface TableScope<TRow = unknown> {
 	/** The scroll container of the table, for both axes. */
 	root: Ref<HTMLElement | null>;

@@ -9,7 +9,11 @@ import type { SortDirection, TableSort } from './sort';
 
 export type RememberField = 'order' | 'hidden' | 'widths' | 'pinned' | 'collapsed' | 'sort';
 
-export type ColumnName<TColumns> = Extract<keyof TColumns, string>;
+/**
+ * The column names of columns from `defineColumns`, such as `ColumnName<typeof columns>` for a sort or
+ * a name of your own checked against them; `string` for columns in an array.
+ */
+export type ColumnName<TColumns> = TColumns extends readonly unknown[] ? string : Extract<keyof TColumns, string>;
 
 export interface TableColumnsStateOptions<TColumns extends ColumnsInput = ColumnsInput> {
 	/**

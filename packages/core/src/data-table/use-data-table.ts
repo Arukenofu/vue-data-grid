@@ -8,6 +8,7 @@ import {
 	type CellWrite,
 	type CellWriteResult,
 	type ChangeHistory,
+	type ColumnName,
 	type EditingCell,
 	type GeometryLayer,
 	type RowNode,
@@ -18,6 +19,7 @@ import {
 	type TableColumnsStateOptions,
 	type TableEngineOptions,
 	type TableScope,
+	type TableSort,
 	useTableColumnsState,
 	useTableEngine,
 	useTableGeometry,
@@ -216,10 +218,21 @@ type LateFeatures<TRow> = {
 	[TName in keyof FeaturesBefore]?: (table: FeatureTable<TRow>) => NonNullable<DataTableHandles<TRow>[TName]>;
 };
 
+/** The options of the table's own column state, with the names in `sort` checked against the columns. */
+export interface DataTableStateOptions<TColumns extends TableColumns = TableColumns>
+	extends Omit<TableColumnsStateOptions, 'columns' | 'sort'> {
+	/**
+	 * The initial sort, its names checked against `columns`, or a ref of it as a model, such as
+	 * `v-model:sort`: the state writes to it and follows it. The ref may hold any names, as a model of
+	 * `defineModel` does.
+	 */
+	sort?: readonly TableSort<ColumnName<TColumns>>[] | Ref<readonly TableSort[]>;
+}
+
 /** Where the column state comes from: a state of your own, or the options to create one. */
-export type DataTableStateSource =
-	| ({ state: TableColumnsState } & { [TName in keyof Omit<TableColumnsStateOptions, 'columns'>]?: never })
-	| ({ state?: undefined } & Omit<TableColumnsStateOptions, 'columns'>);
+export type DataTableStateSource<TColumns extends TableColumns = TableColumns> =
+	| ({ state: TableColumnsState } & { [TName in keyof DataTableStateOptions]?: never })
+	| ({ state?: undefined } & DataTableStateOptions<TColumns>);
 
 export interface DataTableBaseOptions<TRow, TColumns extends TableColumns, TFeatures>
 	extends
@@ -239,7 +252,7 @@ export interface DataTableBaseOptions<TRow, TColumns extends TableColumns, TFeat
  * `multiSort`, `persist`, `remember`), not both.
  */
 export type DataTableOptions<TRow, TColumns extends TableColumns = TableColumns, TFeatures = object> =
-	DataTableBaseOptions<TRow, TColumns, TFeatures> & DataTableStateSource;
+	DataTableBaseOptions<TRow, TColumns, TFeatures> & DataTableStateSource<TColumns>;
 
 /**
  * The handle `THandles` gives a feature, else what any table may have there. An indexed intersection

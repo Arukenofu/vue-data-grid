@@ -734,6 +734,77 @@ describe('useTableEngine — scrolling to a row without the row window', () => {
 	});
 });
 
+describe('useTableEngine — unknown column names', () => {
+	function warnings(run: (engine: Engine) => void) {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+		mounted = setup();
+		run(mounted.engine);
+
+		const messages = warn.mock.calls.map(call => String(call[0]));
+
+		warn.mockRestore();
+
+		return messages;
+	}
+
+	it('warns about a name that is not a declared column, naming the method and the declared ones', () => {
+		const messages = warnings(engine => engine.scope.pinColumn('symbl', 'start'));
+
+		expect(messages).toHaveLength(1);
+		expect(messages[0]).toContain('scope.pinColumn() got "symbl"');
+		expect(messages[0]).toContain('"symbol", "price", "cap"');
+	});
+
+	it('warns from every command that takes a column name', () => {
+		const messages = warnings((engine) => {
+			const { scope } = engine;
+
+			scope.toggleColumn('a');
+			scope.pinColumn('b', null);
+			scope.moveColumnTo('c', 0);
+			scope.moveColumnBefore('symbol', 'd');
+			scope.moveColumnBy('e', 1);
+			scope.toggleSort('f', false);
+			scope.resize('g', 100);
+			scope.setWidths({ price: 100, h: 100 });
+			scope.fitColumns(['i']);
+			scope.scrollToColumn('j');
+		});
+
+		expect(messages).toHaveLength(10);
+		expect(messages.map(message => message.match(/got "(\w)"/)?.[1])).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+	});
+
+	it('warns once per method and name', () => {
+		const messages = warnings((engine) => {
+			engine.scope.toggleColumn('gone');
+			engine.scope.toggleColumn('gone');
+			engine.scope.pinColumn('gone', 'end');
+		});
+
+		expect(messages).toHaveLength(2);
+	});
+
+	it('stays quiet about declared columns a command leaves alone, and in queries', () => {
+		const messages = warnings((engine) => {
+			const { scope } = engine;
+
+			scope.pinColumn('price', 'start');
+			scope.resize('symbol', 100);
+			scope.setWidths({ cap: 100 });
+			scope.getWidth('gone');
+			scope.getColumn('gone');
+			scope.isColumnHidden('gone');
+			scope.getSortDirection('gone');
+			scope.canMoveColumnTo('gone', 0);
+			scope.previewWidths({ gone: 100 });
+		});
+
+		expect(messages).toEqual([]);
+	});
+});
+
 describe('useTableEngine — widths of several columns', () => {
 	const wide = defineColumns({
 		symbol: { value: (row: Row) => row.id, width: 100, minWidth: 20, resizable: true },
@@ -756,7 +827,7 @@ describe('useTableEngine — widths of several columns', () => {
 	it('`setWidths` without a resizable column changes nothing', () => {
 		mounted = setup({ columns: () => wide });
 
-		expect(mounted.engine.scope.setWidths({ cap: 50, gone: 10 })).toBe(false);
+		expect(mounted.engine.scope.setWidths({ cap: 50 })).toBe(false);
 		expect(mounted.engine.state.layout.value).toBeNull();
 	});
 

@@ -6,6 +6,7 @@ import {
 	type RowGroup,
 	type RowNode,
 	type RowSelection,
+	type TableSort,
 	useTableColumnsState,
 } from '@vue-data-grid/engine';
 import { mount } from '@vue/test-utils';
@@ -332,6 +333,20 @@ describe('useDataTable — types', () => {
 		// @ts-expect-error `sort` is an option of the state, which is given
 		inSetup(() => useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30, state, sort: [] }));
 		inSetup(() => useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30, state }));
+	});
+
+	it('checks the names of the initial sort against the columns', () => {
+		inSetup(() => useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30, sort: [{ name: 'cap', direction: 'desc' }] }));
+		// @ts-expect-error `nope` is not a column
+		inSetup(() => useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30, sort: [{ name: 'nope', direction: 'desc' }] }));
+	});
+
+	it('takes a sort model with any names, and any names with columns in an array', () => {
+		const sort = shallowRef<readonly TableSort[]>([{ name: 'cap', direction: 'desc' }]);
+		const listed = Object.values(columns);
+
+		inSetup(() => useDataTable({ columns, rows, rowKey: 'id', rowHeight: 30, sort }));
+		inSetup(() => useDataTable({ columns: listed, rows, rowKey: 'id', rowHeight: 30, sort: [{ name: 'cap', direction: 'asc' }] }));
 	});
 
 	it('takes a function of your own in place of a factory, typed by the table', () => {

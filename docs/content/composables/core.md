@@ -74,6 +74,11 @@ The scope is the one object the markup reads. The main members:
 | Widths | `resize`, `commitResize`, `previewWidths`, `setWidths`, `fitColumns` |
 | Scrolling | `scrollToRow`, `scrollToColumn`, `keepRendered` |
 
+Members take column names as plain strings, so a name from `column.name`, a prop or a stored
+setting fits without a cast. A method that changes the table by a name that is not a declared
+column, such as a typo, ignores it and warns once in development; queries such as `getWidth` answer
+for it quietly.
+
 A `RenderedColumn` carries `cellProps` and `headerProps`: one frozen object per column with its
 `data-dg-column`, pin, alignment and geometry, shared by every row. That sharing is what lets a
 thousand cells of a column cost Vue one comparison each.
