@@ -6,8 +6,10 @@ import { GridDragHandle } from './grid-drag-parts';
 
 /**
  * The column of row drag handles: a real column, `kind: 'service'`, pinned to the start by default,
- * with a `GridDragHandle` in every cell and an empty header. Put the rows in a `GridRowDrag` with
- * `handle`, so that rows drag by it, and with the keyboard; CSV, ranges and autosize leave it out.
+ * with a `GridDragHandle` in every cell. Its `label`, `'Drag'` by default, names the header as a
+ * `hidden-label` part: read by screen readers, hidden by the structural styles. Put the rows in a
+ * `GridRowDrag` with `handle`, so that rows drag by it, and with the keyboard; CSV, ranges and
+ * autosize leave it out.
  */
 export function dragHandleColumn<TRow>(options: ServiceColumnOptions = {}): ColumnInput<TRow, null> {
 	return {
@@ -19,7 +21,7 @@ export function dragHandleColumn<TRow>(options: ServiceColumnOptions = {}): Colu
 		...options,
 		kind: 'service',
 		value: () => null,
-		header: () => '',
+		header: ({ column }) => h('span', { 'data-dg-part': 'hidden-label' }, column.label ?? column.name),
 		cell: ({ key }) => h(GridDragHandle, { row: key }),
 	};
 }

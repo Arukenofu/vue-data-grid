@@ -616,12 +616,13 @@ describe('GridDropZone', () => {
 });
 
 describe('dragHandleColumn', () => {
-	it('is a service column with a handle in every row and an empty header', () => {
+	it('is a service column with a handle in every row and its label hidden in the header', () => {
 		const { root } = setup({ handle: true });
+		const label = root.querySelector('[role="columnheader"][data-dg-column="drag"] [data-dg-part="hidden-label"]');
 
 		expect(withHandles.drag).toMatchObject({ kind: 'service', pinned: 'start', width: 32 });
 		expect(root.querySelectorAll('[data-dg-part="body"] [data-dg-part="drag-handle"]')).toHaveLength(4);
-		expect(root.querySelector('[role="columnheader"][data-dg-column="drag"]')?.textContent).toBe('');
+		expect(label?.textContent).toBe('Drag');
 	});
 });
 

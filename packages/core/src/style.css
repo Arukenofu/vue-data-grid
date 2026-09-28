@@ -490,8 +490,8 @@
 	cursor: pointer;
 }
 
-/* The live region of the announcer: read by screen readers, never seen. */
-:where([data-dg-part='announcer']) {
+/* The live region of the announcer and hidden labels: read by screen readers, never seen. */
+:where([data-dg-part='announcer'], [data-dg-part='hidden-label']) {
 	position: absolute;
 	width: 1px;
 	height: 1px;

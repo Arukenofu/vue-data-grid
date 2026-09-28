@@ -91,8 +91,10 @@ treeColumn(column: ColumnInput<TRow, TValue>): ColumnInput<TRow, TValue>
 
 ### dragHandleColumn
 
-The column of drag handles: a [`GridDragHandle`](/components/row-drag) in every cell and an empty
-header. Pinned to the start by default, 32 px wide. Import it from `@vue-data-grid/core/drag-and-drop`.
+The column of drag handles: a [`GridDragHandle`](/components/row-drag) in every cell. The header
+holds the column's `label`, `'Drag'` by default, as visually hidden text, so the column header has
+a name for screen readers; pass `label` in the language of the page. Pinned to the start by default,
+32 px wide. Import it from `@vue-data-grid/core/drag-and-drop`.
 
 ```ts
 dragHandleColumn(options?: ServiceColumnOptions): ColumnInput<TRow, null>
@@ -120,11 +122,12 @@ What a service column lets you change:
 
 The data attributes of the parts inside are on their own pages: the
 [selection checkbox](/components/selection-checkbox), the [tree toggle](/components/tree-toggle)
-and the [drag handle](/components/row-drag). A cell of `treeColumn()` has an indent element too:
+and the [drag handle](/components/row-drag). A cell of `treeColumn()` has an indent element, and the
+header of `dragHandleColumn()` a hidden label:
 
 <DataAttributesTable
 	:data="[
-		{ attribute: '[data-dg-part]', values: ['tree-indent'] },
+		{ attribute: '[data-dg-part]', values: ['tree-indent', 'hidden-label'] },
 	]"
 />
 

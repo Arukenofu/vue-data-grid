@@ -27,7 +27,7 @@ describe('style.css', () => {
 
 	it('styles the parts `useGridProps` and the grid parts name, and no other', () => {
 		expect(readValues('data-dg-part')).toEqual(
-			new Set(['grid', 'head', 'foot', 'body', 'row', 'cell-text', 'resize-handle', 'sort-indicator', 'tree-indent', 'tree-toggle', 'announcer', 'empty', 'empty-cell', 'loading', 'drag-handle', 'drag-preview', 'drag-overlay', 'range', 'range-cell', 'editor', 'editor-error', 'editor-list', 'editor-option', 'editor-empty', 'cell-checkbox', 'fill-handle']),
+			new Set(['grid', 'head', 'foot', 'body', 'row', 'cell-text', 'resize-handle', 'sort-indicator', 'tree-indent', 'tree-toggle', 'announcer', 'hidden-label', 'empty', 'empty-cell', 'loading', 'drag-handle', 'drag-preview', 'drag-overlay', 'range', 'range-cell', 'editor', 'editor-error', 'editor-list', 'editor-option', 'editor-empty', 'cell-checkbox', 'fill-handle']),
 		);
 		expect(readValues('data-dg-row-layout')).toEqual(new Set(['positioned']));
 	});
