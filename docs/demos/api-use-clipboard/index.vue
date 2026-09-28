@@ -58,7 +58,7 @@ const grid = useDataGrid({
 	features: {
 		navigation: navigation(),
 		ranges: ranges(),
-		editing: editing<Sale>({
+		editing: editing({
 			onCommit: (commit) => {
 				rows.value = commit.apply(rows.value);
 			},

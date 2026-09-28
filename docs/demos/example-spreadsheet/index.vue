@@ -122,7 +122,7 @@ const grid = useDataGrid({
 	features: {
 		navigation: navigation(),
 		ranges: ranges(),
-		editing: editing<BudgetLine>({
+		editing: editing({
 			onCommit: (commit) => {
 				lines.value = commit.apply(lines.value);
 			},

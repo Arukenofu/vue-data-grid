@@ -59,7 +59,7 @@ const grid = useDataGrid({
 	features: {
 		navigation: navigation(),
 		ranges: ranges(),
-		editing: editing<Product>({
+		editing: editing({
 			onCommit: (commit) => {
 				rows.value = commit.apply(rows.value);
 			},
@@ -75,8 +75,9 @@ row key, the column, and the value `before` and `after`, and its `source`: `'edi
 
 Editing needs a focused cell to start from, which is why `navigation` comes with it. With `ranges`,
 <kbd>Delete</kbd>, paste and the fill handle work on the selected cells rather than the focused one.
-The type argument of `editing<Product>` tells the commit what a row is; TypeScript cannot guess it
-from inside `onCommit`.
+The commit knows what a row is from the grid: in `features`, `commit.apply` takes and returns
+`Product` rows. A factory called apart from `useDataGrid`, such as into a variable of its own, takes
+the row type as an argument: `editing<Product>({ … })`.
 
 ## Editors
 
@@ -158,7 +159,7 @@ A paste or a fill writes many cells at once and cannot stop at each wrong one. I
 values and reports the rest, which `onWrite` hears about:
 
 ```ts
-editing<Product>({
+editing({
 	onCommit: (commit) => {
 		rows.value = commit.apply(rows.value);
 	},
@@ -176,7 +177,7 @@ editing<Product>({
 with values rounded or some left out, or `false` to write nothing:
 
 ```ts
-editing<Product>({
+editing({
 	onBeforeCommit: ({ edits }) => edits.map(edit => (
 		edit.column === 'price' && typeof edit.after === 'number'
 			? { ...edit, after: Math.round(edit.after * 100) / 100 }
@@ -209,7 +210,7 @@ import { editing, fill, navigation, ranges } from '@vue-data-grid/core';
 features: {
 	navigation: navigation(),
 	ranges: ranges(),
-	editing: editing<Product>({ onCommit }),
+	editing: editing({ onCommit }),
 	fill: fill(),
 },
 ```
@@ -239,7 +240,7 @@ The `history` feature keeps the commits as steps:
 import { history } from '@vue-data-grid/core';
 
 features: {
-	editing: editing<Product>({ onCommit }),
+	editing: editing({ onCommit }),
 	history: history({ limit: 50 }),
 },
 ```
