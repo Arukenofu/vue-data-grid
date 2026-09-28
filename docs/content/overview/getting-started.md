@@ -22,7 +22,7 @@ animation engines with it, so this one package is all you import from.
 Then import the structural styles once, in your app's entry file:
 
 ```ts
-import '@vue-data-grid/core/style.css';
+import "@vue-data-grid/core/style.css";
 ```
 
 They hold only what a grid needs to work: rows laid out as flex lines, a sticky header, pinned
@@ -36,7 +36,7 @@ A column is a function that reads a value from a row, plus a few facts about how
 and what its value is:
 
 ```ts
-import { defineColumn, defineColumns } from '@vue-data-grid/core';
+import { defineColumn, defineColumns } from "@vue-data-grid/core";
 
 interface Person {
 	id: string;
@@ -49,13 +49,22 @@ interface Person {
 const column = defineColumn<Person>();
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 170 }),
-	role: column(person => person.role, { label: 'Role', flex: 1 }),
-	team: column(person => person.team, { label: 'Team', width: 130 }),
-	salary: column(person => person.salary, {
-		label: 'Salary',
-		align: 'right',
-		format: salary => `$${salary.toLocaleString('en-US')}`,
+	name: column((person) => person.name, {
+		label: "Name",
+		width: 170,
+	}),
+	role: column((person) => person.role, {
+		label: "Role",
+		flex: 1,
+	}),
+	team: column((person) => person.team, {
+		label: "Team",
+		width: 130,
+	}),
+	salary: column((person) => person.salary, {
+		label: "Salary",
+		align: "right",
+		format: (salary) => `$${salary.toLocaleString("en-US")}`,
 	}),
 });
 ```
@@ -75,12 +84,12 @@ Columns are compared by reference to decide what to re-render. Declare them at t
 one place.
 
 ```ts
-import { useDataGrid } from '@vue-data-grid/core';
+import { useDataGrid } from "@vue-data-grid/core";
 
 const grid = useDataGrid({
 	columns,
 	rows: people,
-	rowKey: 'id',
+	rowKey: "id",
 	rowHeight: 40,
 });
 ```
@@ -103,7 +112,11 @@ body gives you its rows.
 	<GridRoot :grid="grid" label="People" class="people">
 		<GridHeader>
 			<GridHeaderRow v-slot="{ columns }">
-				<GridHeaderCell v-for="column in columns" :key="column.key" :column="column" />
+				<GridHeaderCell
+					v-for="column in columns"
+					:key="column.key"
+					:column="column"
+				/>
 			</GridHeaderRow>
 		</GridHeader>
 		<GridBody v-slot="{ rows }">
@@ -136,14 +149,14 @@ A grid does nothing it was not asked to. Behaviour comes in as **features**, eac
 factory, so the code of a feature you do not use never reaches your bundle:
 
 ```ts
-import { sorting } from '@vue-data-grid/core';
+import { sorting } from "@vue-data-grid/core";
 
 const column = defineColumn<Person>({ sortable: true });
 
 const grid = useDataGrid({
 	columns,
 	rows: people,
-	rowKey: 'id',
+	rowKey: "id",
 	rowHeight: 40,
 	multiSort: true,
 	features: { sorting: sorting() },
