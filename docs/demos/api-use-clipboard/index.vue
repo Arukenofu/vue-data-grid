@@ -25,10 +25,10 @@ const column = defineColumn<Sale>();
 const money = (value: number | null) => (value === null ? '' : `$${value.toLocaleString('en-US')}`);
 
 const columns = defineColumns({
-	product: column(sale => sale.product, { label: 'Product', width: 140 }),
-	region: column(sale => sale.region, { label: 'Region', width: 130 }),
-	quarter: column(sale => sale.quarter, { label: 'Quarter', width: 90 }),
-	units: column(sale => sale.units, {
+	product: column('product', { label: 'Product', width: 140 }),
+	region: column('region', { label: 'Region', width: 130 }),
+	quarter: column('quarter', { label: 'Quarter', width: 90 }),
+	units: column('units', {
 		label: 'Units',
 		width: 100,
 		align: 'right',
@@ -36,7 +36,7 @@ const columns = defineColumns({
 		...numberField({ min: 0 }),
 		setValue: (sale, units) => ({ ...sale, units: units ?? 0 }),
 	}),
-	revenue: column(sale => sale.revenue, {
+	revenue: column('revenue', {
 		label: 'Revenue',
 		flex: 1,
 		width: 120,

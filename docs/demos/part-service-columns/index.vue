@@ -29,15 +29,15 @@ const column = defineColumn<WorkItem>();
 const columns = defineColumns({
 	drag: dragHandleColumn(),
 	select: selectionColumn(),
-	number: column(item => item.number, {
+	number: column('number', {
 		label: 'ID',
 		width: 72,
 		format: number => `#${number}`,
 		cellClass: () => 'ui-cell-muted',
 	}),
-	title: treeColumn(column(item => item.title, { label: 'Work item', width: 230, flex: 1, rowHeader: true })),
-	owner: column(item => item.owner, { label: 'Owner', width: 140 }),
-	points: column(item => item.points, {
+	title: treeColumn(column('title', { label: 'Work item', width: 230, flex: 1, rowHeader: true })),
+	owner: column('owner', { label: 'Owner', width: 140 }),
+	points: column('points', {
 		label: 'Points',
 		width: 84,
 		align: 'right',

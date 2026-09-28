@@ -42,8 +42,8 @@ interface Instrument {
 const column = defineColumn<Instrument>();
 
 const columns = defineColumns({
-	symbol: column(row => row.symbol, { label: 'Symbol', width: 140 }),
-	price: column(row => row.price, { label: 'Price', align: 'right', format: value => value.toFixed(2) }),
+	symbol: column('symbol', { label: 'Symbol', width: 140 }),
+	price: column('price', { label: 'Price', align: 'right', format: value => value.toFixed(2) }),
 });
 
 export default defineComponent({

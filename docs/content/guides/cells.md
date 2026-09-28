@@ -146,7 +146,7 @@ Costs:
 ### The `cell` field of the column
 
 ```ts
-status: column(invoice => invoice.status, {
+status: column('status', {
 	label: 'Status',
 	cell: ({ value }) => STATUS[value].label,
 }),
@@ -166,7 +166,7 @@ Costs:
 ### `format` and `cellClass`
 
 ```ts
-amount: column(invoice => invoice.amount, {
+amount: column('amount', {
 	format: amount => money.format(amount),
 	cellClass: ({ value }) => (value < 0 ? 'negative' : undefined),
 }),
@@ -238,7 +238,7 @@ Costs:
 ```
 
 ```ts
-amount: column(invoice => invoice.amount, { label: 'Amount', header: () => 'Amount, USD' }),
+amount: column('amount', { label: 'Amount', header: () => 'Amount, USD' }),
 ```
 
 The template replaces the label only: the sort indicator and the resize handle stay in
@@ -265,7 +265,7 @@ the header.
 ```
 
 ```ts
-amount: column(invoice => invoice.amount, {
+amount: column('amount', {
 	aggregate: 'sum',
 	footer: ({ aggregate }) => money.format(aggregate ?? 0),
 }),
@@ -286,8 +286,8 @@ and `aggregate` has to come before it in the object for its type.
 ```
 
 ```ts
-price: column(stock => stock.price, { editable: true, setValue, ...numberField({ step: 0.5 }) }),
-active: column(row => row.active, { editable: true, setValue, ...checkboxField() }),
+price: column('price', { editable: true, setValue, ...numberField({ step: 0.5 }) }),
+active: column('active', { editable: true, setValue, ...checkboxField() }),
 ```
 
 ```ts

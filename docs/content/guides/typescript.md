@@ -14,8 +14,9 @@ type argument, on <code>defineColumn</code>, and none on the grid.
 ## Rows and columns
 
 `defineColumn<Person>()` makes a builder for columns of one row type, with defaults they share.
-Each column's value type comes from its `value` function, and flows into its `format`, `compare`,
-`cell` and `footer`:
+Each column's value type comes from the key it reads, or from its `value` function, and flows into
+its `format`, `compare`, `cell` and `footer`. Other fields can widen it, as the editor of
+`numberField()` makes a column of `number` one of `number | null`:
 
 ```ts
 import { defineColumn, defineColumns } from '@vue-data-grid/core';
@@ -29,8 +30,8 @@ interface Person {
 const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name' }),
-	salary: column(person => person.salary, {
+	name: column('name', { label: 'Name' }),
+	salary: column('salary', {
 		label: 'Salary',
 		// `salary` is a number here, and `person` a Person in `cell`.
 		format: salary => salary.toLocaleString('en-US'),

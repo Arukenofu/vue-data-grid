@@ -65,7 +65,7 @@ function total(line: BudgetLine) {
 }
 
 const columns = defineColumns({
-	category: column(line => line.category, { label: 'Category', width: 150, pinned: 'start' }),
+	category: column('category', { label: 'Category', width: 150, pinned: 'start' }),
 	jan: month('jan'),
 	feb: month('feb'),
 	mar: month('mar'),

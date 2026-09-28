@@ -26,7 +26,7 @@ import { selection, selectionColumn, useDataGrid } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	id: column(order => order.id, { label: 'Order' }),
+	id: column('id', { label: 'Order' }),
 	// …
 });
 

@@ -81,7 +81,7 @@ import { dragHandleColumn } from '@vue-data-grid/core/drag-and-drop';
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
-	title: column(track => track.title, { label: 'Title' }),
+	title: column('title', { label: 'Title' }),
 });
 ```
 

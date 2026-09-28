@@ -5,14 +5,14 @@ import { count, getMargin, getProfit, money, type ReportRow } from './report';
 const column = defineColumn<ReportRow>({ sortable: true, resizable: true });
 
 export const columns = defineColumns({
-	label: treeColumn(column(row => row.label, {
+	label: treeColumn(column('label', {
 		label: 'Breakdown',
 		flex: 1,
 		minWidth: 240,
 		sortOrder: ['asc', 'desc'],
 		footer: () => 'Total',
 	})),
-	units: column(row => row.units, {
+	units: column('units', {
 		label: 'Units',
 		width: 96,
 		align: 'right',
@@ -26,7 +26,7 @@ export const columns = defineColumns({
 		align: 'right',
 		format: price => money.format(price),
 	}),
-	revenue: column(row => row.revenue, {
+	revenue: column('revenue', {
 		label: 'Revenue',
 		width: 128,
 		align: 'right',
@@ -34,7 +34,7 @@ export const columns = defineColumns({
 		format: revenue => money.format(revenue),
 		footer: ({ aggregate }) => money.format(aggregate ?? 0),
 	}),
-	cost: column(row => row.cost, {
+	cost: column('cost', {
 		label: 'Cost',
 		width: 128,
 		align: 'right',

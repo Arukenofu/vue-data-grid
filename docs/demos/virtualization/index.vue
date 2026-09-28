@@ -27,8 +27,8 @@ function temperature(day: number) {
 }
 
 const columns = defineColumns({
-	name: column(sensor => sensor.name, { label: 'Sensor', width: 150, pinned: 'start' }),
-	site: column(sensor => sensor.site, { label: 'Site', width: 116 }),
+	name: column('name', { label: 'Sensor', width: 150, pinned: 'start' }),
+	site: column('site', { label: 'Site', width: 116 }),
 	...Object.fromEntries(DAYS.map((day, index) => [day.value, temperature(index)])),
 });
 

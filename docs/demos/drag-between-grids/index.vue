@@ -19,12 +19,12 @@ const PRIORITY: Readonly<Record<Priority, BadgeTone>> = {
 const column = defineColumn<Task>();
 
 const columns = defineColumns({
-	title: column(task => task.title, { label: 'Task', width: 176 }),
-	priority: column(task => task.priority, {
+	title: column('title', { label: 'Task', width: 176 }),
+	priority: column('priority', {
 		label: 'Priority',
 		width: 84,
 	}),
-	estimate: column(task => task.estimate, { label: 'Days', width: 52, align: 'right' }),
+	estimate: column('estimate', { label: 'Days', width: 52, align: 'right' }),
 });
 
 const backlog = shallowRef<readonly Task[]>(tasks.filter(task => task.status === 'todo'));

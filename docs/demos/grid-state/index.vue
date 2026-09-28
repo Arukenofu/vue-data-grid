@@ -23,10 +23,10 @@ import { UiButton, UiSortIcon, UiSwitch, UiToolbar } from '@/ui';
 const column = defineColumn<Stock>({ sortable: true, resizable: true, movable: true, hideable: true, pinnable: true });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 100 }),
-	name: column(stock => stock.name, { label: 'Company', width: 190 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 130 }),
-	price: column(stock => stock.price, {
+	symbol: column('symbol', { label: 'Symbol', width: 100 }),
+	name: column('name', { label: 'Company', width: 190 }),
+	sector: column('sector', { label: 'Sector', width: 130 }),
+	price: column('price', {
 		label: 'Price',
 		width: 100,
 		align: 'right',

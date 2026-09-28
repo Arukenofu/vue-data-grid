@@ -32,13 +32,13 @@ import { dragHandleColumn } from '@vue-data-grid/core/drag-and-drop';
 const columns = defineColumns({
 	drag: dragHandleColumn(),
 	select: selectionColumn(),
-	title: treeColumn(column(item => item.title, { label: 'Work item', flex: 1 })),
-	owner: column(item => item.owner, { label: 'Owner' }),
+	title: treeColumn(column('title', { label: 'Work item', flex: 1 })),
+	owner: column('owner', { label: 'Owner' }),
 });
 
 const leaderboard = defineColumns({
 	place: rowNumberColumn(),
-	name: column(person => person.name, { label: 'Name' }),
+	name: column('name', { label: 'Name' }),
 });
 ```
 

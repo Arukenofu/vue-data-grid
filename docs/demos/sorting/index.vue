@@ -32,22 +32,22 @@ const text = defineColumn<Stock>({ sortable: true, sortOrder: ['asc', 'desc'] })
 const number = defineColumn<Stock>({ sortable: true, align: 'right' });
 
 const columns = defineColumns({
-	symbol: text(stock => stock.symbol, { label: 'Symbol', width: 96, cellClass: () => 'ui-cell-mono ui-cell-strong' }),
-	name: text(stock => stock.name, { label: 'Company', width: 164, flex: 1 }),
+	symbol: text('symbol', { label: 'Symbol', width: 96, cellClass: () => 'ui-cell-mono ui-cell-strong' }),
+	name: text('name', { label: 'Company', width: 164, flex: 1 }),
 	rating: text(getRating, {
 		label: 'Rating',
 		width: 112,
 		sortOrder: ['desc', 'asc'],
 		compare: (a, b) => RATINGS.indexOf(a) - RATINGS.indexOf(b),
 	}),
-	price: number(stock => stock.price, { label: 'Price', width: 96, format: price => money.format(price) }),
+	price: number('price', { label: 'Price', width: 96, format: price => money.format(price) }),
 	change: number(getChange, {
 		label: 'Change',
 		width: 104,
 		format: change => `${change > 0 ? '+' : ''}${change.toFixed(2)}%`,
 		cellClass: ({ value }) => (value >= 0 ? 'ui-cell-up' : 'ui-cell-down'),
 	}),
-	marketCap: number(stock => stock.marketCap, { label: 'Market cap', width: 124, format: cap => `$${cap.toFixed(1)}B` }),
+	marketCap: number('marketCap', { label: 'Market cap', width: 124, format: cap => `$${cap.toFixed(1)}B` }),
 });
 
 const sort = shallowRef<readonly GridSort[]>([

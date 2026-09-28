@@ -43,11 +43,11 @@ const column = defineColumn<Track>();
 
 const columns = defineColumns({
 	grip: column(() => null, { kind: 'service', label: 'Move', width: 40, align: 'center', header: () => '' }),
-	number: column(track => track.number, { label: '#', width: 44, align: 'right', cellClass: () => 'ui-cell-muted' }),
-	title: column(track => track.title, { label: 'Title', width: 170, flex: 1, rowHeader: true }),
-	artist: column(track => track.artist, { label: 'Artist', width: 140 }),
-	album: column(track => track.album, { label: 'Album', width: 120 }),
-	seconds: column(track => track.seconds, { label: 'Time', width: 70, align: 'right', format: formatTime }),
+	number: column('number', { label: '#', width: 44, align: 'right', cellClass: () => 'ui-cell-muted' }),
+	title: column('title', { label: 'Title', width: 170, flex: 1, rowHeader: true }),
+	artist: column('artist', { label: 'Artist', width: 140 }),
+	album: column('album', { label: 'Album', width: 120 }),
+	seconds: column('seconds', { label: 'Time', width: 70, align: 'right', format: formatTime }),
 });
 
 const rows = shallowRef<readonly Track[]>(tracks);

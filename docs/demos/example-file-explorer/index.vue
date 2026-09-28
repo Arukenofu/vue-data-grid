@@ -42,10 +42,10 @@ const column = defineColumn<FileRow>({ sortable: true, resizable: true, sortOrde
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
-	name: treeColumn(column(file => file.name, { label: 'Name', flex: 1, minWidth: 280 })),
+	name: treeColumn(column('name', { label: 'Name', flex: 1, minWidth: 280 })),
 	kind: column(file => KIND_LABELS[file.kind], { label: 'Kind', width: 130 }),
-	size: column(file => file.size, { label: 'Size', width: 110, align: 'right', format: formatSize }),
-	modified: column(file => file.modified, { label: 'Modified', width: 140, format: formatDate }),
+	size: column('size', { label: 'Size', width: 110, align: 'right', format: formatSize }),
+	modified: column('modified', { label: 'Modified', width: 140, format: formatDate }),
 });
 
 const grid = useDataGrid({

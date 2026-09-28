@@ -22,10 +22,10 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD
 const column = defineColumn<OrgMember>({ sortable: true, sortOrder: ['asc', 'desc'] });
 
 const columns = defineColumns({
-	name: treeColumn(column(member => member.name, { label: 'Name', width: 220 })),
-	title: column(member => member.title, { label: 'Title', width: 190 }),
-	reports: column(member => member.reports, { label: 'Reports', width: 92, align: 'right' }),
-	cost: column(member => member.cost, { label: 'Org cost', width: 104, align: 'right', format: cost => money.format(cost) }),
+	name: treeColumn(column('name', { label: 'Name', width: 220 })),
+	title: column('title', { label: 'Title', width: 190 }),
+	reports: column('reports', { label: 'Reports', width: 92, align: 'right' }),
+	cost: column('cost', { label: 'Org cost', width: 104, align: 'right', format: cost => money.format(cost) }),
 });
 
 const expanded = shallowRef<string[] | undefined>(undefined);

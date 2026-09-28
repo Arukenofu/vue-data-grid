@@ -38,9 +38,9 @@ const starred = shallowRef<ReadonlySet<string>>(new Set(['launch']));
 const column = defineColumn<FileEntry>();
 
 const columns = defineColumns({
-	name: column(file => file.name, { label: 'Name', width: 180, flex: 1 }),
-	size: column(file => file.size, { label: 'Size', width: 84, align: 'right', format: formatSize }),
-	modified: column(file => file.modified, { label: 'Modified', width: 90, format: modified => day.format(new Date(modified)) }),
+	name: column('name', { label: 'Name', width: 180, flex: 1 }),
+	size: column('size', { label: 'Size', width: 84, align: 'right', format: formatSize }),
+	modified: column('modified', { label: 'Modified', width: 90, format: modified => day.format(new Date(modified)) }),
 });
 
 const grid = useDataGrid({

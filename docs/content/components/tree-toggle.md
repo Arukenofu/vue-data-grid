@@ -114,7 +114,7 @@ cells, and the cell context carries the row's tree node:
 
 ```ts
 const columns = defineColumns({
-	name: column(file => file.name, { label: 'Name', tree: true }),
+	name: column('name', { label: 'Name', tree: true }),
 });
 ```
 

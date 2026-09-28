@@ -40,17 +40,17 @@ const metrics = Object.fromEntries(METRICS.map((metric, index) => [
 ]));
 
 const columns = defineColumns({
-	id: column(reading => reading.id, {
+	id: column('id', {
 		label: '#',
 		width: 88,
 		pinned: 'start',
 		format: id => id.toLocaleString('en-US'),
 	}),
-	time: column(reading => reading.time, { label: 'Time', width: 136, align: 'left' }),
-	device: column(reading => reading.device, { label: 'Device', width: 112, align: 'left' }),
-	region: column(reading => reading.region, { label: 'Region', width: 104, align: 'left' }),
+	time: column('time', { label: 'Time', width: 136, align: 'left' }),
+	device: column('device', { label: 'Device', width: 112, align: 'left' }),
+	region: column('region', { label: 'Region', width: 104, align: 'left' }),
 	...metrics,
-	health: column(reading => reading.health, {
+	health: column('health', {
 		label: 'Health',
 		width: 112,
 		align: 'left',

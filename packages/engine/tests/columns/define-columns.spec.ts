@@ -124,6 +124,46 @@ describe('defineColumn', () => {
 		expect(columns.price.align).toBe('right');
 		expect(columns.symbol.name).toBe('symbol');
 	});
+
+	it('a key of the row reads that field, typed by it', () => {
+		const column = defineColumn<Row>();
+		const price = column('price', {
+			width: 200,
+			format: (value) => {
+				expectTypeOf(value).toEqualTypeOf<number>();
+
+				return value.toFixed(2);
+			},
+		});
+
+		expect(price.width).toBe(200);
+		expect(price.value({ id: 'a', price: 7 })).toBe(7);
+		expectTypeOf(price.value).returns.toEqualTypeOf<number>();
+		expectTypeOf(column('id').value).returns.toEqualTypeOf<string>();
+		expectTypeOf(column('price', { aggregate: 'sum' }).aggregate).toEqualTypeOf<'sum' | undefined>();
+		// @ts-expect-error: the row has no field of that name.
+		column('title');
+	});
+
+	it('with a key the other fields widen the value, as they do with a function', () => {
+		const column = defineColumn<Row>();
+		const parse = (text: string) => (text === '' ? null : Number(text));
+
+		expectTypeOf(column('price', { parse }).value).returns.toEqualTypeOf<number | null>();
+		expectTypeOf(column(row => row.price, { parse }).value).returns.toEqualTypeOf<number | null>();
+	});
+
+	it('keys and functions mix in one `defineColumns`, with the same fields and defaults', () => {
+		const column = defineColumn<Row>({ sortable: true });
+		const columns = defineColumns({
+			id: column('id'),
+			price: column(row => row.price * 2, { align: 'right' }),
+		});
+
+		expect(columns.id).toMatchObject({ name: 'id', sortable: true });
+		expect(columns.id.value({ id: 'b', price: 1 })).toBe('b');
+		expect(columns.price.value({ id: 'b', price: 1 })).toBe(2);
+	});
 });
 
 describe('defineColumn — defaults', () => {

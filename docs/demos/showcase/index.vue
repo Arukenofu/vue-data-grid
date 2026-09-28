@@ -90,7 +90,7 @@ const column = defineColumn<Account>({ sortable: true, resizable: true, hideable
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	account: column(account => account.company, {
+	account: column('company', {
 		label: 'Account',
 		width: 220,
 		minWidth: 180,
@@ -99,16 +99,16 @@ const columns = defineColumns({
 		hideable: false,
 		footer: ({ rows }) => `${rows.length} accounts`,
 	}),
-	status: column(account => account.status, {
+	status: column('status', {
 		label: 'Status',
 		width: 110,
 		format: value => STATUS[value].label,
 	}),
-	plan: column(account => account.plan, {
+	plan: column('plan', {
 		label: 'Plan',
 		width: 104,
 	}),
-	mrr: column(account => account.mrr, {
+	mrr: column('mrr', {
 		label: 'MRR',
 		width: 104,
 		align: 'right',
@@ -123,8 +123,8 @@ const columns = defineColumns({
 		aggregate: 'avg',
 		footer: ({ aggregate }) => (aggregate === null ? '' : `${formatPercent(aggregate)} used`),
 	}),
-	country: column(account => account.country, { label: 'Country', width: 112, flex: 1 }),
-	lastActive: column(account => account.lastActive, {
+	country: column('country', { label: 'Country', width: 112, flex: 1 }),
+	lastActive: column('lastActive', {
 		label: 'Last active',
 		width: 112,
 		sortOrder: ['asc', 'desc'],

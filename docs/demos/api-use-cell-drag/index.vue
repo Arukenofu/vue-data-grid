@@ -19,10 +19,10 @@ const column = defineColumn<Person>();
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	name: column(person => person.name, { label: 'Name', width: 170 }),
-	role: column(person => person.role, { label: 'Role', flex: 1, width: 200 }),
-	team: column(person => person.team, { label: 'Team', width: 130 }),
-	location: column(person => person.location, { label: 'Location', width: 120 }),
+	name: column('name', { label: 'Name', width: 170 }),
+	role: column('role', { label: 'Role', flex: 1, width: 200 }),
+	team: column('team', { label: 'Team', width: 130 }),
+	location: column('location', { label: 'Location', width: 120 }),
 });
 
 const grid = useDataGrid({

@@ -29,13 +29,13 @@ const rows = shallowRef<readonly Product[]>(products);
 const column = defineColumn<Product>();
 
 const columns = defineColumns({
-	name: column(product => product.name, {
+	name: column('name', {
 		label: 'Name',
 		editable: true,
 		setValue: (product, name) => ({ ...product, name }),
 		validate: name => (name.trim() === '' ? 'A name is required' : null),
 	}),
-	stock: column(product => product.stock, {
+	stock: column('stock', {
 		label: 'In stock',
 		align: 'right',
 		editable: product => !product.archived,

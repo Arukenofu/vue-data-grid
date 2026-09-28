@@ -23,16 +23,16 @@ after this one is a variation on them.
 
 ## Columns describe, they do not render
 
-A column is a small record: a `value` function that reads the cell from a row, plus facts about the
-column. It is not a component and holds no state.
+A column is a small record: a `value` that reads the cell from a row, by a key or with a function,
+plus facts about the column. It is not a component and holds no state.
 
 ```ts
 const column = defineColumn<Invoice>();
 
 const columns = defineColumns({
-	number: column(invoice => invoice.number, { label: 'Invoice', width: 120 }),
+	number: column('number', { label: 'Invoice', width: 120 }),
 	customer: column(invoice => invoice.customer.name, { label: 'Customer', flex: 1 }),
-	total: column(invoice => invoice.total, {
+	total: column('total', {
 		label: 'Total',
 		align: 'right',
 		format: total => currency.format(total),

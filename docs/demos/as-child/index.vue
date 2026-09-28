@@ -32,10 +32,10 @@ const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	name: column(person => person.name, { label: 'Name', width: 180 }),
-	team: column(person => person.team, { label: 'Team', width: 120 }),
-	role: column(person => person.role, { label: 'Role', width: 170, flex: 1 }),
-	location: column(person => person.location, { label: 'Office', width: 100 }),
+	name: column('name', { label: 'Name', width: 180 }),
+	team: column('team', { label: 'Team', width: 120 }),
+	role: column('role', { label: 'Role', width: 170, flex: 1 }),
+	location: column('location', { label: 'Office', width: 100 }),
 });
 
 const grid = useDataGrid({

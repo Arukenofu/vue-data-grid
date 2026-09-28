@@ -20,10 +20,10 @@ import { type Person, people } from '@/data/people';
 const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 170 }),
-	role: column(person => person.role, { label: 'Role', flex: 1, minWidth: 160 }),
-	team: column(person => person.team, { label: 'Team', width: 130 }),
-	salary: column(person => person.salary, {
+	name: column('name', { label: 'Name', width: 170 }),
+	role: column('role', { label: 'Role', flex: 1, minWidth: 160 }),
+	team: column('team', { label: 'Team', width: 130 }),
+	salary: column('salary', {
 		label: 'Salary',
 		width: 120,
 		align: 'right',

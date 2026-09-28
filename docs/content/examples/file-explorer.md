@@ -82,7 +82,7 @@ navigation open and close folders in it. The content after the toggle is the col
 `GridCellTemplate`, whose slot gets the row's node:
 
 ```ts
-name: treeColumn(column(file => file.name, { label: 'Name', flex: 1 })),
+name: treeColumn(column('name', { label: 'Name', flex: 1 })),
 ```
 
 ```vue

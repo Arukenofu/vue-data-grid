@@ -54,7 +54,7 @@ For text alone, the column's `footer` field does it without a template:
 
 ```ts
 const columns = defineColumns({
-	revenue: column(sale => sale.revenue, {
+	revenue: column('revenue', {
 		label: 'Revenue',
 		aggregate: 'sum',
 		footer: ({ aggregate }) => money.format(aggregate ?? 0),

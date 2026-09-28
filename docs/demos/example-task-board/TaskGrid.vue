@@ -46,21 +46,21 @@ const column = defineColumn<BoardTask>();
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
-	title: column(task => task.title, {
+	title: column('title', {
 		label: 'Task',
 		flex: 1,
 		minWidth: 200,
 	}),
-	priority: column(task => task.priority, {
+	priority: column('priority', {
 		label: 'Priority',
 		width: 96,
 	}),
-	assignee: column(task => task.assignee, {
+	assignee: column('assignee', {
 		label: 'Owner',
 		width: 68,
 		align: 'center',
 	}),
-	actions: column(task => task.id, {
+	actions: column('id', {
 		label: 'Actions',
 		kind: 'service',
 		width: 76,

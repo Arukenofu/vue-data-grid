@@ -31,9 +31,9 @@ it has zero specificity and your own CSS always wins. Colours, fonts and spacing
 
 ## 1. Describe the columns
 
-A column is a function that reads a value from a row, plus a few facts about how to show it.
-`defineColumn` binds a builder to your row type once, so every column after it knows what a row is
-and what its value is:
+A column reads a value from a row, by a key of the row or with a function, plus a few facts about
+how to show it. `defineColumn` binds a builder to your row type once, so every column after it knows
+what a row is and what its value is:
 
 ```ts
 import { defineColumn, defineColumns } from "@vue-data-grid/core";
@@ -49,19 +49,19 @@ interface Person {
 const column = defineColumn<Person>();
 
 const columns = defineColumns({
-	name: column((person) => person.name, {
+	name: column("name", {
 		label: "Name",
 		width: 170,
 	}),
-	role: column((person) => person.role, {
+	role: column("role", {
 		label: "Role",
 		flex: 1,
 	}),
-	team: column((person) => person.team, {
+	team: column("team", {
 		label: "Team",
 		width: 130,
 	}),
-	salary: column((person) => person.salary, {
+	salary: column("salary", {
 		label: "Salary",
 		align: "right",
 		format: (salary) => `$${salary.toLocaleString("en-US")}`,

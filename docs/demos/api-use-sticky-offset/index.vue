@@ -25,10 +25,10 @@ const column = defineColumn<Person>();
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	name: column(person => person.name, { label: 'Name', width: 170, flex: 1, aggregate: 'count', footer: ({ aggregate }) => `${aggregate} people` }),
-	team: column(person => person.team, { label: 'Team', width: 120 }),
-	projects: column(person => person.projects, { label: 'Projects', width: 90, align: 'right' }),
-	salary: column(person => person.salary, {
+	name: column('name', { label: 'Name', width: 170, flex: 1, aggregate: 'count', footer: ({ aggregate }) => `${aggregate} people` }),
+	team: column('team', { label: 'Team', width: 120 }),
+	projects: column('projects', { label: 'Projects', width: 90, align: 'right' }),
+	salary: column('salary', {
 		label: 'Salary',
 		width: 120,
 		align: 'right',

@@ -66,19 +66,19 @@ function quarter(name: Quarter, label: string) {
 
 const columns = defineColumns({
 	row: rowNumberColumn({ rowHeader: true, pinned: 'start', width: 48, minWidth: 44 }),
-	item: column(line => line.item, {
+	item: column('item', {
 		label: 'Item',
 		width: 160,
 		validate: value => (value.trim() === '' ? 'An item needs a name' : undefined),
 		setValue: (line, item) => ({ ...line, item }),
 	}),
-	category: column(line => line.category, {
+	category: column('category', {
 		label: 'Category',
 		width: 116,
 		editor: selectEditor({ options: CATEGORIES.map(category => ({ value: category, label: category })) }),
 		setValue: (line, category) => ({ ...line, category }),
 	}),
-	owner: column(line => line.owner, {
+	owner: column('owner', {
 		label: 'Owner',
 		width: 92,
 		setValue: (line, owner) => ({ ...line, owner }),
@@ -95,7 +95,7 @@ const columns = defineColumns({
 		cell: ({ value }) => formatAmount(value),
 		cellClass: () => 'ui-cell-strong',
 	}),
-	approved: column(line => line.approved, {
+	approved: column('approved', {
 		label: 'Approved',
 		width: 88,
 		align: 'center',

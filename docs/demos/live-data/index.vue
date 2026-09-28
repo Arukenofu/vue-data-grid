@@ -39,9 +39,9 @@ function formatChange(value: number) {
 const column = defineColumn<Stock>({ sortable: true });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 90, cellClass: () => 'ui-cell-mono ui-cell-strong' }),
-	name: column(stock => stock.name, { label: 'Company', width: 136 }),
-	price: column(stock => stock.price, {
+	symbol: column('symbol', { label: 'Symbol', width: 90, cellClass: () => 'ui-cell-mono ui-cell-strong' }),
+	name: column('name', { label: 'Company', width: 136 }),
+	price: column('price', {
 		label: 'Price',
 		width: 88,
 		align: 'right',
@@ -52,12 +52,12 @@ const columns = defineColumns({
 		align: 'right',
 		cellClass: ({ value }) => (value >= 0 ? 'ui-cell-up' : 'ui-cell-down'),
 	}),
-	trend: column(stock => stock.history, {
+	trend: column('history', {
 		label: 'Trend',
 		width: 96,
 		sortable: false,
 	}),
-	volume: column(stock => stock.volume, { label: 'Volume', width: 94, align: 'right', format: volume => compact.format(volume) }),
+	volume: column('volume', { label: 'Volume', width: 94, align: 'right', format: volume => compact.format(volume) }),
 });
 
 const stream = useRowStream({ rows: stocks, rowKey: 'id' });

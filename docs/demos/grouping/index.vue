@@ -47,26 +47,26 @@ const column = defineColumn<SalesRow>({ sortable: true });
 const amount = defineColumn<SalesRow>({ sortable: true, align: 'right', width: 110 });
 
 const columns = defineColumns({
-	label: treeColumn(column(row => row.label, {
+	label: treeColumn(column('label', {
 		label: 'Group',
 		width: 216,
 		sortOrder: ['asc', 'desc'],
 		footer: () => 'Total',
 	})),
-	units: amount(row => row.units, {
+	units: amount('units', {
 		label: 'Units',
 		width: 84,
 		format: units => units.toLocaleString('en-US'),
 		aggregate: 'sum',
 		footer: ({ aggregate }) => (aggregate ?? 0).toLocaleString('en-US'),
 	}),
-	revenue: amount(row => row.revenue, {
+	revenue: amount('revenue', {
 		label: 'Revenue',
 		format: revenue => money.format(revenue),
 		aggregate: 'sum',
 		footer: ({ aggregate }) => money.format(aggregate ?? 0),
 	}),
-	cost: amount(row => row.cost, {
+	cost: amount('cost', {
 		label: 'Cost',
 		format: cost => money.format(cost),
 		aggregate: 'sum',

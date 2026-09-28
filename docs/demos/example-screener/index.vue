@@ -70,7 +70,7 @@ const views = computed(() => [
 const column = defineColumn<Stock>({ sortable: true, resizable: true });
 
 const columns = defineColumns({
-	watch: column(stock => stock.symbol, {
+	watch: column('symbol', {
 		kind: 'service',
 		label: 'Watch',
 		width: 48,
@@ -80,17 +80,17 @@ const columns = defineColumns({
 		sortable: false,
 		resizable: false,
 	}),
-	symbol: column(stock => stock.symbol, {
+	symbol: column('symbol', {
 		label: 'Symbol',
 		width: 200,
 		pinned: 'start',
 		footer: ({ rows }) => `${rows.length} stocks`,
 	}),
-	sector: column(stock => stock.sector, {
+	sector: column('sector', {
 		label: 'Sector',
 		width: 120,
 	}),
-	price: column(stock => stock.price, {
+	price: column('price', {
 		label: 'Price',
 		width: 110,
 		align: 'right',
@@ -104,13 +104,13 @@ const columns = defineColumns({
 		aggregate: 'avg',
 		footer: ({ aggregate }) => (aggregate === null ? '' : `avg ${formatChange(aggregate)}`),
 	}),
-	trend: column(stock => stock.history, {
+	trend: column('history', {
 		label: 'Trend',
 		width: 110,
 		flex: 1,
 		sortable: false,
 	}),
-	volume: column(stock => stock.volume, {
+	volume: column('volume', {
 		label: 'Volume',
 		width: 100,
 		align: 'right',
@@ -118,7 +118,7 @@ const columns = defineColumns({
 		aggregate: 'sum',
 		footer: ({ aggregate }) => (aggregate === null ? '' : formatVolume(aggregate)),
 	}),
-	marketCap: column(stock => stock.marketCap, {
+	marketCap: column('marketCap', {
 		label: 'Market cap',
 		width: 120,
 		align: 'right',

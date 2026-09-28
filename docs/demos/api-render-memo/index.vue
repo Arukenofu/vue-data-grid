@@ -10,10 +10,10 @@ import { MemoRows } from './MemoRows';
 const column = defineColumn<Stock>();
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 90, cellClass: () => 'ui-cell-mono' }),
-	name: column(stock => stock.name, { label: 'Company', width: 170, flex: 1 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 120 }),
-	price: column(stock => stock.price, { label: 'Price', width: 100, align: 'right', format: price => price.toFixed(2) }),
+	symbol: column('symbol', { label: 'Symbol', width: 90, cellClass: () => 'ui-cell-mono' }),
+	name: column('name', { label: 'Company', width: 170, flex: 1 }),
+	sector: column('sector', { label: 'Sector', width: 120 }),
+	price: column('price', { label: 'Price', width: 100, align: 'right', format: price => price.toFixed(2) }),
 });
 
 const rows = shallowRef<readonly Stock[]>(stocks);

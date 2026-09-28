@@ -21,11 +21,11 @@ import { UiButton, UiToolbar } from '@/ui';
 const column = defineColumn<Stock>({ resizable: true, minWidth: 70 });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 100 }),
-	name: column(stock => stock.name, { label: 'Company', width: 200, maxWidth: 320 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 130 }),
-	price: column(stock => stock.price, { label: 'Price', width: 110, align: 'right', format: price => price.toFixed(2) }),
-	volume: column(stock => stock.volume, {
+	symbol: column('symbol', { label: 'Symbol', width: 100 }),
+	name: column('name', { label: 'Company', width: 200, maxWidth: 320 }),
+	sector: column('sector', { label: 'Sector', width: 130 }),
+	price: column('price', { label: 'Price', width: 110, align: 'right', format: price => price.toFixed(2) }),
+	volume: column('volume', {
 		label: 'Volume',
 		width: 130,
 		align: 'right',

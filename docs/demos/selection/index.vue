@@ -36,16 +36,16 @@ const column = defineColumn<Order>();
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	id: column(order => order.id, { label: 'Order', width: 84, cellClass: () => 'ui-cell-mono' }),
-	customer: column(order => order.customer, { label: 'Customer', width: 140 }),
-	city: column(order => order.city, { label: 'City', width: 96 }),
-	status: column(order => order.status, {
+	id: column('id', { label: 'Order', width: 84, cellClass: () => 'ui-cell-mono' }),
+	customer: column('customer', { label: 'Customer', width: 140 }),
+	city: column('city', { label: 'City', width: 96 }),
+	status: column('status', {
 		label: 'Status',
 		width: 112,
 		format: status => STATUS[status].label,
 	}),
-	items: column(order => order.items, { label: 'Items', width: 64, align: 'right' }),
-	total: column(order => order.total, { label: 'Total', width: 96, align: 'right', format: total => money.format(total) }),
+	items: column('items', { label: 'Items', width: 64, align: 'right' }),
+	total: column('total', { label: 'Total', width: 96, align: 'right', format: total => money.format(total) }),
 });
 
 const orders = shallowRef<readonly Order[]>(createOrders(36));

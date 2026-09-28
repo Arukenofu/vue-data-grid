@@ -25,7 +25,7 @@ for every column, and the name column opts out of hiding:
 const column = defineColumn<Person>({ resizable: true, movable: true, hideable: true, pinnable: true });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', pinned: 'start', hideable: false }),
+	name: column('name', { label: 'Name', pinned: 'start', hideable: false }),
 	// …
 });
 ```

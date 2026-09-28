@@ -24,9 +24,9 @@ const column = defineColumn<Stock>({ sortable: true });
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 90 }),
-	name: column(stock => stock.name, { label: 'Company', width: 150, flex: 1 }),
-	price: column(stock => stock.price, { label: 'Price', width: 90, align: 'right', format: price => price.toFixed(2) }),
+	symbol: column('symbol', { label: 'Symbol', width: 90 }),
+	name: column('name', { label: 'Company', width: 150, flex: 1 }),
+	price: column('price', { label: 'Price', width: 90, align: 'right', format: price => price.toFixed(2) }),
 });
 
 const grid = useDataGrid({

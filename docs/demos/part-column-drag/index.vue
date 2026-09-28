@@ -30,10 +30,10 @@ const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFra
 const column = defineColumn<Stock>({ movable: true });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 96, pinned: 'start', movable: false }),
-	name: column(stock => stock.name, { label: 'Company', width: 170 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 120 }),
-	price: column(stock => stock.price, { label: 'Price', width: 96, align: 'right', format: price => `$${price.toFixed(2)}` }),
+	symbol: column('symbol', { label: 'Symbol', width: 96, pinned: 'start', movable: false }),
+	name: column('name', { label: 'Company', width: 170 }),
+	sector: column('sector', { label: 'Sector', width: 120 }),
+	price: column('price', { label: 'Price', width: 96, align: 'right', format: price => `$${price.toFixed(2)}` }),
 	change: column(getChange, {
 		label: 'Change',
 		width: 96,
@@ -41,7 +41,7 @@ const columns = defineColumns({
 		format: change => `${change > 0 ? '+' : ''}${change.toFixed(2)}%`,
 		cellClass: ({ value }) => (value < 0 ? 'ui-cell-down' : 'ui-cell-up'),
 	}),
-	volume: column(stock => stock.volume, { label: 'Volume', width: 96, align: 'right', format: volume => compact.format(volume) }),
+	volume: column('volume', { label: 'Volume', width: 96, align: 'right', format: volume => compact.format(volume) }),
 });
 
 const grid = useDataGrid({

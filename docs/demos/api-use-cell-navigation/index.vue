@@ -25,9 +25,9 @@ const column = defineColumn<Task>();
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	title: column(task => task.title, { label: 'Task', width: 220 }),
-	assignee: column(task => task.assignee, { label: 'Assignee', flex: 1, width: 130 }),
-	due: column(task => task.due, { label: 'Due', width: 90, format: formatDay }),
+	title: column('title', { label: 'Task', width: 220 }),
+	assignee: column('assignee', { label: 'Assignee', flex: 1, width: 130 }),
+	due: column('due', { label: 'Due', width: 90, format: formatDay }),
 	actions: column(() => null, {
 		label: 'Actions',
 		kind: 'service',

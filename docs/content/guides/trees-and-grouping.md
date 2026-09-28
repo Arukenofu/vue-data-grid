@@ -44,8 +44,8 @@ indent for the row's level and a toggle for a group, then the column's own conte
 import { tree, treeColumn } from '@vue-data-grid/core';
 
 const columns = defineColumns({
-	name: treeColumn(column(member => member.name, { label: 'Name', width: 240 })),
-	title: column(member => member.title, { label: 'Title' }),
+	name: treeColumn(column('name', { label: 'Name', width: 240 })),
+	title: column('title', { label: 'Title' }),
 });
 ```
 

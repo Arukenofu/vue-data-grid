@@ -12,11 +12,11 @@ const people = createPeople(400, 23);
 const column = defineColumn<Person>({ sortable: true, resizable: true, width: 110, minWidth: 60 });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name' }),
-	email: column(person => person.email, { label: 'Email' }),
-	role: column(person => person.role, { label: 'Role' }),
-	team: column(person => person.team, { label: 'Team' }),
-	location: column(person => person.location, { label: 'Office' }),
+	name: column('name', { label: 'Name' }),
+	email: column('email', { label: 'Email' }),
+	role: column('role', { label: 'Role' }),
+	team: column('team', { label: 'Team' }),
+	location: column('location', { label: 'Office' }),
 });
 
 const grid = useDataGrid({

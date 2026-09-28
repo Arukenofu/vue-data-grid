@@ -24,11 +24,11 @@ import { UiButton, UiSwitch, UiToolbar } from '@/ui';
 const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 170, sortOrder: ['asc', 'desc'] }),
-	team: column(person => person.team, { label: 'Team', width: 150, sortOrder: ['asc', 'desc'] }),
-	location: column(person => person.location, { label: 'Location', width: 130, flex: 1, sortOrder: ['asc', 'desc'] }),
-	projects: column(person => person.projects, { label: 'Projects', width: 120, align: 'right' }),
-	rating: column(person => person.rating, { label: 'Rating', width: 110, align: 'right', format: rating => rating.toFixed(1) }),
+	name: column('name', { label: 'Name', width: 170, sortOrder: ['asc', 'desc'] }),
+	team: column('team', { label: 'Team', width: 150, sortOrder: ['asc', 'desc'] }),
+	location: column('location', { label: 'Location', width: 130, flex: 1, sortOrder: ['asc', 'desc'] }),
+	projects: column('projects', { label: 'Projects', width: 120, align: 'right' }),
+	rating: column('rating', { label: 'Rating', width: 110, align: 'right', format: rating => rating.toFixed(1) }),
 });
 
 const grid = useDataGrid({

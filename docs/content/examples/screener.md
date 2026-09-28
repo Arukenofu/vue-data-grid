@@ -126,7 +126,7 @@ renders the result. Because `aggregate` comes before `footer` in the object, the
 is typed: `number | null` for `'avg'` and `'sum'`.
 
 ```ts
-volume: column(stock => stock.volume, {
+volume: column('volume', {
 	label: 'Volume',
 	align: 'right',
 	format: formatVolume,

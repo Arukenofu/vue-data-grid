@@ -47,7 +47,7 @@ import { selection, selectionColumn, useDataGrid } from '@vue-data-grid/core';
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	name: column(person => person.name, { label: 'Name' }),
+	name: column('name', { label: 'Name' }),
 });
 
 const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 40, features: { selection: selection() } });

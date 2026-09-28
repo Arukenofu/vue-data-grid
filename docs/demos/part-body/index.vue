@@ -34,16 +34,16 @@ const day = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', t
 const column = defineColumn<Task>();
 
 const columns = defineColumns({
-	title: column(task => task.title, {
+	title: column('title', {
 		label: 'Task',
 		width: 240,
 		flex: 1,
 		cellClass: ({ row }) => (row.status === 'done' ? 'task-done' : undefined),
 	}),
-	status: column(task => task.status, { label: 'Status', width: 124 }),
-	assignee: column(task => task.assignee, { label: 'Assignee', width: 160 }),
-	progress: column(task => task.progress, { label: 'Progress', width: 150 }),
-	due: column(task => task.due, {
+	status: column('status', { label: 'Status', width: 124 }),
+	assignee: column('assignee', { label: 'Assignee', width: 160 }),
+	progress: column('progress', { label: 'Progress', width: 150 }),
+	due: column('due', {
 		label: 'Due',
 		width: 90,
 		align: 'right',

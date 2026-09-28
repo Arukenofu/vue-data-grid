@@ -64,11 +64,11 @@ function shuffled<TItem>(items: readonly TItem[]) {
 const column = defineColumn<Player>({ sortable: true, resizable: true, movable: true });
 
 const columns = defineColumns({
-	number: column(player => player.number, { label: '#', width: 56, sortable: false, format: value => `#${value}` }),
-	name: column(player => player.name, { label: 'Player', width: 150, flex: 1 }),
-	team: column(player => player.team, { label: 'Team', width: 110 }),
-	wins: column(player => player.wins, { label: 'Wins', width: 80, align: 'right' }),
-	points: column(player => player.points, {
+	number: column('number', { label: '#', width: 56, sortable: false, format: value => `#${value}` }),
+	name: column('name', { label: 'Player', width: 150, flex: 1 }),
+	team: column('team', { label: 'Team', width: 110 }),
+	wins: column('wins', { label: 'Wins', width: 80, align: 'right' }),
+	points: column('points', {
 		label: 'Points',
 		width: 100,
 		align: 'right',

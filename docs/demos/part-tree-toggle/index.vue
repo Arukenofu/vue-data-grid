@@ -46,7 +46,7 @@ const sizes = new Map(files.map(file => [file.id, measure(file)]));
 const column = defineColumn<FileEntry>();
 
 const columns = defineColumns({
-	name: column(file => file.name, {
+	name: column('name', {
 		label: 'Name',
 		width: 280,
 		flex: 1,
@@ -58,7 +58,7 @@ const columns = defineColumns({
 		align: 'right',
 		format: size => formatSize(size),
 	}),
-	modified: column(file => file.modified, {
+	modified: column('modified', {
 		label: 'Modified',
 		width: 140,
 		format: modified => day.format(new Date(modified)),

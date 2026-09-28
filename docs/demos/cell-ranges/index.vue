@@ -17,11 +17,11 @@ function amount(value: number) {
 const column = defineColumn<BudgetLine>();
 
 const columns = defineColumns({
-	team: column(line => line.team, { label: 'Team', width: 120, pinned: 'start', pinnable: true }),
-	q1: column(line => line.q1, { label: 'Q1', width: 100, align: 'right', format: amount }),
-	q2: column(line => line.q2, { label: 'Q2', width: 100, align: 'right', format: amount }),
-	q3: column(line => line.q3, { label: 'Q3', width: 100, align: 'right', format: amount }),
-	q4: column(line => line.q4, { label: 'Q4', width: 100, align: 'right', format: amount }),
+	team: column('team', { label: 'Team', width: 120, pinned: 'start', pinnable: true }),
+	q1: column('q1', { label: 'Q1', width: 100, align: 'right', format: amount }),
+	q2: column('q2', { label: 'Q2', width: 100, align: 'right', format: amount }),
+	q3: column('q3', { label: 'Q3', width: 100, align: 'right', format: amount }),
+	q4: column('q4', { label: 'Q4', width: 100, align: 'right', format: amount }),
 	year: column(line => line.q1 + line.q2 + line.q3 + line.q4, {
 		label: 'Year',
 		width: 116,

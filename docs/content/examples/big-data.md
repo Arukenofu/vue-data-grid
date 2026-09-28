@@ -49,10 +49,10 @@ const metrics = Object.fromEntries(METRICS.map((metric, index) => [
 ]));
 
 const columns = defineColumns({
-	id: column(reading => reading.id, { label: '#', width: 88, pinned: 'start' }),
-	time: column(reading => reading.time, { label: 'Time', width: 136, align: 'left' }),
+	id: column('id', { label: '#', width: 88, pinned: 'start' }),
+	time: column('time', { label: 'Time', width: 136, align: 'left' }),
 	...metrics,
-	health: column(reading => reading.health, { label: 'Health', pinned: 'end' }),
+	health: column('health', { label: 'Health', pinned: 'end' }),
 });
 ```
 

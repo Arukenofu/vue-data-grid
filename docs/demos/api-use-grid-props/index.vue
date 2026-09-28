@@ -8,10 +8,10 @@ const MARKS = { asc: '▲', desc: '▼', none: '' } as const;
 const column = defineColumn<Task>({ sortable: true });
 
 const columns = defineColumns({
-	title: column(task => task.title, { label: 'Task', width: 250 }),
-	assignee: column(task => task.assignee, { label: 'Assignee', width: 150 }),
-	estimate: column(task => task.estimate, { label: 'Days', width: 90, align: 'right' }),
-	due: column(task => task.due, { label: 'Due', flex: 1, width: 120 }),
+	title: column('title', { label: 'Task', width: 250 }),
+	assignee: column('assignee', { label: 'Assignee', width: 150 }),
+	estimate: column('estimate', { label: 'Days', width: 90, align: 'right' }),
+	due: column('due', { label: 'Due', flex: 1, width: 120 }),
 });
 
 const grid = useDataGrid({

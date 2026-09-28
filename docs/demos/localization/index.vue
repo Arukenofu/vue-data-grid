@@ -27,15 +27,15 @@ function createColumns(locale: Locale) {
 
 	return defineColumns({
 		select: selectionColumn({ label: labels.selection }),
-		name: column(person => person.name, { label: labels.name, width: 140 }),
-		team: column(person => person.team, { label: labels.team, width: 112 }),
-		location: column(person => person.location, { label: labels.location, width: 100 }),
-		started: column(person => person.started, {
+		name: column('name', { label: labels.name, width: 140 }),
+		team: column('team', { label: labels.team, width: 112 }),
+		location: column('location', { label: labels.location, width: 100 }),
+		started: column('started', {
 			label: labels.started,
 			width: 124,
 			format: started => day.format(new Date(started)),
 		}),
-		salary: column(person => person.salary, {
+		salary: column('salary', {
 			label: labels.salary,
 			width: 112,
 			align: 'right',

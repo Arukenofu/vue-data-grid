@@ -51,8 +51,8 @@ header cells under it register themselves. Columns say whether they move:
 const column = defineColumn<Stock>({ movable: true });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', pinned: 'start', movable: false }),
-	name: column(stock => stock.name, { label: 'Company' }),
+	symbol: column('symbol', { label: 'Symbol', pinned: 'start', movable: false }),
+	name: column('name', { label: 'Company' }),
 });
 ```
 

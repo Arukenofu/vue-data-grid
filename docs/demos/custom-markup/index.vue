@@ -27,11 +27,11 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD
 const column = defineColumn<Invoice>({ sortable: true });
 
 const columns = defineColumns({
-	number: column(invoice => invoice.number, { label: 'Invoice', width: 110, cellClass: () => 'ui-cell-mono' }),
-	customer: column(invoice => invoice.customer, { label: 'Customer', width: 170, flex: 1 }),
-	issued: column(invoice => invoice.issued, { label: 'Issued', width: 110 }),
-	amount: column(invoice => invoice.amount, { label: 'Amount', width: 120, align: 'right', format: amount => money.format(amount) }),
-	status: column(invoice => invoice.status, { label: 'Status', width: 100 }),
+	number: column('number', { label: 'Invoice', width: 110, cellClass: () => 'ui-cell-mono' }),
+	customer: column('customer', { label: 'Customer', width: 170, flex: 1 }),
+	issued: column('issued', { label: 'Issued', width: 110 }),
+	amount: column('amount', { label: 'Amount', width: 120, align: 'right', format: amount => money.format(amount) }),
+	status: column('status', { label: 'Status', width: 100 }),
 });
 
 const grid = useDataGrid({

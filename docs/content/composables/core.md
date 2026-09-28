@@ -194,7 +194,7 @@ the row it is in.
 import { useCellChanges, useDataGrid } from '@vue-data-grid/core';
 
 const columns = defineColumns({
-	price: column(stock => stock.price, {
+	price: column('price', {
 		label: 'Price',
 		cellClass: ({ key }) => `flash-${changes.getChange(key, 'price')?.direction ?? 'none'}`,
 	}),

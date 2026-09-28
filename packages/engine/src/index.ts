@@ -19,6 +19,7 @@ export type {
 	ColumnDefaults,
 	ColumnExtension,
 	ColumnInput,
+	ColumnKey,
 	ColumnKind,
 	ColumnName,
 	ColumnPinSide,

@@ -37,10 +37,10 @@ const column = defineColumn<Track>();
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
-	number: column(track => track.number, { label: '#', width: 48, align: 'right', cellClass: () => 'ui-cell-muted' }),
-	title: column(track => track.title, { label: 'Title', width: 170, flex: 1, rowHeader: true }),
-	artist: column(track => track.artist, { label: 'Artist', width: 140 }),
-	time: column(track => track.seconds, { label: 'Time', width: 72, align: 'right', format: formatTime }),
+	number: column('number', { label: '#', width: 48, align: 'right', cellClass: () => 'ui-cell-muted' }),
+	title: column('title', { label: 'Title', width: 170, flex: 1, rowHeader: true }),
+	artist: column('artist', { label: 'Artist', width: 140 }),
+	time: column('seconds', { label: 'Time', width: 72, align: 'right', format: formatTime }),
 });
 
 const playlist = shallowRef(tracks);

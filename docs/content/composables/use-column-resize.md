@@ -78,7 +78,7 @@ and End take the width to them.
 
 ```ts
 const columns = defineColumns({
-	name: column(row => row.name, { label: 'Name', width: 200, minWidth: 120, maxWidth: 360, resizable: true }),
+	name: column('name', { label: 'Name', width: 200, minWidth: 120, maxWidth: 360, resizable: true }),
 });
 ```
 

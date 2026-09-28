@@ -15,7 +15,7 @@ a label, a width, an alignment, and how to render its cells when plain text is n
 ## Defining columns
 
 `defineColumn` binds a column builder to your row type. Every column the builder makes knows what a
-row is, and infers its value type from the function you give it:
+row is, and reads its value by a key of the row, typed as that field:
 
 ```ts
 import { defineColumn, defineColumns } from '@vue-data-grid/core';
@@ -23,11 +23,15 @@ import { defineColumn, defineColumns } from '@vue-data-grid/core';
 const column = defineColumn<Invoice>();
 
 const columns = defineColumns({
-	number: column(invoice => invoice.number, { label: 'Invoice', width: 116 }),
-	customer: column(invoice => invoice.customer, { label: 'Customer', flex: 1 }),
-	amount: column(invoice => invoice.amount, { label: 'Amount', align: 'right' }),
+	number: column('number', { label: 'Invoice', width: 116 }),
+	customer: column('customer', { label: 'Customer', flex: 1 }),
+	amount: column('amount', { label: 'Amount', align: 'right' }),
 });
 ```
+
+A value the row does not hold as a field of its own is a function of the row, and its type is what
+the function returns: `column(invoice => invoice.customer.name, { label: 'Customer' })`. The two
+forms mix freely, and a key the row does not have fails to compile.
 
 `defineColumns` takes an object: its keys become the names of the columns, typed as literals, so a
 sort or a layout that names a column that does not exist fails to compile. The value of `amount` is
@@ -52,7 +56,7 @@ It warns about it in development. Keep the declarations at the top of the module
 <PropsTable
 	label="Field"
 	:data="[
-		{ name: 'value', type: '(row: TRow) => TValue', required: true, description: 'Reads the value of the cell from the row.' },
+		{ name: 'value', type: '(row: TRow) => TValue', required: true, description: 'Reads the value of the cell from the row. The builder takes it first, as a key of the row or a function.' },
 		{ name: 'label', type: 'string', description: 'The name of the column for people: the header text, the CSV header, the names of its controls. The column name without it.' },
 		{ name: 'format', type: '(value: TValue, row: TRow) => string', description: 'The value as text: what the default cell shows, what CSV, copying and autosize read. `String(value)` by default, and `\'\'` for `null` and `undefined`.' },
 		{ name: 'equals', type: '(current: TValue, next: TValue) => boolean', description: 'Equality for values that arrive as new objects, such as dates. `Object.is` by default.' },
@@ -99,8 +103,8 @@ import { defineColumn, defineColumns, GridCellTemplate, useDataGrid } from '@vue
 const column = defineColumn<Invoice>();
 
 const columns = defineColumns({
-	customer: column(invoice => invoice.customer, { label: 'Customer', flex: 1 }),
-	status: column(invoice => invoice.status, { label: 'Status', format: status => STATUS[status].label }),
+	customer: column('customer', { label: 'Customer', flex: 1 }),
+	status: column('status', { label: 'Status', format: status => STATUS[status].label }),
 });
 
 const grid = useDataGrid({ columns, rows: invoices, rowKey: 'id', rowHeight: 52 });
@@ -149,7 +153,7 @@ own scoped CSS.
 depends on the value, such as a negative amount in red:
 
 ```ts
-amount: column(invoice => invoice.amount, {
+amount: column('amount', {
 	cellClass: ({ value }) => (value < 0 ? 'negative' : undefined),
 }),
 ```
@@ -161,7 +165,7 @@ the column and its sort state. `GridFooterTemplate` renders the footer cell. Wit
 the footer receives the total of the column over the rows, typed by the aggregate:
 
 ```ts
-amount: column(invoice => invoice.amount, { label: 'Amount', aggregate: 'sum' }),
+amount: column('amount', { label: 'Amount', aggregate: 'sum' }),
 ```
 
 ```vue

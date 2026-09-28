@@ -40,10 +40,10 @@ const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFra
 const column = defineColumn<Stock>({ sortable: true, resizable: true, movable: true });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 116, pinned: 'start', movable: false }),
-	name: column(stock => stock.name, { label: 'Company', width: 190, flex: 1 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 140 }),
-	price: column(stock => stock.price, {
+	symbol: column('symbol', { label: 'Symbol', width: 116, pinned: 'start', movable: false }),
+	name: column('name', { label: 'Company', width: 190, flex: 1 }),
+	sector: column('sector', { label: 'Sector', width: 140 }),
+	price: column('price', {
 		label: 'Price',
 		width: 112,
 		align: 'right',
@@ -55,7 +55,7 @@ const columns = defineColumns({
 		align: 'right',
 		format: change => `${change > 0 ? '+' : ''}${change.toFixed(2)}%`,
 	}),
-	volume: column(stock => stock.volume, {
+	volume: column('volume', {
 		label: 'Volume',
 		width: 112,
 		align: 'right',

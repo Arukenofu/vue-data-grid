@@ -104,7 +104,7 @@ default. Names read better ascending first:
 
 ```ts
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', sortable: true, sortOrder: ['asc', 'desc'] }),
+	name: column('name', { label: 'Name', sortable: true, sortOrder: ['asc', 'desc'] }),
 });
 ```
 

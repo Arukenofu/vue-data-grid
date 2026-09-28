@@ -43,15 +43,15 @@ function revenue(value: (sale: ProductSales) => number, label: string) {
 }
 
 const columns = defineColumns({
-	product: column(sale => sale.product, { label: 'Name', width: 130, align: 'left' }),
-	category: column(sale => sale.category, { label: 'Category', width: 116, align: 'left' }),
+	product: column('product', { label: 'Name', width: 130, align: 'left' }),
+	category: column('category', { label: 'Category', width: 116, align: 'left' }),
 	q1: revenue(sale => sale.q1, 'Q1'),
 	q2: revenue(sale => sale.q2, 'Q2'),
 	h1: revenue(sale => sale.q1 + sale.q2, 'Total'),
 	q3: revenue(sale => sale.q3, 'Q3'),
 	q4: revenue(sale => sale.q4, 'Q4'),
 	h2: revenue(sale => sale.q3 + sale.q4, 'Total'),
-	margin: column(sale => sale.margin, { label: 'Margin', format: margin => `${Math.round(margin * 100)}%` }),
+	margin: column('margin', { label: 'Margin', format: margin => `${Math.round(margin * 100)}%` }),
 });
 
 const groups = defineColumnGroups({

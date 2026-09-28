@@ -13,11 +13,11 @@ const column = defineColumn<Song>();
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
-	number: column(song => song.number, { label: '#', width: 48, align: 'right', cellClass: () => 'ui-cell-muted' }),
-	title: column(song => song.title, { label: 'Title', flex: 1, width: 180, rowHeader: true }),
-	artist: column(song => song.artist, { label: 'Artist', width: 140 }),
-	album: column(song => song.album, { label: 'Album', width: 130 }),
-	length: column(song => song.seconds, { label: 'Length', width: 90, align: 'right', format: formatDuration }),
+	number: column('number', { label: '#', width: 48, align: 'right', cellClass: () => 'ui-cell-muted' }),
+	title: column('title', { label: 'Title', flex: 1, width: 180, rowHeader: true }),
+	artist: column('artist', { label: 'Artist', width: 140 }),
+	album: column('album', { label: 'Album', width: 130 }),
+	length: column('seconds', { label: 'Length', width: 90, align: 'right', format: formatDuration }),
 });
 
 const grid = useDataGrid({

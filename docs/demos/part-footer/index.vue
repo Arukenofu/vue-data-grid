@@ -37,7 +37,7 @@ const count = new Intl.NumberFormat('en-US');
 const column = defineColumn<Sale>({ width: 120, align: 'right' });
 
 const columns = defineColumns({
-	product: column(sale => sale.product, {
+	product: column('product', {
 		label: 'Product',
 		width: 150,
 		flex: 1,
@@ -45,21 +45,21 @@ const columns = defineColumns({
 		aggregate: 'count',
 		footer: ({ aggregate }) => `${aggregate} sales`,
 	}),
-	region: column(sale => sale.region, { label: 'Region', width: 130, align: 'left' }),
-	quarter: column(sale => sale.quarter, { label: 'Quarter', width: 90, align: 'left' }),
-	units: column(sale => sale.units, {
+	region: column('region', { label: 'Region', width: 130, align: 'left' }),
+	quarter: column('quarter', { label: 'Quarter', width: 90, align: 'left' }),
+	units: column('units', {
 		label: 'Units',
 		width: 90,
 		aggregate: 'sum',
 		footer: ({ aggregate }) => count.format(aggregate ?? 0),
 	}),
-	revenue: column(sale => sale.revenue, {
+	revenue: column('revenue', {
 		label: 'Revenue',
 		format: revenue => money.format(revenue),
 		aggregate: 'sum',
 		footer: ({ aggregate }) => money.format(aggregate ?? 0),
 	}),
-	cost: column(sale => sale.cost, {
+	cost: column('cost', {
 		label: 'Cost',
 		format: cost => money.format(cost),
 		aggregate: 'sum',

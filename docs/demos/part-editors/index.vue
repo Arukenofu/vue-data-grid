@@ -49,20 +49,20 @@ function checkAmount(amount: number | null) {
 const column = defineColumn<Product>({ editable: true });
 
 const columns = defineColumns({
-	name: column(product => product.name, {
+	name: column('name', {
 		label: 'Product',
 		width: 170,
 		setValue: (product, name) => ({ ...product, name }),
 		validate: name => (name.trim() === '' ? 'A product needs a name' : undefined),
 	}),
-	category: column(product => product.category, {
+	category: column('category', {
 		label: 'Category',
 		width: 130,
 		format: labelOf,
 		editor: selectEditor({ options: CATEGORIES }),
 		setValue: (product, category) => ({ ...product, category }),
 	}),
-	price: column(product => product.price, {
+	price: column('price', {
 		label: 'Price',
 		width: 104,
 		align: 'right',
@@ -71,7 +71,7 @@ const columns = defineColumns({
 		setValue: (product, price) => ({ ...product, price }),
 		validate: checkAmount,
 	}),
-	stock: column(product => product.stock, {
+	stock: column('stock', {
 		label: 'Stock',
 		width: 80,
 		align: 'right',
@@ -79,7 +79,7 @@ const columns = defineColumns({
 		setValue: (product, stock) => ({ ...product, stock }),
 		validate: checkAmount,
 	}),
-	restock: column(product => product.restock, {
+	restock: column('restock', {
 		label: 'Restock',
 		width: 136,
 		typing: 'value',
@@ -87,14 +87,14 @@ const columns = defineColumns({
 		format: restock => (restock === null ? '—' : day.format(new Date(restock))),
 		setValue: (product, restock) => ({ ...product, restock }),
 	}),
-	published: column(product => product.published, {
+	published: column('published', {
 		label: 'Live',
 		width: 64,
 		align: 'center',
 		...checkboxField(),
 		setValue: (product, published) => ({ ...product, published }),
 	}),
-	notes: column(product => product.notes, {
+	notes: column('notes', {
 		label: 'Notes',
 		width: 180,
 		flex: 1,

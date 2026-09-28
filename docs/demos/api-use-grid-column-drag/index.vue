@@ -9,10 +9,10 @@ import { UiButton, UiDataGrid, UiToolbar } from '@/ui';
 const column = defineColumn<Stock>({ movable: true });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 100, movable: false, pinned: 'start' }),
-	name: column(stock => stock.name, { label: 'Company', width: 190 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 130 }),
-	price: column(stock => stock.price, { label: 'Price', width: 100, align: 'right', format: price => price.toFixed(2) }),
+	symbol: column('symbol', { label: 'Symbol', width: 100, movable: false, pinned: 'start' }),
+	name: column('name', { label: 'Company', width: 190 }),
+	sector: column('sector', { label: 'Sector', width: 130 }),
+	price: column('price', { label: 'Price', width: 100, align: 'right', format: price => price.toFixed(2) }),
 	change: column(stock => getChange(stock), {
 		label: 'Change',
 		width: 100,
@@ -20,7 +20,7 @@ const columns = defineColumns({
 		format: change => `${change > 0 ? '+' : ''}${change.toFixed(2)}%`,
 		cellClass: ({ value }) => (value >= 0 ? 'ui-cell-up' : 'ui-cell-down'),
 	}),
-	volume: column(stock => stock.volume, {
+	volume: column('volume', {
 		label: 'Volume',
 		width: 120,
 		align: 'right',

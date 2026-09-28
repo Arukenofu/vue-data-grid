@@ -38,16 +38,16 @@ const column = defineColumn<Release>({ sortable: true, movable: true, resizable:
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	version: column(release => release.version, {
+	version: column('version', {
 		label: 'Version',
 		width: 100,
 	}),
-	service: column(release => release.service, { label: 'Service', width: 110, flex: 1 }),
-	status: column(release => release.status, {
+	service: column('service', { label: 'Service', width: 110, flex: 1 }),
+	status: column('status', {
 		label: 'Build',
 		width: 104,
 	}),
-	approved: column(release => release.approved, {
+	approved: column('approved', {
 		label: 'Approved',
 		width: 106,
 		align: 'center',

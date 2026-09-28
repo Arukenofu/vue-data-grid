@@ -35,16 +35,16 @@ import { defineColumn, defineColumns, numberField, selectEditor } from '@vue-dat
 const column = defineColumn<Product>({ editable: true });
 
 const columns = defineColumns({
-	name: column(product => product.name, {
+	name: column('name', {
 		label: 'Product',
 		setValue: (product, name) => ({ ...product, name }),
 	}),
-	category: column(product => product.category, {
+	category: column('category', {
 		label: 'Category',
 		editor: selectEditor({ options: categories }),
 		setValue: (product, category) => ({ ...product, category }),
 	}),
-	price: column(product => product.price, {
+	price: column('price', {
 		label: 'Price',
 		...numberField({ min: 0, digits: 2 }),
 		setValue: (product, price) => ({ ...product, price }),
@@ -211,7 +211,7 @@ What an editor of your own renders from: the cell context and the draft.
 An invalid draft keeps the editor open, marked `aria-invalid`, with the error under it:
 
 ```ts
-price: column(product => product.price, {
+price: column('price', {
 	label: 'Price',
 	...numberField({ min: 0 }),
 	setValue: (product, price) => ({ ...product, price }),
@@ -258,7 +258,7 @@ of Reka UI: a field of segments, and a calendar that opens with it. It is a comp
 which takes the editor context as a prop, and a `GridEditorTemplate` renders it:
 
 ```ts
-restock: column(product => product.restock, {
+restock: column('restock', {
 	label: 'Restock',
 	typing: 'value',
 	parse: parseDay,

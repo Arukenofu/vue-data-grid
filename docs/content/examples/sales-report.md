@@ -152,7 +152,7 @@ computes it from the rows it gets, and renders the same bar as the cells of the 
 A total that is text stays a `footer` field of the column, a function of the same context:
 
 ```ts
-revenue: column(row => row.revenue, {
+revenue: column('revenue', {
 	label: 'Revenue',
 	aggregate: 'sum',
 	format: revenue => money.format(revenue),

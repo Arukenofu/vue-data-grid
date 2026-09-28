@@ -17,10 +17,10 @@ import { UiDataGrid } from '@/ui';
 const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 130 }),
-	team: column(person => person.team, { label: 'Team', width: 100 }),
-	location: column(person => person.location, { label: 'Location', width: 90, flex: 1 }),
-	projects: column(person => person.projects, { label: 'Projects', width: 80, align: 'right' }),
+	name: column('name', { label: 'Name', width: 130 }),
+	team: column('team', { label: 'Team', width: 100 }),
+	location: column('location', { label: 'Location', width: 90, flex: 1 }),
+	projects: column('projects', { label: 'Projects', width: 80, align: 'right' }),
 });
 
 const grid = useDataGrid({

@@ -33,7 +33,7 @@ function month(name: Month, label: string) {
 }
 
 const columns = defineColumns({
-	channel: column(line => line.channel, { label: 'Channel', width: 140 }),
+	channel: column('channel', { label: 'Channel', width: 140 }),
 	jan: month('jan', 'Jan'),
 	feb: month('feb', 'Feb'),
 	mar: month('mar', 'Mar'),

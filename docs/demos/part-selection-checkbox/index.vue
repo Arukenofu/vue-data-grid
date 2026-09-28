@@ -42,9 +42,9 @@ const column = defineColumn<Person>();
 
 const columns = defineColumns({
 	select: column(() => null, { kind: 'service', label: 'Select', width: 48, align: 'center', pinned: 'start' }),
-	name: column(person => person.name, { label: 'Name', width: 170 }),
-	role: column(person => person.role, { label: 'Role', width: 180, flex: 1 }),
-	presence: column(person => person.presence, {
+	name: column('name', { label: 'Name', width: 170 }),
+	role: column('role', { label: 'Role', width: 180, flex: 1 }),
+	presence: column('presence', {
 		label: 'Status',
 		width: 120,
 	}),

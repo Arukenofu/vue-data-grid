@@ -28,10 +28,10 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD
 const column = defineColumn<Person>({ sortable: true, sortOrder: ['asc', 'desc'] });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 170 }),
-	team: column(person => person.team, { label: 'Team', width: 130 }),
-	location: column(person => person.location, { label: 'Office', width: 120 }),
-	salary: column(person => person.salary, {
+	name: column('name', { label: 'Name', width: 170 }),
+	team: column('team', { label: 'Team', width: 130 }),
+	location: column('location', { label: 'Office', width: 120 }),
+	salary: column('salary', {
 		label: 'Salary',
 		width: 120,
 		align: 'right',

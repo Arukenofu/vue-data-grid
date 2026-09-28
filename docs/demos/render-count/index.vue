@@ -30,9 +30,9 @@ const column = defineColumn<Stock>({ sortable: true, resizable: true });
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 90 }),
-	name: column(stock => stock.name, { label: 'Company', width: 170, flex: 1 }),
-	price: column(stock => stock.price, {
+	symbol: column('symbol', { label: 'Symbol', width: 90 }),
+	name: column('name', { label: 'Company', width: 170, flex: 1 }),
+	price: column('price', {
 		label: 'Price',
 		width: 100,
 		align: 'right',
@@ -45,7 +45,7 @@ const columns = defineColumns({
 		format: change => `${change > 0 ? '+' : ''}${change.toFixed(2)}%`,
 		cellClass: ({ value }) => (value >= 0 ? 'tone-up' : 'tone-down'),
 	}),
-	volume: column(stock => stock.volume, {
+	volume: column('volume', {
 		label: 'Volume',
 		width: 110,
 		align: 'right',

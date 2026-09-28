@@ -57,20 +57,51 @@ export type ColumnBuilderFields<TRow, TValue, TMeta, TName extends AggregateName
 	aggregate?: TName | ((values: readonly TValue[], rows: readonly TRow[]) => TResult);
 };
 
-export type ColumnBuilder<TRow, TMeta = unknown> = <TValue, TName extends AggregateName = never, TResult = never>(
-	value: (row: TRow) => TValue,
-	rest?: ColumnBuilderFields<TRow, TValue, TMeta, TName, TResult>,
-) => ColumnInput<TRow, TValue, TMeta, NoInfer<ColumnBuilderAggregate<TRow, TValue, TName, TResult>>>;
+/** The keys of a row a column can read by name: its string keys. */
+export type ColumnKey<TRow> = keyof TRow & string;
 
 /**
- * A column builder bound to a row type. The value type is inferred from `value` at the builder call,
+ * A column builder: a call takes the value of the column, a key of the row such as `'price'` or a
+ * function of the row, and the other fields of the column. With a key the value is of the field's
+ * type, widened by what the other fields take, as with a function: `number | null` with the editor of
+ * `numberField()`, which can clear a cell.
+ */
+export interface ColumnBuilder<TRow, TMeta = unknown> {
+	// `TValue` only widens the field's type: the value read from the row always fits.
+	<TKey extends ColumnKey<TRow>, TValue = TRow[TKey], TName extends AggregateName = never, TResult = never>(
+		key: TKey,
+		rest?: ColumnBuilderFields<TRow, TValue | TRow[TKey], TMeta, TName, TResult>,
+	): ColumnInput<TRow, TValue | TRow[TKey], TMeta, NoInfer<ColumnBuilderAggregate<TRow, TValue | TRow[TKey], TName, TResult>>>;
+	<TValue, TName extends AggregateName = never, TResult = never>(
+		value: (row: TRow) => TValue,
+		rest?: ColumnBuilderFields<TRow, TValue, TMeta, TName, TResult>,
+	): ColumnInput<TRow, TValue, TMeta, NoInfer<ColumnBuilderAggregate<TRow, TValue, TName, TResult>>>;
+}
+
+/** The `value` of a column from a key of the row, read once when the column is declared. */
+function toValue<TRow>(value: ColumnKey<TRow> | ((row: TRow) => unknown)): (row: TRow) => unknown {
+	if (typeof value === 'function') {
+		return value;
+	}
+
+	return row => row[value];
+}
+
+/**
+ * A column builder bound to a row type. The value is a key of the row, `column('price')`, or a
+ * function of it, `column(row => row.price * row.quantity)`; its type is inferred at the builder call,
  * and then types `equals`, `format`, `compare` and the functions of `ColumnExtension`. The inferred
  * `aggregate` reaches `ColumnExtension` too; a function `aggregate` does so for the fields after it
  * in the object. `defaults` go into every column the builder makes, such as the same rights for the
  * whole grid.
  */
 export function defineColumn<TRow, TMeta = unknown>(defaults?: ColumnDefaults): ColumnBuilder<TRow, TMeta> {
-	return ((value, rest) => ({ ...defaults, ...rest, value })) as ColumnBuilder<TRow, TMeta>;
+	function build(value: ColumnKey<TRow> | ((row: TRow) => unknown), rest?: object) {
+		return { ...defaults, ...rest, value: toValue(value) };
+	}
+
+	// The two call signatures of the builder are one function here; each types its own call.
+	return build as ColumnBuilder<TRow, TMeta>;
 }
 
 /**

@@ -29,10 +29,10 @@ const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFra
 const column = defineColumn<Stock>({ movable: true });
 
 const columns = defineColumns({
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 84, cellClass: () => 'ui-cell-mono ui-cell-strong' }),
-	name: column(stock => stock.name, { label: 'Company', width: 160 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 110 }),
-	price: column(stock => stock.price, { label: 'Price', width: 88, align: 'right', format: price => price.toFixed(2) }),
+	symbol: column('symbol', { label: 'Symbol', width: 84, cellClass: () => 'ui-cell-mono ui-cell-strong' }),
+	name: column('name', { label: 'Company', width: 160 }),
+	sector: column('sector', { label: 'Sector', width: 110 }),
+	price: column('price', { label: 'Price', width: 88, align: 'right', format: price => price.toFixed(2) }),
 	change: column(stock => getChange(stock), {
 		label: 'Change',
 		width: 86,
@@ -40,7 +40,7 @@ const columns = defineColumns({
 		format: change => `${change > 0 ? '+' : ''}${change.toFixed(2)}%`,
 		cellClass: ({ value }) => (value >= 0 ? 'ui-cell-up' : 'ui-cell-down'),
 	}),
-	volume: column(stock => stock.volume, { label: 'Volume', width: 90, align: 'right', format: volume => compact.format(volume) }),
+	volume: column('volume', { label: 'Volume', width: 90, align: 'right', format: volume => compact.format(volume) }),
 });
 
 const indicator = shallowRef<DragIndicator>('gap');

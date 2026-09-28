@@ -13,9 +13,9 @@ const team = people.slice(0, CARD_COUNT);
 const column = defineColumn<Person>();
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name' }),
-	role: column(person => person.role, { label: 'Role' }),
-	email: column(person => person.email, { label: 'Email' }),
+	name: column('name', { label: 'Name' }),
+	role: column('role', { label: 'Role' }),
+	email: column('email', { label: 'Email' }),
 });
 
 const selection = useRowSelection({ rows: team, rowKey: 'id' });

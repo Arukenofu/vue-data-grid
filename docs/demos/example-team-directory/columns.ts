@@ -31,7 +31,7 @@ const column = defineColumn<Person>({ sortable: true, resizable: true, movable: 
 
 export const columns = defineColumns({
 	select: selectionColumn(),
-	name: column(person => person.name, {
+	name: column('name', {
 		label: 'Name',
 		width: 250,
 		pinned: 'start',
@@ -39,20 +39,20 @@ export const columns = defineColumns({
 		movable: false,
 		hideable: false,
 	}),
-	role: column(person => person.role, { label: 'Role', width: 190 }),
-	team: column(person => person.team, {
+	role: column('role', { label: 'Role', width: 190 }),
+	team: column('team', {
 		label: 'Team',
 		width: 130,
 	}),
-	location: column(person => person.location, { label: 'Location', width: 120 }),
-	presence: column(person => person.presence, {
+	location: column('location', { label: 'Location', width: 120 }),
+	presence: column('presence', {
 		label: 'Status',
 		width: 116,
 	}),
-	started: column(person => person.started, { label: 'Started', width: 116, format: formatMonth }),
-	projects: column(person => person.projects, { label: 'Projects', width: 100, align: 'right' }),
-	rating: column(person => person.rating, { label: 'Rating', width: 96, align: 'right', format: rating => rating.toFixed(1) }),
-	salary: column(person => person.salary, {
+	started: column('started', { label: 'Started', width: 116, format: formatMonth }),
+	projects: column('projects', { label: 'Projects', width: 100, align: 'right' }),
+	rating: column('rating', { label: 'Rating', width: 96, align: 'right', format: rating => rating.toFixed(1) }),
+	salary: column('salary', {
 		label: 'Salary',
 		width: 120,
 		align: 'right',

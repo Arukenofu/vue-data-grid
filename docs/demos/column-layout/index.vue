@@ -21,14 +21,14 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD
 const column = defineColumn<Person>({ resizable: true, movable: true, hideable: true, pinnable: true });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 160, pinned: 'start', hideable: false }),
-	email: column(person => person.email, { label: 'Email', width: 200 }),
-	team: column(person => person.team, { label: 'Team', width: 120 }),
-	role: column(person => person.role, { label: 'Role', width: 170 }),
-	location: column(person => person.location, { label: 'Location', width: 110 }),
-	started: column(person => person.started, { label: 'Started', width: 110, hiddenByDefault: true }),
-	projects: column(person => person.projects, { label: 'Projects', width: 96, align: 'right' }),
-	salary: column(person => person.salary, { label: 'Salary', width: 110, align: 'right', format: salary => money.format(salary) }),
+	name: column('name', { label: 'Name', width: 160, pinned: 'start', hideable: false }),
+	email: column('email', { label: 'Email', width: 200 }),
+	team: column('team', { label: 'Team', width: 120 }),
+	role: column('role', { label: 'Role', width: 170 }),
+	location: column('location', { label: 'Location', width: 110 }),
+	started: column('started', { label: 'Started', width: 110, hiddenByDefault: true }),
+	projects: column('projects', { label: 'Projects', width: 96, align: 'right' }),
+	salary: column('salary', { label: 'Salary', width: 110, align: 'right', format: salary => money.format(salary) }),
 });
 
 const grid = useDataGrid({

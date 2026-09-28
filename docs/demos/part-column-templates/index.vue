@@ -33,11 +33,11 @@ const PRIORITY: Readonly<Record<Priority, BadgeTone>> = {
 const column = defineColumn<Task>({ sortable: true });
 
 const columns = defineColumns({
-	title: column(task => task.title, { label: 'Task', width: 240, flex: 1 }),
-	assignee: column(task => task.assignee, { label: 'Owner', width: 170 }),
-	priority: column(task => task.priority, { label: 'Priority', width: 110 }),
-	progress: column(task => task.progress, { label: 'Progress', width: 150 }),
-	estimate: column(task => task.estimate, {
+	title: column('title', { label: 'Task', width: 240, flex: 1 }),
+	assignee: column('assignee', { label: 'Owner', width: 170 }),
+	priority: column('priority', { label: 'Priority', width: 110 }),
+	progress: column('progress', { label: 'Progress', width: 150 }),
+	estimate: column('estimate', {
 		label: 'Days',
 		width: 80,
 		align: 'right',

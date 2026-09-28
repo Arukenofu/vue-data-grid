@@ -107,7 +107,7 @@ more than using one:
 const money = new Intl.NumberFormat(locale.tag, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const day = new Intl.DateTimeFormat(locale.tag, { dateStyle: 'short', timeZone: 'UTC' });
 
-salary: column(person => person.salary, { format: salary => money.format(salary) }),
+salary: column('salary', { format: salary => money.format(salary) }),
 ```
 
 Formatting changes only the text: sorting still compares the numbers and dates underneath. A fixed

@@ -25,12 +25,12 @@ const column = defineColumn<BudgetLine>({ editable: true });
 const money = (value: number | null) => (value === null ? '' : `$${value.toLocaleString('en-US')}`);
 
 const columns = defineColumns({
-	category: column(line => line.category, {
+	category: column('category', {
 		label: 'Category',
 		width: 160,
 		setValue: (line, category) => ({ ...line, category }),
 	}),
-	planned: column(line => line.planned, {
+	planned: column('planned', {
 		label: 'Planned',
 		width: 120,
 		align: 'right',
@@ -38,7 +38,7 @@ const columns = defineColumns({
 		...numberField({ min: 0, step: 100 }),
 		setValue: (line, planned) => ({ ...line, planned: planned ?? 0 }),
 	}),
-	spent: column(line => line.spent, {
+	spent: column('spent', {
 		label: 'Spent',
 		width: 120,
 		align: 'right',
@@ -46,7 +46,7 @@ const columns = defineColumns({
 		...numberField({ min: 0, step: 100 }),
 		setValue: (line, spent) => ({ ...line, spent: spent ?? 0 }),
 	}),
-	note: column(line => line.note, {
+	note: column('note', {
 		label: 'Note',
 		flex: 1,
 		width: 220,

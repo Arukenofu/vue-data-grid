@@ -26,10 +26,10 @@ const LATENCY = 1400;
 const column = defineColumn<Person>();
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 170 }),
-	role: column(person => person.role, { label: 'Role', width: 180, flex: 1 }),
-	team: column(person => person.team, { label: 'Team', width: 120 }),
-	location: column(person => person.location, { label: 'Location', width: 120 }),
+	name: column('name', { label: 'Name', width: 170 }),
+	role: column('role', { label: 'Role', width: 180, flex: 1 }),
+	team: column('team', { label: 'Team', width: 120 }),
+	location: column('location', { label: 'Location', width: 120 }),
 });
 
 const query = shallowRef('');

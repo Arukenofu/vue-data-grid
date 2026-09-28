@@ -26,7 +26,7 @@ with `setValue`:
 const column = defineColumn<Product>();
 
 const columns = defineColumns({
-	name: column(product => product.name, {
+	name: column('name', {
 		label: 'Product',
 		editable: true,
 		setValue: (product, name) => ({ ...product, name }),
@@ -96,7 +96,7 @@ The helpers ending in `Field` give several fields of the column at once, an `edi
 so spread them into it:
 
 ```ts
-price: column(product => product.price, {
+price: column('price', {
 	label: 'Price',
 	align: 'right',
 	editable: true,

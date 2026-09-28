@@ -24,8 +24,8 @@ import { defineColumn, defineColumns, selection, sorting, useDataGrid } from '@v
 const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 180 }),
-	salary: column(person => person.salary, { label: 'Salary', align: 'right' }),
+	name: column('name', { label: 'Name', width: 180 }),
+	salary: column('salary', { label: 'Salary', align: 'right' }),
 });
 
 const grid = useDataGrid({

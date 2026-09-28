@@ -37,6 +37,7 @@ export type {
 	ColumnBuilderAggregate,
 	ColumnBuilderFields,
 	ColumnDefaults,
+	ColumnKey,
 	Columns,
 } from './define-columns';
 export { defineColumn, defineColumns } from './define-columns';

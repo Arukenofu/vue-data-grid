@@ -8,10 +8,10 @@ const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
 	place: rowNumberColumn({ width: 52 }),
-	name: column(person => person.name, { label: 'Name', width: 170, flex: 1 }),
-	team: column(person => person.team, { label: 'Team', width: 130 }),
-	projects: column(person => person.projects, { label: 'Projects', width: 100, align: 'right' }),
-	rating: column(person => person.rating, {
+	name: column('name', { label: 'Name', width: 170, flex: 1 }),
+	team: column('team', { label: 'Team', width: 130 }),
+	projects: column('projects', { label: 'Projects', width: 100, align: 'right' }),
+	rating: column('rating', {
 		label: 'Rating',
 		width: 100,
 		align: 'right',

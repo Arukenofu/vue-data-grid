@@ -215,7 +215,7 @@ The default slot of `GridCells` does the same for every column at once, with `v-
 
 ```ts
 const columns = defineColumns({
-	due: column(task => task.due, {
+	due: column('due', {
 		label: 'Due',
 		cellClass: ({ row }) => (row.due < today && row.status !== 'done' ? 'overdue' : undefined),
 	}),

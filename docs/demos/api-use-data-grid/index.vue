@@ -27,10 +27,10 @@ const column = defineColumn<Person>({ sortable: true });
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	name: column(person => person.name, { label: 'Name', width: 180 }),
-	team: column(person => person.team, { label: 'Team', width: 130 }),
-	location: column(person => person.location, { label: 'Location', width: 130 }),
-	salary: column(person => person.salary, {
+	name: column('name', { label: 'Name', width: 180 }),
+	team: column('team', { label: 'Team', width: 130 }),
+	location: column('location', { label: 'Location', width: 130 }),
+	salary: column('salary', {
 		label: 'Salary',
 		flex: 1,
 		width: 120,

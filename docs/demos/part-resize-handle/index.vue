@@ -22,11 +22,11 @@ import { UiButton, UiToolbar } from '@/ui';
 const column = defineColumn<Person>({ resizable: true, minWidth: 80, maxWidth: 360 });
 
 const columns = defineColumns({
-	name: column(person => person.name, { label: 'Name', width: 150 }),
-	email: column(person => person.email, { label: 'Email', width: 170 }),
-	role: column(person => person.role, { label: 'Role', width: 150 }),
-	location: column(person => person.location, { label: 'Location', width: 110 }),
-	salary: column(person => person.salary, {
+	name: column('name', { label: 'Name', width: 150 }),
+	email: column('email', { label: 'Email', width: 170 }),
+	role: column('role', { label: 'Role', width: 150 }),
+	location: column('location', { label: 'Location', width: 110 }),
+	salary: column('salary', {
 		label: 'Salary',
 		width: 110,
 		align: 'right',

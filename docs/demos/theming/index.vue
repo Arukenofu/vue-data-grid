@@ -51,15 +51,15 @@ const sectorClass = ({ row }: { row: Stock }) => `sector-${row.sector.toLowerCas
 
 const columns = defineColumns({
 	select: selectionColumn(),
-	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 104, pinned: 'start', cellClass: sectorClass }),
-	name: column(stock => stock.name, { label: 'Company', flex: 1, minWidth: 120 }),
-	sector: column(stock => stock.sector, { label: 'Sector', width: 124, cellClass: sectorClass }),
-	trend: column(stock => stock.history, {
+	symbol: column('symbol', { label: 'Symbol', width: 104, pinned: 'start', cellClass: sectorClass }),
+	name: column('name', { label: 'Company', flex: 1, minWidth: 120 }),
+	sector: column('sector', { label: 'Sector', width: 124, cellClass: sectorClass }),
+	trend: column('history', {
 		label: 'Trend',
 		width: 92,
 		sortable: false,
 	}),
-	price: column(stock => stock.price, {
+	price: column('price', {
 		label: 'Price',
 		width: 84,
 		align: 'right',

@@ -53,8 +53,8 @@ function revenue(label: string, read: (row: ProductYear) => number, width = 92) 
 }
 
 const columns = defineColumns({
-	product: column(row => row.product, { label: 'Name', width: 140, footer: () => 'Total' }),
-	category: column(row => row.category, { label: 'Category', width: 108 }),
+	product: column('product', { label: 'Name', width: 140, footer: () => 'Total' }),
+	category: column('category', { label: 'Category', width: 108 }),
 	q1: revenue('Q1', row => row.q1),
 	q2: revenue('Q2', row => row.q2),
 	h1: revenue('Total', row => row.q1 + row.q2, 128),
@@ -62,8 +62,8 @@ const columns = defineColumns({
 	q4: revenue('Q4', row => row.q4),
 	h2: revenue('Total', row => row.q3 + row.q4, 128),
 	year: revenue('Year', row => row.q1 + row.q2 + row.q3 + row.q4, 100),
-	units: amount(row => row.units, { label: 'Units', aggregate: 'sum', footer: ({ aggregate }) => aggregate?.toLocaleString('en-US') }),
-	returns: amount(row => row.returns, { label: 'Returns', aggregate: 'sum', footer: ({ aggregate }) => aggregate?.toLocaleString('en-US') }),
+	units: amount('units', { label: 'Units', aggregate: 'sum', footer: ({ aggregate }) => aggregate?.toLocaleString('en-US') }),
+	returns: amount('returns', { label: 'Returns', aggregate: 'sum', footer: ({ aggregate }) => aggregate?.toLocaleString('en-US') }),
 });
 
 const groups = defineColumnGroups({

@@ -40,20 +40,20 @@ function formatDay(date: string | null) {
 const column = defineColumn<Product>({ editable: true });
 
 const columns = defineColumns({
-	name: column(product => product.name, {
+	name: column('name', {
 		label: 'Product',
 		width: 150,
 		flex: 1,
 		setValue: (product, name) => ({ ...product, name }),
 		validate: name => (name.trim() === '' ? 'Give the product a name' : undefined),
 	}),
-	category: column(product => product.category, {
+	category: column('category', {
 		label: 'Category',
 		width: 110,
 		setValue: (product, category) => ({ ...product, category }),
 		editor: selectEditor({ options: CATEGORIES }),
 	}),
-	price: column(product => product.price, {
+	price: column('price', {
 		label: 'Price',
 		width: 100,
 		align: 'right',
@@ -68,7 +68,7 @@ const columns = defineColumns({
 		},
 		...numberField({ min: 0, step: 0.5, digits: 2 }),
 	}),
-	stock: column(product => product.stock, {
+	stock: column('stock', {
 		label: 'Stock',
 		width: 80,
 		align: 'right',
@@ -77,14 +77,14 @@ const columns = defineColumns({
 		validate: stock => (stock !== null && (!Number.isInteger(stock) || stock < 0) ? 'Enter a whole number' : undefined),
 		...numberField({ min: 0 }),
 	}),
-	restock: column(product => product.restock, {
+	restock: column('restock', {
 		label: 'Restock',
 		width: 112,
 		format: formatDay,
 		setValue: (product, restock) => ({ ...product, restock }),
 		...dateField({ value: 'text' }),
 	}),
-	active: column(product => product.active, {
+	active: column('active', {
 		label: 'Active',
 		width: 72,
 		align: 'center',

@@ -30,7 +30,7 @@ import { dragHandleColumn, useGridRowDrag } from '@vue-data-grid/core/drag-and-d
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
-	title: column(song => song.title, { label: 'Title' }),
+	title: column('title', { label: 'Title' }),
 });
 
 const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 42 });
