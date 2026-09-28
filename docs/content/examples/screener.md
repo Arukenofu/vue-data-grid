@@ -82,18 +82,18 @@ watchlist survives switching sectors.
 ### Cells that flash
 
 `useCellChanges` watches the rows of the grid and, for each price that changed, keeps its direction
-and the time it arrived. The price column renders a small component with it:
+and the time it arrived. The template of the price column renders a small component with it:
 
-```ts
-price: column(stock => stock.price, {
-	label: 'Price',
-	align: 'right',
-	format: formatPrice,
-	cell: ({ key, value }) => h(PriceCell, { text: formatPrice(value), change: changes.getChange(key, 'price') }),
-}),
+```vue
+<UiDataGrid :grid="grid" label="Stock screener" footer>
+	<GridCellTemplate v-slot="{ key, value }" :column="columns.price">
+		<PriceCell :text="formatPrice(value)" :change="changes.getChange(key, 'price')" />
+	</GridCellTemplate>
+</UiDataGrid>
 ```
 
 ```vue
+<!-- PriceCell.vue -->
 <template>
 	<span :key="change?.at" class="price" :data-flash="change?.direction ?? undefined">{{ text }}</span>
 </template>

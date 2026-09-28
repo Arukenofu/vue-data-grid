@@ -7,6 +7,7 @@ import {
 	editing,
 	GridBody,
 	GridCells,
+	GridEditorTemplate,
 	GridHeader,
 	GridHeaderCell,
 	GridHeaderRow,
@@ -24,7 +25,15 @@ import { shallowRef } from 'vue';
 import { UiToolbar } from '@/ui';
 
 import { CATEGORIES, type Category, type Product, products } from './data';
-import { parseDay, rekaDateEditor } from './date-editor';
+import DateEditor from './DateEditor.vue';
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+function parseDay(text: string) {
+	const value = text.trim();
+
+	return DAY.test(value) ? value : null;
+}
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const day = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
@@ -73,7 +82,7 @@ const columns = defineColumns({
 	restock: column(product => product.restock, {
 		label: 'Restock',
 		width: 136,
-		editor: rekaDateEditor<Product>(),
+		typing: 'value',
 		parse: parseDay,
 		format: restock => (restock === null ? '—' : day.format(new Date(restock))),
 		setValue: (product, restock) => ({ ...product, restock }),
@@ -128,6 +137,9 @@ const grid = useDataGrid({
 		</UiToolbar>
 
 		<GridRoot :grid="grid" label="Products" class="ui-grid" data-size="auto">
+			<GridEditorTemplate v-slot="context" :column="columns.restock">
+				<DateEditor :context="context" />
+			</GridEditorTemplate>
 			<GridHeader>
 				<GridHeaderRow v-slot="{ columns: headers }">
 					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />

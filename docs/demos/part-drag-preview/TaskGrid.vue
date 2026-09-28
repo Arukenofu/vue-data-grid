@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridHeader,
 	GridHeaderCell,
 	GridHeaderRow,
@@ -12,7 +13,6 @@ import {
 	useDataGrid,
 } from '@vue-data-grid/core';
 import { GridDragOverlay, GridDragPreview, type GridRowDropEvent, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
-import { h } from 'vue';
 
 import type { Priority, Task } from '@/data/tasks';
 import { type BadgeTone, UiAvatar, UiBadge } from '@/ui';
@@ -35,11 +35,7 @@ const column = defineColumn<Task>();
 
 const columns = defineColumns({
 	title: column(task => task.title, { label: 'Task', width: 150, flex: 1 }),
-	priority: column(task => task.priority, {
-		label: 'Priority',
-		width: 92,
-		cell: ({ value }) => h(UiBadge, { tone: PRIORITY[value] }, () => value),
-	}),
+	priority: column(task => task.priority, { label: 'Priority', width: 92 }),
 });
 
 const grid = useDataGrid({
@@ -61,6 +57,9 @@ function findTask(key: string) {
 			<span class="lane-count">{{ tasks.length }}</span>
 		</h3>
 		<GridRoot :grid="grid" :label="label" class="ui-grid" data-size="sm">
+			<GridCellTemplate v-slot="{ value }" :column="columns.priority">
+				<UiBadge :tone="PRIORITY[value]">{{ value }}</UiBadge>
+			</GridCellTemplate>
 			<GridHeader>
 				<GridHeaderRow v-slot="{ columns: headers }">
 					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />

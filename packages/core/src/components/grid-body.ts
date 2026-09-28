@@ -1,8 +1,10 @@
-import { canEditCell, getCellText, type RenderedColumn, type RuntimeColumn } from '@vue-data-grid/engine';
+import { canEditCell, type ColumnsInput, type RenderedColumn, type RuntimeColumn } from '@vue-data-grid/engine';
 import {
 	type ComponentPublicInstance,
 	computed,
+	type DefineSetupFnComponent,
 	defineComponent,
+	type ExtractPublicPropTypes,
 	Fragment,
 	h,
 	isVNode,
@@ -17,13 +19,23 @@ import {
 } from 'vue';
 
 import type { CellContext, CellEditor } from '../columns/column-fields';
-import { createBodyRowContext, type GridBodyRow, useBodyRowContext, useDataGridContext, useRowDragContext } from './context';
+import { renderCellContent, renderCellEditor } from './cell-content';
+import {
+	createBodyRowContext,
+	type GridBodyRow,
+	useBodyRowContext,
+	useDataGridContext,
+	useGridTemplatesContext,
+	useRowDragContext,
+} from './context';
 import { useDragItem } from './drag-item';
 import { keepMounted } from '../render/memo';
 import { forwardElement, hasContent, primitiveProps, renderPrimitive, toElement } from './primitive';
 
-/** What the default slot of `GridCells` gets for each cell: the cell context of the column's `cell` field. */
+/** What the slots of `GridCells` get for each cell: the cell context of the column's `cell` field. */
 export type CellSlotContext = CellContext<unknown, unknown>;
+
+type CellSlot = (context: CellSlotContext) => VNodeChild;
 
 function getContext(rendered: RenderedColumn, row: GridBodyRow): CellSlotContext | null {
 	const { column } = rendered;
@@ -31,11 +43,6 @@ function getContext(rendered: RenderedColumn, row: GridBodyRow): CellSlotContext
 	return column
 		? { row: row.original, value: column.value(row.original), key: row.key, index: row.index, column, node: row.node }
 		: null;
-}
-
-/** The content of a body cell: the column's `cell` field, else its text through `format` on one line. */
-function renderContent(context: CellSlotContext) {
-	return context.column.cell?.(context) ?? h('span', { 'data-dg-part': 'cell-text' }, getCellText(context.column, context.row));
 }
 
 // The names of the columns ranges span, one set for each list of them, shared by every row.
@@ -64,41 +71,67 @@ const GridCellEditor = defineComponent({
 	},
 	setup(props) {
 		const grid = useDataGridContext();
+		const templates = useGridTemplatesContext(null);
 
 		return () => {
 			const context = grid.editing?.getEditorContext(props.context);
 
-			return context ? props.editor(context) : null;
+			return context ? renderCellEditor(context, templates, props.editor) : null;
 		};
 	},
 });
+
+/**
+ * The content of the part's own slots for a cell: the slot named as its column, else `default`. A
+ * compiled slots object also holds its flags, under `_`, so only functions count as slots.
+ */
+function renderSlots(slots: Readonly<Record<string, unknown>>, context: CellSlotContext): VNodeChild {
+	const { name } = context.column;
+	const named = name === 'default' ? undefined : slots[name];
+	const own: VNodeChild = typeof named === 'function' ? named(context) : undefined;
+
+	if (hasContent(own)) {
+		return own;
+	}
+
+	const fallback = slots.default;
+
+	return typeof fallback === 'function' ? fallback(context) : undefined;
+}
+
+const cellsProps = {
+	/** The element of each cell; `'div'` by default. */
+	as: { type: String, default: 'div' },
+};
 
 /**
  * The cells of the body row it is in, one for each rendered column: plain elements with their role,
  * `aria-colindex`, width and pin, `aria-selected` with the `ranges` feature, and the column's
  * `cellClass`, rendered by this part without a component each, so a row costs one component
  * whatever its width. With the `editing` feature the cell being edited renders its editor, the
- * column's `editor` or the editing's default, with `data-dg-state="editing"`, and a cell that can be
- * edited gets `write` in its context. Attributes of the part go to every cell.
+ * column's `GridEditorTemplate`, its `editor` or the editing's default, with
+ * `data-dg-state="editing"`, and a cell that can be edited gets `write` in its context. Attributes of
+ * the part go to every cell.
  *
  * `aria-selected` is written to the cells of the row as the ranges change, without a render: a range
  * that grows across a hundred rows renders none of them.
  *
- * The default slot renders the content of each cell and gets its cell context
- * `{ row, value, key, index, column, node, write }`. A cell the slot renders nothing for, such as one
- * its `v-if` skips, shows its own content, as a `<slot>` shows its fallback: the column's `cell`
- * field, else its text through `format`. A spacer of the column window renders an empty cell.
+ * The slots render the content of each cell from its cell context
+ * `{ row, value, key, index, column, node, write }`: the slot named as the cell's column, else the
+ * default slot. A cell the slots render nothing for, such as one a `v-if` skips, shows its own
+ * content, as a `<slot>` shows its fallback: the column's `GridCellTemplate`, its `cell` field, else
+ * its text through `format`. The column's `cellFrame`, such as the indent and the toggle of
+ * `treeColumn()`, goes around it. A spacer of the column window renders an empty cell. For slots
+ * typed by the columns, use `defineGridCells`.
  */
 export const GridCells = defineComponent({
 	name: 'GridCells',
 	inheritAttrs: false,
-	props: {
-		/** The element of each cell. */
-		as: { type: String, default: 'div' },
-	},
-	slots: Object as SlotsType<{ default?: (context: CellSlotContext) => VNodeChild }>,
+	props: cellsProps,
+	slots: Object as SlotsType<Record<string, CellSlot | undefined>>,
 	setup(props, { attrs, slots }) {
 		const grid = useDataGridContext();
+		const templates = useGridTemplatesContext(null);
 		const row = useBodyRowContext();
 		// The `write` of each cell, made once for each object of the row: a control that writes is not
 		// patched again on every render. A commit gives the row a new object, and new writes.
@@ -146,6 +179,7 @@ export const GridCells = defineComponent({
 		onMounted(writeSelection);
 		onUpdated(writeSelection);
 
+		/** The editor of the cell while it is edited; `null` for a column with `editor: false`. */
 		function getEditor(context: CellSlotContext, current: GridBodyRow) {
 			const { editing } = grid;
 
@@ -178,9 +212,7 @@ export const GridCells = defineComponent({
 				return h(props.as, cellProps, [h(GridCellEditor, { context, editor })]);
 			}
 
-			const content = slots.default?.(context);
-
-			return h(props.as, cellProps, [hasContent(content) ? content : renderContent(context)]);
+			return h(props.as, cellProps, [renderCellContent(context, templates, renderSlots(slots, context))]);
 		}
 
 		return () => {
@@ -193,6 +225,49 @@ export const GridCells = defineComponent({
 		};
 	},
 });
+
+/** The row of the columns in `TColumns`: the row the `value` of a column reads. */
+export type GridColumnsRow<TColumns> = TColumns[keyof TColumns] extends { value(row: infer TRow): unknown } ? TRow : unknown;
+
+/** The value of a column: what its `value` returns. */
+export type GridColumnValue<TColumn> = TColumn extends { value(row: never): infer TValue } ? TValue : unknown;
+
+/**
+ * The slots of `GridCells` for the columns `TColumns`: one for each column, named as the column and
+ * typed by it, and `default` for every cell its column slot leaves. A column named `default` has no
+ * slot of its own.
+ */
+export type GridCellsSlots<TColumns> = {
+	[TName in Exclude<keyof TColumns & string, 'default'>]?: (
+		context: CellContext<GridColumnsRow<TColumns>, GridColumnValue<TColumns[TName]>>,
+	) => VNodeChild;
+} & {
+	default?: (context: CellContext<GridColumnsRow<TColumns>, unknown>) => VNodeChild;
+};
+
+/** The props of `GridCells`. */
+export type GridCellsProps = ExtractPublicPropTypes<typeof cellsProps>;
+
+/**
+ * The type `defineGridCells` gives for the columns `TColumns`: `GridCells` with its slots typed by the
+ * columns. A plain component type, as `defineComponent` gives, with no generic of its own.
+ */
+export type GridCellsComponent<TColumns> = DefineSetupFnComponent<
+	GridCellsProps,
+	Record<never, never>,
+	SlotsType<GridCellsSlots<TColumns>>
+>;
+
+/**
+ * `GridCells` typed by `columns`, the object of `defineColumns` given to `useDataGrid`: a slot for
+ * each column, named as the column and typed by it, and a slot named after no column is an error. Call
+ * it in `setup` and render what it returns in the row, `const Cells = defineGridCells(columns)` and
+ * `<Cells>`. It makes no component: every call gives `GridCells` itself, with the types of its columns.
+ */
+export function defineGridCells<TColumns extends ColumnsInput>(_columns: TColumns): GridCellsComponent<TColumns> {
+	// The part is one for every grid; the type is of these columns, which vue-tsc reads the slots from.
+	return GridCells as unknown as GridCellsComponent<TColumns>;
+}
 
 /**
  * A body row, positioned at its offset under the row window, with its role, index, tree and

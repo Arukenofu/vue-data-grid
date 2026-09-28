@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridRow,
 	type GridSort,
 	moveRow,
@@ -16,7 +17,7 @@ import {
 import { dragHandleColumn, GridDragPreview, useGridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
 import IconUnfoldVertical from '~icons/lucide/unfold-vertical';
-import { computed, h, nextTick, ref, shallowRef, useTemplateRef } from 'vue';
+import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue';
 
 import { type FileEntry, files as initialFiles, formatSize } from '@/data/files';
 import { UiButton, UiDataGrid, UiStat, UiToolbar } from '@/ui';
@@ -41,12 +42,7 @@ const column = defineColumn<FileRow>({ sortable: true, resizable: true, sortOrde
 
 const columns = defineColumns({
 	handle: dragHandleColumn(),
-	name: treeColumn(column(file => file.name, {
-		label: 'Name',
-		flex: 1,
-		minWidth: 280,
-		cell: ({ row, node }) => h(FileName, { file: row, open: node?.expanded }),
-	})),
+	name: treeColumn(column(file => file.name, { label: 'Name', flex: 1, minWidth: 280 })),
 	kind: column(file => KIND_LABELS[file.kind], { label: 'Kind', width: 130 }),
 	size: column(file => file.size, { label: 'Size', width: 110, align: 'right', format: formatSize }),
 	modified: column(file => file.modified, { label: 'Modified', width: 140, format: formatDate }),
@@ -157,21 +153,26 @@ function onRowKeydown(event: KeyboardEvent, key: string) {
 		<div class="explorer-body">
 			<div class="explorer-grid">
 				<UiDataGrid :grid="grid" label="Files" data-size="lg">
-					<GridBody v-slot="{ rows: shown }">
-						<GridRow
-							v-for="row in shown"
-							:key="row.key"
-							:row="row"
-							:aria-current="row.key === openKey ? 'true' : undefined"
-							@click="onRowClick($event, row.key)"
-							@keydown="onRowKeydown($event, row.key)"
-						>
-							<GridCells />
-						</GridRow>
-					</GridBody>
-					<GridDragPreview v-slot="{ key, label }">
-						<FileGhost :label="label" :file="rowsById.get(key)" />
-					</GridDragPreview>
+					<GridCellTemplate v-slot="{ row, node }" :column="columns.name">
+						<FileName :file="row" :open="node?.expanded" />
+					</GridCellTemplate>
+					<template #body>
+						<GridBody v-slot="{ rows: shown }">
+							<GridRow
+								v-for="row in shown"
+								:key="row.key"
+								:row="row"
+								:aria-current="row.key === openKey ? 'true' : undefined"
+								@click="onRowClick($event, row.key)"
+								@keydown="onRowKeydown($event, row.key)"
+							>
+								<GridCells />
+							</GridRow>
+						</GridBody>
+						<GridDragPreview v-slot="{ key, label }">
+							<FileGhost :label="label" :file="rowsById.get(key)" />
+						</GridDragPreview>
+					</template>
 				</UiDataGrid>
 			</div>
 

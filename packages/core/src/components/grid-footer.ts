@@ -1,9 +1,10 @@
 import { aggregateColumn, type RenderedColumn } from '@vue-data-grid/engine';
-import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, type SlotsType, type VNodeChild } from 'vue';
+import { defineComponent, onBeforeUnmount, onMounted, type PropType, type SlotsType, type VNodeChild } from 'vue';
 
 import type { FooterContext } from '../columns/column-fields';
 import type { DataGrid } from '../data-grid/use-data-grid';
-import { createFooterCellContext, useDataGridContext, useFooterCellContext } from './context';
+import { createFooterCellContext, useDataGridContext, useFooterCellContext, useGridTemplatesContext } from './context';
+import { renderFooterContent } from './cell-content';
 import { forwardElement, primitiveProps, renderPrimitive } from './primitive';
 
 /** What a footer cell's default slot gets. */
@@ -21,31 +22,22 @@ function getContext(grid: DataGrid, rendered: RenderedColumn): FooterSlotContext
 	return { column, rows, aggregate: aggregateColumn(column, rows) };
 }
 
-// Text of the `footer` field is cut to one line as the text of body and header cells is; a node is the
-// column's own content.
-function renderContent(context: FooterSlotContext) {
-	const content = context.column.footer?.(context);
-
-	return typeof content === 'string' || typeof content === 'number'
-		? h('span', { 'data-dg-part': 'cell-text' }, content)
-		: content;
-}
-
 /**
- * The content of the footer cell it is in: the column's `footer` field, text of it on one line with an
- * ellipsis. It renders no element of its own. `GridFooterCell` shows it without a slot; put it in the
- * slot to keep it next to content of your own.
+ * The content of the footer cell it is in: the column's `GridFooterTemplate`, else its `footer` field,
+ * text of it on one line with an ellipsis. It renders no element of its own. `GridFooterCell` shows it
+ * without a slot; put it in the slot to keep it next to content of your own.
  */
 export const GridFooterContent = defineComponent({
 	name: 'GridFooterContent',
 	setup() {
 		const grid = useDataGridContext();
+		const templates = useGridTemplatesContext(null);
 		const column = useFooterCellContext();
 
 		return () => {
 			const context = getContext(grid, column());
 
-			return context ? renderContent(context) : null;
+			return context ? renderFooterContent(context, templates) : null;
 		};
 	},
 });
@@ -65,6 +57,7 @@ export const GridFooterCell = defineComponent({
 	slots: Object as SlotsType<{ default?: (context: FooterSlotContext) => VNodeChild }>,
 	setup(props, { slots }) {
 		const grid = useDataGridContext();
+		const templates = useGridTemplatesContext(null);
 
 		createFooterCellContext(() => props.column);
 
@@ -76,7 +69,7 @@ export const GridFooterCell = defineComponent({
 			}
 
 			return renderPrimitive(props, { ...grid.getCellProps(props.column) }, () => (
-				slots.default ? slots.default(context) : renderContent(context)
+				slots.default ? slots.default(context) : renderFooterContent(context, templates)
 			));
 		};
 	},

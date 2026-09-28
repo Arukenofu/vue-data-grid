@@ -78,14 +78,17 @@ function expandAll() {
 
 `treeColumn()` turns the name column into the column of the tree. It puts the indent of the level
 and a `GridTreeToggle` in front of your own content, and marks the column, so → and ← of the
-navigation open and close folders in it:
+navigation open and close folders in it. The content after the toggle is the column's
+`GridCellTemplate`, whose slot gets the row's node:
 
 ```ts
-name: treeColumn(column(file => file.name, {
-	label: 'Name',
-	flex: 1,
-	cell: ({ row, node }) => h(FileName, { file: row, open: node?.expanded }),
-})),
+name: treeColumn(column(file => file.name, { label: 'Name', flex: 1 })),
+```
+
+```vue
+<GridCellTemplate v-slot="{ row, node }" :column="columns.name">
+	<FileName :file="row" :open="node?.expanded" />
+</GridCellTemplate>
 ```
 
 ### Folders first

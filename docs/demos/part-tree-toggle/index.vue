@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridHeader,
 	GridHeaderCell,
 	GridHeaderRow,
@@ -13,7 +14,7 @@ import {
 	tree,
 	useDataGrid,
 } from '@vue-data-grid/core';
-import { h, shallowRef } from 'vue';
+import { shallowRef } from 'vue';
 
 import { type FileEntry, files, formatSize } from '@/data/files';
 import { UiButton, UiToolbar } from '@/ui';
@@ -50,7 +51,6 @@ const columns = defineColumns({
 		width: 280,
 		flex: 1,
 		tree: true,
-		cell: ({ row, node }) => h(FileCell, { file: row, node }),
 	}),
 	size: column(file => sizes.get(file.id) ?? file.size, {
 		label: 'Size',
@@ -87,6 +87,9 @@ const grid = useDataGrid({
 		</UiToolbar>
 
 		<GridRoot :grid="grid" label="Files" class="ui-grid" data-size="sm">
+			<GridCellTemplate v-slot="{ row, node }" :column="columns.name">
+				<FileCell :file="row" :node="node" />
+			</GridCellTemplate>
 			<GridHeader>
 				<GridHeaderRow v-slot="{ columns: headers }">
 					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />

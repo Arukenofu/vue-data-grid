@@ -67,13 +67,13 @@ The handle of the feature is `grid.selection`:
 
 `selectionColumn()` renders two parts, which you can use anywhere else: `GridSelectionCheckbox`, the
 checkbox of the row it is in, and `GridSelectAllCheckbox`. A checkbox in the first column next to
-the name is one `cell` field away:
+the name is one [`GridCellTemplate`](/components/column-templates) away:
 
-```ts
-name: column(person => person.name, {
-	label: 'Name',
-	cell: ({ key, value }) => [h(GridSelectionCheckbox, { row: key }), value],
-}),
+```vue
+<GridCellTemplate v-slot="{ key, value }" :column="columns.name">
+	<GridSelectionCheckbox :row="key" />
+	{{ value }}
+</GridCellTemplate>
 ```
 
 Both render a native `<input type="checkbox">` by default. With `as` or `asChild` they render any

@@ -19,7 +19,7 @@ columns, from the pointer and from the keyboard.
 		'Sticks to the top of the grid, and is measured so that scrolling to a row never leaves it under the header.',
 		'A click or Enter sorts a `sortable` column; Shift adds it to a multi-sort.',
 		'Alt with ← and → moves a `movable` column, Shift with ← and → resizes a `resizable` one.',
-		'Renders the column\'s `header` field or its label, or anything you put in the slot.',
+		'Renders the column\'s `GridHeaderTemplate`, its `header` field or its label, or anything you put in the slot.',
 		'Keeps the geometry of the column, its width and its pin, in step with the body without a render.',
 	]"
 />
@@ -150,8 +150,8 @@ window renders an empty cell with `role="presentation"`.
 
 ### GridHeaderContent
 
-The content of the header cell it is in: the column's `header` field when it has one, else its
-`label` (or name) on one line, cut with an ellipsis. It renders no element of its own. You need it
+The content of the header cell it is in: the column's `GridHeaderTemplate` or `header` field when it
+has one, else its `label` (or name) on one line, cut with an ellipsis. It renders no element of its own. You need it
 only when the cell has a slot, to keep the default content next to parts of your own.
 
 <DataAttributesTable
@@ -175,23 +175,28 @@ anything else around it, such as an icon:
 </GridHeaderCell>
 ```
 
-### A header declared with the column
+### A header of one column
 
-When a header is the same wherever the column is shown, declare it with the column instead. The
-`header` field gets the same context as the slot and returns what to render:
+When one column needs a header of its own, give it a
+[`GridHeaderTemplate`](/components/column-templates) next to the parts. It gets the same context as
+the slot, and every header cell of the column shows it:
 
-```ts
-import { h } from 'vue';
-
-const columns = defineColumns({
-	price: column(stock => stock.price, {
-		label: 'Price',
-		header: () => h('span', { title: 'Last trade, USD' }, ['Price ', h('small', 'USD')]),
-	}),
-});
+```vue
+<template>
+	<GridRoot :grid="grid" label="Stocks">
+		<GridHeaderTemplate :column="columns.price">
+			<span title="Last trade, USD">Price <small>USD</small></span>
+		</GridHeaderTemplate>
+		<GridHeader>
+			<!-- the header row -->
+		</GridHeader>
+	</GridRoot>
+</template>
 ```
 
-`GridHeaderContent` renders this field, so the slot and the default content stay in agreement.
+`GridHeaderContent` renders the template, so the slot and the default content stay in agreement.
+A header that is text only can be the column's `header` field instead, a function of the same
+context: `header: ({ direction }) => (direction ? 'Price, sorted' : 'Price')`.
 
 ### Columns that move and resize
 

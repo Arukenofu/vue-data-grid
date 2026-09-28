@@ -1,5 +1,5 @@
 import type { ColumnGroup, GridScope, RenderedColumn, RenderedGroup } from '@vue-data-grid/engine';
-import { type ComponentPublicInstance, defineComponent, h, type PropType, type SlotsType, type VNodeChild } from 'vue';
+import { type ComponentPublicInstance, defineComponent, type PropType, type SlotsType, type VNodeChild } from 'vue';
 
 import type { HeaderContext } from '../columns/column-fields';
 import { useHeaderCell } from '../header/use-header-cell';
@@ -8,12 +8,14 @@ import {
 	createHeaderCellContext,
 	useColumnDragContext,
 	useDataGridContext,
+	useGridTemplatesContext,
 	useGroupCellContext,
 	useHeaderCellContext,
 } from './context';
 import { useGridMessagesContext } from './messages';
 import { useDragItem } from './drag-item';
 import { forwardElement, getRenderedTag, primitiveProps, renderPrimitive, toElement, toRootContent } from './primitive';
+import { renderCellText, renderHeaderContent } from './cell-content';
 
 /** What a group cell's default slot gets. */
 export interface GroupCellSlotContext {
@@ -26,10 +28,6 @@ export interface GroupCellSlotContext {
 	toggle: () => void;
 }
 
-function renderLabel(text: string) {
-	return h('span', { 'data-dg-part': 'cell-text' }, text);
-}
-
 function getHeaderContext(scope: GridScope, rendered: RenderedColumn): HeaderContext | null {
 	const { column } = rendered;
 
@@ -38,33 +36,29 @@ function getHeaderContext(scope: GridScope, rendered: RenderedColumn): HeaderCon
 		: null;
 }
 
-/** The content of a header cell: the column's `header` field, else its label on one line. */
-function renderHeaderContent(context: HeaderContext) {
-	return context.column.header?.(context) ?? renderLabel(context.column.label ?? context.column.name);
-}
-
-/** The content of a group cell: the group's `header` field, else its label on one line. */
 function renderGroupContent(cell: RenderedGroup) {
 	const { group } = cell;
 
-	return group ? group.header?.({ group, collapsed: cell.collapsed }) ?? renderLabel(group.label ?? group.name) : null;
+	return group ? group.header?.({ group, collapsed: cell.collapsed }) ?? renderCellText(group.label ?? group.name) : null;
 }
 
 /**
- * The content of the column header cell it is in: the column's `header` field, else its label on one
- * line with an ellipsis. It renders no element of its own. `GridHeaderCell` shows it without a slot;
- * put it in the slot next to a sort indicator or a resize handle.
+ * The content of the column header cell it is in: the column's `GridHeaderTemplate`, its `header`
+ * field, else its label on one line with an ellipsis. It renders no element of its own.
+ * `GridHeaderCell` shows it without a slot; put it in the slot next to a sort indicator or a resize
+ * handle.
  */
 export const GridHeaderContent = defineComponent({
 	name: 'GridHeaderContent',
 	setup() {
 		const grid = useDataGridContext();
+		const templates = useGridTemplatesContext(null);
 		const column = useHeaderCellContext();
 
 		return () => {
 			const context = getHeaderContext(grid.scope, column());
 
-			return context ? toRootContent(renderHeaderContent(context)) : null;
+			return context ? toRootContent(renderHeaderContent(context, templates)) : null;
 		};
 	},
 });
@@ -76,7 +70,8 @@ export const GridHeaderContent = defineComponent({
  * `GridColumnDrag` it registers its element with the drag list, so the column can be dragged.
  *
  * The default slot gets `{ column, direction, sortIndex }`; without it the cell shows its content, as
- * `GridHeaderContent` does. A spacer of the column window renders an empty cell.
+ * `GridHeaderContent` does: its `GridHeaderTemplate`, `header` field or label. A spacer of the column
+ * window renders an empty cell.
  */
 export const GridHeaderCell = defineComponent({
 	name: 'GridHeaderCell',
@@ -88,6 +83,7 @@ export const GridHeaderCell = defineComponent({
 	slots: Object as SlotsType<{ default?: (context: HeaderContext) => VNodeChild }>,
 	setup(props, { slots }) {
 		const grid = useDataGridContext();
+		const templates = useGridTemplatesContext(null);
 		const header = useHeaderCell(grid.scope);
 
 		createHeaderCellContext(() => props.column);
@@ -113,7 +109,9 @@ export const GridHeaderCell = defineComponent({
 				...header.getHandlers(context.column.name),
 				...dragItems?.getItemProps(context.column.name),
 				ref: cellRef,
-			}, () => (slots.default ? slots.default(context) : renderHeaderContent(context)));
+			}, () => (slots.default
+				? slots.default(context)
+				: renderHeaderContent(context, templates)));
 		};
 	},
 });

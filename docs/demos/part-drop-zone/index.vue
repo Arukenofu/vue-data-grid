@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridHeader,
 	GridHeaderCell,
 	GridHeaderRow,
@@ -22,7 +23,7 @@ import {
 import IconFile from '~icons/lucide/file';
 import IconStar from '~icons/lucide/star';
 import IconTrash from '~icons/lucide/trash-2';
-import { h, shallowRef } from 'vue';
+import { shallowRef } from 'vue';
 
 import { type FileEntry, files, formatSize } from '@/data/files';
 import { UiButton, UiToolbar } from '@/ui';
@@ -37,15 +38,7 @@ const starred = shallowRef<ReadonlySet<string>>(new Set(['launch']));
 const column = defineColumn<FileEntry>();
 
 const columns = defineColumns({
-	name: column(file => file.name, {
-		label: 'Name',
-		width: 180,
-		flex: 1,
-		cell: ({ key, value }) => h('span', { class: 'file-name' }, [
-			value,
-			starred.value.has(key) ? h(IconStar, { class: 'file-star', 'aria-label': 'Starred' }) : null,
-		]),
-	}),
+	name: column(file => file.name, { label: 'Name', width: 180, flex: 1 }),
 	size: column(file => file.size, { label: 'Size', width: 84, align: 'right', format: formatSize }),
 	modified: column(file => file.modified, { label: 'Modified', width: 90, format: modified => day.format(new Date(modified)) }),
 });
@@ -89,6 +82,12 @@ function restore() {
 
 		<div class="layout">
 			<GridRoot :grid="grid" label="Files" class="ui-grid" data-size="sm">
+				<GridCellTemplate v-slot="{ key, value }" :column="columns.name">
+					<span class="file-name">
+						{{ value }}
+						<IconStar v-if="starred.has(key)" class="file-star" aria-label="Starred" />
+					</span>
+				</GridCellTemplate>
 				<GridHeader>
 					<GridHeaderRow v-slot="{ columns: headers }">
 						<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
@@ -192,14 +191,14 @@ function restore() {
 	color: var(--ui-accent);
 }
 
-.layout :deep(.file-name) {
+.file-name {
 	display: flex;
 	align-items: center;
 	gap: 6px;
 	min-width: 0;
 }
 
-.layout :deep(.file-star) {
+.file-star {
 	flex: none;
 	width: 13px;
 	height: 13px;

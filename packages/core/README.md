@@ -36,6 +36,7 @@ pages are Markdown files in `docs/content/`:
   [performance](../../docs/content/overview/performance.md),
   [inspiration](../../docs/content/overview/inspiration.md)
 - Guides: [columns](../../docs/content/guides/columns.md),
+  [cell content](../../docs/content/guides/cells.md),
   [sorting](../../docs/content/guides/sorting.md),
   [column layout](../../docs/content/guides/column-layout.md),
   [column groups](../../docs/content/guides/column-groups.md),

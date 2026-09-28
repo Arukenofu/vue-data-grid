@@ -2,8 +2,9 @@
 import {
 	defineColumn,
 	defineColumns,
+	defineGridCells,
 	GridBody,
-	GridCells,
+	GridCellTemplate,
 	GridHeader,
 	GridHeaderCell,
 	GridHeaderRow,
@@ -11,7 +12,7 @@ import {
 	GridRow,
 	useDataGrid,
 } from '@vue-data-grid/core';
-import { computed, h, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 import { type Task, type TaskStatus, tasks } from '@/data/tasks';
 import { type BadgeTone, UiBadge, UiButton, UiProgress, UiStat, UiToolbar } from '@/ui';
@@ -39,16 +40,8 @@ const columns = defineColumns({
 		flex: 1,
 		cellClass: ({ row }) => (row.status === 'done' ? 'task-done' : undefined),
 	}),
-	status: column(task => task.status, {
-		label: 'Status',
-		width: 124,
-		cell: ({ value }) => h(UiBadge, { tone: STATUS[value].tone, dot: true }, () => STATUS[value].label),
-	}),
-	assignee: column(task => task.assignee, {
-		label: 'Assignee',
-		width: 160,
-		cell: ({ value }) => h(AssigneeCell, { name: value }),
-	}),
+	status: column(task => task.status, { label: 'Status', width: 124 }),
+	assignee: column(task => task.assignee, { label: 'Assignee', width: 160 }),
 	progress: column(task => task.progress, { label: 'Progress', width: 150 }),
 	due: column(task => task.due, {
 		label: 'Due',
@@ -67,6 +60,8 @@ const grid = useDataGrid({
 	rowKey: 'id',
 	rowHeight: 44,
 });
+
+const Cells = defineGridCells(columns);
 
 const done = computed(() => rows.value.filter(task => task.status === 'done').length);
 
@@ -95,6 +90,12 @@ function advance() {
 		</UiToolbar>
 
 		<GridRoot :grid="grid" label="Tasks" class="ui-grid" data-size="sm">
+			<GridCellTemplate v-slot="{ value }" :column="columns.status">
+				<UiBadge :tone="STATUS[value].tone" dot>{{ STATUS[value].label }}</UiBadge>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.assignee">
+				<AssigneeCell :name="value" />
+			</GridCellTemplate>
 			<GridHeader>
 				<GridHeaderRow v-slot="{ columns: headers }">
 					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
@@ -102,12 +103,14 @@ function advance() {
 			</GridHeader>
 			<GridBody v-slot="{ rows: bodyRows }">
 				<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
-					<GridCells v-slot="{ column, value }">
-						<span v-if="column.name === 'progress'" class="progress">
-							<UiProgress :value="Number(value)" />
-							<span class="progress-value">{{ value }}%</span>
-						</span>
-					</GridCells>
+					<Cells>
+						<template #progress="{ value }">
+							<span class="progress">
+								<UiProgress :value="value" />
+								<span class="progress-value">{{ value }}%</span>
+							</span>
+						</template>
+					</Cells>
 				</GridRow>
 			</GridBody>
 		</GridRoot>

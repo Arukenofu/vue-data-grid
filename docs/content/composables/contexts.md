@@ -66,6 +66,7 @@ parts while its column changes, and a part that reads it in a `computed` or a re
 		{ name: 'createColumnDragContext / useColumnDragContext', type: 'GridDragItems', description: 'The column drag list header cells register with. `GridColumnDrag` and `useGridColumnDrag` provide it.' },
 		{ name: 'createGridMessagesContext / useGridMessagesContext', type: 'GridMessages', description: 'The strings of the interface. `GridRoot` provides its `messages` over the defaults; outside a grid the defaults.' },
 		{ name: 'createGridScopeContext / useGridScopeContext', type: 'GridScope', description: 'The scope of the engine, from the core.' },
+		{ name: 'createGridTemplatesContext / useGridTemplatesContext', type: 'GridTemplates', description: 'The column templates: `get(kind, column)` and `register`. `GridRoot` provides it, and the template parts register there as they are set up; the parts that render cells read it with a `null` fallback. `createDataGridContext` provides none, so a grid under markup of your own does not reach the templates of a grid around it.' },
 	]"
 />
 
@@ -94,6 +95,17 @@ import { createDataGridContext, useDataGrid } from '@vue-data-grid/core';
 const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 40 });
 
 createDataGridContext(grid);
+```
+
+The parts that render cells work without column templates. For `GridCellTemplate` and the other
+template parts, give the grid a registry after its context, as `GridRoot` does; put the templates
+first in what your root renders, so they register before the cells render:
+
+```ts
+import { createDataGridContext, createGridTemplatesContext } from '@vue-data-grid/core';
+
+createDataGridContext(grid);
+createGridTemplatesContext();
 ```
 
 ### Replacing a built-in part

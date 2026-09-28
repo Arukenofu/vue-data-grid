@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, rowNumberColumn, useDataGrid } from '@vue-data-grid/core';
-import { h } from 'vue';
+import { defineColumn, defineColumns, GridCellTemplate, rowNumberColumn, useDataGrid } from '@vue-data-grid/core';
 
 import { type BadgeTone, UiBadge, UiDataGrid, UiProgress } from '@/ui';
 
@@ -27,17 +26,11 @@ const columns = defineColumns({
 		cellClass: () => 'ui-cell-mono',
 		footer: () => 'Total',
 	}),
-	customer: column(invoice => invoice.customer, {
-		label: 'Customer',
-		width: 248,
-		flex: 1,
-		cell: ({ row }) => h(CustomerCell, { name: row.customer, email: row.email }),
-	}),
+	customer: column(invoice => invoice.customer, { label: 'Customer', width: 248, flex: 1 }),
 	status: column(invoice => invoice.status, {
 		label: 'Status',
 		width: 124,
 		format: status => STATUS[status].label,
-		cell: ({ value }) => h(UiBadge, { tone: STATUS[value].tone, dot: true }, () => STATUS[value].label),
 	}),
 	issued: column(invoice => invoice.issued, {
 		label: 'Issued',
@@ -48,10 +41,6 @@ const columns = defineColumns({
 		label: 'Paid',
 		width: 144,
 		format: paid => `${paid}%`,
-		cell: ({ value }) => h('span', { style: { display: 'flex', alignItems: 'center', gap: '10px', width: '100%' } }, [
-			h(UiProgress, { value }),
-			`${value}%`,
-		]),
 	}),
 	amount: column(invoice => invoice.amount, {
 		label: 'Amount',
@@ -74,5 +63,27 @@ const grid = useDataGrid({
 </script>
 
 <template>
-	<UiDataGrid :grid="grid" label="Invoices" footer />
+	<UiDataGrid :grid="grid" label="Invoices" footer>
+		<GridCellTemplate v-slot="{ row }" :column="columns.customer">
+			<CustomerCell :name="row.customer" :email="row.email" />
+		</GridCellTemplate>
+		<GridCellTemplate v-slot="{ value }" :column="columns.status">
+			<UiBadge :tone="STATUS[value].tone" dot>{{ STATUS[value].label }}</UiBadge>
+		</GridCellTemplate>
+		<GridCellTemplate v-slot="{ value }" :column="columns.paid">
+			<span class="paid">
+				<UiProgress :value="value" />
+				{{ value }}%
+			</span>
+		</GridCellTemplate>
+	</UiDataGrid>
 </template>
+
+<style scoped>
+.paid {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+}
+</style>

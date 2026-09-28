@@ -5,6 +5,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridGroupCell,
 	GridGroupContent,
 	GridGroupRow,
@@ -20,7 +21,6 @@ import {
 } from '@vue-data-grid/core';
 import IconMinus from '~icons/lucide/minus';
 import IconPlus from '~icons/lucide/plus';
-import { h } from 'vue';
 
 import { type BadgeTone, UiBadge, UiButton, UiToolbar } from '@/ui';
 
@@ -44,12 +44,7 @@ function revenue(value: (sale: ProductSales) => number, label: string) {
 
 const columns = defineColumns({
 	product: column(sale => sale.product, { label: 'Name', width: 130, align: 'left' }),
-	category: column(sale => sale.category, {
-		label: 'Category',
-		width: 116,
-		align: 'left',
-		cell: ({ value }) => h(UiBadge, { tone: TONES[value] }, () => value),
-	}),
+	category: column(sale => sale.category, { label: 'Category', width: 116, align: 'left' }),
 	q1: revenue(sale => sale.q1, 'Q1'),
 	q2: revenue(sale => sale.q2, 'Q2'),
 	h1: revenue(sale => sale.q1 + sale.q2, 'Total'),
@@ -98,6 +93,9 @@ function setCollapsed(collapsed: boolean) {
 		</UiToolbar>
 
 		<GridRoot :grid="grid" label="Revenue by product" class="ui-grid" data-size="auto">
+			<GridCellTemplate v-slot="{ value }" :column="columns.category">
+				<UiBadge :tone="TONES[value]">{{ value }}</UiBadge>
+			</GridCellTemplate>
 			<GridHeader v-slot="{ groups: levels }">
 				<GridGroupRow v-for="(cells, level) in levels" :key="level" :level="level">
 					<GridGroupCell v-for="cell in cells" :key="cell.key" :cell="cell">

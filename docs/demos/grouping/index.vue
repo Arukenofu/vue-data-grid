@@ -3,6 +3,7 @@ import {
 	type ColumnAggregates,
 	defineColumn,
 	defineColumns,
+	GridCellTemplate,
 	grouping,
 	navigation,
 	type RowGroup,
@@ -12,7 +13,7 @@ import {
 	useDataGrid,
 	useGridMotion,
 } from '@vue-data-grid/core';
-import { h, shallowRef } from 'vue';
+import { shallowRef } from 'vue';
 
 import { UiBadge, UiDataGrid, UiToggleGroup, UiToolbar } from '@/ui';
 
@@ -50,9 +51,6 @@ const columns = defineColumns({
 		label: 'Group',
 		width: 216,
 		sortOrder: ['asc', 'desc'],
-		cell: ({ row, value }) => (row.count > 0
-			? h('span', { class: 'group-label' }, [value, h(UiBadge, () => row.count)])
-			: value),
 		footer: () => 'Total',
 	})),
 	units: amount(row => row.units, {
@@ -122,12 +120,19 @@ useGridMotion(grid);
 			<span class="ui-toolbar-text">Group by</span>
 			<UiToggleGroup v-model="groupBy" :options="GROUPINGS" label="Group by" />
 		</UiToolbar>
-		<UiDataGrid :grid="grid" label="Sales" footer />
+		<UiDataGrid :grid="grid" label="Sales" footer>
+			<GridCellTemplate v-slot="{ row, value }" :column="columns.label">
+				<span v-if="row.count > 0" class="group-label">
+					{{ value }}
+					<UiBadge>{{ row.count }}</UiBadge>
+				</span>
+			</GridCellTemplate>
+		</UiDataGrid>
 	</div>
 </template>
 
 <style scoped>
-.sales :deep(.group-label) {
+.group-label {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;

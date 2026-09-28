@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, selection, selectionColumn, useDataGrid } from '@vue-data-grid/core';
-import { computed, h, shallowRef } from 'vue';
+import {
+	defineColumn,
+	defineColumns,
+	GridCellTemplate,
+	navigation,
+	selection,
+	selectionColumn,
+	useDataGrid,
+} from '@vue-data-grid/core';
+import { computed, shallowRef } from 'vue';
 
 import { type Task, tasks } from '@/data/tasks';
 import { UiButton, UiDataGrid, UiToolbar } from '@/ui';
@@ -24,10 +32,6 @@ const columns = defineColumns({
 		label: 'Actions',
 		kind: 'service',
 		width: 150,
-		cell: ({ row }) => h('span', { class: 'actions' }, [
-			h(UiButton, { size: 'sm', onClick: () => announce(`Opened “${row.title}”`) }, () => 'Open'),
-			h(UiButton, { size: 'sm', variant: 'ghost', onClick: () => announce(`Archived “${row.title}”`) }, () => 'Archive'),
-		]),
 	}),
 });
 
@@ -70,7 +74,14 @@ function focusLast() {
 			<UiButton @click="focusLast">Focus the last actions</UiButton>
 		</UiToolbar>
 
-		<UiDataGrid :grid="grid" label="Tasks" data-size="sm" />
+		<UiDataGrid :grid="grid" label="Tasks" data-size="sm">
+			<GridCellTemplate v-slot="{ row }" :column="columns.actions">
+				<span class="actions">
+					<UiButton size="sm" @click="announce(`Opened “${row.title}”`)">Open</UiButton>
+					<UiButton size="sm" variant="ghost" @click="announce(`Archived “${row.title}”`)">Archive</UiButton>
+				</span>
+			</GridCellTemplate>
+		</UiDataGrid>
 
 		<p class="status">
 			<span><strong>Focused:</strong> {{ focused }}</span>
@@ -94,7 +105,7 @@ function focusLast() {
 	font-weight: 600;
 }
 
-:deep(.actions) {
+.actions {
 	display: inline-flex;
 	gap: 6px;
 }

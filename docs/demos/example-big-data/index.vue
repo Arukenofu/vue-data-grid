@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, navigation, sorting, useDataGrid } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, GridCellTemplate, navigation, sorting, useDataGrid } from '@vue-data-grid/core';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
 import IconArrowUpToLine from '~icons/lucide/arrow-up-to-line';
 import IconLocate from '~icons/lucide/locate';
-import { computed, h, nextTick, shallowRef, watch } from 'vue';
+import { computed, nextTick, shallowRef, watch } from 'vue';
 
 import { type BadgeTone, type Option, UiBadge, UiButton, UiDataGrid, UiNumberField, UiStat, UiToggleGroup, UiToolbar } from '@/ui';
 
@@ -55,7 +55,6 @@ const columns = defineColumns({
 		width: 112,
 		align: 'left',
 		pinned: 'end',
-		cell: ({ value }) => h(UiBadge, { tone: HEALTH[value].tone, dot: true }, () => HEALTH[value].label),
 	}),
 });
 
@@ -115,7 +114,11 @@ function formatCount(value: number) {
 			</UiButton>
 		</UiToolbar>
 
-		<UiDataGrid :grid="grid" label="Device readings" density="compact" style="height: 560px" />
+		<UiDataGrid :grid="grid" label="Device readings" density="compact" style="height: 560px">
+			<GridCellTemplate v-slot="{ value }" :column="columns.health">
+				<UiBadge :tone="HEALTH[value].tone" dot>{{ HEALTH[value].label }}</UiBadge>
+			</GridCellTemplate>
+		</UiDataGrid>
 
 		<div class="stats">
 			<UiStat label="Cells" :value="formatCount(cellCount)" />

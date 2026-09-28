@@ -2,7 +2,7 @@ import { defineComponent, h, type PropType, type Ref, type SlotsType, type VNode
 
 import { useGridAnnouncer } from '../announcer/use-grid-announcer';
 import type { DataGrid } from '../data-grid/use-data-grid';
-import { createDataGridContext } from './context';
+import { createDataGridContext, createGridTemplatesContext } from './context';
 import { createGridMessagesContext, type GridMessages } from './messages';
 import { forwardElement, primitiveProps, renderPrimitive } from './primitive';
 
@@ -20,6 +20,10 @@ const LiveRegion = defineComponent({
  * is the grid that takes focus first, and it renders the exit that Tab leaves the grid through right
  * after itself. Next to it stands a polite live region of `useGridAnnouncer`: the sort, the number of
  * selected rows, loading.
+ *
+ * The column templates, `GridCellTemplate` and the others, come first in its slot, before the header
+ * and the body: each registers itself as it is set up, before the cells it fills render, on the
+ * server too.
  *
  * The default slot gets `{ grid }`. Attributes go to the grid element; `grid` and `messages` are
  * read once. The part has several root nodes, so the scoped styles of a parent reach the grid from
@@ -46,6 +50,7 @@ export const GridRoot = defineComponent({
 		const announcer = props.announce ? useGridAnnouncer(grid, messages) : null;
 
 		createDataGridContext(grid);
+		createGridTemplatesContext();
 
 		const rootRef = forwardElement(grid.root);
 

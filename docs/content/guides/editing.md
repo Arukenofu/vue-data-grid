@@ -110,30 +110,32 @@ column as `number | null` and let `validate` refuse `NaN`.
 
 ### An editor of your own
 
-An editor is a function of its context that renders the element to type in. Spread
-`context.inputProps` on that element: they focus it, give it the keys of the grid, a label, and the
-error state.
+An editor with markup of your own is a `GridEditorTemplate` of its column, in the template of the
+grid. Bind `inputProps` to the element to type in: they focus it, give it the keys of the grid, a
+label, and the error state.
 
-```ts
-import type { CellEditor } from '@vue-data-grid/core';
-
-const colorEditor: CellEditor<Label, string> = context => h('input', {
-	...context.inputProps,
-	type: 'color',
-	value: context.draft,
-	onInput: (event: Event) => {
-		if (event.target instanceof HTMLInputElement) {
-			context.setDraft(event.target.value);
-		}
-	},
-});
-
-colorEditor.typing = 'value';
+```vue
+<GridRoot :grid="grid" label="Labels">
+	<GridEditorTemplate v-slot="{ inputProps, text, draft, setText }" :column="columns.color">
+		<span class="color-editor">
+			<span class="color-swatch" :style="{ background: draft }" />
+			<input
+				v-bind="inputProps"
+				:value="text ?? draft"
+				@input="setText(($event.target as HTMLInputElement).value)"
+			>
+		</span>
+	</GridEditorTemplate>
+	<!-- the header and the body -->
+</GridRoot>
 ```
 
-`typing: 'value'` says that a character typed on the cell should open the editor with the current
-value, since a colour cannot start from one letter. `setText` instead of `setDraft` keeps the text as
-typed and reads the value through the column's `parse`.
+`:column` types the slot by the column, so `draft` is a `string` here. `setText` keeps the text as
+typed and reads the value through the column's `parse`; `setDraft` sets a value as it is. The
+template renders the editor in place of the column's `editor`. What a character typed on the cell
+does is the column's `typing`: this field starts from the character, as text does; an editor that
+cannot start from one letter, such as a date picker, sits on a column with `typing: 'value'`, and
+typing on the cell opens it with the value.
 
 ## Two ways to edit a cell
 

@@ -82,8 +82,10 @@ with the row.
 ### treeColumn
 
 Turns a data column into the column of the tree: each cell starts with an indent of
-`--dg-tree-indent` per level and a [`GridTreeToggle`](/components/tree-toggle), then the column's own
-content. It stays a data column, and it is marked `tree`, so → and ← expand and collapse rows in it.
+`--dg-tree-indent` per level and a [`GridTreeToggle`](/components/tree-toggle), then the content of
+the cell, whichever gives it: a slot of `GridCells`, a `GridCellTemplate`, the column's `cell` or its
+text. The indent and the toggle are the column's `cellFrame`. It stays a data column, and it is
+marked `tree`, so → and ← expand and collapse rows in it.
 
 ```ts
 treeColumn(column: ColumnInput<TRow, TValue>): ColumnInput<TRow, TValue>
@@ -143,7 +145,8 @@ header of `dragHandleColumn()` a hidden label:
 ### A service column of your own
 
 Any column with `kind: 'service'` is furniture: an actions menu, a status light. Declare it as a
-column, and CSV, ranges and autosize leave it out:
+column, and CSV, ranges and autosize leave it out; its cells come from a
+[`GridCellTemplate`](/components/column-templates):
 
 ```ts
 const columns = defineColumns({
@@ -152,9 +155,18 @@ const columns = defineColumns({
 		label: 'Actions',
 		width: 48,
 		pinned: 'end',
-		cell: ({ row }) => h(RowMenu, { invoice: row }),
 	}),
 });
+```
+
+```vue
+<template>
+	<UiDataGrid :grid="grid" label="Invoices">
+		<GridCellTemplate v-slot="{ row }" :column="columns.actions">
+			<RowMenu :invoice="row" />
+		</GridCellTemplate>
+	</UiDataGrid>
+</template>
 ```
 
 ### Row numbers that name the rows

@@ -25,6 +25,7 @@ export { useColumnResize } from './columns/use-column-resize';
 export type {
 	CellContext,
 	CellEditor,
+	CellTyping,
 	EditorContext,
 	EditorMode,
 	EditorMove,
@@ -55,14 +56,23 @@ export type { EditingGrid, GridEditing, GridEditingOptions } from './editing/use
 export { useGridEditing } from './editing/use-grid-editing';
 export type { GridHistory, GridHistoryOptions, HistoryGrid } from './editing/use-grid-history';
 export { useGridHistory } from './editing/use-grid-history';
-export type { CellSlotContext } from './components/grid-body';
-export { GridBody, GridCells, GridRow } from './components/grid-body';
+export type {
+	CellSlotContext,
+	GridCellsComponent,
+	GridCellsProps,
+	GridCellsSlots,
+	GridColumnsRow,
+	GridColumnValue,
+} from './components/grid-body';
+export { defineGridCells, GridBody, GridCells, GridRow } from './components/grid-body';
+export { renderCellContent, renderCellEditor, renderFooterContent, renderHeaderContent } from './components/cell-content';
 export type { GridBodyRow, GridDragItems } from './components/context';
 export {
 	createBodyRowContext,
 	createColumnDragContext,
 	createDataGridContext,
 	createFooterCellContext,
+	createGridTemplatesContext,
 	createGroupCellContext,
 	createHeaderCellContext,
 	createRowDragContext,
@@ -70,10 +80,25 @@ export {
 	useColumnDragContext,
 	useDataGridContext,
 	useFooterCellContext,
+	useGridTemplatesContext,
 	useGroupCellContext,
 	useHeaderCellContext,
 	useRowDragContext,
 } from './components/context';
+export type {
+	GridTemplate,
+	GridTemplateContexts,
+	GridTemplateKind,
+	GridTemplateRegistration,
+	GridTemplates,
+} from './components/template-registry';
+export type {
+	GridCellTemplateComponent,
+	GridEditorTemplateComponent,
+	GridFooterTemplateComponent,
+	GridTemplateColumn,
+} from './components/grid-templates';
+export { GridCellTemplate, GridEditorTemplate, GridFooterTemplate, GridHeaderTemplate } from './components/grid-templates';
 export type { FooterSlotContext } from './components/grid-footer';
 export { GridFooter, GridFooterCell, GridFooterContent, GridFooterRow } from './components/grid-footer';
 export type { GroupCellSlotContext } from './components/grid-header';

@@ -4,6 +4,8 @@ import {
 	defineColumns,
 	downloadCsv,
 	getCellColumns,
+	GridCellTemplate,
+	GridHeaderTemplate,
 	navigation,
 	selection,
 	selectionColumn,
@@ -14,7 +16,7 @@ import {
 import IconDownload from '~icons/lucide/download';
 import IconTrash from '~icons/lucide/trash-2';
 import IconX from '~icons/lucide/x';
-import { computed, h, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 
 import {
 	type BadgeTone,
@@ -95,19 +97,16 @@ const columns = defineColumns({
 		pinned: 'start',
 		pinnable: true,
 		hideable: false,
-		cell: ({ row }) => h(AccountCell, { account: row }),
 		footer: ({ rows }) => `${rows.length} accounts`,
 	}),
 	status: column(account => account.status, {
 		label: 'Status',
 		width: 110,
 		format: value => STATUS[value].label,
-		cell: ({ value }) => h(UiBadge, { tone: STATUS[value].tone, dot: true }, () => STATUS[value].label),
 	}),
 	plan: column(account => account.plan, {
 		label: 'Plan',
 		width: 104,
-		cell: ({ value }) => h(UiBadge, { tone: PLAN_TONES[value] }, () => value),
 	}),
 	mrr: column(account => account.mrr, {
 		label: 'MRR',
@@ -122,7 +121,6 @@ const columns = defineColumns({
 		width: 140,
 		format: formatPercent,
 		aggregate: 'avg',
-		cell: ({ row }) => h(UsageCell, { account: row }),
 		footer: ({ aggregate }) => (aggregate === null ? '' : `${formatPercent(aggregate)} used`),
 	}),
 	country: column(account => account.country, { label: 'Country', width: 112, flex: 1 }),
@@ -140,13 +138,6 @@ const columns = defineColumns({
 		sortable: false,
 		resizable: false,
 		hideable: false,
-		header: () => h('span', { class: 'ui-visually-hidden' }, 'Actions'),
-		cell: ({ row }) => h(RowActions, {
-			account: row,
-			onUpgrade: () => replace(row.id, upgrade),
-			onCopy: () => copyEmail(row),
-			onRemove: () => remove([row.id]),
-		}),
 	}),
 });
 
@@ -240,7 +231,31 @@ watch(narrow, value => grid.scope.pinColumn('account', value ? null : 'start'));
 			:messages="{ empty: 'No accounts match these filters' }"
 			footer
 			data-size="lg"
-		/>
+		>
+			<GridCellTemplate v-slot="{ row }" :column="columns.account">
+				<AccountCell :account="row" />
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.status">
+				<UiBadge :tone="STATUS[value].tone" dot>{{ STATUS[value].label }}</UiBadge>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.plan">
+				<UiBadge :tone="PLAN_TONES[value]">{{ value }}</UiBadge>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ row }" :column="columns.usage">
+				<UsageCell :account="row" />
+			</GridCellTemplate>
+			<GridHeaderTemplate :column="columns.actions">
+				<span class="ui-visually-hidden">Actions</span>
+			</GridHeaderTemplate>
+			<GridCellTemplate v-slot="{ row }" :column="columns.actions">
+				<RowActions
+					:account="row"
+					@upgrade="replace(row.id, upgrade)"
+					@copy="copyEmail(row)"
+					@remove="remove([row.id])"
+				/>
+			</GridCellTemplate>
+		</UiDataGrid>
 	</div>
 </template>
 

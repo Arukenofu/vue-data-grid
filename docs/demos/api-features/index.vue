@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, useDataGrid, useGridMotion } from '@vue-data-grid/core';
-import { h, shallowRef } from 'vue';
+import {
+	defineColumn,
+	defineColumns,
+	GridCellTemplate,
+	GridHeaderTemplate,
+	useDataGrid,
+	useGridMotion,
+} from '@vue-data-grid/core';
+import { shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';
 import { UiDataGrid, UiStat, UiToolbar } from '@/ui';
@@ -29,8 +36,6 @@ const columns = defineColumns({
 		width: 48,
 		align: 'center',
 		sortable: false,
-		header: () => h('span', { class: 'ui-visually-hidden' }, 'Starred'),
-		cell: ({ row, value }) => h(StarButton, { starred: value, label: row.name, onToggle: () => toggleStar(row.id) }),
 	}),
 	symbol: column(stock => stock.symbol, { label: 'Symbol', width: 96 }),
 	name: column(stock => stock.name, { label: 'Company', flex: 1, width: 196 }),
@@ -65,6 +70,13 @@ useGridMotion(grid);
 			<UiStat label="Starred" :value="starred.size" />
 		</UiToolbar>
 
-		<UiDataGrid :grid="grid" label="Stocks" />
+		<UiDataGrid :grid="grid" label="Stocks">
+			<GridHeaderTemplate :column="columns.star">
+				<span class="ui-visually-hidden">Starred</span>
+			</GridHeaderTemplate>
+			<GridCellTemplate v-slot="{ row, value }" :column="columns.star">
+				<StarButton :starred="value" :label="row.name" @toggle="toggleStar(row.id)" />
+			</GridCellTemplate>
+		</UiDataGrid>
 	</div>
 </template>

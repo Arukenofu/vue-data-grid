@@ -22,18 +22,21 @@ const emit = defineEmits<{
 			<span class="task-list-count">{{ grid.rows.value.length }}</span>
 		</h3>
 		<UiDataGrid :grid="grid" :label="label" data-size="sm">
-			<GridRowDrag group="tasks" @drop="event => emit('drop', event)">
-				<GridBody v-slot="{ rows }">
-					<GridRow v-for="row in rows" :key="row.key" :row="row">
-						<GridCells />
-					</GridRow>
-				</GridBody>
-				<GridDragOverlay v-slot="{ label: task }">Drop “{{ task }}” into {{ label }}</GridDragOverlay>
-				<GridDragPreview v-slot="{ label: task }">
-					<IconGripVertical aria-hidden="true" />
-					{{ task }}
-				</GridDragPreview>
-			</GridRowDrag>
+			<slot />
+			<template #body>
+				<GridRowDrag group="tasks" @drop="event => emit('drop', event)">
+					<GridBody v-slot="{ rows }">
+						<GridRow v-for="row in rows" :key="row.key" :row="row">
+							<GridCells />
+						</GridRow>
+					</GridBody>
+					<GridDragOverlay v-slot="{ label: task }">Drop “{{ task }}” into {{ label }}</GridDragOverlay>
+					<GridDragPreview v-slot="{ label: task }">
+						<IconGripVertical aria-hidden="true" />
+						{{ task }}
+					</GridDragPreview>
+				</GridRowDrag>
+			</template>
 		</UiDataGrid>
 	</section>
 </template>

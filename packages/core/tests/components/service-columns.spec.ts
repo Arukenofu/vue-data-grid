@@ -6,7 +6,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { rowNumberColumn, selectionColumn, treeColumn } from '../../src/columns/service-columns';
 import { GridRoot } from '../../src/components/grid-root';
 import { type GridBodyRow, useBodyRowContext } from '../../src/components/context';
-import { GridBody } from '../../src/components/grid-body';
+import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import { GridCellTemplate } from '../../src/components/grid-templates';
+import type { CellContext } from '../../src/columns/column-fields';
 import { GridSelectionCheckbox } from '../../src/components/grid-service-parts';
 import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { selection, sorting, tree } from '../../src/data-grid/factories';
@@ -98,6 +100,50 @@ describe('service columns — rendered', () => {
 		expect(second.get('[data-dg-part="tree-toggle"]').element.tagName).toBe('SPAN');
 		// The top level has no indent to draw.
 		expect(first.find('[data-dg-part="tree-indent"]').exists()).toBe(false);
+	});
+
+	it('a `GridCellTemplate` of the tree column fills the cell after its indent and toggle', () => {
+		wrapper = mount(defineComponent({
+			setup() {
+				const grid = withFeatures() as DataGrid;
+
+				return () => h(GridRoot, { grid }, {
+					default: () => [
+						h(GridCellTemplate, { column: columns.name }, { default: ({ value }: CellContext<Row, string>) => h('b', value) }),
+						renderBody(),
+					],
+				});
+			},
+		}), { attachTo: document.body });
+
+		const [first, second] = bodyRows();
+
+		expect(first.get('[data-dg-column="name"]').text()).toBe('▾alpha');
+		expect(second.find('[data-dg-column="name"] [data-dg-part="tree-indent"]').exists()).toBe(true);
+		expect(second.get('[data-dg-column="name"] b').text()).toBe('beta');
+	});
+
+	it('a slot of `GridCells` fills the tree cell after its indent and toggle, as a template does', () => {
+		wrapper = mount(defineComponent({
+			setup() {
+				const grid = withFeatures() as DataGrid;
+
+				return () => h(GridRoot, { grid }, {
+					default: () => h(GridBody, null, {
+						default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => bodyRows.map(row => h(GridRow, { key: row.key, row }, {
+							default: () => h(GridCells, null, { name: ({ value }: CellContext<Row, string>) => h('em', value) }),
+						})),
+					}),
+				});
+			},
+		}), { attachTo: document.body });
+
+		const [first, second] = bodyRows();
+
+		expect(first.get('[data-dg-column="name"]').text()).toBe('▾alpha');
+		expect(first.find('[data-dg-column="name"] [data-dg-part="tree-toggle"]').exists()).toBe(true);
+		expect(second.find('[data-dg-column="name"] [data-dg-part="tree-indent"]').exists()).toBe(true);
+		expect(second.get('[data-dg-column="name"] em').text()).toBe('beta');
 	});
 
 	it('a tree without groups draws neither indents nor the room of toggles', () => {

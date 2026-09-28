@@ -8,7 +8,7 @@ import {
 	editing,
 	fill,
 	getCellText,
-	type HeaderContext,
+	GridHeaderTemplate,
 	history,
 	navigation,
 	numberField,
@@ -24,7 +24,7 @@ import IconCopy from '~icons/lucide/copy';
 import IconDownload from '~icons/lucide/download';
 import IconRedo from '~icons/lucide/redo-2';
 import IconUndo from '~icons/lucide/undo-2';
-import { computed, h, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 import { UiButton, UiDataGrid, UiToolbar } from '@/ui';
 
@@ -35,16 +35,12 @@ import StatusBar from './StatusBar.vue';
 
 type Quarter = 'q1' | 'q2' | 'q3' | 'q4';
 
-const SHEET = ['item', 'category', 'owner', 'q1', 'q2', 'q3', 'q4', 'total', 'approved'];
+const SHEET = ['item', 'category', 'owner', 'q1', 'q2', 'q3', 'q4', 'total', 'approved'] as const satisfies readonly (keyof typeof columns)[];
 
 function letterOf(name: string) {
-	const index = SHEET.indexOf(name);
+	const index = SHEET.findIndex(entry => entry === name);
 
 	return index === -1 ? '' : String.fromCharCode(65 + index);
-}
-
-function heading({ column }: HeaderContext) {
-	return h(ColumnHeader, { letter: letterOf(column.name), name: column.label ?? column.name });
 }
 
 function formatAmount(value: number | null) {
@@ -60,7 +56,6 @@ function quarter(name: Quarter, label: string) {
 		label,
 		width: 88,
 		align: 'right',
-		header: heading,
 		...numberField<BudgetLine>({ step: 50 }),
 		cell: ({ value }) => formatAmount(value),
 		cellClass: ({ value }) => (value !== null && value < 0 ? 'ui-cell-down' : undefined),
@@ -74,21 +69,18 @@ const columns = defineColumns({
 	item: column(line => line.item, {
 		label: 'Item',
 		width: 160,
-		header: heading,
 		validate: value => (value.trim() === '' ? 'An item needs a name' : undefined),
 		setValue: (line, item) => ({ ...line, item }),
 	}),
 	category: column(line => line.category, {
 		label: 'Category',
 		width: 116,
-		header: heading,
 		editor: selectEditor({ options: CATEGORIES.map(category => ({ value: category, label: category })) }),
 		setValue: (line, category) => ({ ...line, category }),
 	}),
 	owner: column(line => line.owner, {
 		label: 'Owner',
 		width: 92,
-		header: heading,
 		setValue: (line, owner) => ({ ...line, owner }),
 	}),
 	q1: quarter('q1', 'Q1'),
@@ -100,7 +92,6 @@ const columns = defineColumns({
 		width: 100,
 		align: 'right',
 		editable: false,
-		header: heading,
 		cell: ({ value }) => formatAmount(value),
 		cellClass: () => 'ui-cell-strong',
 	}),
@@ -108,7 +99,6 @@ const columns = defineColumns({
 		label: 'Approved',
 		width: 88,
 		align: 'center',
-		header: heading,
 		...checkboxField<BudgetLine>(),
 		setValue: (line, approved) => ({ ...line, approved }),
 	}),
@@ -203,7 +193,11 @@ function download() {
 
 		<FormulaBar :reference="active.reference" :content="draft ?? active.content" :editing="draft !== null" />
 
-		<UiDataGrid :grid="grid" label="Budget" density="compact" style="height: 520px" />
+		<UiDataGrid :grid="grid" label="Budget" density="compact" style="height: 520px">
+			<GridHeaderTemplate v-for="name in SHEET" :key="name" v-slot="{ column }" :column="columns[name]">
+				<ColumnHeader :letter="letterOf(name)" :name="column.label ?? column.name" />
+			</GridHeaderTemplate>
+		</UiDataGrid>
 
 		<StatusBar :cells="selected.cells" :numbers="selected.numbers" />
 	</div>

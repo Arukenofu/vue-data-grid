@@ -109,17 +109,27 @@ What `tree()` takes, to shape the tree the toggle opens:
 ### A cell of your own
 
 The demo renders the name column with a component of its own: an indent by level, the toggle with a
-chevron that turns, and a folder that opens. The cell context carries the row's tree node:
+chevron that turns, and a folder that opens. A `GridCellTemplate` of the column puts it in the
+cells, and the cell context carries the row's tree node:
 
 ```ts
 const columns = defineColumns({
-	name: column(file => file.name, {
-		label: 'Name',
-		tree: true,
-		cell: ({ row, node }) => h(FileCell, { file: row, node }),
-	}),
+	name: column(file => file.name, { label: 'Name', tree: true }),
 });
 ```
+
+```vue
+<template>
+	<GridRoot :grid="grid" label="Files">
+		<GridCellTemplate v-slot="{ row, node }" :column="columns.name">
+			<FileCell :file="row" :node="node" />
+		</GridCellTemplate>
+		<!-- the header and the body -->
+	</GridRoot>
+</template>
+```
+
+`FileCell.vue`:
 
 ```vue
 <template>

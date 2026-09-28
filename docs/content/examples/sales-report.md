@@ -134,8 +134,22 @@ const detailed = computed({
 
 ### The footer
 
-The `footer` field of a column renders its footer cell. It gets the column's `aggregate` over the
-leaves of the tree, every line, open or not, so the total does not depend on what is expanded:
+A footer cell gets the column's `aggregate` over the leaves of the tree, every line, open or not, so
+the total does not depend on what is expanded. The margin is not a sum, so its footer template
+computes it from the rows it gets, and renders the same bar as the cells of the column:
+
+```vue
+<UiDataGrid :grid="grid" label="Sales report" footer>
+	<GridCellTemplate v-slot="{ value }" :column="columns.margin">
+		<MarginCell :value="value" />
+	</GridCellTemplate>
+	<GridFooterTemplate v-slot="{ rows }" :column="columns.margin">
+		<MarginCell :value="getMargin(rows)" />
+	</GridFooterTemplate>
+</UiDataGrid>
+```
+
+A total that is text stays a `footer` field of the column, a function of the same context:
 
 ```ts
 revenue: column(row => row.revenue, {
@@ -144,16 +158,10 @@ revenue: column(row => row.revenue, {
 	format: revenue => money.format(revenue),
 	footer: ({ aggregate }) => money.format(aggregate ?? 0),
 }),
-margin: column(row => getMargin([row]), {
-	label: 'Margin',
-	cell: ({ value }) => h(MarginCell, { value }),
-	footer: ({ rows }) => h(MarginCell, { value: getMargin(rows) }),
-}),
 ```
 
-The margin is not a sum, so its footer computes it from the rows it gets. `aggregate` comes before
-`footer` in the object on purpose: TypeScript types the functions of an object in order, and that is
-what gives the footer its typed `aggregate`.
+`aggregate` comes before `footer` in the object on purpose: TypeScript types the functions of an
+object in order, and that is what gives the footer its typed `aggregate`.
 
 ## Accessibility
 

@@ -2,6 +2,7 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridCellTemplate,
 	navigation,
 	selection,
 	selectionColumn,
@@ -11,7 +12,7 @@ import {
 } from '@vue-data-grid/core';
 import IconArchive from '~icons/lucide/archive';
 import IconTruck from '~icons/lucide/truck';
-import { computed, h, shallowRef, watch } from 'vue';
+import { computed, shallowRef, watch } from 'vue';
 
 import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiToggleGroup, UiToolbar } from '@/ui';
 
@@ -42,7 +43,6 @@ const columns = defineColumns({
 		label: 'Status',
 		width: 112,
 		format: status => STATUS[status].label,
-		cell: ({ value }) => h(UiBadge, { tone: STATUS[value].tone, dot: true }, () => STATUS[value].label),
 	}),
 	items: column(order => order.items, { label: 'Items', width: 64, align: 'right' }),
 	total: column(order => order.total, { label: 'Total', width: 96, align: 'right', format: total => money.format(total) }),
@@ -113,6 +113,10 @@ function archive() {
 			<span class="ui-spacer" />
 			<UiToggleGroup v-model="selectionMode" :options="MODES" label="Selection mode" />
 		</UiToolbar>
-		<UiDataGrid :grid="grid" label="Orders" />
+		<UiDataGrid :grid="grid" label="Orders">
+			<GridCellTemplate v-slot="{ value }" :column="columns.status">
+				<UiBadge :tone="STATUS[value].tone" dot>{{ STATUS[value].label }}</UiBadge>
+			</GridCellTemplate>
+		</UiDataGrid>
 	</div>
 </template>

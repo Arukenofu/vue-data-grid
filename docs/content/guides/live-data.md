@@ -109,20 +109,22 @@ const changes = useCellChanges(grid.scope, { duration: 900, columns: ['price', '
 and use `at` as the key of the element, so that a second change restarts its animation instead of
 being lost in the first one:
 
-```ts
-price: column(stock => stock.price, {
-	label: 'Price',
-	align: 'right',
-	cell: ({ key, value }) => {
-		const change = changes.getChange(key, 'price');
-
-		return h('span', { key: change?.at, class: change && `quote-${change.direction}` }, value.toFixed(2));
-	},
-}),
+```vue
+<UiDataGrid :grid="grid" label="Live quotes">
+	<GridCellTemplate v-slot="{ key, value }" :column="columns.price">
+		<span
+			:key="changes.getChange(key, 'price')?.at"
+			class="quote"
+			:data-change="changes.getChange(key, 'price')?.direction"
+		>
+			{{ value.toFixed(2) }}
+		</span>
+	</GridCellTemplate>
+</UiDataGrid>
 ```
 
 ```css
-.quote-up {
+.quote[data-change='up'] {
 	animation: flash-up 0.9s ease-out;
 }
 

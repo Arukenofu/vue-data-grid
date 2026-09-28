@@ -5,9 +5,10 @@ import {
 	type RowNode,
 	type VirtualItem,
 } from '@vue-data-grid/engine';
-import { inject, type InjectionKey, provide } from 'vue';
+import { inject, type InjectionKey, onMounted, provide } from 'vue';
 
 import type { DataGrid } from '../data-grid/use-data-grid';
+import { createGridTemplates, type GridTemplates } from './template-registry';
 
 /** A body row as the parts of the body take it: one object per row while its item, data and node hold. */
 export interface GridBodyRow<TRow = unknown> {
@@ -23,6 +24,9 @@ export interface GridBodyRow<TRow = unknown> {
 }
 
 const DATA_GRID: InjectionKey<DataGrid> = Symbol('@vue-data-grid/core');
+
+// `null` below a grid without templates, so its parts do not reach those of a grid around it.
+const TEMPLATES: InjectionKey<GridTemplates | null> = Symbol('@vue-data-grid/core templates');
 
 const BODY_ROW: InjectionKey<() => GridBodyRow> = Symbol('@vue-data-grid/core row');
 
@@ -49,13 +53,48 @@ function injectContext<TValue>(key: InjectionKey<TValue>, fallback: unknown[], n
 
 /**
  * Provides the grid to the parts below, and its scope to `useGridScopeContext()`. `GridRoot` calls it;
- * call it yourself for parts under markup of your own.
+ * call it yourself for parts under markup of your own, then `createGridTemplatesContext` for the
+ * column templates.
  */
 export function createDataGridContext<TRow>(grid: DataGrid<TRow>) {
 	provide(DATA_GRID, grid as DataGrid);
+	provide(TEMPLATES, null);
 	createGridScopeContext(grid.scope);
 
 	return grid;
+}
+
+/**
+ * Provides an empty registry of column templates to the parts below and returns it: `GridCellTemplate`
+ * and the other template parts register there. `GridRoot` calls it; call it yourself in `setup` of a
+ * root of your own, after `createDataGridContext`, for a grid that takes template parts. It uses the
+ * lifecycle of the component it is called in.
+ */
+export function createGridTemplatesContext() {
+	let mounted = false;
+
+	// A server render never mounts: there a template after its cells stays out of order.
+	onMounted(() => {
+		mounted = true;
+	});
+
+	const templates = createGridTemplates(() => mounted);
+
+	provide(TEMPLATES, templates);
+
+	return templates;
+}
+
+/**
+ * The column templates of the grid around, which `GridCellTemplate` and the other template parts
+ * register: for a part of your own that renders cells, headers, footers or editors as the grid's parts
+ * do, with `renderCellContent` and the other content utilities. Throws outside a grid with templates,
+ * unless given a `fallback`, such as `null` in a part that renders without templates too.
+ */
+export function useGridTemplatesContext(): GridTemplates;
+export function useGridTemplatesContext<TFallback>(fallback: TFallback): GridTemplates | TFallback;
+export function useGridTemplatesContext(...fallback: unknown[]) {
+	return injectContext(TEMPLATES, fallback, 'useGridTemplatesContext', 'GridRoot');
 }
 
 /**

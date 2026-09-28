@@ -2,6 +2,8 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridCellTemplate,
+	GridHeaderTemplate,
 	navigation,
 	selection,
 	sorting,
@@ -11,7 +13,7 @@ import {
 } from '@vue-data-grid/core';
 import IconPause from '~icons/lucide/pause';
 import IconPlay from '~icons/lucide/play';
-import { computed, h, ref, shallowRef } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 
 import { getChange, type Sector, type Stock } from '@/data/stocks';
 import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiSelect, UiSparkline, UiToggleGroup, UiToolbar } from '@/ui';
@@ -77,27 +79,22 @@ const columns = defineColumns({
 		align: 'center',
 		sortable: false,
 		resizable: false,
-		header: () => h('span', { class: 'ui-visually-hidden' }, 'Watchlist'),
-		cell: ({ key, value }) => h(WatchToggle, { rowKey: key, symbol: value }),
 	}),
 	symbol: column(stock => stock.symbol, {
 		label: 'Symbol',
 		width: 200,
 		pinned: 'start',
-		cell: ({ row }) => h(SymbolCell, { stock: row }),
 		footer: ({ rows }) => `${rows.length} stocks`,
 	}),
 	sector: column(stock => stock.sector, {
 		label: 'Sector',
 		width: 120,
-		cell: ({ value }) => h(UiBadge, { tone: SECTOR_TONES[value] }, () => value),
 	}),
 	price: column(stock => stock.price, {
 		label: 'Price',
 		width: 110,
 		align: 'right',
 		format: formatPrice,
-		cell: ({ key, value }) => h(PriceCell, { text: formatPrice(value), change: changes.getChange(key, 'price') }),
 	}),
 	change: column(getChange, {
 		label: 'Change',
@@ -105,7 +102,6 @@ const columns = defineColumns({
 		align: 'right',
 		format: formatChange,
 		aggregate: 'avg',
-		cell: ({ value }) => h(ChangeCell, { value }),
 		footer: ({ aggregate }) => (aggregate === null ? '' : `avg ${formatChange(aggregate)}`),
 	}),
 	trend: column(stock => stock.history, {
@@ -113,7 +109,6 @@ const columns = defineColumns({
 		width: 110,
 		flex: 1,
 		sortable: false,
-		cell: ({ value }) => h(UiSparkline, { values: value }),
 	}),
 	volume: column(stock => stock.volume, {
 		label: 'Volume',
@@ -176,7 +171,29 @@ const declining = computed(() => quotes.value.length - advancing.value);
 			:messages="{ empty: 'Star a few stocks to build your watchlist.' }"
 			footer
 			style="height: 560px"
-		/>
+		>
+			<GridHeaderTemplate :column="columns.watch">
+				<span class="ui-visually-hidden">Watchlist</span>
+			</GridHeaderTemplate>
+			<GridCellTemplate v-slot="{ key, value }" :column="columns.watch">
+				<WatchToggle :row-key="key" :symbol="value" />
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ row }" :column="columns.symbol">
+				<SymbolCell :stock="row" />
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.sector">
+				<UiBadge :tone="SECTOR_TONES[value]">{{ value }}</UiBadge>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ key, value }" :column="columns.price">
+				<PriceCell :text="formatPrice(value)" :change="changes.getChange(key, 'price')" />
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.change">
+				<ChangeCell :value="value" />
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.trend">
+				<UiSparkline :values="value" />
+			</GridCellTemplate>
+		</UiDataGrid>
 
 		<p class="market">
 			<span class="market-live" :data-running="running ? '' : undefined">{{ running ? 'Live' : 'Paused' }}</span>

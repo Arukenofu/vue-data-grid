@@ -100,17 +100,29 @@ revenue: { label: 'Revenue 2026', children: ['firstHalf', 'secondHalf', 'year'],
 
 ## A header of your own
 
-Like a column, a group takes a `header` field when its label is not enough. It gets the group and
-whether it is collapsed:
+When a label is not enough, the slot of `GridGroupCell` takes markup of your own. It gets the cell,
+its group and whether it is collapsed:
+
+```vue
+<GridGroupCell v-for="cell in cells" :key="cell.key" v-slot="{ group }" :cell="cell">
+	<span v-if="group?.name === 'revenue'" class="revenue-title">
+		<IconChartLine aria-hidden="true" />
+		{{ group.label }}
+	</span>
+	<GridGroupContent v-else />
+	<GridGroupToggle />
+</GridGroupCell>
+```
+
+A header that is text wherever the group is shown can be declared with the group instead: its
+`header` field gets the group and whether it is collapsed, and `GridGroupContent` renders it:
 
 ```ts
-import { h } from 'vue';
-
 const groups = defineColumnGroups({
 	revenue: {
 		label: 'Revenue 2026',
 		children: ['firstHalf', 'secondHalf', 'year'],
-		header: ({ group }) => h('span', { class: 'revenue-title' }, [h(IconChartLine), group.label]),
+		header: ({ group, collapsed }) => (collapsed ? `${group.label} (total)` : group.label),
 	},
 });
 ```

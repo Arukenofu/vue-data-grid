@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridHeader,
 	GridHeaderCell,
 	GridHeaderContent,
@@ -17,7 +18,7 @@ import {
 	sorting,
 	useDataGrid,
 } from '@vue-data-grid/core';
-import { computed, h, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';
 import { type Option, UiSortIcon, UiSparkline, UiToggleGroup, UiToolbar } from '@/ui';
@@ -57,7 +58,6 @@ const columns = defineColumns({
 		label: 'Trend',
 		width: 92,
 		sortable: false,
-		cell: ({ value }) => h(UiSparkline, { values: value, width: 72, height: 22 }),
 	}),
 	price: column(stock => stock.price, {
 		label: 'Price',
@@ -103,6 +103,9 @@ const selectedCount = grid.selection.selectedCount;
 			</div>
 
 			<GridRoot :grid="grid" label="Watchlist" :class="{ 'ui-grid': theme === 'kit' }">
+				<GridCellTemplate v-slot="{ value }" :column="columns.trend">
+					<UiSparkline :values="value" :width="72" :height="22" />
+				</GridCellTemplate>
 				<GridHeader>
 					<GridHeaderRow v-slot="{ columns }">
 						<GridHeaderCell v-for="column in columns" :key="column.key" :column="column">

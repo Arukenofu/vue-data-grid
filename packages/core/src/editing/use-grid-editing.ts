@@ -177,6 +177,13 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 		return column ? getEditor(column) : null;
 	}
 
+	/** What a character typed on a cell of the column does: the column's `typing`, else its editor's. */
+	function getTyping(name: string) {
+		const column = scope.getColumn(name)?.column;
+
+		return column?.typing ?? getColumnEditor(name)?.typing ?? 'text';
+	}
+
 	function focusCell(cell: CellAddress) {
 		if (focus) {
 			focus.focus(cell);
@@ -553,7 +560,7 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 		return getColumnEditor(cell.column) !== null && editing.canEdit(cell);
 	}
 
-	/** The keys that start editing a cell: Enter, F2 and a character, by the column's editor. */
+	/** The keys that start editing a cell: Enter, F2 and a character, by the column's `typing`. */
 	function handleStartKey(event: KeyboardEvent, cell: CellAddress) {
 		if (!canStartEditor(cell)) {
 			return;
@@ -564,7 +571,7 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 			start(cell);
 		} else if (isCharacter(event)) {
 			event.preventDefault();
-			start(cell, getColumnEditor(cell.column)?.typing === 'value' ? {} : { text: event.key });
+			start(cell, getTyping(cell.column) === 'value' ? {} : { text: event.key });
 		}
 	}
 

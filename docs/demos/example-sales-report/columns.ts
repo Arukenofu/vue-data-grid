@@ -1,7 +1,5 @@
 import { defineColumn, defineColumnGroups, defineColumns, treeColumn } from '@vue-data-grid/core';
-import { h } from 'vue';
 
-import MarginCell from './MarginCell.vue';
 import { count, getMargin, getProfit, money, type ReportRow } from './report';
 
 const column = defineColumn<ReportRow>({ sortable: true, resizable: true });
@@ -56,8 +54,6 @@ export const columns = defineColumns({
 		label: 'Margin',
 		width: 130,
 		align: 'right',
-		cell: ({ value }) => h(MarginCell, { value }),
-		footer: ({ rows }) => h(MarginCell, { value: getMargin(rows) }),
 	}),
 });
 

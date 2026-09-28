@@ -55,9 +55,11 @@ export function rowNumberColumn<TRow>(options: ServiceColumnOptions & { rowHeade
 /**
  * Makes a data column the column of the tree: each cell starts with an indent for the row's level,
  * from level 1, and a `GridTreeToggle`, which expands a group row and leaves room on a leaf while the
- * tree has groups, then the column's own content. The indent is `--dg-tree-indent` per level in the structural styles. The toggle finds the
- * tree in the grid it is rendered in, so the grid needs the `tree` feature. The column is marked
- * `tree`, so → and ← of the navigation expand and collapse rows in it.
+ * tree has groups, then the cell's content: a slot of `GridCells`, the column's `GridCellTemplate`,
+ * its `cell`, else its text. The indent and the toggle are the column's `cellFrame`. The indent is
+ * `--dg-tree-indent` per level in the structural styles. The toggle finds the tree in the grid it is
+ * rendered in, so the grid needs the `tree` feature. The column is marked `tree`, so → and ← of the
+ * navigation expand and collapse rows in it.
  */
 export function treeColumn<
 	TRow,
@@ -65,25 +67,15 @@ export function treeColumn<
 	TMeta,
 	TAggregate extends ColumnAggregate<TRow, TValue> | AggregateName | undefined,
 >(column: ColumnInput<TRow, TValue, TMeta, TAggregate>): ColumnInput<TRow, TValue, TMeta, TAggregate> {
-	const { cell } = column;
-
 	return {
 		...column,
 		tree: true,
-		cell: context => [
+		cellFrame: (context, content) => [
 			context.node?.level
 				? h('span', { 'aria-hidden': 'true', 'data-dg-part': 'tree-indent', style: `--dg-level:${context.node.level}` })
 				: null,
 			h(GridTreeToggle, { row: context.key }),
-			cell?.(context) ?? h('span', { 'data-dg-part': 'cell-text' }, formatValue(column, context.value, context.row)),
+			content,
 		],
 	};
-}
-
-function formatValue<TRow, TValue>(column: Pick<ColumnInput<TRow, TValue>, 'format'>, value: TValue, row: TRow) {
-	if (column.format) {
-		return column.format(value, row);
-	}
-
-	return value === null || value === undefined ? '' : String(value);
 }

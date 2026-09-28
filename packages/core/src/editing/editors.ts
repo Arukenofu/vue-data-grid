@@ -343,19 +343,25 @@ export function numberField<TRow = unknown>(options: NumberEditorOptions = {}) {
 
 /**
  * The editing fields of a column of dates, to spread into it next to `editable` and `setValue`: the
- * `dateEditor` and a `parse` that reads `YYYY-MM-DD` as the editor gives it, and anything else as
- * `null`.
+ * `dateEditor`, a `parse` that reads `YYYY-MM-DD` as the editor gives it, and anything else as
+ * `null`, and `typing: 'value'`, so a typed character opens the editor with the value.
  */
 export function dateField<TRow = unknown>(options?: DateObjectEditorOptions): {
 	editor: CellEditor<TRow, Date | null>;
 	parse: (text: string) => Date | null;
+	typing: 'value';
 };
 export function dateField<TRow = unknown>(options: DateTextEditorOptions): {
 	editor: CellEditor<TRow, string | null>;
 	parse: (text: string) => string | null;
+	typing: 'value';
 };
-export function dateField(options: DateEditorOptions = {}): { editor: CellEditor<never, never>; parse: (text: string) => unknown } {
-	return { editor: createDateEditor(options), parse: getDateParser(options) };
+export function dateField(options: DateEditorOptions = {}): {
+	editor: CellEditor<never, never>;
+	parse: (text: string) => unknown;
+	typing: 'value';
+} {
+	return { editor: createDateEditor(options), parse: getDateParser(options), typing: 'value' };
 }
 
 /**

@@ -100,14 +100,14 @@ const emit = defineEmits<{ action: [name: string] }>();
 </template>
 ```
 
-The column renders it from its `cell` field, typed by the row:
+A `GridCellTemplate` of the column renders it, with the slot typed by the column's rows:
 
-```ts
-actions: column(() => null, {
-	label: 'Actions',
-	kind: 'service',
-	cell: ({ row }) => h(ReleaseActions, { release: row, onAction: name => run(name, row) }),
-}),
+```vue
+<UiDataGrid :grid="grid" label="Releases">
+	<GridCellTemplate v-slot="{ row }" :column="columns.actions">
+		<ReleaseActions :release="row" @action="name => run(name, row)" />
+	</GridCellTemplate>
+</UiDataGrid>
 ```
 
 The roving focus of the toolbar keeps only one of its buttons in the Tab order, so <kbd>Enter</kbd>

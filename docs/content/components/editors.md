@@ -20,7 +20,7 @@ yes-or-no values, and a small contract for writing your own.
 		'Values are checked by the column\'s `validate`; an invalid draft keeps the editor open with its error.',
 		'A list editor that filters its choices as you type, and opens above the cell when there is more room there.',
 		'A checkbox in the cell for yes-or-no columns, which writes on a click, with no editor at all.',
-		'Any editor of your own from one function of the editor context, such as the Reka UI date picker of the demo.',
+		'Any editor of your own in a template, with `GridEditorTemplate`, such as the Reka UI date picker of the demo.',
 	]"
 />
 
@@ -73,7 +73,8 @@ const grid = useDataGrid({
 ```
 
 `GridCells` renders the editor in the cell being edited, and the rest of the grid does not render.
-A column without `editor` edits with `textEditor()`.
+A column without `editor` edits with `textEditor()`. An editor with markup of your own is a
+`GridEditorTemplate` of its column in the template, [below](#an-editor-of-your-own).
 
 ## API reference
 
@@ -128,7 +129,7 @@ draft; Enter or Tab saves it, and so does a click on a choice.
 An editor of a date on the browser's date field, by the local calendar. The draft is a `Date` at
 local midnight, or `YYYY-MM-DD` text with `value: 'text'`; an empty field is `null`. A date field
 cannot start from one typed character, so typing on the cell opens it with the value.
-`dateField(options)` gives `{ editor, parse }`.
+`dateField(options)` gives `{ editor, parse, typing: 'value' }`.
 
 <PropsTable
 	label="Option"
@@ -163,6 +164,20 @@ the list says in `data-dg-side` which side of the cell it opened on.
 		{ name: '--dg-error-color', default: '#d93025', description: 'The outline of an invalid draft and the background of its error.' },
 		{ name: '--dg-editor-list-max-height', default: '16em', description: 'The list of `selectEditor`, which also keeps to the room in view.' },
 		{ name: '--dg-editor-text-max-height', default: '12em', description: 'A text area of `textEditor({ multiline: true })`, growing with its text.' },
+	]"
+/>
+
+### GridEditorTemplate
+
+The editor of the cells of a column, with markup in the template. The default slot gets the
+`EditorContext`, typed by the column; the part renders nothing where it stands. Put it first in the
+slot of `GridRoot`. It takes the place of the column's `editor` in the cell, and a cell its slot
+renders nothing for gets the column's `editor`. What a typed character does is the column's
+`typing`. A column with `editor: false` opens no editor, and a template for it warns in development.
+
+<PropsTable
+	:data="[
+		{ name: 'column', type: 'GridTemplateColumn<TRow, TValue>', required: true, description: 'The column, from `defineColumns`, such as `columns.restock`. It types the slot by the column\'s rows and values.' },
 	]"
 />
 
@@ -208,61 +223,57 @@ price: column(product => product.price, {
 
 ### An editor of your own
 
-An editor is a function of its context that renders the field. Bind `inputProps` to the element
-that takes input: it brings focus, the keys, the commit when focus leaves and the accessible name.
+An editor of your own is a `GridEditorTemplate` of its column, with the field in the template. Bind
+`inputProps` to the element that takes input: it brings focus, the keys, the commit when focus
+leaves and the accessible name.
 
-```ts
-import type { CellEditor } from '@vue-data-grid/core';
-import { h } from 'vue';
-
-function ratingEditor(): CellEditor<Product, number> {
-	return context => h('input', {
-		...context.inputProps,
-		type: 'range',
-		min: 0,
-		max: 5,
-		value: context.draft,
-		onInput: (event: Event) => {
-			if (event.target instanceof HTMLInputElement) {
-				context.setDraft(Number(event.target.value));
-			}
-		},
-	});
-}
+```vue
+<GridRoot :grid="grid" label="Products">
+	<GridEditorTemplate v-slot="{ inputProps, draft, setDraft }" :column="columns.rating">
+		<input
+			v-bind="inputProps"
+			type="range"
+			min="0"
+			max="5"
+			:value="draft"
+			@input="setDraft(Number(($event.target as HTMLInputElement).value))"
+		>
+	</GridEditorTemplate>
+	<!-- the header and the body -->
+</GridRoot>
 ```
 
-An editor that cannot start from one typed character, as a date field cannot, says so with
-`typing = 'value'`: typing on the cell then opens it with the value, in the full mode.
+`:column` types the slot: `draft` is the value of the column. For text, show `text ?? draft` and
+write with `setText(text)`, so the draft comes through the column's `parse` and the text stays as it
+was typed.
+
+The template renders the editor; the column's `typing` says what a typed character does. An editor
+that cannot start from one typed character, as a date field cannot, sits on a column with
+`typing: 'value'`: typing on the cell then opens it with the value, in the full mode.
 
 ### A date picker of Reka UI
 
 The dates of the demo are edited with the [Date Picker](https://reka-ui.com/docs/components/date-picker)
 of Reka UI: a field of segments, and a calendar that opens with it. It is a component of its own,
-and the editor is a function that renders it:
-
-```ts
-import type { CellEditor } from '@vue-data-grid/core';
-import { h } from 'vue';
-
-import DateEditor from './DateEditor.vue';
-
-export function rekaDateEditor<TRow>(): CellEditor<TRow, string | null> {
-	const editor: CellEditor<TRow, string | null> = context => h(DateEditor, { context });
-
-	editor.typing = 'value';
-
-	return editor;
-}
-```
+which takes the editor context as a prop, and a `GridEditorTemplate` renders it:
 
 ```ts
 restock: column(product => product.restock, {
 	label: 'Restock',
-	editor: rekaDateEditor<Product>(),
+	typing: 'value',
 	parse: parseDay,
 	setValue: (product, restock) => ({ ...product, restock }),
 }),
 ```
+
+```vue
+<GridEditorTemplate v-slot="context" :column="columns.restock">
+	<DateEditor :context="context" />
+</GridEditorTemplate>
+```
+
+`typing: 'value'` opens the picker with the value on a typed character, and `parse` reads a pasted
+`YYYY-MM-DD`; the template renders the picker.
 
 A picker is several elements rather than one: the segments of the field, a trigger, and a calendar
 in a popover outside the grid. The component spreads `inputProps` on the field, which gives it the

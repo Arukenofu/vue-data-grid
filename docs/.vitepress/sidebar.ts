@@ -17,6 +17,7 @@ const docs: DefaultTheme.SidebarItem[] = [
 		text: 'Guides',
 		items: [
 			{ text: 'Columns', link: '/guides/columns' },
+			{ text: 'Cell content', link: '/guides/cells' },
 			{ text: 'Sorting', link: '/guides/sorting' },
 			{ text: 'Column layout', link: '/guides/column-layout' },
 			{ text: 'Column groups', link: '/guides/column-groups' },
@@ -63,6 +64,7 @@ const components: DefaultTheme.SidebarItem[] = [
 	{
 		text: 'Columns',
 		items: [
+			{ text: 'Column templates', link: '/components/column-templates' },
 			{ text: 'Service columns', link: '/components/service-columns' },
 			{ text: 'Editors', link: '/components/editors' },
 		],

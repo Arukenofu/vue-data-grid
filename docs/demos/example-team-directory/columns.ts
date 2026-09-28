@@ -1,18 +1,15 @@
 import { defineColumn, defineColumns, selectionColumn } from '@vue-data-grid/core';
-import { h } from 'vue';
 
 import type { Person, Presence, Team } from '@/data/people';
-import { type BadgeTone, UiBadge } from '@/ui';
+import type { BadgeTone } from '@/ui';
 
-import PersonCell from './PersonCell.vue';
-
-const PRESENCE: Readonly<Record<Presence, { label: string; tone: BadgeTone }>> = {
+export const PRESENCE: Readonly<Record<Presence, { label: string; tone: BadgeTone }>> = {
 	active: { label: 'Active', tone: 'green' },
 	away: { label: 'Away', tone: 'amber' },
 	offline: { label: 'Offline', tone: 'gray' },
 };
 
-const TEAM_TONES: Readonly<Record<Team, BadgeTone>> = {
+export const TEAM_TONES: Readonly<Record<Team, BadgeTone>> = {
 	Design: 'violet',
 	Engineering: 'blue',
 	Marketing: 'amber',
@@ -41,19 +38,16 @@ export const columns = defineColumns({
 		pinnable: true,
 		movable: false,
 		hideable: false,
-		cell: ({ row }) => h(PersonCell, { person: row }),
 	}),
 	role: column(person => person.role, { label: 'Role', width: 190 }),
 	team: column(person => person.team, {
 		label: 'Team',
 		width: 130,
-		cell: ({ value }) => h(UiBadge, { tone: TEAM_TONES[value] }, () => value),
 	}),
 	location: column(person => person.location, { label: 'Location', width: 120 }),
 	presence: column(person => person.presence, {
 		label: 'Status',
 		width: 116,
-		cell: ({ value }) => h(UiBadge, { tone: PRESENCE[value].tone, dot: true }, () => PRESENCE[value].label),
 	}),
 	started: column(person => person.started, { label: 'Started', width: 116, format: formatMonth }),
 	projects: column(person => person.projects, { label: 'Projects', width: 100, align: 'right' }),

@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridHeader,
 	GridHeaderCell,
 	GridHeaderContent,
@@ -19,7 +20,7 @@ import {
 import IconCheck from '~icons/lucide/check';
 import IconMinus from '~icons/lucide/minus';
 import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
-import { h, shallowRef } from 'vue';
+import { shallowRef } from 'vue';
 
 import { type Person, type Presence, people } from '@/data/people';
 import { type BadgeTone, UiBadge, UiButton, UiStat, UiToggleGroup, UiToolbar } from '@/ui';
@@ -46,7 +47,6 @@ const columns = defineColumns({
 	presence: column(person => person.presence, {
 		label: 'Status',
 		width: 120,
-		cell: ({ value }) => h(UiBadge, { tone: PRESENCE[value].tone, dot: true }, () => PRESENCE[value].label),
 	}),
 });
 
@@ -75,6 +75,9 @@ const { selectedCount, clear } = grid.selection;
 		</UiToolbar>
 
 		<GridRoot :grid="grid" label="People" class="ui-grid people" data-size="sm">
+			<GridCellTemplate v-slot="{ value }" :column="columns.presence">
+				<UiBadge :tone="PRESENCE[value].tone" dot>{{ PRESENCE[value].label }}</UiBadge>
+			</GridCellTemplate>
 			<GridHeader>
 				<GridHeaderRow v-slot="{ columns: headers }">
 					<GridHeaderCell v-for="header in headers" :key="header.key" v-slot="{ column }" :column="header">

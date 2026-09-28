@@ -41,8 +41,16 @@ import { GridFooter, GridFooterCell, GridFooterRow } from '@vue-data-grid/core';
 </template>
 ```
 
-What a footer cell shows is declared with the column: an `aggregate` to compute, and a `footer` to
-render it.
+What a footer cell computes is declared with the column, an `aggregate`; what it shows, with a
+[`GridFooterTemplate`](./column-templates) in the template, its slot typed by that aggregate:
+
+```vue
+<GridFooterTemplate v-slot="{ aggregate }" :column="columns.revenue">
+	<strong>{{ money.format(aggregate ?? 0) }}</strong>
+</GridFooterTemplate>
+```
+
+For text alone, the column's `footer` field does it without a template:
 
 ```ts
 const columns = defineColumns({
@@ -136,8 +144,8 @@ A footer cell of a column, with the geometry of its column. Without a slot it sh
 
 ### GridFooterContent
 
-The content of the footer cell it is in: what the column's `footer` field returns. Text is cut to one
-line with an ellipsis, a node is shown as it is. It renders no element of its own; put it in the slot
+The content of the footer cell it is in: the column's `GridFooterTemplate`, else what its `footer`
+field returns. Text of the field is cut to one line with an ellipsis, a node is shown as it is. It renders no element of its own; put it in the slot
 to keep it next to content of your own.
 
 <DataAttributesTable

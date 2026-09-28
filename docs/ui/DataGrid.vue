@@ -5,7 +5,9 @@
 	empty and loading states, with `footer` the footer, and cell ranges with the `ranges` feature and
 	their fill handle with `fill`.
 
-	The default slot replaces the body, for rows of your own: put a `GridBody` there.
+	The default slot holds the column templates (`GridCellTemplate` and the others), first in
+	`GridRoot`, before the header and the body. The `body` slot replaces the body, for rows of your
+	own: put a `GridBody` there.
 -->
 <script setup lang="ts">
 import {
@@ -46,8 +48,9 @@ withDefaults(defineProps<{
 
 <template>
 	<GridRoot :grid="grid" :label="label" :messages="messages" class="ui-grid" :data-density="density">
+		<slot />
 		<DataGridHeader />
-		<slot>
+		<slot name="body">
 			<GridBody v-slot="{ rows }">
 				<GridRow v-for="row in rows" :key="row.key" :row="row">
 					<GridCells />

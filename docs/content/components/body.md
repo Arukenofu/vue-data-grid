@@ -19,7 +19,7 @@ renders again only when its own data changes.
 		'Renders only the rows in the row window, each placed at its offset.',
 		'A row keeps the same object while its data, place and tree node hold: this is the row memo.',
 		'All the cells of a row come from one part, as plain elements: a wide row costs one component.',
-		'A cell shows the column\'s `cell` field, or its text through `format`, or whatever your slot renders.',
+		'A cell shows whatever your slot renders, the column\'s `GridCellTemplate` or `cell` field, or its text through `format`.',
 		'`aria-selected` of cells in a range is written straight to the DOM, without rendering a row.',
 		'The cell being edited renders its editor; every other cell stays as it is.',
 	]"
@@ -110,9 +110,13 @@ The cells of the row it is in: one plain element per rendered column, with its r
 every cell. There is no component per cell on purpose: mounting and updating a body of components
 per cell costs about twice as much, and a grid is mostly cells.
 
-The default slot renders the content of each cell. When it renders nothing for a cell, for example
-because its `v-if` is false, the cell shows its own content, just as a `<slot>` shows its fallback:
-the column's `cell` field, else its text through `format`.
+The slots render the content of each cell: the slot named as the cell's column, else the default
+slot. When they render nothing for a cell, for example because a `v-if` is false, the cell shows its
+own content, just as a `<slot>` shows its fallback: the column's
+[`GridCellTemplate`](./column-templates), its `cell` field, else its text through `format`. A
+column's `cellFrame`, such as the indent and the toggle of `treeColumn()`, goes around whichever
+renders. The slots are not typed by the columns here; [`defineGridCells`](#definegridcells) gives
+them the types.
 
 <PropsTable
 	:data="[
@@ -122,7 +126,8 @@ the column's `cell` field, else its text through `format`.
 
 <SlotsTable
 	:data="[
-		{ name: 'default', scope: '{ row: unknown; value: unknown; key: string; index: number; column: RuntimeColumn; node?: RowNode; write?(value): void }', description: 'The cell context of each cell. `write` is there with the `editing` feature on a cell that can be edited.' },
+		{ name: '[column name]', scope: 'CellContext', description: 'The content of the cells of that column. A column named `default` has no slot of its own.' },
+		{ name: 'default', scope: '{ row: unknown; value: unknown; key: string; index: number; column: RuntimeColumn; node?: RowNode; write?(value): void }', description: 'The cell context of each cell its column slot leaves. `write` is there with the `editing` feature on a cell that can be edited.' },
 	]"
 />
 
@@ -146,28 +151,63 @@ the column's `cell` field, else its text through `format`.
 	]"
 />
 
+### defineGridCells
+
+`defineGridCells(columns)` gives `GridCells` typed by the columns given: the object of
+`defineColumns` passed to `useDataGrid`. `<template #status="{ value }">` gets the values of the
+column `status`, and a slot named after no column is an error in the template. The `default` slot
+types the row but not the value.
+
+It is the typed override of one body you write yourself. What a column shows wherever it is shown
+belongs to its [`GridCellTemplate`](./column-templates), which the slots here come before.
+
+```vue
+<script setup lang="ts">
+const grid = useDataGrid({ columns, rows, rowKey: 'id' });
+const Cells = defineGridCells(columns);
+</script>
+
+<template>
+	<GridRow v-for="row in rows" :key="row.key" :row="row">
+		<Cells>
+			<template #status="{ value }">…</template>
+		</Cells>
+	</GridRow>
+</template>
+```
+
+`defineGridCells` makes no component: every call gives `GridCells` itself, with the types of the
+columns it is given, so call it in `setup` wherever it suits. A list of columns has no names to type
+the slots by, and is a type error. A component that takes any grid, typed `DataGrid`, calls it with
+columns of its own type, or renders `GridCells`, whose slots are not typed.
+
 ## Examples
 
 ### Three ways to fill a cell
 
 Every cell of the demo above comes from one of three places, in this order of preference:
 
-1. **The column's `cell` field**, typed by the row: the status badge and the assignee. It is the same
-   wherever the column is shown, and the type of `row` and `value` comes from the column.
-2. **The slot of `GridCells`**, for markup that belongs to this one grid: the progress bar. The
-   slot is typed loosely, since the parts find the grid through `inject` and do not know its rows,
-   so read `value` rather than the row.
-3. **The fallback**: the text of the value through `format`, cut to one line. The due date needs
-   nothing more.
+1. **A [`GridCellTemplate`](./column-templates) of the column**: the status badge and the assignee.
+   Its slot is typed by the column it is given, so `value` is the column's value.
+2. **A slot of [`defineGridCells`](#definegridcells)**, named as its column, for markup of this one
+   body: the progress bar. The columns given to it name the slots and type them, so `value` is a
+   number there.
+3. **The fallback**: the column's `cell` field when it has one, else the text of the value through
+   `format`, cut to one line. The due date needs nothing more.
 
 ```vue
-<GridCells v-slot="{ column, value }">
-	<span v-if="column.name === 'progress'" class="progress">
-		<UiProgress :value="Number(value)" />
-		{{ value }}%
-	</span>
-</GridCells>
+<Cells>
+	<template #progress="{ value }">
+		<span class="progress">
+			<UiProgress :value="value" />
+			{{ value }}%
+		</span>
+	</template>
+</Cells>
 ```
+
+The default slot of `GridCells` does the same for every column at once, with `v-if` on
+`column.name`, but it is not typed by the columns: `value` is `unknown` there.
 
 ### Classes from the data
 

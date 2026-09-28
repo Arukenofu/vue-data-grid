@@ -2,13 +2,14 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridCellTemplate,
 	navigation,
 	selection,
 	selectionColumn,
 	sorting,
 	useDataGrid,
 } from '@vue-data-grid/core';
-import { computed, h, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiStat, UiToolbar } from '@/ui';
 
@@ -40,32 +41,22 @@ const columns = defineColumns({
 	version: column(release => release.version, {
 		label: 'Version',
 		width: 100,
-		cell: ({ row, value }) => h('button', { type: 'button', class: 'release-link', onClick: () => run('Opened the notes of', row) }, value),
 	}),
 	service: column(release => release.service, { label: 'Service', width: 110, flex: 1 }),
 	status: column(release => release.status, {
 		label: 'Build',
 		width: 104,
-		cell: ({ value }) => h(UiBadge, { tone: STATUS[value].tone, dot: true }, () => STATUS[value].label),
 	}),
 	approved: column(release => release.approved, {
 		label: 'Approved',
 		width: 106,
 		align: 'center',
-		cell: ({ row, value }) => h('input', {
-			type: 'checkbox',
-			class: 'release-check',
-			checked: value,
-			'aria-label': `Approve ${row.version}`,
-			onChange: () => toggleApproval(row),
-		}),
 	}),
 	actions: column(() => null, {
 		label: 'Actions',
 		kind: 'service',
 		width: 164,
 		sortable: false,
-		cell: ({ row }) => h(ReleaseActions, { release: row, onAction: (name: string) => run(name, row) }),
 	}),
 });
 
@@ -107,12 +98,31 @@ async function focusFirstCell() {
 			<UiStat label="Last action" :value="lastAction" />
 		</UiToolbar>
 
-		<UiDataGrid :grid="grid" label="Releases" />
+		<UiDataGrid :grid="grid" label="Releases">
+			<GridCellTemplate v-slot="{ row, value }" :column="columns.version">
+				<button type="button" class="release-link" @click="run('Opened the notes of', row)">{{ value }}</button>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.status">
+				<UiBadge :tone="STATUS[value].tone" dot>{{ STATUS[value].label }}</UiBadge>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ row, value }" :column="columns.approved">
+				<input
+					type="checkbox"
+					class="release-check"
+					:checked="value"
+					:aria-label="`Approve ${row.version}`"
+					@change="toggleApproval(row)"
+				>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ row }" :column="columns.actions">
+				<ReleaseActions :release="row" @action="name => run(name, row)" />
+			</GridCellTemplate>
+		</UiDataGrid>
 	</div>
 </template>
 
 <style scoped>
-.releases :deep(.release-link) {
+.release-link {
 	padding: 0;
 	border: none;
 	background: none;
@@ -125,7 +135,7 @@ async function focusFirstCell() {
 	cursor: pointer;
 }
 
-.releases :deep(.release-check) {
+.release-check {
 	width: 16px;
 	height: 16px;
 	margin: 0;

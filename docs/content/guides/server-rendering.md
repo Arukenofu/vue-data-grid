@@ -26,6 +26,10 @@ hundred thousand, with `aria-rowcount="100001"`, before any script runs.
   `persist` waits for the browser, see below.
 - **Ids.** The ids that tie an editor to its error and a list to its field come from Vue's `useId`,
   which gives the same ids on the server and in the browser.
+- **Column templates.** `GridCellTemplate` and the other template parts register themselves as they
+  are set up, so the server renders the cells with the templates that come before them: put them
+  first in the slot of `GridRoot`. One after its cells is missing from the server's HTML, which warns
+  in development.
 
 ```ts
 const grid = useDataGrid({

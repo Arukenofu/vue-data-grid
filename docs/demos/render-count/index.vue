@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridRoot,
 	GridRow,
 	selection,
@@ -12,7 +13,7 @@ import {
 	useCellChanges,
 	useDataGrid,
 } from '@vue-data-grid/core';
-import { h, ref, shallowRef } from 'vue';
+import { ref, shallowRef } from 'vue';
 
 import { createRandom } from '@/data/random';
 import { getChange, type Stock, stocks, tickStock } from '@/data/stocks';
@@ -36,7 +37,6 @@ const columns = defineColumns({
 		width: 100,
 		align: 'right',
 		format: price => price.toFixed(2),
-		cell: ({ key, value }) => h(FlashCell, { text: value.toFixed(2), change: () => changes.getChange(key, 'price') }),
 	}),
 	change: column(stock => getChange(stock), {
 		label: 'Change',
@@ -50,7 +50,6 @@ const columns = defineColumns({
 		width: 110,
 		align: 'right',
 		format: volume => volume.toLocaleString('en-US'),
-		cell: ({ key, value }) => h(FlashCell, { text: value.toLocaleString('en-US'), change: () => changes.getChange(key, 'volume') }),
 	}),
 	renders: column(() => 0, { label: 'Renders', kind: 'service', width: 88, align: 'center', pinned: 'end', sortable: false, resizable: false }),
 });
@@ -130,6 +129,12 @@ function sortByChange() {
 		</UiToolbar>
 
 		<GridRoot :grid="grid" label="Render counts" class="ui-grid" data-size="sm">
+			<GridCellTemplate v-slot="{ key, value }" :column="columns.price">
+				<FlashCell :text="value.toFixed(2)" :change="() => changes.getChange(key, 'price')" />
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ key, value }" :column="columns.volume">
+				<FlashCell :text="value.toLocaleString('en-US')" :change="() => changes.getChange(key, 'volume')" />
+			</GridCellTemplate>
 			<UiDataGridHeader />
 			<GridBody v-slot="{ rows: shown }">
 				<GridRow v-for="row in shown" :key="row.key" :row="row">

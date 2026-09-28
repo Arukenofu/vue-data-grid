@@ -133,13 +133,46 @@ and `GridFillFeature<Person>`.
 ## Slots
 
 The parts take the grid from their context, where its row type is not known, so their slots type
-the row as `unknown`: `GridBody` gives `GridBodyRow` items, `GridCells` a `CellSlotContext`. Two ways
-to a typed row:
+the row as `unknown`: `GridBody` gives `GridBodyRow` items, `GridCells` a `CellSlotContext`. Four
+ways to a typed row:
+
+- **A template of the column.** `GridCellTemplate`, `GridHeaderTemplate`, `GridFooterTemplate` and
+  `GridEditorTemplate` take the column from `defineColumns` as `:column`, and the column types their
+  slot: the row, the value and the column's `aggregate`. They are the first choice: the content of a
+  column wherever the body is rendered, such as by a grid component of yours, and they cover headers,
+  footers and editors.
+
+```vue
+<GridCellTemplate v-slot="{ value, row }" :column="columns.status">
+	<!-- value: Status, row: Person -->
+	<StatusBadge :status="value" :name="row.name" />
+</GridCellTemplate>
+```
+
+- **`defineGridCells`.** It gives `GridCells` typed by the columns you pass: a slot for each column,
+  and a slot named after no column is a type error. It overrides the templates in one body you write
+  yourself.
+
+```vue
+<script setup lang="ts">
+const Cells = defineGridCells(columns);
+</script>
+
+<template>
+	<GridRow v-for="row in rows" :key="row.key" :row="row">
+		<Cells>
+			<template #status="{ value, row: person }">
+				<!-- value: Status, person: Person -->
+				<StatusBadge :status="value" :name="person.name" />
+			</template>
+		</Cells>
+	</GridRow>
+</template>
+```
 
 - **Render in the column.** The `cell` field of a column gets a context of its own row and value
-  types, and `GridCells` renders it without a slot. This is the first choice for what belongs to a
-  column.
-- **Read the row from the grid.** In a slot, the index points into the grid's typed rows:
+  types too, for text or for columns shared as a module.
+- **Read the row from the grid.** In a slot of a part, the index points into the grid's typed rows:
 
 ```vue
 <GridCells v-slot="{ column, index }">
@@ -149,26 +182,23 @@ to a typed row:
 
 ## Editors
 
-An editor of your own is a `CellEditor<Person, number>`, a function of an `EditorContext` with the
-draft typed as the column's value. The built-in ones say what they edit: `numberEditor()` is a
-`CellEditor<TRow, number | null>`.
+An editor of your own is a `GridEditorTemplate` of its column: the slot gets an `EditorContext`
+with the draft typed as the column's value, `number` for a column of numbers.
 
-```ts
-import type { CellEditor } from '@vue-data-grid/core';
-
-function ratingEditor(): CellEditor<Person, number> {
-	return context => h('input', {
-		...context.inputProps,
-		type: 'range',
-		value: context.draft,
-		onInput: (event: Event) => {
-			if (event.target instanceof HTMLInputElement) {
-				context.setDraft(Number(event.target.value));
-			}
-		},
-	});
-}
+```vue
+<GridEditorTemplate v-slot="{ inputProps, draft, setDraft }" :column="columns.rating">
+	<input
+		v-bind="inputProps"
+		type="range"
+		:value="draft"
+		@input="setDraft(Number(($event.target as HTMLInputElement).value))"
+	>
+</GridEditorTemplate>
 ```
+
+`setDraft` takes a `number` here: a string is a type error in the template. The built-in editors
+say what they edit: `numberEditor()` is a `CellEditor<TRow, number | null>`, which fits a column of
+`number | null` only.
 
 ## Types to know
 
@@ -176,6 +206,8 @@ function ratingEditor(): CellEditor<Person, number> {
 	label="Type"
 	:data="[
 		{ name: 'DataGrid<TRow, THandles>', type: 'interface', description: 'The grid object of `useDataGrid`, for props and variables.' },
+		{ name: 'GridCellsComponent<TColumns>', type: 'type', description: 'What `defineGridCells` returns: `GridCells` with its slots typed by the columns.' },
+		{ name: 'GridCellsSlots<TColumns>', type: 'type', description: 'Its slots: one for each column, typed by it, and `default`.' },
 		{ name: 'DataGridOptions<TRow, TColumns, TFeatures>', type: 'type', description: 'The options of `useDataGrid`, for a wrapper that builds grids.' },
 		{ name: 'GridColumns', type: 'type', description: 'Columns of a grid: an object from `defineColumns`, or an array.' },
 		{ name: 'ColumnName<TColumns>', type: 'type', description: 'The names of columns from `defineColumns`; `string` for an array.' },
@@ -183,6 +215,7 @@ function ratingEditor(): CellEditor<Person, number> {
 		{ name: 'CellContext<TRow, TValue>', type: 'interface', description: 'What a `cell` field gets: the row, its value, key and index, the column and the tree node.' },
 		{ name: 'HeaderContext, FooterContext', type: 'interface', description: 'What `header` and `footer` fields get.' },
 		{ name: 'CellEditor<TRow, TValue>, EditorContext<TRow, TValue>', type: 'interface', description: 'An editor, and what it renders from.' },
+		{ name: 'GridTemplateColumn<TRow, TValue, TAggregate>', type: 'interface', description: 'The column a template part takes as `:column`, which types its slot.' },
 		{ name: 'GridMessages', type: 'interface', description: 'Every string of the interface, for a language of your own.' },
 	]"
 />

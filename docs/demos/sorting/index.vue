@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, type GridSort, sorting, useDataGrid } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, GridCellTemplate, type GridSort, sorting, useDataGrid } from '@vue-data-grid/core';
 import IconArrowDown from '~icons/lucide/arrow-down';
 import IconArrowUp from '~icons/lucide/arrow-up';
 import IconX from '~icons/lucide/x';
-import { computed, h, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 import { getChange, type Stock, stocks } from '@/data/stocks';
 import { type BadgeTone, UiBadge, UiButton, UiDataGrid, UiSwitch, UiToolbar } from '@/ui';
@@ -39,7 +39,6 @@ const columns = defineColumns({
 		width: 112,
 		sortOrder: ['desc', 'asc'],
 		compare: (a, b) => RATINGS.indexOf(a) - RATINGS.indexOf(b),
-		cell: ({ value }) => h(UiBadge, { tone: RATING_TONES[value] }, () => value),
 	}),
 	price: number(stock => stock.price, { label: 'Price', width: 96, format: price => money.format(price) }),
 	change: number(getChange, {
@@ -106,7 +105,11 @@ function clearSort() {
 			</UiButton>
 			<UiSwitch v-model="multiSort" label="Multi-sort with Shift" />
 		</UiToolbar>
-		<UiDataGrid :grid="grid" label="Stocks" />
+		<UiDataGrid :grid="grid" label="Stocks">
+			<GridCellTemplate v-slot="{ value }" :column="columns.rating">
+				<UiBadge :tone="RATING_TONES[value]">{{ value }}</UiBadge>
+			</GridCellTemplate>
+		</UiDataGrid>
 	</div>
 </template>
 

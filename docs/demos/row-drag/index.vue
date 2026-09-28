@@ -76,17 +76,19 @@ function reorder(event: GridRowDropEvent<unknown>) {
 		</UiToolbar>
 
 		<UiDataGrid :grid="grid" label="Playlist">
-			<GridRowDrag handle :indicator="indicator" @drop="reorder">
-				<GridBody v-slot="{ rows }">
-					<GridRow v-for="row in rows" :key="row.key" :row="row">
-						<GridCells />
-					</GridRow>
-				</GridBody>
-				<GridDragPreview v-slot="{ label }">
-					<IconMusic aria-hidden="true" />
-					{{ label }}
-				</GridDragPreview>
-			</GridRowDrag>
+			<template #body>
+				<GridRowDrag handle :indicator="indicator" @drop="reorder">
+					<GridBody v-slot="{ rows }">
+						<GridRow v-for="row in rows" :key="row.key" :row="row">
+							<GridCells />
+						</GridRow>
+					</GridBody>
+					<GridDragPreview v-slot="{ label }">
+						<IconMusic aria-hidden="true" />
+						{{ label }}
+					</GridDragPreview>
+				</GridRowDrag>
+			</template>
 		</UiDataGrid>
 	</div>
 </template>

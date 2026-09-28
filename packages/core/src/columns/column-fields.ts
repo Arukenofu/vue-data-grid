@@ -83,12 +83,18 @@ export interface EditorContext<TRow, TValue> extends CellContext<TRow, TValue> {
 export interface CellEditor<TRow = unknown, TValue = unknown> {
 	(context: EditorContext<TRow, TValue>): VNodeChild;
 	/**
-	 * What a character typed on the cell does: `'text'`, the default, starts editing with that
-	 * character in place of the value, in the `'quick'` mode; `'value'` starts with the value, in the
-	 * `'full'` mode, for an editor that cannot take part of a value, such as a date field.
+	 * What a character typed on the cell does with this editor, as the column's `typing` says it; the
+	 * column's own `typing` comes first. `dateEditor()` sets `'value'`.
 	 */
-	typing?: 'text' | 'value';
+	typing?: CellTyping;
 }
+
+/**
+ * What a character typed on a cell does: `'text'` starts editing with that character in place of the
+ * value, in the `'quick'` mode; `'value'` starts with the value, in the `'full'` mode, for an editor
+ * that cannot take part of a value, such as a date field.
+ */
+export type CellTyping = 'text' | 'value';
 
 /** What a header cell renders from. */
 export interface HeaderContext {
@@ -121,21 +127,41 @@ export interface GroupHeaderContext {
 declare module '@vue-data-grid/engine' {
 	// Type parameters must repeat the core declaration exactly, or the interfaces do not merge.
 	interface ColumnExtension<TRow, TValue, TAggregate> {
-		/** The header cell, when the column's `label` is not enough. */
+		/**
+		 * The header cell, when the column's `label` is not enough. In a template, `GridHeaderTemplate`
+		 * does it with markup.
+		 */
 		header?: (context: HeaderContext) => VNodeChild;
-		/** The body cell; the cell text from `format` without it. */
+		/**
+		 * The body cell; the cell text from `format` without it. In a template, `GridCellTemplate` does it
+		 * with markup.
+		 */
 		cell?: (context: CellContext<TRow, TValue>) => VNodeChild;
+		/**
+		 * What goes around the content of a body cell, whichever gives it: a slot of `GridCells`, the
+		 * column's `GridCellTemplate`, its `cell` or its text. `treeColumn()` puts the indent and the
+		 * toggle of the tree before it. Not around an editor.
+		 */
+		cellFrame?: (context: CellContext<TRow, TValue>, content: VNodeChild) => VNodeChild;
 		cellClass?: (context: CellContext<TRow, TValue>) => ClassValue;
 		/**
 		 * The editor of a cell of an `editable` column, such as `numberEditor()`; `textEditor()` without
 		 * it. `false` for a column whose cell edits itself with a control that calls `write`, such as
 		 * `checkboxCell()`: no editor opens, and Enter and Space go to the control. Bind `inputProps` to
-		 * the element that takes input.
+		 * the element that takes input. In a template, `GridEditorTemplate` renders it with markup.
 		 */
 		editor?: CellEditor<TRow, TValue> | false;
 		/**
+		 * What a character typed on a cell of the column does: `'text'` starts editing with it, `'value'`
+		 * opens the editor with the value. The `typing` of the column's `editor` without it, else
+		 * `'text'`. Set `'value'` on a column whose `GridEditorTemplate` cannot start from one character,
+		 * such as a date picker.
+		 */
+		typing?: CellTyping;
+		/**
 		 * The footer cell. A function `aggregate` types `aggregate` here when it comes before `footer` in
-		 * the object: TypeScript types the functions of an object literal in order.
+		 * the object: TypeScript types the functions of an object literal in order. In a template,
+		 * `GridFooterTemplate` does it with markup.
 		 */
 		footer?: (context: FooterContext<TRow, AggregateResult<TValue, TAggregate>>) => VNodeChild;
 		/**

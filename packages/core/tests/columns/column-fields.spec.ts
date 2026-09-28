@@ -1,4 +1,5 @@
 import {
+	type ColumnInput,
 	defineColumn,
 	defineColumnGroups,
 	defineColumns,
@@ -10,8 +11,8 @@ import {
 import { h, type VNodeChild } from 'vue';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import type { CellContext, CellEditor, EditorContext, EditorMode, GroupHeaderContext, HeaderContext } from '../../src/columns/column-fields';
-import { checkboxCell, textEditor } from '../../src/editing/editors';
+import type { CellContext, CellEditor, CellTyping, EditorContext, EditorMode, GroupHeaderContext, HeaderContext } from '../../src/columns/column-fields';
+import { checkboxCell, dateField, textEditor } from '../../src/editing/editors';
 
 interface Row {
 	id: string;
@@ -53,6 +54,23 @@ describe('column render fields', () => {
 
 		expectTypeOf(textEditor<Row, number>()).toEqualTypeOf<CellEditor<Row, number>>();
 		expectTypeOf<CellEditor['typing']>().toEqualTypeOf<'text' | 'value' | undefined>();
+	});
+
+	it('a column says what a typed character does with `typing`, and `dateField` sets `value`', () => {
+		expectTypeOf<ColumnInput<Row, string>['typing']>().toEqualTypeOf<CellTyping | undefined>();
+		expect(dateField({ value: 'text' }).typing).toBe('value');
+		expect(column(row => row.id, { ...dateField({ value: 'text' }) }).typing).toBe('value');
+	});
+
+	it('`cellFrame` takes the cell context typed by the column and the content', () => {
+		column(row => row.price, {
+			cellFrame: (context, content) => {
+				expectTypeOf(context).toEqualTypeOf<CellContext<Row, number>>();
+				expectTypeOf(content).toEqualTypeOf<VNodeChild>();
+
+				return [content];
+			},
+		});
 	});
 
 	it('`cell` and `cellClass` take the row and the value typed by the column', () => {

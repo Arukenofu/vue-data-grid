@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, moveRow, useDataGrid, useGridMotion } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, GridCellTemplate, moveRow, useDataGrid, useGridMotion } from '@vue-data-grid/core';
 import { GridDropZone, type GridDropZoneEvent, type GridRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
-import { computed, h, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 import { type Priority, type Task, tasks } from '@/data/tasks';
 import { type BadgeTone, UiBadge } from '@/ui';
@@ -23,7 +23,6 @@ const columns = defineColumns({
 	priority: column(task => task.priority, {
 		label: 'Priority',
 		width: 84,
-		cell: ({ value }) => h(UiBadge, { tone: PRIORITY[value] }, () => value),
 	}),
 	estimate: column(task => task.estimate, { label: 'Days', width: 52, align: 'right' }),
 });
@@ -65,6 +64,11 @@ function archive(event: GridDropZoneEvent) {
 	}
 }
 
+const boards = [
+	{ list: 'backlog', label: 'Backlog', grid: backlogGrid },
+	{ list: 'sprint', label: 'This sprint', grid: sprintGrid },
+] as const;
+
 const archiveText = computed(() => (archived.value.length === 0
 	? 'Drag a task here to archive it'
 	: `Archived: ${archived.value.map(task => task.title).join(', ')}`));
@@ -73,8 +77,17 @@ const archiveText = computed(() => (archived.value.length === 0
 <template>
 	<div class="ui-stack">
 		<div class="boards">
-			<TaskList :grid="backlogGrid" label="Backlog" @drop="event => place('backlog', event)" />
-			<TaskList :grid="sprintGrid" label="This sprint" @drop="event => place('sprint', event)" />
+			<TaskList
+				v-for="board in boards"
+				:key="board.list"
+				:grid="board.grid"
+				:label="board.label"
+				@drop="event => place(board.list, event)"
+			>
+				<GridCellTemplate v-slot="{ value }" :column="columns.priority">
+					<UiBadge :tone="PRIORITY[value]">{{ value }}</UiBadge>
+				</GridCellTemplate>
+			</TaskList>
 		</div>
 
 		<GridDropZone v-slot="{ ready, over }" class="bin" group="tasks" @drop="archive">

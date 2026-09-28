@@ -2,6 +2,7 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridCellTemplate,
 	sorting,
 	useCellChanges,
 	useDataGrid,
@@ -10,7 +11,7 @@ import {
 } from '@vue-data-grid/core';
 import IconPause from '~icons/lucide/pause';
 import IconPlay from '~icons/lucide/play';
-import { h, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue';
+import { onBeforeUnmount, onMounted, shallowRef, watch } from 'vue';
 
 import { createRandom } from '@/data/random';
 import { getChange, type Stock, stocks, tickStock } from '@/data/stocks';
@@ -23,12 +24,16 @@ const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFra
 
 let renders = 0;
 
-function renderQuote(key: string, column: string, text: string) {
+function quoteProps(key: string, column: string) {
 	renders += 1;
 
 	const change = changes.getChange(key, column);
 
-	return h('span', { key: change?.at, class: ['quote', change?.direction && `quote-${change.direction}`] }, text);
+	return { key: change?.at, class: ['quote', change?.direction && `quote-${change.direction}`] };
+}
+
+function formatChange(value: number) {
+	return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`;
 }
 
 const column = defineColumn<Stock>({ sortable: true });
@@ -40,20 +45,17 @@ const columns = defineColumns({
 		label: 'Price',
 		width: 88,
 		align: 'right',
-		cell: ({ key, value }) => renderQuote(key, 'price', value.toFixed(2)),
 	}),
 	change: column(stock => getChange(stock), {
 		label: 'Change',
 		width: 98,
 		align: 'right',
 		cellClass: ({ value }) => (value >= 0 ? 'ui-cell-up' : 'ui-cell-down'),
-		cell: ({ key, value }) => renderQuote(key, 'change', `${value > 0 ? '+' : ''}${value.toFixed(2)}%`),
 	}),
 	trend: column(stock => stock.history, {
 		label: 'Trend',
 		width: 96,
 		sortable: false,
-		cell: ({ value }) => h(UiSparkline, { values: value }),
 	}),
 	volume: column(stock => stock.volume, { label: 'Volume', width: 94, align: 'right', format: volume => compact.format(volume) }),
 });
@@ -133,7 +135,17 @@ onBeforeUnmount(() => {
 			<UiStat label="Renders/s" :value="rendered" />
 		</UiToolbar>
 
-		<UiDataGrid :grid="grid" label="Live quotes" />
+		<UiDataGrid :grid="grid" label="Live quotes">
+			<GridCellTemplate v-slot="{ key, value }" :column="columns.price">
+				<span v-bind="quoteProps(key, 'price')">{{ value.toFixed(2) }}</span>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ key, value }" :column="columns.change">
+				<span v-bind="quoteProps(key, 'change')">{{ formatChange(value) }}</span>
+			</GridCellTemplate>
+			<GridCellTemplate v-slot="{ value }" :column="columns.trend">
+				<UiSparkline :values="value" />
+			</GridCellTemplate>
+		</UiDataGrid>
 	</div>
 </template>
 

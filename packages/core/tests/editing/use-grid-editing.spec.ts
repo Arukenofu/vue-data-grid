@@ -5,11 +5,12 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import type { CellWriteResult, EditingCell as EditingCellOf } from '@vue-data-grid/engine';
 
-import type { CellContext, CellEditor } from '../../src/columns/column-fields';
+import type { CellContext, CellEditor, CellTyping, EditorContext } from '../../src/columns/column-fields';
 import type { GridBodyRow } from '../../src/components/context';
 import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
 import { GridRangeOverlay } from '../../src/components/grid-range-overlay';
 import { GridRoot } from '../../src/components/grid-root';
+import { GridEditorTemplate } from '../../src/components/grid-templates';
 import { clipboard, editing, history, navigation, ranges, sorting } from '../../src/data-grid/factories';
 import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { checkboxField, dateField, numberField, selectEditor, textEditor } from '../../src/editing/editors';
@@ -98,13 +99,19 @@ interface SetupOptions extends Partial<GridEditingOptions<Row>> {
 	cellSlot?: (context: CellContext<unknown, unknown>) => VNodeChild;
 	/** Sort the rows by their names, so that a write can move them. */
 	sorted?: boolean;
+	/** A `GridEditorTemplate` of the column `name`. */
+	nameEditor?: (context: EditorContext<Row, string>) => VNodeChild;
+	/** A `GridEditorTemplate` of the column `active`, whose cells edit themselves. */
+	activeEditor?: (context: EditorContext<Row, boolean>) => VNodeChild;
+	/** The `typing` of the column `name`. */
+	nameTyping?: CellTyping;
 }
 
 function createGrid(rows: ShallowRef<Row[]>, options: SetupOptions) {
-	const { cellSlot: _cellSlot, sorted, ...editingOptions } = options;
+	const { cellSlot: _cellSlot, sorted, nameEditor: _nameEditor, activeEditor: _activeEditor, nameTyping, ...editingOptions } = options;
 
 	return useDataGrid({
-		columns,
+		columns: nameTyping ? { ...columns, name: { ...columns.name, typing: nameTyping } } : columns,
 		rows,
 		rowKey: 'id',
 		rowHeight: 30,
@@ -125,6 +132,25 @@ function createGrid(rows: ShallowRef<Row[]>, options: SetupOptions) {
 	});
 }
 
+function renderBody(options: SetupOptions) {
+	return h(GridBody, null, {
+		default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => [
+			...bodyRows.map(row => h(GridRow, { key: row.key, row }, {
+				default: () => h(GridCells, null, options.cellSlot ? { default: options.cellSlot } : undefined),
+				$stable: true,
+			})),
+			h(GridRangeOverlay, { key: 'ranges' }),
+		],
+	});
+}
+
+function renderTemplates(options: SetupOptions) {
+	return [
+		options.nameEditor ? h(GridEditorTemplate, { column: columns.name }, { default: options.nameEditor }) : null,
+		options.activeEditor ? h(GridEditorTemplate, { column: columns.active }, { default: options.activeEditor }) : null,
+	];
+}
+
 function setup(options: SetupOptions = {}) {
 	const rows: ShallowRef<Row[]> = shallowRef(initial);
 	let grid: Grid | null = null;
@@ -134,15 +160,7 @@ function setup(options: SetupOptions = {}) {
 			grid = createGrid(rows, options);
 
 			return () => h(GridRoot, { grid: grid as DataGrid }, {
-				default: () => h(GridBody, null, {
-					default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => [
-						...bodyRows.map(row => h(GridRow, { key: row.key, row }, {
-							default: () => h(GridCells, null, options.cellSlot ? { default: options.cellSlot } : undefined),
-							$stable: true,
-						})),
-						h(GridRangeOverlay, { key: 'ranges' }),
-					],
-				}),
+				default: () => [...renderTemplates(options), renderBody(options)],
 			});
 		},
 	}), { attachTo: document.body });
@@ -984,6 +1002,65 @@ describe('useGridEditing — the default editor', () => {
 		await startWith(grid, 0, 'name', 'Enter');
 
 		expect(editor()?.getAttribute('data-own')).toBe('yes');
+	});
+
+	it('a `GridEditorTemplate` renders the editor of its column from the editor context', async () => {
+		const { grid, rows } = setup({
+			nameEditor: context => h('input', {
+				...context.inputProps,
+				'data-mode': context.mode,
+				value: context.text ?? String(context.draft),
+				onInput: (event: Event) => context.setText((event.target as HTMLInputElement).value),
+			}),
+		});
+		const input = await startWith(grid, 0, 'name', 'Z');
+
+		expect(input.value).toBe('Z');
+		expect(input.getAttribute('data-mode')).toBe('quick');
+
+		type(input, 'Zeta');
+		await nextTick();
+		key(input, 'Enter');
+		await nextTick();
+
+		expect(rows.value[0].name).toBe('Zeta');
+	});
+
+	it('a column with `editor: false` opens no editor, even with a `GridEditorTemplate`, and warns of the template', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const { grid } = setup({ activeEditor: () => h('input', { 'data-dg-part': 'editor' }) });
+
+		await startWith(grid, 1, 'active', 'Enter');
+
+		expect(editor()).toBeNull();
+		expect(warn.mock.calls.map(call => String(call[0])).filter(message => message.includes('never renders'))).toEqual([
+			expect.stringContaining('<GridEditorTemplate> of column "active"'),
+		]);
+		warn.mockRestore();
+	});
+
+	it('a `GridEditorTemplate` that renders nothing for a cell hands it to the editor of the column', async () => {
+		const { grid } = setup({
+			nameEditor: context => (context.key === 'a' ? null : h('input', { ...context.inputProps, 'data-own': 'template' })),
+		});
+
+		expect((await startWith(grid, 0, 'name', 'Enter')).hasAttribute('data-own')).toBe(false);
+
+		key(editor() as HTMLInputElement, 'Escape');
+		await nextTick();
+
+		expect((await startWith(grid, 1, 'name', 'Enter')).getAttribute('data-own')).toBe('template');
+	});
+
+	it('the `typing` of the column says what a typed character does, over the one of its editor', async () => {
+		const { grid } = setup({
+			nameTyping: 'value',
+			nameEditor: context => h('input', { ...context.inputProps, 'data-mode': context.mode, value: context.text ?? String(context.draft) }),
+		});
+		const input = await startWith(grid, 0, 'name', 'Z');
+
+		expect(input.value).toBe('Alpha');
+		expect(input.getAttribute('data-mode')).toBe('full');
 	});
 
 	it('types the editing by the rows, so a commit gives the rows back', () => {

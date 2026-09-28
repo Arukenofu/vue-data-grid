@@ -3,6 +3,7 @@ import {
 	downloadCsv,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridEmpty,
 	GridRoot,
 	GridRow,
@@ -22,10 +23,11 @@ import IconX from '~icons/lucide/x';
 import { computed, shallowRef } from 'vue';
 
 import { people as initialPeople, type Person, type Team } from '@/data/people';
-import { type SelectOption, UiButton, UiDataGridHeader, UiInput, UiSelect, UiStat, UiToolbar } from '@/ui';
+import { type SelectOption, UiBadge, UiButton, UiDataGridHeader, UiInput, UiSelect, UiStat, UiToolbar } from '@/ui';
 
-import { columns } from './columns';
+import { columns, PRESENCE, TEAM_TONES } from './columns';
 import ColumnsMenu from './ColumnsMenu.vue';
+import PersonCell from './PersonCell.vue';
 
 type TeamFilter = Team | 'all';
 
@@ -100,6 +102,15 @@ function remove() {
 
 		<div class="directory-grid">
 			<GridRoot :grid="grid" label="Team directory" class="ui-grid" data-size="lg">
+				<GridCellTemplate v-slot="{ row }" :column="columns.name">
+					<PersonCell :person="row" />
+				</GridCellTemplate>
+				<GridCellTemplate v-slot="{ value }" :column="columns.team">
+					<UiBadge :tone="TEAM_TONES[value]">{{ value }}</UiBadge>
+				</GridCellTemplate>
+				<GridCellTemplate v-slot="{ value }" :column="columns.presence">
+					<UiBadge :tone="PRESENCE[value].tone" dot>{{ PRESENCE[value].label }}</UiBadge>
+				</GridCellTemplate>
 				<GridColumnDrag>
 					<UiDataGridHeader />
 					<GridDragPreview />

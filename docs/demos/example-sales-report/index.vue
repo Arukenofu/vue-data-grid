@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { grouping, navigation, tree, useDataGrid, useGridMotion } from '@vue-data-grid/core';
+import {
+	GridCellTemplate,
+	GridFooterTemplate,
+	grouping,
+	navigation,
+	tree,
+	useDataGrid,
+	useGridMotion,
+} from '@vue-data-grid/core';
 import IconFoldVertical from '~icons/lucide/fold-vertical';
 import IconUnfoldVertical from '~icons/lucide/unfold-vertical';
 import { computed, ref, shallowRef, watch } from 'vue';
@@ -8,6 +16,7 @@ import { sales } from '@/data/sales';
 import { type Option, UiButton, UiDataGrid, UiStat, UiSwitch, UiToggleGroup, UiToolbar } from '@/ui';
 
 import { columns, groups } from './columns';
+import MarginCell from './MarginCell.vue';
 import { collectGroups, getMargin, GROUPINGS, type Grouping, money, type ReportRow, toLines } from './report';
 
 const GROUP_OPTIONS: readonly Option<Grouping>[] = [
@@ -94,6 +103,13 @@ function collapseAll() {
 			<UiStat label="Margin" :value="margin === null ? '—' : `${(margin * 100).toFixed(1)}%`" />
 		</UiToolbar>
 
-		<UiDataGrid :grid="grid" label="Sales report" footer data-size="lg" />
+		<UiDataGrid :grid="grid" label="Sales report" footer data-size="lg">
+			<GridCellTemplate v-slot="{ value }" :column="columns.margin">
+				<MarginCell :value="value" />
+			</GridCellTemplate>
+			<GridFooterTemplate v-slot="{ rows: footerRows }" :column="columns.margin">
+				<MarginCell :value="getMargin(footerRows)" />
+			</GridFooterTemplate>
+		</UiDataGrid>
 	</div>
 </template>

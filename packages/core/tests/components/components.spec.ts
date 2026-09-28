@@ -1,10 +1,28 @@
 import { defineColumn, defineColumnGroups, defineColumns, type RenderedColumn } from '@vue-data-grid/engine';
 import { mount } from '@vue/test-utils';
-import { defineComponent, h, nextTick, type ShallowRef, shallowRef, type VNodeChild } from 'vue';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { defineComponent, h, KeepAlive, nextTick, type ShallowRef, shallowRef, type VNodeChild } from 'vue';
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
-import type { GridBodyRow } from '../../src/components/context';
-import { type CellSlotContext, GridBody, GridCells, GridRow } from '../../src/components/grid-body';
+import type { CellContext, FooterContext, HeaderContext } from '../../src/columns/column-fields';
+import { renderCellContent } from '../../src/components/cell-content';
+import {
+	createDataGridContext,
+	createGridTemplatesContext,
+	type GridBodyRow,
+	useBodyRowContext,
+	useDataGridContext,
+	useGridTemplatesContext,
+} from '../../src/components/context';
+import { GridCellTemplate, GridEditorTemplate, GridFooterTemplate, GridHeaderTemplate } from '../../src/components/grid-templates';
+import {
+	type CellSlotContext,
+	defineGridCells,
+	GridBody,
+	GridCells,
+	type GridCellsComponent,
+	type GridCellsSlots,
+	GridRow,
+} from '../../src/components/grid-body';
 import { GridFooter } from '../../src/components/grid-footer';
 import { GridGroupToggle, GridHeader, GridHeaderCell, GridHeaderRow } from '../../src/components/grid-header';
 import { GridRoot } from '../../src/components/grid-root';
@@ -56,6 +74,7 @@ afterEach(() => {
 	wrapper = null;
 	cellRenders = 0;
 	document.body.innerHTML = '';
+	vi.restoreAllMocks();
 });
 
 function render(content: () => VNodeChild, create: CreateGrid = plainGrid) {
@@ -284,6 +303,392 @@ describe('grid parts — the row memo', () => {
 
 		expect(cellRenders).toBe(1);
 		expect(wrapper?.get('[data-dg-part="body"] [role="row"]').attributes()).toMatchObject({ 'aria-level': '1', 'aria-expanded': 'true' });
+	});
+});
+
+describe('grid parts — cells with a slot for each column', () => {
+	function renderSlotted(slots: Record<string, (context: CellSlotContext) => VNodeChild>) {
+		return () => h(GridBody, {}, {
+			default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, {
+				default: () => h(GridCells, null, slots),
+			})),
+		});
+	}
+
+	it('render a column with its slot, the other cells with the default slot, then their own content', () => {
+		render(renderSlotted({
+			id: ({ value }) => `id:${String(value)}`,
+			price: ({ value }) => (value === 1 ? null : `p:${String(value)}`),
+			default: ({ column: own }) => (own.name === 'price' ? 'default' : null),
+		}));
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['id:ap:3', 'id:bdefault', 'id:cp:2']);
+	});
+
+	it('a column named `_` renders its own content next to the flags of compiled slots', () => {
+		const flagged = defineColumns({ _: { value: (row: Row) => row.id } });
+
+		render(() => h(GridBody, {}, {
+			default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, {
+				// Compiled slots carry their flags under `_`.
+				default: () => h(GridCells, null, { default: () => null, _: 1 }),
+			})),
+		}), rows => useDataGrid({ columns: flagged, rows, rowKey: 'id', rowHeight: 30 }) as DataGrid<Row>);
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['a', 'b', 'c']);
+	});
+
+	it('`defineGridCells` gives `GridCells`, typed by the columns', () => {
+		const Cells = defineGridCells(columns);
+		type Slots = GridCellsSlots<typeof columns>;
+
+		expect(Cells).toBe(GridCells);
+		expectTypeOf(Cells).toEqualTypeOf<GridCellsComponent<typeof columns>>();
+		expectTypeOf<Parameters<NonNullable<Slots['id']>>[0]>().toEqualTypeOf<CellContext<Row, string>>();
+		expectTypeOf<Parameters<NonNullable<Slots['price']>>[0]>().toEqualTypeOf<CellContext<Row, number>>();
+		expectTypeOf<Parameters<NonNullable<Slots['default']>>[0]>().toEqualTypeOf<CellContext<Row, unknown>>();
+		// @ts-expect-error: no column has that name.
+		expectTypeOf<Slots['nothing']>();
+		// @ts-expect-error: a list of columns has no names to type the slots by.
+		expect(defineGridCells(Object.values(columns))).toBe(GridCells);
+	});
+});
+
+describe('grid parts — column templates', () => {
+	const templates = (price: () => VNodeChild = () => 'template') => [
+		h(GridCellTemplate, { column: columns.id }, { default: ({ value, key }: CellContext<Row, string>) => `${key}:${value}` }),
+		h(GridCellTemplate, { column: columns.price }, { default: price }),
+		h(GridHeaderTemplate, { column: columns.price }, { default: ({ column: own }: HeaderContext) => `head:${own.name}` }),
+		h(GridFooterTemplate, { column: columns.price }, {
+			default: ({ aggregate }: FooterContext<Row, number | null>) => `sum:${aggregate}`,
+		}),
+	];
+
+	const lateWarnings = (warn: { mock: { calls: unknown[][] } }) => warn.mock.calls
+		.map(call => String(call[0]))
+		.filter(message => message.includes('came after the cells'));
+
+	it('render the cells, the header and the footer of their column', async () => {
+		render(() => [...templates(), ...whole()]);
+		await nextTick();
+
+		expect(texts('[role="columnheader"]')).toEqual(['Id', 'head:price']);
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['a:atemplate', 'b:btemplate', 'c:ctemplate']);
+		expect(texts('[data-dg-part="foot"] [role="row"]')).toEqual(['sum:6']);
+	});
+
+	it('a template that renders nothing leaves the column\'s own content, and the slot of a part comes first', () => {
+		render(() => [
+			...templates(() => null),
+			h(GridBody, {}, {
+				default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, {
+					default: () => h(GridCells, null, {
+						default: ({ column: own }: CellSlotContext) => (own.name === 'id' ? 'slot' : null),
+					}),
+				})),
+			}),
+		]);
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['slot$3', 'slot$1', 'slot$2']);
+	});
+
+	it('a template after the body fills its cells once mounted, and warns that a server render misses it', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+		render(() => [renderBody(), templates()]);
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['a:atemplate', 'b:btemplate', 'c:ctemplate']);
+		expect(lateWarnings(warn)).toEqual([
+			expect.stringContaining('<GridCellTemplate> of column "id"'),
+			expect.stringContaining('<GridCellTemplate> of column "price"'),
+		]);
+	});
+
+	it('a template inside a component of its own before the body warns of nothing', () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const Templates = defineComponent({ setup: () => () => templates() });
+
+		render(() => [h(Templates), renderBody()]);
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['a:atemplate', 'b:btemplate', 'c:ctemplate']);
+		expect(warn).not.toHaveBeenCalled();
+	});
+
+	it('a render of the root with stable slots of its templates renders no row again', async () => {
+		const tick = shallowRef(0);
+		let calls = 0;
+
+		render(() => [
+			h('span', { class: 'tick' }, tick.value),
+			h(GridCellTemplate, { column: columns.id }, {
+				default: ({ value }: CellContext<Row, string>) => {
+					calls += 1;
+
+					return value;
+				},
+				$stable: true,
+			}),
+			renderBody(),
+		]);
+
+		const before = calls;
+
+		tick.value += 1;
+		await nextTick();
+
+		expect(wrapper?.get('.tick').text()).toBe('1');
+		expect(calls).toBe(before);
+	});
+
+	it('a slot that reads the render around it renders the cells of its column again when that changes', async () => {
+		const label = shallowRef('old');
+
+		render(() => {
+			const captured = label.value;
+
+			return [
+				h(GridCellTemplate, { column: columns.id }, { default: ({ value }: CellContext<Row, string>) => `${captured}:${value}` }),
+				h(GridHeaderTemplate, { column: columns.id }, { default: () => `head-${captured}` }),
+				renderHeader(),
+				renderBody(),
+			];
+		});
+
+		label.value = 'new';
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="id"]')).toEqual(['new:a', 'new:b', 'new:c']);
+		expect(texts('[role="columnheader"]')[0]).toBe('head-new');
+	});
+
+	it('a `v-if` that swaps two templates of a column renders the one shown', async () => {
+		const compact = shallowRef(true);
+
+		render(() => [
+			compact.value
+				? h(GridCellTemplate, { key: 'short', column: columns.price }, { default: () => 'short' })
+				: h(GridCellTemplate, { key: 'long', column: columns.price }, { default: () => 'long' }),
+			renderBody(),
+		]);
+
+		compact.value = false;
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="price"]')).toEqual(['long', 'long', 'long']);
+	});
+
+	it('templates that swap their columns fill the columns they stand for now', async () => {
+		const swapped = shallowRef(false);
+
+		render(() => [
+			h(GridCellTemplate, { key: 'one', column: swapped.value ? columns.price : columns.id }, { default: () => 'one' }),
+			h(GridCellTemplate, { key: 'two', column: swapped.value ? columns.id : columns.price }, { default: () => 'two' }),
+			renderBody(),
+		]);
+
+		swapped.value = true;
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['twoone', 'twoone', 'twoone']);
+	});
+
+	it('of two templates of a column the first one renders, with a warning, and the second takes over when it goes', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const first = shallowRef(true);
+		const Second = defineComponent({
+			setup: () => () => h(GridCellTemplate, { column: columns.id }, { default: () => 'second' }),
+		});
+
+		render(() => [
+			first.value ? h(GridCellTemplate, { column: columns.id }, { default: () => 'first' }) : null,
+			h(Second),
+			renderBody(),
+		]);
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="id"]')).toEqual(['first', 'first', 'first']);
+		expect(warn.mock.calls.map(call => String(call[0])).filter(message => message.includes('two <GridCellTemplate>'))).toHaveLength(1);
+
+		first.value = false;
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="id"]')).toEqual(['second', 'second', 'second']);
+	});
+
+	it('a template kept by `KeepAlive` fills its column only while it is shown', async () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+		const First = defineComponent({ setup: () => () => h(GridCellTemplate, { column: columns.id }, { default: () => 'A' }) });
+		const Second = defineComponent({ setup: () => () => h(GridCellTemplate, { column: columns.id }, { default: () => 'B' }) });
+		const shown = shallowRef<typeof First>(First);
+
+		render(() => [h(KeepAlive, null, { default: () => h(shown.value) }), renderBody()]);
+
+		shown.value = Second;
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="id"]')).toEqual(['B', 'B', 'B']);
+
+		shown.value = First;
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="id"]')).toEqual(['A', 'A', 'A']);
+	});
+
+	it('a template that comes and goes after the grid mounted fills its cells and warns of nothing', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const shown = shallowRef(false);
+
+		render(() => [shown.value ? templates() : null, renderBody()]);
+		await nextTick();
+
+		shown.value = true;
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['a:atemplate', 'b:btemplate', 'c:ctemplate']);
+		expect(warn).not.toHaveBeenCalled();
+
+		shown.value = false;
+		await nextTick();
+
+		expect(texts('[data-dg-part="body"] [role="row"]')).toEqual(['a$3', 'b$1', 'c$2']);
+	});
+
+	it('a column marked `tree` without `treeColumn()` renders its template', () => {
+		const marked = defineColumns({ id: { value: (row: Row) => row.id, tree: true } });
+
+		render(
+			() => [h(GridCellTemplate, { column: marked.id }, { default: () => 'T' }), renderBody()],
+			rows => useDataGrid({ columns: marked, rows, rowKey: 'id', rowHeight: 30 }) as DataGrid<Row>,
+		);
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="id"]')).toEqual(['T', 'T', 'T']);
+	});
+
+	it('a template outside a grid with templates throws an error that names the fix', () => {
+		vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+		expect(() => mount(() => h(GridCellTemplate, { column: columns.id }, { default: () => 'x' }))).toThrow(
+			'<GridCellTemplate> must be inside <GridRoot>, or a root of your own that calls createGridTemplatesContext()',
+		);
+	});
+
+	it('a root of your own takes templates with `createGridTemplatesContext`, and without it does not reach those of a grid around', () => {
+		const rows = shallowRef(initial);
+
+		function ownRoot(withTemplates: boolean) {
+			return defineComponent({
+				setup(_props, { slots }) {
+					createDataGridContext(useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 }) as DataGrid);
+
+					if (withTemplates) {
+						createGridTemplatesContext();
+					}
+
+					return () => h('div', { class: withTemplates ? 'with' : 'without' }, slots.default?.());
+				},
+			});
+		}
+
+		const With = ownRoot(true);
+		const Without = ownRoot(false);
+
+		render(() => [
+			h(GridCellTemplate, { column: columns.id }, { default: () => 'outer' }),
+			h(With, null, { default: () => [h(GridCellTemplate, { column: columns.id }, { default: () => 'own' }), renderBody()] }),
+			h(Without, null, { default: () => renderBody() }),
+		]);
+
+		expect(texts('.with [data-dg-column="id"]')).toEqual(['own', 'own', 'own']);
+		expect(texts('.without [data-dg-column="id"]')).toEqual(['a', 'b', 'c']);
+	});
+
+	it('the slot of a template is typed by its column', () => {
+		expectTypeOf(GridCellTemplate).toBeFunction();
+		// Not called: the check is of the types vue-tsc gives a template.
+		const check = () => [
+			GridCellTemplate({ column: columns.price }, {
+				attrs: {},
+				emit: () => undefined,
+				slots: { default: context => expectTypeOf(context).toEqualTypeOf<CellContext<Row, number>>() },
+			}),
+			GridFooterTemplate({ column: columns.price }, {
+				attrs: {},
+				emit: () => undefined,
+				slots: { default: ({ aggregate }) => expectTypeOf(aggregate).toEqualTypeOf<number | null>() },
+			}),
+			GridEditorTemplate({ column: columns.id }, {
+				attrs: {},
+				emit: () => undefined,
+				slots: { default: ({ draft }) => expectTypeOf(draft).toEqualTypeOf<string>() },
+			}),
+			// @ts-expect-error: the values of `price` are numbers, not the strings the slot takes.
+			GridCellTemplate({ column: columns.price }, {
+				attrs: {},
+				emit: () => undefined,
+				slots: { default: (context: CellContext<Row, string>) => context.value },
+			}),
+			GridEditorTemplate({ column: columns.price }, {
+				attrs: {},
+				emit: () => undefined,
+				// @ts-expect-error: the draft of `price` is a number.
+				slots: { default: ({ setDraft }) => setDraft('x') },
+			}),
+		];
+
+		expect(check).toBeTypeOf('function');
+	});
+});
+
+describe('cell content', () => {
+	it('a part of your own renders the content of cells as `GridCells` does, with `renderCellContent`', () => {
+		const OwnCells = defineComponent({
+			setup() {
+				const grid = useDataGridContext();
+				const templates = useGridTemplatesContext(null);
+				const row = useBodyRowContext();
+
+				return () => grid.scope.renderedColumns.value.map(({ key, column: own }) => {
+					const current = row();
+
+					if (!own) {
+						return null;
+					}
+
+					const context = { row: current.original, value: own.value(current.original), key: current.key, index: current.index, column: own };
+
+					const slotContent = current.key === 'a' && own.name === 'id' ? 'own' : null;
+
+					return h('span', { key, class: 'own' }, [renderCellContent(context, templates, slotContent)]);
+				});
+			},
+		});
+
+		render(() => [
+			h(GridCellTemplate, { column: columns.id }, { default: ({ key }: CellContext<Row, string>) => (key === 'c' ? 'template' : null) }),
+			h(GridBody, null, {
+				default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, { default: () => h(OwnCells) })),
+			}),
+		]);
+
+		expect(texts('.own')).toEqual(['own', '$3', 'b', '$1', 'template', '$2']);
+	});
+
+	it('the `cellFrame` of the column goes around the content of a cell, whichever gives it', () => {
+		const framed = defineColumns({
+			id: { value: (row: Row) => row.id, cellFrame: (_context, content) => ['[', content, ']'] },
+		});
+
+		render(() => [
+			h(GridCellTemplate, { column: framed.id }, { default: ({ key }: CellContext<Row, string>) => (key === 'b' ? 'template' : null) }),
+			h(GridBody, null, {
+				default: ({ rows }: { rows: readonly GridBodyRow[] }) => rows.map(row => h(GridRow, { key: row.key, row }, {
+					default: () => h(GridCells, null, { default: ({ key }: CellSlotContext) => (key === 'a' ? 'slot' : null) }),
+				})),
+			}),
+		], rows => useDataGrid({ columns: framed, rows, rowKey: 'id', rowHeight: 30 }) as DataGrid<Row>);
+
+		expect(texts('[data-dg-part="body"] [data-dg-column="id"]')).toEqual(['[slot]', '[template]', '[c]']);
 	});
 });
 

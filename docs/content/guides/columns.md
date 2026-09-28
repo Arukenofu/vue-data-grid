@@ -31,8 +31,8 @@ const columns = defineColumns({
 
 `defineColumns` takes an object: its keys become the names of the columns, typed as literals, so a
 sort or a layout that names a column that does not exist fails to compile. The value of `amount` is
-a `number` from here on: its `format`, `compare`, `cell` and `footer` all receive a number without a
-single type annotation.
+a `number` from here on: its `format` and `compare`, and the slots of its templates in the markup,
+all receive a number without a single type annotation.
 
 Columns can also be an array, or a `ref` or getter of either, when the set of columns changes at
 run time. The grid then reconciles the new set against the old one field by field, and keeps every
@@ -89,26 +89,39 @@ why resizing a column of a thousand rows stays smooth.
 ## Rendering cells
 
 Without anything else, a cell shows the text of `format` on one line, cut with an ellipsis. When a
-cell needs more, give its column a `cell` field: a function of the cell's context that returns what
-to render, as a render function does.
+cell needs more, write its markup in the template of the grid with a `GridCellTemplate` of its
+column:
 
-```ts
-import { h } from 'vue';
+```vue
+<script setup lang="ts">
+import { defineColumn, defineColumns, GridCellTemplate, useDataGrid } from '@vue-data-grid/core';
+
+const column = defineColumn<Invoice>();
 
 const columns = defineColumns({
-	status: column(invoice => invoice.status, {
-		label: 'Status',
-		format: status => STATUS[status].label,
-		cell: ({ value }) => h(UiBadge, { tone: STATUS[value].tone }, () => STATUS[value].label),
-	}),
-	customer: column(invoice => invoice.customer, {
-		label: 'Customer',
-		cell: ({ row }) => h(CustomerCell, { name: row.customer, email: row.email }),
-	}),
+	customer: column(invoice => invoice.customer, { label: 'Customer', flex: 1 }),
+	status: column(invoice => invoice.status, { label: 'Status', format: status => STATUS[status].label }),
 });
+
+const grid = useDataGrid({ columns, rows: invoices, rowKey: 'id', rowHeight: 52 });
+</script>
+
+<template>
+	<GridRoot :grid="grid" label="Invoices">
+		<GridCellTemplate v-slot="{ row }" :column="columns.customer">
+			<CustomerCell :name="row.customer" :email="row.email" />
+		</GridCellTemplate>
+		<GridCellTemplate v-slot="{ value }" :column="columns.status">
+			<UiBadge :tone="STATUS[value].tone">{{ STATUS[value].label }}</UiBadge>
+		</GridCellTemplate>
+		<!-- the header and the body -->
+	</GridRoot>
+</template>
 ```
 
-The context is typed by the column: `value` is the value of the column, `row` is your row.
+The template renders nothing where it stands: it gives its slot to the cells of its column, which
+`GridCells` renders. `:column` takes the column from `defineColumns` and types the slot by it:
+`value` is the value of the column, `row` is your row.
 
 <PropsTable
 	label="Context"
@@ -123,8 +136,14 @@ The context is typed by the column: `value` is the value of the column, `row` is
 	]"
 />
 
-For anything more than a line or two, render a small component of your own, as `CustomerCell` does
-in the demo: the cell stays declarative, typed by its props, and styled by its own scoped CSS.
+Put the templates first in the slot of `GridRoot`, before the header and the body: each registers
+itself as it is set up, before the cells it fills render, on the server too. A template inside a
+component of your own counts where the component stands. One that comes after its cells warns in
+development: it fills them once mounted, but a server render misses it.
+
+For anything more than a line or two, render a small component of your own inside the template, as
+`CustomerCell` does in the demo: the cell stays declarative, typed by its props, and styled by its
+own scoped CSS.
 
 `cellClass` adds classes to the cell element itself, from the same context. Use it for a look that
 depends on the value, such as a negative amount in red:
@@ -135,40 +154,34 @@ amount: column(invoice => invoice.amount, {
 }),
 ```
 
-### From the template instead
-
-`GridCells` takes a slot too. It runs for every cell, and a cell the slot renders nothing for keeps
-its own content, as a `<slot>` keeps its fallback. That makes the slot handy for a quick change in
-the template:
-
-```vue
-<GridCells v-slot="{ column, value }">
-	<strong v-if="column.name === 'number'">{{ value }}</strong>
-</GridCells>
-```
-
-The slot is shared by every column, so it cannot know the type of your rows: `row` and `value` are
-`unknown` there. For typed content, the `cell` field is the better home.
-
 ### Headers and footers
 
-`header` renders the header cell when the label is not enough, and gets the column and its sort
-state. `footer` renders the footer cell. With an `aggregate`, the footer receives the total of the
-column over the rows, typed by the aggregate:
+`GridHeaderTemplate` renders the header cell of its column when the label is not enough, and gets
+the column and its sort state. `GridFooterTemplate` renders the footer cell. With an `aggregate`,
+the footer receives the total of the column over the rows, typed by the aggregate:
 
 ```ts
-amount: column(invoice => invoice.amount, {
-	label: 'Amount',
-	aggregate: 'sum',
-	footer: ({ aggregate }) => money.format(aggregate ?? 0),
-}),
+amount: column(invoice => invoice.amount, { label: 'Amount', aggregate: 'sum' }),
+```
+
+```vue
+<GridFooterTemplate v-slot="{ aggregate }" :column="columns.amount">
+	<strong>{{ money.format(aggregate ?? 0) }}</strong>
+</GridFooterTemplate>
 ```
 
 `aggregate` is `'sum'`, `'avg'`, `'min'`, `'max'`, `'count'`, or a function of the values and the rows.
 `sum` and `avg` count finite numbers only and give `null` when there are none, which is why the
-footer above falls back to zero. Put `aggregate` before `footer` in the object: TypeScript types the
-functions of an object literal in order. Group rows use the same aggregates; see
+footer above falls back to zero. Group rows use the same aggregates; see
 [Trees and grouping](/guides/trees-and-grouping).
+
+### Other ways
+
+A column can also carry its content itself, in its `cell`, `header` and `footer` fields, functions
+for text and for columns shared as a module, and a `cellFrame` around the content of its body cells,
+as `treeColumn()` does; `GridCells` takes a slot for each column, typed with `defineGridCells`, and
+`GridCells`, `GridHeaderCell` and `GridFooterCell` take a slot for a change across columns. [Cell content](/guides/cells) lists every way with what it
+costs, the order in which they apply, and why the templates are a workaround for now.
 
 ## Defaults for every column
 
@@ -213,7 +226,7 @@ row header rendered, so a row keeps its name while it is scrolled sideways.
   `role="rowheader"`, so every cell can be announced with its row and column.
 - The label is the name of the column's controls: a resize handle is announced as "Resize Amount",
   and the announcer says "Sorted by Amount descending".
-- When a `header` renders only an icon, keep a text for screen readers inside it, visually hidden,
+- When a header template renders only an icon, keep a text for screen readers inside it, visually hidden,
   or the column has no name.
 - A row header column lets people moving down a column hear which row they are on. Choose the column
   that names the row best, such as a name or a number.

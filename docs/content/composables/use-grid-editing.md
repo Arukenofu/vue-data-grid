@@ -91,6 +91,7 @@ The column fields that editing reads:
 		{ name: 'parse', type: '(text: string, row: TRow) => TValue', description: 'The value from text, such as a paste or a text editor gives; the text itself by default.' },
 		{ name: 'validate', type: '(value: TValue, row: TRow) => string | null | void', description: 'What is wrong with a value, in words for the person; nothing when it is right.' },
 		{ name: 'editor', type: 'CellEditor | false', description: 'The editor of the column, such as `numberEditor()`. `false` for a column whose cell edits itself with a control, such as `checkboxCell()`.' },
+		{ name: 'typing', type: '\'text\' | \'value\'', default: 'that of the editor, else \'text\'', description: 'What a character typed on a cell does: `text` starts editing with it, `value` opens the editor with the value, as a date picker in a `GridEditorTemplate` needs.' },
 	]"
 />
 
@@ -125,13 +126,12 @@ from a keystroke.
 
 ### An editor of your own
 
-An editor is a function of its context that renders the field. Bind `inputProps` to the element that
-takes input: it focuses it, gives it the keys of editing, its label and its error.
+An editor of your own is a `GridEditorTemplate` of its column, with the field in the template. Bind
+`inputProps` to the element that takes input: it focuses it, gives it the keys of editing, its label
+and its error. `:column` types the slot, so `draft` is a `Priority` here.
 
-```ts
-import type { CellEditor } from '@vue-data-grid/core';
-import { h } from 'vue';
-
+```vue
+<script setup lang="ts">
 const PRIORITIES = ['low', 'medium', 'high'] as const;
 
 type Priority = (typeof PRIORITIES)[number];
@@ -140,21 +140,30 @@ function isPriority(value: string): value is Priority {
 	return PRIORITIES.some(priority => priority === value);
 }
 
-export const priorityEditor: CellEditor<Task, Priority> = context => h('select', {
-	...context.inputProps,
-	value: context.draft,
-	onChange: (event: Event) => {
-		const select = event.target;
+function pick(event: Event, setDraft: (value: Priority) => void) {
+	const select = event.target;
 
-		if (select instanceof HTMLSelectElement && isPriority(select.value)) {
-			context.setDraft(select.value);
-		}
-	},
-}, PRIORITIES.map(priority => h('option', { value: priority }, priority)));
+	if (select instanceof HTMLSelectElement && isPriority(select.value)) {
+		setDraft(select.value);
+	}
+}
+</script>
+
+<template>
+	<GridRoot :grid="grid" label="Tasks">
+		<GridEditorTemplate v-slot="{ inputProps, draft, setDraft }" :column="columns.priority">
+			<select v-bind="inputProps" :value="draft" @change="pick($event, setDraft)">
+				<option v-for="priority in PRIORITIES" :key="priority" :value="priority">{{ priority }}</option>
+			</select>
+		</GridEditorTemplate>
+		<!-- the header and the body -->
+	</GridRoot>
+</template>
 ```
 
-The built-in editors — `textEditor`, `numberEditor`, `selectEditor`, `dateEditor` and
-`checkboxCell` — are on the [Editors](/components/editors) page.
+The template renders the editor in place of the column's `editor`, which still says what a typed
+character does. The built-in editors — `textEditor`, `numberEditor`, `selectEditor`, `dateEditor`
+and `checkboxCell` — are on the [Editors](/components/editors) page.
 
 ### Saving to a server
 

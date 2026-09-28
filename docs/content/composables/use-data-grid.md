@@ -42,7 +42,9 @@ const grid = useDataGrid({
 ```
 
 Call it in `setup`. It does not provide anything by itself: pass the grid to `GridRoot`, which
-provides it to the parts, or call `createDataGridContext(grid)` for parts under markup of your own.
+provides it to the parts, or call `createDataGridContext(grid)` for parts under markup of your own,
+with `createGridTemplatesContext()` when they take column templates
+(see [Contexts](/composables/contexts#parts-under-your-own-markup)).
 
 ## Options
 

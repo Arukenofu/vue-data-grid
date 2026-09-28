@@ -4,6 +4,7 @@ import {
 	defineColumns,
 	GridBody,
 	GridCells,
+	GridCellTemplate,
 	GridRow,
 	navigation,
 	useDataGrid,
@@ -17,7 +18,7 @@ import {
 	type GridRowDropEvent,
 } from '@vue-data-grid/core/drag-and-drop';
 import IconArrowDownToLine from '~icons/lucide/arrow-down-to-line';
-import { computed, h } from 'vue';
+import { computed } from 'vue';
 
 import { UiBadge, UiDataGrid } from '@/ui';
 
@@ -49,30 +50,21 @@ const columns = defineColumns({
 		label: 'Task',
 		flex: 1,
 		minWidth: 200,
-		cell: ({ row }) => h(TaskCell, { task: row }),
 	}),
 	priority: column(task => task.priority, {
 		label: 'Priority',
 		width: 96,
-		cell: ({ value }) => h(UiBadge, { tone: PRIORITIES[value].tone, dot: true }, () => PRIORITIES[value].label),
 	}),
 	assignee: column(task => task.assignee, {
 		label: 'Owner',
 		width: 68,
 		align: 'center',
-		cell: ({ value }) => h(OwnerCell, { name: value }),
 	}),
 	actions: column(task => task.id, {
 		label: 'Actions',
 		kind: 'service',
 		width: 76,
 		align: 'center',
-		cell: ({ row }) => h(TaskActions, {
-			task: row.title,
-			target: props.other,
-			onTransfer: () => emit('transfer', row.id),
-			onArchive: () => emit('archive', row.id),
-		}),
 	}),
 });
 
@@ -107,20 +99,39 @@ function drop(event: GridRowDropEvent<unknown>) {
 
 		<div class="task-list-grid">
 			<UiDataGrid :grid="grid" :label="title" :messages="messages">
-				<GridRowDrag group="tasks" handle @drop="drop">
-					<GridBody v-slot="{ rows }">
-						<GridRow v-for="row in rows" :key="row.key" :row="row">
-							<GridCells />
-						</GridRow>
-					</GridBody>
-					<GridDragPreview v-slot="{ key, label }">
-						<TaskGhost :label="label" :task="tasksByKey.get(key)" />
-					</GridDragPreview>
-					<GridDragOverlay v-slot="{ label, over }" class="task-list-overlay">
-						<IconArrowDownToLine aria-hidden="true" />
-						{{ over ? `Drop “${label}” into ${title}` : `Move to ${title}` }}
-					</GridDragOverlay>
-				</GridRowDrag>
+				<GridCellTemplate v-slot="{ row }" :column="columns.title">
+					<TaskCell :task="row" />
+				</GridCellTemplate>
+				<GridCellTemplate v-slot="{ value }" :column="columns.priority">
+					<UiBadge :tone="PRIORITIES[value].tone" dot>{{ PRIORITIES[value].label }}</UiBadge>
+				</GridCellTemplate>
+				<GridCellTemplate v-slot="{ value }" :column="columns.assignee">
+					<OwnerCell :name="value" />
+				</GridCellTemplate>
+				<GridCellTemplate v-slot="{ row }" :column="columns.actions">
+					<TaskActions
+						:task="row.title"
+						:target="other"
+						@transfer="emit('transfer', row.id)"
+						@archive="emit('archive', row.id)"
+					/>
+				</GridCellTemplate>
+				<template #body>
+					<GridRowDrag group="tasks" handle @drop="drop">
+						<GridBody v-slot="{ rows }">
+							<GridRow v-for="row in rows" :key="row.key" :row="row">
+								<GridCells />
+							</GridRow>
+						</GridBody>
+						<GridDragPreview v-slot="{ key, label }">
+							<TaskGhost :label="label" :task="tasksByKey.get(key)" />
+						</GridDragPreview>
+						<GridDragOverlay v-slot="{ label, over }" class="task-list-overlay">
+							<IconArrowDownToLine aria-hidden="true" />
+							{{ over ? `Drop “${label}” into ${title}` : `Move to ${title}` }}
+						</GridDragOverlay>
+					</GridRowDrag>
+				</template>
 			</UiDataGrid>
 		</div>
 	</section>
