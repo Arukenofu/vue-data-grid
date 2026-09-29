@@ -103,6 +103,7 @@ are ignored, with a warning in development.
 		{ name: 'header', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Whether the markup renders the row of column headers. `false` for a grid without `GridHeader`, so that `aria-rowcount` and `aria-rowindex` leave the header row out.' },
 		{ name: 'footerRows', type: 'MaybeRefOrGetter<number>', default: '0', description: 'Footer rows you render yourself, for `aria-rowcount`. A `GridFooterRow` counts itself.' },
 		{ name: 'rowCount', type: 'MaybeRefOrGetter<number>', description: 'Body rows in the whole set when not all are loaded, or `-1` when unknown: the `aria-rowcount` of a grid that pages on a server.' },
+		{ name: 'rowIndexOffset', type: 'MaybeRefOrGetter<number>', default: '0', description: 'Body rows of the whole set before the first of `rows`, such as the pages before this one: `aria-rowindex` counts on from them.' },
 		{ name: 'insets', type: 'MaybeRefOrGetter<{ start: number; end: number }>', description: 'Widths of decoration at each edge of a row, px, outside the columns; pinned columns stick after them. Render them with `getInsetCellProps`.' },
 		{ name: 'cellStyles', type: 'GridCellStyles', default: 'FLEX_CELL_STYLES', description: 'How geometry becomes the styles of cells, group cells and spacers. The default lays a row out as a flex line. Read once.' },
 	]"
@@ -135,6 +136,7 @@ the object goes wherever [useGridProps](/composables/use-grid-props) is taken.
 		{ name: 'leaves', type: 'ComputedRef<readonly TRow[]>', description: 'The rows totals are counted over: the leaves of the tree, collapsed ones too, else `rows`. Footers read it.' },
 		{ name: 'items', type: 'ComputedRef<readonly VirtualItem[]>', description: 'The row window: `{ key, index, start, end, size }` of each row to render. Every row without a window.' },
 		{ name: 'totalSize', type: 'ComputedRef<number>', description: 'The height of all body rows, px: the height of the body block.' },
+		{ name: 'uniformHeight', type: 'ComputedRef<number | null>', description: 'The height of every body row, px, when `rowHeight` is one number and rows are not measured; `null` otherwise.' },
 		{ name: 'measureElement', type: '(element) => void', description: 'Measures a body row with `measureRows`: bind it to the row with `:ref`.' },
 		{ name: 'windowed', type: 'ComputedRef<boolean>', description: 'Whether the column window leaves columns out right now.' },
 		{ name: 'getNodeAt', type: '(index: number) => RowNode | undefined', description: 'The tree node of the shown row at `index`: level, parent, expanded, place among siblings.' },
@@ -183,10 +185,12 @@ These are what the parts use to tell the grid about themselves. Parts of your ow
 <ReturnsTable
 	:data="[
 		{ name: 'addLayers', type: '(layers: MaybeRefOrGetter<GeometryLayer[]>) => () => void', description: 'Writes styles of your own to exactly the elements a selector finds, next to the engine\'s geometry, until the returned function is called. Elements that mount meanwhile get them too. For what changes every frame without a render, such as the cells of a column under a drag.' },
-		{ name: 'markBusy', type: '() => () => void', description: 'Marks the grid `aria-busy` until the returned function is called, as `GridLoading` does.' },
+		{ name: 'markBusy', type: '() => () => void', description: 'Marks the grid `aria-busy` until the returned function is called, as `GridLoading` does; `GridEmpty` waits meanwhile.' },
 		{ name: 'isBusy', type: 'ComputedRef<boolean>', description: 'Whether anything marked the grid busy.' },
 		{ name: 'addFooterRows', type: '(count: number) => () => void', description: 'Counts footer rows into `aria-rowcount` until the returned function is called.' },
 		{ name: 'addBodyRows', type: '(count: number) => () => void', description: 'Counts body rows that stand for no row, such as the row of `GridEmpty`, into `aria-rowcount`.' },
+		{ name: 'addBodyOffset', type: '(height: MaybeRefOrGetter<number>) => () => void', description: 'Counts the height of an element in flow between the header and the body, px, such as `GridPlaceholderRows` at the top: rows are windowed and scrolled to below it, and the rows in view stay in place as it changes. The returned function takes back exactly this height.' },
+		{ name: 'holdAnchorAtTop', type: '() => () => void', description: 'Keeps the rows in view in place when rows come in above them also at the very top, until the returned function is called, as loading at the top needs; `useGridEdge` with `edge: \'top\'` does. Otherwise rows that come in at the top show, as in a feed.' },
 	]"
 />
 
@@ -267,8 +271,8 @@ a grid of your own markup on its prop-getters say the same to assistive technolo
 
 - the role of the grid follows the features: `grid`, `treegrid` with a tree, or `table` by `role`;
 - `aria-rowcount` counts the header rows, the body rows, or `rowCount` when you pass it, and the
-  footer rows; `aria-rowindex` of each row agrees with it, so a screen reader knows where it is
-  even while the row window renders a slice;
+  footer rows; `aria-rowindex` of each row agrees with it, after `rowIndexOffset` rows of the pages
+  before, so a screen reader knows where it is even while the row window renders a slice;
 - `aria-multiselectable` follows the selection mode, and `aria-busy` follows `markBusy`;
 - with the `navigation` feature, cells take `tabindex="-1"` and the grid becomes one Tab stop.
 

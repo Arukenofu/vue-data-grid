@@ -78,6 +78,18 @@ rowHeight: (row, index) => (row.group ? 48 : 36),
 `rowHeight` has no default on purpose: a made-up height would shift every scroll position against
 the real rows.
 
+## Rows added above
+
+When rows come in or go above the ones in view, and the rows in view kept their order, as when a page
+is loaded at the top, the grid scrolls by as much as the rows above them grew: the rows people read
+stay where they were on the screen. A sort or a filter that changes the rows in view leaves the
+scroll alone. A row above the view that changes height, with `measureRows`, is followed the same way.
+
+At the very top rows that come in show there, as new entries of a feed do, unless something holds the
+rows in place: `useGridEdge` at the top does, or `grid.holdAnchorAtTop()`. With markup of your own,
+give the root `overflow-anchor: none`, as the structural styles do, so that the browser does not
+move the rows a second time. See [Pages and infinite scrolling](/guides/paging).
+
 ## Scrolling from code
 
 A row or a column outside the window is not in the DOM, so `scrollIntoView` cannot reach it. Ask the

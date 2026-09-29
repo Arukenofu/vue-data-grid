@@ -6,6 +6,8 @@ import type { ColumnRange } from './column-window';
 import { createItemMetrics, isSameRange, resolveVisibleRange } from './item-metrics';
 import type { ScrollViewport } from './use-scroll-viewport';
 
+const NO_RANGE: ColumnRange = Object.freeze({ start: 0, end: 0 });
+
 export interface VirtualColumnsOptions {
 	viewport: ScrollViewport;
 	/** Shown columns in display order, pinned ones included. */
@@ -24,6 +26,8 @@ export interface VirtualColumnsOptions {
  * The column window over the scrolling part of the row. Pinned columns are never windowed: their
  * width, together with the start inset, is where the scrolling part begins. The window is always a
  * contiguous slice, so a kept column stretches it rather than being rendered on its own.
+ * `visibleRange` is the scrolling columns in view between the pinned ones, at least partly, whether
+ * the window is on or not; `scrollingRange` is all the scrolling columns.
  */
 export function useVirtualColumns(options: VirtualColumnsOptions) {
 	const { viewport } = options;
@@ -44,15 +48,26 @@ export function useVirtualColumns(options: VirtualColumnsOptions) {
 		return { start, end, items: columns.slice(start, end) };
 	});
 
-	const margin = computed(() => {
-		let result = options.inset();
+	function sumWidths(columns: readonly RenderedColumn[]) {
+		let result = 0;
 
-		for (const column of options.columns().slice(0, scrolling.value.start)) {
+		for (const column of columns) {
 			result += options.getWidth(column.column?.name ?? '');
 		}
 
 		return result;
+	}
+
+	const scrollingRange = stableComputed<ColumnRange>(NO_RANGE, (previous) => {
+		const next = { start: scrolling.value.start, end: scrolling.value.end };
+
+		return isSameRange(previous, next) ? previous : next;
 	});
+
+	const margin = computed(() => options.inset() + sumWidths(options.columns().slice(0, scrolling.value.start)));
+
+	// The pinned columns at the end cover the viewport from its end edge.
+	const marginEnd = computed(() => sumWidths(options.columns().slice(scrolling.value.end)));
 
 	const metrics = computed(() => {
 		const { items } = scrolling.value;
@@ -88,5 +103,21 @@ export function useVirtualColumns(options: VirtualColumnsOptions) {
 		return isSameRange(previous, next) ? previous : next;
 	});
 
-	return { range };
+	// Scrolling columns start after the start margin, so in their coordinates the uncovered part starts
+	// at the scroll position, as rows do below the sticky top.
+	const visibleRange = stableComputed<ColumnRange>(NO_RANGE, (previous) => {
+		const width = Math.max(viewport.width.value - margin.value - marginEnd.value, 0);
+
+		if (!viewport.element.value || width === 0 || scrolling.value.items.length === 0) {
+			return NO_RANGE;
+		}
+
+		const visible = resolveVisibleRange(metrics.value, viewport.scrollInline.value, width);
+		const offset = scrolling.value.start;
+		const next = { start: offset + visible.start, end: offset + visible.end };
+
+		return isSameRange(previous, next) ? previous : next;
+	});
+
+	return { range, visibleRange, scrollingRange };
 }

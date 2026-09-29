@@ -145,3 +145,56 @@ describe('useVirtualColumns', () => {
 		expect(current.window.range.value).toBeNull();
 	});
 });
+
+describe('useVirtualColumns — columns in view', () => {
+	it('are the scrolling columns between the pinned ones, without the ones under them', () => {
+		current = setup({ bufferPx: () => 150 });
+
+		/** 500px less 200px pinned at the start and 100px at the end leave two columns. */
+		expect(current.window.visibleRange.value).toEqual({ start: 2, end: 4 });
+
+		current.scroller.scrollToPosition({ left: 1000 });
+		expect(current.window.visibleRange.value).toEqual({ start: 12, end: 14 });
+	});
+
+	it('count a column cut by an edge', () => {
+		current = setup();
+		current.scroller.scrollToPosition({ left: 1050 });
+
+		expect(current.window.visibleRange.value).toEqual({ start: 12, end: 15 });
+	});
+
+	it('are there with the window off, and keep their object while they hold', () => {
+		current = setup({ enabled: () => false });
+		current.scroller.scrollToPosition({ left: 50 });
+
+		const before = current.window.visibleRange.value;
+
+		current.scroller.scrollToPosition({ left: 60 });
+		expect(current.window.visibleRange.value).toBe(before);
+		expect(before).toEqual({ start: 2, end: 5 });
+	});
+
+	it('are none without columns that scroll', () => {
+		current = setup();
+		current.columns.value = [column('a', 0, 'start'), column('b', 1, 'end')];
+
+		expect(current.window.visibleRange.value).toEqual({ start: 0, end: 0 });
+	});
+});
+
+describe('useVirtualColumns — scrolling columns', () => {
+	it('are the columns between the pinned ones, and keep their object while the pins hold', () => {
+		current = setup();
+
+		const before = current.window.scrollingRange.value;
+
+		expect(before).toEqual({ start: 2, end: 19 });
+
+		current.columns.value = [...createColumns()];
+		expect(current.window.scrollingRange.value).toBe(before);
+
+		current.columns.value = createColumns().map(item => ({ ...item, pin: undefined }));
+		expect(current.window.scrollingRange.value).toEqual({ start: 0, end: 20 });
+	});
+});

@@ -50,6 +50,7 @@ pages are Markdown files in `docs/content/`:
   [animation](../../docs/content/guides/animation.md),
   [live data](../../docs/content/guides/live-data.md),
   [loading and empty states](../../docs/content/guides/data-loading.md),
+  [pages and infinite scrolling](../../docs/content/guides/paging.md),
   [your own markup](../../docs/content/guides/custom-markup.md),
   [localization](../../docs/content/guides/localization.md)
 - [Components](../../docs/content/components/root.md): every part with its props, slots, data

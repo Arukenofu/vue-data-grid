@@ -112,6 +112,7 @@ has a `key` for `v-for`.
 | keeping that state in `localStorage`, memory or your own store | a server-side store, if you want one |
 | column groups: header rows, cells, collapse, keep-together | how groups look: rows, one line, a collapse control |
 | row and column windows, scrolling to a row or a column | pinned rows |
+| keeping the rows in view in place when rows come in above them (`bodyOffset`, `anchorAtTop`) | `overflow-anchor: none` on the root, so that the browser does not move them a second time |
 | service columns (`kind: 'service'`) and row headers | what service cells show: checkboxes, numbers, actions |
 | geometry as CSS variables, the layer of pinned cells (`--dg-pinned-z-index`), widths in one write, fit to viewport | styling, ARIA roles and attributes: the core gives the numbers |
 | stable references for memoization; a row moved in the data, `moveRow` | dragging rows and columns, as in `@vue-data-grid/core/drag-and-drop` |

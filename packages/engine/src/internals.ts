@@ -34,7 +34,8 @@ export {
 export type { FitColumn } from './engine';
 export { fitColumnWidths, useGridColumns } from './engine';
 export type {
-	ColumnRange,
+	AnchorSnapshot,
+	AnchorTarget,
 	ColumnWindow,
 	ItemMetrics,
 	ItemRange,
@@ -48,6 +49,7 @@ export {
 	createItemMetrics,
 	expandRange,
 	isSameRange,
+	resolveAnchorShift,
 	resolveColumnWindow,
 	resolvePageStep,
 	resolveScrollPosition,

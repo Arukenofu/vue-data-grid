@@ -69,7 +69,7 @@ export {
 	useGridEngine,
 	useGridScopeContext,
 } from './engine';
-export type { PageDirection, ScrollAlign, VirtualItem } from './virtual';
+export type { ColumnRange, PageDirection, ScrollAlign, VirtualItem } from './virtual';
 export type {
 	ColumnSpanCell,
 	GeometryLayer,

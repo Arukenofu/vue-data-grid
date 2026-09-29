@@ -31,6 +31,7 @@ const docs: DefaultTheme.SidebarItem[] = [
 			{ text: 'Animation', link: '/guides/animation' },
 			{ text: 'Live data', link: '/guides/live-data' },
 			{ text: 'Loading and empty states', link: '/guides/data-loading' },
+			{ text: 'Pages and infinite scrolling', link: '/guides/paging' },
 			{ text: 'Your own markup', link: '/guides/custom-markup' },
 			{ text: 'Localization', link: '/guides/localization' },
 			{ text: 'TypeScript', link: '/guides/typescript' },
@@ -103,6 +104,7 @@ const composables: DefaultTheme.SidebarItem[] = [
 			{ text: 'useGridFill', link: '/composables/use-grid-fill' },
 			{ text: 'useGridRowDrag', link: '/composables/use-grid-row-drag' },
 			{ text: 'useGridColumnDrag', link: '/composables/use-grid-column-drag' },
+			{ text: 'useGridEdge', link: '/composables/use-grid-edge' },
 		],
 	},
 	{

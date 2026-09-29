@@ -541,6 +541,44 @@
 	}
 }
 
+/*
+ * Placeholder rows: a bar in every cell of `GridPlaceholderRows`, or `ui-skeleton` in its slot for a
+ * bar of your own width or shape.
+ */
+.ui-skeleton,
+.ui-grid [data-dg-part='placeholder-cell']:empty::before {
+	display: block;
+	width: 64%;
+	height: 10px;
+	border-radius: 5px;
+	background: linear-gradient(
+		90deg,
+		color-mix(in srgb, var(--ui-fg) 7%, var(--ui-bg)) 30%,
+		color-mix(in srgb, var(--ui-fg) 13%, var(--ui-bg)) 50%,
+		color-mix(in srgb, var(--ui-fg) 7%, var(--ui-bg)) 70%
+	);
+	background-size: 300% 100%;
+	content: '';
+	animation: ui-skeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes ui-skeleton {
+	from {
+		background-position: 100% 0;
+	}
+
+	to {
+		background-position: 0 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ui-skeleton,
+	.ui-grid [data-dg-part='placeholder-cell']:empty::before {
+		animation: none;
+	}
+}
+
 /* The kit's group toggle, the parts' default one included. */
 .ui-grid [data-dg-part='group-toggle'] {
 	display: inline-flex;

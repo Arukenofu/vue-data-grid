@@ -6,10 +6,12 @@ import {
 	GridCells,
 	GridEmpty,
 	GridLoading,
+	GridPlaceholderRows,
 	GridRoot,
 	GridRow,
 	type GridSort,
 	useDataGrid,
+	useGridEdge,
 } from '@vue-data-grid/core';
 import IconLoaderCircle from '~icons/lucide/loader-circle';
 import IconSearchX from '~icons/lucide/search-x';
@@ -21,7 +23,6 @@ import { UiDataGridHeader, UiInput, UiSlider, UiStat, UiToolbar } from '@/ui';
 import { fetchPeople } from './api';
 
 const PAGE_SIZE = 40;
-const PREFETCH_ROWS = 10;
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
@@ -43,6 +44,7 @@ const columns = defineColumns({
 const people = shallowRef<readonly Person[]>([]);
 const total = shallowRef(0);
 const loading = shallowRef(true);
+const loadingMore = shallowRef(false);
 const query = shallowRef('');
 const sort = shallowRef<readonly GridSort[]>([]);
 const latency = shallowRef(800);
@@ -64,6 +66,7 @@ async function load(from: number) {
 	const current = request;
 
 	loading.value = true;
+	loadingMore.value = from > 0;
 
 	const page = await fetchPeople({ query: query.value, sort: sort.value, offset: from, limit: PAGE_SIZE, latency: latency.value });
 
@@ -74,6 +77,7 @@ async function load(from: number) {
 	people.value = from === 0 ? page.rows : [...people.value, ...page.rows];
 	total.value = page.total;
 	loading.value = false;
+	loadingMore.value = false;
 }
 
 onMounted(() => {
@@ -84,12 +88,11 @@ watch([query, sort], () => {
 	void load(0);
 });
 
-watch(() => grid.scope.visibleRange.value.end, (end) => {
-	const more = people.value.length < total.value;
-
-	if (more && !loading.value && end >= people.value.length - PREFETCH_ROWS) {
-		void load(people.value.length);
-	}
+useGridEdge(grid, {
+	edge: 'bottom',
+	hasMore: () => people.value.length < total.value,
+	busy: loading,
+	onReach: () => load(people.value.length),
 });
 </script>
 
@@ -108,13 +111,15 @@ watch(() => grid.scope.visibleRange.value.end, (end) => {
 					<GridCells />
 				</GridRow>
 			</GridBody>
-			<GridEmpty v-if="!loading">
+			<GridPlaceholderRows v-if="loading && people.length === 0" :count="10" />
+			<GridPlaceholderRows v-else-if="loadingMore" :count="3" />
+			<GridEmpty>
 				<span class="state">
 					<IconSearchX aria-hidden="true" />
 					No one matches “{{ query }}”
 				</span>
 			</GridEmpty>
-			<GridLoading v-if="loading">
+			<GridLoading v-if="loading && !loadingMore && people.length > 0">
 				<IconLoaderCircle class="spinner" aria-hidden="true" />
 				Loading people…
 			</GridLoading>

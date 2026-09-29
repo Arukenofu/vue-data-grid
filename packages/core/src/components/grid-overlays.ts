@@ -7,7 +7,9 @@ import { primitiveProps, renderPrimitive } from './primitive';
 /**
  * What the grid shows while it has no rows: a row with one cell over every column, so the grid stays
  * valid ARIA, counted into `aria-rowcount` while it is there. It sticks to the start edge, as wide as
- * the grid. Put it after `GridBody`; it renders nothing while there are rows.
+ * the grid. Put it after `GridBody`; it renders nothing while there are rows, and while the grid is busy
+ * (`GridLoading`, `GridPlaceholderRows`, `markBusy`): until the rows come, the grid is not known to be
+ * empty.
  *
  * The default slot holds the content; without it, the `empty` message.
  */
@@ -18,7 +20,7 @@ export const GridEmpty = defineComponent({
 	setup(props, { slots }) {
 		const grid = useDataGridContext();
 		const messages = useGridMessagesContext();
-		const empty = computed(() => grid.rows.value.length === 0);
+		const empty = computed(() => grid.rows.value.length === 0 && !grid.isBusy.value);
 		let release: (() => void) | null = null;
 
 		function count(shown: boolean) {

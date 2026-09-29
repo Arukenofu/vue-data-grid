@@ -3,7 +3,7 @@
  * call (`useDataGrid`) from features, the render fields of columns (`header`, `cell`, `cellClass`,
  * `footer`, `editor`), the markup props of the WAI-ARIA grid, keyboard navigation of the grid, cell
  * ranges, editing with its editors, undo, the clipboard with paste, the fill handle, what header cells
- * do, autosize from content, the sticky offset, and the render memo.
+ * do, autosize from content, the sticky offset, loading at the edges of the grid, and the render memo.
  *
  * It re-exports the stable API of `@vue-data-grid/engine`, so a grid imports everything from here
  * and gets one copy of the core, the one this package augments, and `@vue-data-grid/flip`, the engines
@@ -121,6 +121,8 @@ export type { RangeCellSlotContext } from './components/grid-range-overlay';
 export { GridFillPreview, GridRangeOverlay } from './components/grid-range-overlay';
 export { GridResizeHandle } from './components/grid-resize-handle';
 export { GridEmpty, GridLoading } from './components/grid-overlays';
+export type { GridPlaceholderRowsProps, PlaceholderCellSlotContext } from './components/grid-placeholder-rows';
+export { GridPlaceholderRows } from './components/grid-placeholder-rows';
 export { GridRoot } from './components/grid-root';
 export {
 	GridSelectAllCheckbox,
@@ -200,6 +202,8 @@ export type { GridMotion, GridMotionChange, GridMotionOptions, GridMotionWidths,
 export { useGridMotion } from './motion/use-grid-motion';
 export type { HeaderCellHandlers, HeaderCellOptions } from './header/use-header-cell';
 export { useHeaderCell } from './header/use-header-cell';
+export type { GridEdge, GridEdgeContext, GridEdgeOptions, GridEdgeWatch, GridRowEdge } from './loading/use-grid-edge';
+export { useGridEdge } from './loading/use-grid-edge';
 export type { BodyCellFocus } from './navigation/body-cell-focus';
 export {
 	BODY_SECTION,

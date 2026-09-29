@@ -11,7 +11,7 @@ import {
 } from '@vue-data-grid/engine';
 import { defineComponent, h, shallowRef } from 'vue';
 import { mount } from '@vue/test-utils';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { type GridPropsOptions, useGridProps } from '../../src/props/use-grid-props';
 
@@ -130,6 +130,34 @@ describe('useGridProps — rows', () => {
 		current = setup({ props: () => ({ rowCount: -1 }) });
 
 		expect(current.props.getGridProps()['aria-rowcount']).toBe(-1);
+	});
+
+	it('counts body rows on from `rowIndexOffset`, as the rows of a later page', () => {
+		current = setup({ props: () => ({ rowCount: 120, rowIndexOffset: 80, footerRows: 1 }) });
+
+		expect(current.props.getRowProps({ index: 0, key: 'a' })['aria-rowindex']).toBe(82);
+		expect(current.props.getRowProps({ index: 2, key: 'c' })['aria-rowindex']).toBe(84);
+		expect(current.props.getGridProps()['aria-rowcount']).toBe(122);
+		expect(current.props.getFooterRowProps()['aria-rowindex']).toBe(122);
+	});
+
+	it('counts the footer on from the rows of the page when the size of the whole set is unknown', () => {
+		current = setup({ props: () => ({ rowCount: -1, rowIndexOffset: 80, footerRows: 1 }) });
+
+		expect(current.props.getRowProps({ index: 2, key: 'c' })['aria-rowindex']).toBe(84);
+		expect(current.props.getFooterRowProps()['aria-rowindex']).toBe(85);
+	});
+
+	it('warns once when `rowIndexOffset` counts rows past `rowCount`', () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+		current = setup({ props: () => ({ rowIndexOffset: 80 }) });
+		current.props.getGridProps();
+		current.props.getGridProps();
+
+		expect(warn).toHaveBeenCalledTimes(1);
+		expect(warn.mock.calls[0][0]).toContain('`rowIndexOffset` counts rows past `rowCount`');
+		warn.mockRestore();
 	});
 
 	it('without a header row the body starts at the first row', () => {

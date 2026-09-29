@@ -3,7 +3,10 @@ export interface VirtualItem {
 	key: string;
 	/** Position in the list, which is the index into `rows`. */
 	index: number;
-	/** Edges in scroll-content coordinates along the scroll axis, `scrollMargin` included, px. */
+	/**
+	 * Edges along the scroll axis, px: the offset in the body plus `scrollMargin`. A `bodyOffset` is left
+	 * out: it moves the whole body, and items keep their objects while it changes.
+	 */
 	start: number;
 	end: number;
 	size: number;

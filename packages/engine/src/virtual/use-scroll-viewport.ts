@@ -15,6 +15,11 @@ export interface ScrollViewport {
 	/** `clientWidth` and `clientHeight`: the visible area without scrollbars, px. */
 	width: Readonly<ShallowRef<number>>;
 	height: Readonly<ShallowRef<number>>;
+	/**
+	 * Reads the scroll position now, after the element was scrolled from code, rather than on its
+	 * `scroll` event, which comes with the next frame.
+	 */
+	sync: () => void;
 }
 
 /**
@@ -28,6 +33,15 @@ export function useScrollViewport(root: Ref<HTMLElement | null>): ScrollViewport
 	const scrollInline = shallowRef(0);
 	const width = shallowRef(0);
 	const height = shallowRef(0);
+
+	function sync() {
+		const target = element.value;
+
+		if (target) {
+			scrollTop.value = target.scrollTop;
+			scrollInline.value = Math.abs(target.scrollLeft);
+		}
+	}
 
 	watch(element, (next, _previous, onCleanup) => {
 		if (!next) {
@@ -60,5 +74,5 @@ export function useScrollViewport(root: Ref<HTMLElement | null>): ScrollViewport
 		});
 	}, { immediate: true, flush: 'sync' });
 
-	return { element, scrollTop, scrollInline, width, height };
+	return { element, scrollTop, scrollInline, width, height, sync };
 }

@@ -54,7 +54,8 @@ where it is, so the counts describe the whole grid, not what is rendered:
   is read right even though row 1,204 is the tenth element in the DOM.
 
 When the rows are loaded page by page, pass `rowCount` to `useDataGrid` with the size of the whole
-set, or `-1` while it is unknown. See [Loading and empty states](/guides/data-loading).
+set, or `-1` while it is unknown, and for pages that replace each other `rowIndexOffset` with the rows
+before the page. See [Pages and infinite scrolling](/guides/paging).
 
 ## States
 
@@ -65,7 +66,7 @@ set, or `-1` while it is unknown. See [Loading and empty states](/guides/data-lo
 | `aria-multiselectable` | The grid | While more than one row or cell can be selected. |
 | `aria-level`, `aria-posinset`, `aria-setsize` | Rows of a tree | The `tree` feature: depth and place among siblings. |
 | `aria-expanded` | Rows that have children, group toggles | The `tree` feature and collapsible column groups. |
-| `aria-busy` | The grid | While a `GridLoading` is shown. |
+| `aria-busy` | The grid | While a `GridLoading` or `GridPlaceholderRows` is shown. |
 | `aria-valuenow`, `aria-valuetext` | Resize handles, `role="separator"` | The width of the column, read as "240 px". |
 | `aria-invalid`, `aria-describedby` | Editors | The column's `validate`, pointing at the error text. |
 

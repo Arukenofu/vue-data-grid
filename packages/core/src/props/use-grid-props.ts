@@ -45,6 +45,12 @@ export interface GridPropsOptions {
 	 * `-1` when unknown. `scope.rows.length` by default.
 	 */
 	rowCount?: MaybeRefOrGetter<number | undefined>;
+	/**
+	 * Body rows of the whole set before the first one in `scope.rows`, such as the rows of the pages
+	 * before this one: `aria-rowindex` of body rows counts on from them. Pass the size of the whole set
+	 * as `rowCount` with it. `0` by default.
+	 */
+	rowIndexOffset?: MaybeRefOrGetter<number>;
 	/** Whether the grid is loading or updating: it gets `aria-busy` meanwhile. */
 	busy?: MaybeRefOrGetter<boolean>;
 	/** The node of each body row, `useRowTree().nodes`: level, place among siblings, expand state. */
@@ -210,7 +216,26 @@ export function useGridProps(scope: GridScope, options: GridPropsOptions = {}) {
 		return spans;
 	});
 	const bodyRows = computed(() => toValue(options.rowCount) ?? scope.rows.value.length);
+	const rowIndexOffset = computed(() => toValue(options.rowIndexOffset) ?? 0);
 	const interactive = computed(() => role.value !== 'table');
+	let warnedRowIndexOffset = false;
+
+	// Rows past `rowCount` would get an `aria-rowindex` above `aria-rowcount`: screen readers then
+	// read the position wrong, so this is said once rather than left to a failing audit.
+	function warnRowIndexOffset(body: number) {
+		const offset = rowIndexOffset.value;
+
+		if (warnedRowIndexOffset || offset === 0 || body < 0 || offset + scope.rows.value.length <= body) {
+			return;
+		}
+
+		warnedRowIndexOffset = true;
+		// oxlint-disable-next-line no-console
+		console.warn(
+			'[@vue-data-grid/core] `rowIndexOffset` counts rows past `rowCount`, so `aria-rowindex` runs past '
+			+ '`aria-rowcount`. Pass the size of the whole set as `rowCount`, or `-1` when it is unknown.',
+		);
+	}
 
 	function getSpacerProps(props: Props) {
 		let result = spacers.get(props);
@@ -226,6 +251,10 @@ export function useGridProps(scope: GridScope, options: GridPropsOptions = {}) {
 	/** Props of the grid element: its role, row and column counts, multiple selection, busy state. */
 	function getGridProps(): Props {
 		const body = bodyRows.value;
+
+		if (__DEV__) {
+			warnRowIndexOffset(body);
+		}
 
 		return {
 			role: role.value,
@@ -269,14 +298,14 @@ export function useGridProps(scope: GridScope, options: GridPropsOptions = {}) {
 	}
 
 	/**
-	 * Props of a body row: `aria-rowindex` after the header rows, the index attribute for measuring and
-	 * the `body` section of the navigation; in a tree its level, place among siblings and expand state,
-	 * with a selection `aria-selected`.
+	 * Props of a body row: `aria-rowindex` after the header rows and `rowIndexOffset`, the index
+	 * attribute for measuring and the `body` section of the navigation; in a tree its level, place among
+	 * siblings and expand state, with a selection `aria-selected`.
 	 */
 	function getRowProps(row: GridRowRef): Props {
 		const props: Record<string, unknown> = {
 			...ROW,
-			'aria-rowindex': headerRows.value + row.index + 1,
+			'aria-rowindex': headerRows.value + rowIndexOffset.value + row.index + 1,
 			[indexAttribute]: row.index,
 			...getGridRowAttributes(SECTIONS.body, row.index),
 		};
@@ -303,7 +332,7 @@ export function useGridProps(scope: GridScope, options: GridPropsOptions = {}) {
 
 	/** Props of a footer row, `index` counted from the first footer row: the `foot` section. */
 	function getFooterRowProps(index = 0): Props {
-		const body = bodyRows.value < 0 ? scope.rows.value.length : bodyRows.value;
+		const body = bodyRows.value < 0 ? rowIndexOffset.value + scope.rows.value.length : bodyRows.value;
 
 		return {
 			...ROW,

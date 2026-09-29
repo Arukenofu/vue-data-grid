@@ -15,6 +15,7 @@ import {
 	type VirtualItem,
 } from './item-metrics';
 import { resolveScrollPosition, type ScrollAlign } from './scroll';
+import { useAnchoredScroll } from './use-anchored-scroll';
 import type { ScrollViewport } from './use-scroll-viewport';
 
 export interface VirtualRowsOptions {
@@ -27,6 +28,10 @@ export interface VirtualRowsOptions {
 	scrollMargin: () => number;
 	/** Height of the sticky bottom (a footer, rows pinned there): scrolling to a row keeps it uncovered. */
 	scrollMarginEnd: () => number;
+	/** Height of what stands between the sticky top and the body and scrolls away: the body starts below it too. */
+	bodyOffset: () => number;
+	/** Whether rows coming in above keep the rows in view in place also at the very top of the list. */
+	anchorAtTop: () => boolean;
 	/** Height of the row, or its estimate until the row is measured. */
 	estimateSize: (index: number) => number;
 	/** One height for every row: positions are then arithmetic and the list is never walked. */
@@ -34,8 +39,10 @@ export interface VirtualRowsOptions {
 	/** Rows are measured in the DOM through `measureElement`. */
 	measured: () => boolean;
 	getItemKey: (index: number) => string;
-	/** Keys of every item, shared with whoever else needs them; built from `getItemKey` without it. */
-	getItemKeys?: () => readonly string[];
+	/** Keys of every item, shared with whoever else needs them: a new array only when they change. */
+	getItemKeys: () => readonly string[];
+	/** The index of the item with a key; `-1` for none. */
+	getItemIndex: (key: string) => number;
 	/** Rows that must stay rendered: under a gesture, under focus. */
 	keep: () => readonly number[];
 	/** Rows rendered before the root is mounted: on the server and in the hydration frame. */
@@ -70,31 +77,27 @@ function getBlockSize(entry: ResizeObserverEntry) {
  * With `measured`, row heights come from a `ResizeObserver` and are stored by row key, so they
  * survive sorting and streaming. Heights of rows that are gone are dropped once stored heights
  * outnumber the rows. A row that changes height above the viewport shifts the scroll by the same
- * amount, so the rows in view stay in place.
+ * amount, so the rows in view stay in place; so do rows inserted or removed above the ones in view,
+ * such as a page loaded at the top, when the rows in view kept their order, and a `bodyOffset` that
+ * changes. At the very top that holds only with `anchorAtTop`: otherwise what comes in above shows. The
+ * window and the rows in view follow the new position in the same render that brings the rows, before
+ * the element is scrolled there.
+ *
+ * Items are placed below the sticky top but not below `bodyOffset`: it moves the whole body, so items
+ * keep their positions and objects while it changes.
  */
 export function useVirtualRows(options: VirtualRowsOptions) {
 	const { viewport } = options;
 
+	// Where the body starts in the scroll content: below the sticky top and the body offset.
+	function getBodyStart() {
+		return options.scrollMargin() + options.bodyOffset();
+	}
+
 	// Mutated in place and triggered once per batch of measurements.
 	const sizes = shallowRef(new Map<string, number>());
 
-	const keys = computed<readonly string[] | null>(() => {
-		if (!options.measured()) {
-			return null;
-		}
-
-		if (options.getItemKeys) {
-			return options.getItemKeys();
-		}
-
-		const result: string[] = [];
-
-		for (let index = 0; index < options.count(); index += 1) {
-			result.push(options.getItemKey(index));
-		}
-
-		return result;
-	});
+	const keys = computed<readonly string[] | null>(() => (options.measured() ? options.getItemKeys() : null));
 
 	const metrics = computed<ItemMetrics>(() => {
 		const count = options.count();
@@ -114,6 +117,22 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 		return createItemMetrics(count, index => measured.get(measuredKeys[index]) ?? options.estimateSize(index));
 	});
 
+	// The part of the viewport between the sticky top and bottom, where rows are in view.
+	function getPageHeight() {
+		return Math.max(viewport.height.value - options.scrollMargin() - options.scrollMarginEnd(), 0);
+	}
+
+	const anchored = useAnchoredScroll({
+		viewport,
+		metrics: () => metrics.value,
+		getItemKey: options.getItemKey,
+		getItemIndex: options.getItemIndex,
+		bodyOffset: options.bodyOffset,
+		pageHeight: getPageHeight,
+		atTop: options.anchorAtTop,
+	});
+	const { scrollTop } = anchored;
+
 	const range = stableComputed<ItemRange | null>(null, (previous) => {
 		if (!options.enabled() || !viewport.element.value) {
 			return null;
@@ -121,7 +140,7 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 
 		const visible = resolveVisibleRange(
 			metrics.value,
-			viewport.scrollTop.value - options.scrollMargin(),
+			scrollTop.value - getBodyStart(),
 			viewport.height.value,
 		);
 		const next = expandRange(visible, options.overscan(), metrics.value.count);
@@ -149,12 +168,12 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 
 	const totalSize = computed(() => metrics.value.total);
 
-	// The part of the viewport between the sticky top and bottom, where rows are in view.
-	function getPageHeight() {
-		return Math.max(viewport.height.value - options.scrollMargin() - options.scrollMarginEnd(), 0);
+	// Rows start below the sticky top and the body offset, so in list coordinates the uncovered part
+	// starts at `scrollTop` less the offset, which scrolls away rather than covering the rows.
+	function getVisibleTop() {
+		return scrollTop.value - options.bodyOffset();
 	}
 
-	// Rows start below the sticky top, so in list coordinates the uncovered part starts at `scrollTop`.
 	const visibleRange = stableComputed<ItemRange>(NO_RANGE, (previous) => {
 		const height = getPageHeight();
 
@@ -163,7 +182,7 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 			return NO_RANGE;
 		}
 
-		const next = resolveVisibleRange(metrics.value, viewport.scrollTop.value, height);
+		const next = resolveVisibleRange(metrics.value, getVisibleTop(), height);
 
 		return isSameRange(previous, next) ? previous : next;
 	});
@@ -183,8 +202,8 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 	let observer: ResizeObserver | null = null;
 	const observed = new WeakSet<Element>();
 
-	function forgetGoneRows(count: number) {
-		const present = new Set(keys.value ?? Array.from({ length: count }, (_, index) => options.getItemKey(index)));
+	function forgetGoneRows() {
+		const present = new Set(options.getItemKeys());
 
 		for (const key of sizes.value.keys()) {
 			if (!present.has(key)) {
@@ -196,7 +215,7 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 	function handleResize(entries: readonly ResizeObserverEntry[]) {
 		const root = viewport.element.value;
 		const current = metrics.value;
-		const margin = options.scrollMargin();
+		const margin = getBodyStart();
 		let changed = false;
 		let shift = 0;
 
@@ -234,15 +253,15 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 
 		// Keys of rows that are gone, or a stream of new keys would grow the map forever.
 		if (sizes.value.size > current.count) {
-			forgetGoneRows(current.count);
+			forgetGoneRows();
 		}
 
 		if (changed) {
 			triggerRef(sizes);
 		}
 
-		if (root && shift !== 0) {
-			root.scrollTop += shift;
+		if (shift !== 0) {
+			anchored.scrollBy(shift);
 		}
 	}
 
@@ -288,12 +307,11 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 			correction = null;
 
 			const current = metrics.value;
-			const margin = options.scrollMargin();
-			const start = margin + current.startOf(index);
+			const start = getBodyStart() + current.startOf(index);
 			const position = resolveScrollPosition({
 				start,
 				end: start + current.sizeOf(index),
-				insetStart: margin,
+				insetStart: options.scrollMargin(),
 				insetEnd: options.scrollMarginEnd(),
 				viewport: root.clientHeight,
 				scroll: root.scrollTop,
@@ -305,7 +323,7 @@ export function useVirtualRows(options: VirtualRowsOptions) {
 				return;
 			}
 
-			root.scrollTop = position;
+			anchored.scrollTo(position);
 			attempts += 1;
 
 			if (options.measured() && attempts < MAX_SCROLL_CORRECTIONS && typeof requestAnimationFrame === 'function') {

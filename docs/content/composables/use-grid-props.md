@@ -70,6 +70,7 @@ const props = useGridProps(engine.scope, { navigation: true, footerRows: 1 });
 		{ name: 'header', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Whether the markup renders the row of column headers.' },
 		{ name: 'footerRows', type: 'MaybeRefOrGetter<number>', default: '0', description: 'Footer rows under the body, for `aria-rowcount` and the navigation.' },
 		{ name: 'rowCount', type: 'MaybeRefOrGetter<number>', default: 'the length of rows', description: 'Body rows in the whole set when not all are loaded; `-1` when unknown.' },
+		{ name: 'rowIndexOffset', type: 'MaybeRefOrGetter<number>', default: '0', description: 'Body rows of the whole set before the first one the scope has, such as the rows of the pages before: `aria-rowindex` counts on from them. Pass `rowCount` with it.' },
 		{ name: 'busy', type: 'MaybeRefOrGetter<boolean>', default: 'false', description: 'The grid is loading: it gets `aria-busy` meanwhile.' },
 		{ name: 'nodes', type: 'MaybeRefOrGetter<readonly RowNode[]>', description: 'The node of each body row, from a tree: level, place among siblings, expand state.' },
 		{ name: 'selection', type: 'GridRowSelection', description: 'The row selection: rows get `aria-selected`, and the grid `aria-multiselectable` in `multiple` mode.' },
@@ -140,6 +141,20 @@ A grid that loads pages from a server tells assistive technology the size of the
 
 ```ts
 const grid = useDataGrid({ columns, rows: page, rowKey: 'id', rowHeight: 40, rowCount: total });
+```
+
+Pages that replace each other also say where the page stands, so its first row is "row 41 of 500"
+on the third page of twenty:
+
+```ts
+const grid = useDataGrid({
+	columns,
+	rows: page,
+	rowKey: 'id',
+	rowHeight: 40,
+	rowCount: total,
+	rowIndexOffset: () => pageIndex.value * pageSize,
+});
 ```
 
 ## Accessibility

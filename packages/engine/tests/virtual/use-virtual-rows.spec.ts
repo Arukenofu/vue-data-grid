@@ -11,6 +11,7 @@ type RowWindow = ReturnType<typeof useVirtualRows>;
 interface Setup {
 	window: RowWindow;
 	keys: ShallowRef<string[]>;
+	root: ShallowRef<HTMLElement | null>;
 	scroller: Scroller;
 	attach: () => void;
 	unmount: () => void;
@@ -35,10 +36,14 @@ function setup(options: Partial<Omit<VirtualRowsOptions, 'viewport'>> = {}, coun
 				overscan: () => 0,
 				scrollMargin: () => 0,
 				scrollMarginEnd: () => 0,
+				bodyOffset: () => 0,
+				anchorAtTop: () => false,
 				estimateSize: () => 36,
 				uniformSize: () => 36,
 				measured: () => false,
 				getItemKey: index => keys.value[index] ?? String(index),
+				getItemKeys: () => keys.value,
+				getItemIndex: key => keys.value.indexOf(key),
 				keep: () => [],
 				ssrCount: () => 5,
 				indexAttribute: 'data-dg-index',
@@ -52,6 +57,7 @@ function setup(options: Partial<Omit<VirtualRowsOptions, 'viewport'>> = {}, coun
 	return {
 		window: window as unknown as RowWindow,
 		keys,
+		root,
 		scroller,
 		attach: () => {
 			root.value = scroller;
@@ -120,6 +126,20 @@ describe('useVirtualRows — window', () => {
 
 		current.scroller.scrollToPosition({ top: 40 + 3600 });
 		expect(indexes(current.window)[0]).toBe(100);
+	});
+
+	it('`bodyOffset` moves the body down but scrolls away: rows in view count from under the sticky top', () => {
+		current = setup({ scrollMargin: () => 40, bodyOffset: () => 90 });
+		current.attach();
+
+		expect(current.window.items.value[0].start).toBe(40);
+		expect(current.window.visibleRange.value).toEqual({ start: 0, end: 7 });
+
+		current.scroller.scrollToPosition({ top: 90 + 360 });
+		expect(current.window.visibleRange.value).toEqual({ start: 10, end: 19 });
+
+		current.window.scrollToIndex(20);
+		expect(current.scroller.scrollTop).toBe(90 + 720);
 	});
 
 	it('a scroll frame that keeps the same rows returns the same items', () => {
@@ -240,6 +260,184 @@ describe('useVirtualRows — rows in view', () => {
 		current.attach();
 		expect(current.window.getPageStep(0, 'down')).toBe(8);
 		expect(current.window.getPageStep(50, 'up')).toBe(8);
+	});
+});
+
+describe('useVirtualRows — rows inserted above the ones in view', () => {
+	// What the body does: it reads the window after every scroll, before the rows change.
+	function render(setup: Setup) {
+		void setup.window.items.value;
+	}
+
+	it('keeps the rows in view in place when a page comes in at the top', async () => {
+		current = setup();
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(3960);
+	});
+
+	it('keeps them in place at the very top with `anchorAtTop`, where a page at the top is loaded', async () => {
+		current = setup({ anchorAtTop: () => true });
+		current.attach();
+		render(current);
+
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(360);
+	});
+
+	it('shows the rows that came in above at the very top without `anchorAtTop`, as a feed does', async () => {
+		current = setup();
+		current.attach();
+		render(current);
+
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(0);
+		expect(current.window.visibleRange.value).toEqual({ start: 0, end: 10 });
+	});
+
+	it('keeps them in place when a page comes in at the top and one goes at the bottom, as with a page limit', async () => {
+		current = setup();
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		current.keys.value = [...range(10, 'p'), ...current.keys.value.slice(0, -10)];
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(3960);
+	});
+
+	it('scrolls the element when a scroll in the same flush left the position as it was', async () => {
+		current = setup();
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		current.scroller.scrollToPosition({ top: 3240 });
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(3600);
+	});
+
+	it('drops a shift clamped at the top, so the next scroll lands where it was scrolled to', async () => {
+		const offset = shallowRef(0);
+
+		current = setup({ bodyOffset: () => offset.value, anchorAtTop: () => true });
+		current.attach();
+		render(current);
+
+		offset.value = 90;
+		await nextTick();
+		render(current);
+		expect(current.scroller.scrollTop).toBe(90);
+
+		current.scroller.scrollToPosition({ top: 0 });
+		render(current);
+		offset.value = 0;
+		await nextTick();
+		render(current);
+		expect(current.scroller.scrollTop).toBe(0);
+
+		current.scroller.scrollToPosition({ top: 3600 });
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(3600);
+		expect(current.window.visibleRange.value).toEqual({ start: 100, end: 110 });
+	});
+
+	it('scrolls to a row asked for in the same tick as rows came in above', async () => {
+		current = setup();
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+		current.window.scrollToIndex(0);
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(0);
+	});
+
+	it('starts a new root from its own position, not from the rows in view in the old one', async () => {
+		current = setup();
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		current.root.value = null;
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+
+		const next = createScroller({ width: 800, height: 360 });
+
+		current.root.value = next;
+		render(current);
+		await nextTick();
+
+		expect(next.scrollTop).toBe(0);
+	});
+
+	it('leaves the scroll alone for rows added at the end and for a new order', async () => {
+		current = setup();
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		current.keys.value = [...current.keys.value, ...range(10, 'n')];
+		await nextTick();
+		expect(current.scroller.scrollTop).toBe(3600);
+
+		current.keys.value = [...current.keys.value].reverse();
+		await nextTick();
+		expect(current.scroller.scrollTop).toBe(3600);
+	});
+
+	it('reads the new position in the same render, before the element is scrolled there', () => {
+		current = setup();
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+
+		expect(current.window.visibleRange.value).toEqual({ start: 110, end: 120 });
+		expect(current.window.items.value[0].index).toBe(110);
+	});
+
+	it('keeps them in place as the body offset grows and shrinks', async () => {
+		const offset = shallowRef(0);
+
+		current = setup({ bodyOffset: () => offset.value });
+		current.attach();
+		current.scroller.scrollToPosition({ top: 3600 });
+		render(current);
+
+		offset.value = 108;
+		await nextTick();
+		render(current);
+		expect(current.scroller.scrollTop).toBe(3708);
+
+		offset.value = 0;
+		await nextTick();
+		expect(current.scroller.scrollTop).toBe(3600);
+	});
+
+	it('does nothing before the root is mounted', async () => {
+		current = setup();
+
+		current.keys.value = [...range(10, 'p'), ...current.keys.value];
+		await nextTick();
+
+		expect(current.scroller.scrollTop).toBe(0);
 	});
 });
 

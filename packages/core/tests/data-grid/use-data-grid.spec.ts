@@ -64,6 +64,16 @@ function inSetup<TResult>(create: () => TResult): TResult {
 
 const ids = (list: readonly Row[]) => list.map(row => row.id);
 
+/** A scroll container `height` px tall: happy-dom has no layout. */
+function createRoot(height: number) {
+	const root = document.createElement('div');
+
+	Object.defineProperty(root, 'clientHeight', { value: height });
+	Object.defineProperty(root, 'scrollHeight', { value: 1000 });
+
+	return root;
+}
+
 describe('useDataGrid — the pipeline', () => {
 	it('without features renders the rows as they come, and header clicks only change the sort', () => {
 		const grid = inSetup(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 }));
@@ -181,6 +191,61 @@ describe('useDataGrid — markup', () => {
 		expect(withoutHeader.getGridProps()['aria-rowcount']).toBe(3);
 		expect(withHeader.getRowProps(withHeader.items.value[0])['aria-rowindex']).toBe(2);
 		expect(withoutHeader.getRowProps(withoutHeader.items.value[0])['aria-rowindex']).toBe(1);
+	});
+
+	it('moves the body by a body offset, and the rows in it stay as they were', () => {
+		const grid = inSetup(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 }));
+		const items = grid.items.value;
+
+		grid.addBodyOffset(90);
+
+		expect(grid.items.value).toBe(items);
+		expect(grid.getRowProps(items[1]).style).toEqual({ top: '30px', height: '30px' });
+	});
+
+	it('takes back exactly the body offset it was given, when another one is the same', () => {
+		const grid = inSetup(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30 }));
+		const root = createRoot(30);
+		const height = shallowRef(40);
+
+		grid.root.value = root;
+
+		const release = grid.addBodyOffset(height);
+
+		grid.addBodyOffset(height);
+		release();
+		release();
+		grid.scope.scrollToRow(2);
+
+		// The body starts below one offset of 40px: the third row, at 60px in it, stands at 100px.
+		expect(root.scrollTop).toBe(100);
+	});
+
+	it('keeps the rows in view in place at the very top only while something holds them there', async () => {
+		const list = shallowRef<readonly Row[]>(rows);
+		const grid = inSetup(() => useDataGrid({ columns, rows: list, rowKey: 'id', rowHeight: 30, virtual: true }));
+		const root = createRoot(60);
+
+		grid.root.value = root;
+		void grid.items.value;
+		list.value = [{ id: 'x', sector: 'tech', cap: 0 }, ...list.value];
+		await nextTick();
+		expect(root.scrollTop).toBe(0);
+
+		const release = grid.holdAnchorAtTop();
+
+		void grid.items.value;
+		list.value = [{ id: 'y', sector: 'tech', cap: 0 }, ...list.value];
+		await nextTick();
+		expect(root.scrollTop).toBe(30);
+		release();
+	});
+
+	it('counts `aria-rowindex` of the body rows on from `rowIndexOffset`', () => {
+		const grid = inSetup(() => useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 30, rowCount: 100, rowIndexOffset: 40 }));
+
+		expect(grid.getRowProps(grid.items.value[0])['aria-rowindex']).toBe(42);
+		expect(grid.getGridProps()['aria-rowcount']).toBe(101);
 	});
 
 	it('with rows in flow neither the body nor the rows get geometry', () => {

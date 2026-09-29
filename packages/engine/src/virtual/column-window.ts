@@ -1,6 +1,7 @@
 import type { ColumnPinSide, RenderedColumn } from '../columns/column';
 import { getFlexSpacerStyle } from '../render/geometry';
 
+/** A run of columns next to each other, such as the ones in view: indexes in `columns`. */
 export interface ColumnRange {
 	/** Half-open range `[start, end)` of indexes in `columns`. */
 	start: number;

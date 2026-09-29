@@ -167,7 +167,9 @@ Spread them on elements of your own and the grid works as with the parts, keyboa
 The refs matter as much as the props: `root` is the scroll container the windows and the geometry
 work in, `head` and `foot` are measured so scrolling keeps rows clear of them, `body` is where drags
 and cell ranges find the rows, and `exit` is the element <kbd>Tab</kbd> leaves the grid through when
-the grid has the `navigation` feature. For the keys and clicks of a header, spread
+the grid has the `navigation` feature. Without the structural styles, give `root`
+`overflow-anchor: none`: the grid keeps the rows in view in place when rows come in above them, and
+the browser's own scroll anchoring would move them a second time. For the keys and clicks of a header, spread
 [`useHeaderCell`](/composables/use-header-cell)'s handlers next to its props, as the demo does.
 
 Cell props are one frozen object per column, shared by every row, so spreading them costs nothing.

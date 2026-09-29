@@ -1002,7 +1002,7 @@ describe('useGridEngine — windows', () => {
 		mounted.root.value = scroller;
 		scroller.scrollToPosition({ top: 3600 });
 
-		expect(mounted.engine.scope.visibleRange.value).toEqual({ start: 100, end: 109 });
+		expect(mounted.engine.scope.visibleRowRange.value).toEqual({ start: 100, end: 109 });
 		expect(mounted.engine.scope.getPageStep(100, 'down')).toBe(9);
 	});
 

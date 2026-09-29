@@ -4,6 +4,7 @@ import type { RenderedGroup } from '../column-groups/column-groups';
 import type { AnyColumn, ColumnPinSide, RenderedColumn } from '../columns/column';
 import type { GridSort, SortDirection } from '../columns/sort';
 import type { ColumnSpanCell } from '../render/column-span';
+import type { ColumnRange } from '../virtual/column-window';
 import type { PageDirection } from '../virtual/item-metrics';
 import type { ScrollAlign } from '../virtual/scroll';
 
@@ -45,9 +46,9 @@ export interface GridScope<TRow = unknown> {
 	/**
 	 * The rows in view between the sticky top and bottom, at least partly: without overscan and kept
 	 * rows. `{ start: 0, end: 0 }` before the scroll container is mounted, and while the sticky blocks
-	 * cover the whole viewport.
+	 * cover the whole viewport. Keeps its object while the range holds.
 	 */
-	visibleRange: ComputedRef<RowRange>;
+	visibleRowRange: ComputedRef<RowRange>;
 	/**
 	 * How many rows PageUp (`'up'`) or PageDown (`'down'`) moves from the row at `index`: as many as fit
 	 * between the sticky top and bottom, by their heights. At least one.
@@ -61,6 +62,17 @@ export interface GridScope<TRow = unknown> {
 
 	/** Shown columns in display order. */
 	columns: ComputedRef<readonly RenderedColumn[]>;
+	/**
+	 * The columns in view between the pinned ones, at least partly, as indexes in `columns`: pinned
+	 * columns are always in view and not counted. `{ start: 0, end: 0 }` before the scroll container is
+	 * mounted, and without columns that scroll. Keeps its object while the range holds.
+	 */
+	visibleColumnRange: ComputedRef<ColumnRange>;
+	/**
+	 * The columns that scroll, between the ones pinned to the start and to the end, as indexes in
+	 * `columns`. Keeps its object while the range holds.
+	 */
+	scrollingColumnRange: ComputedRef<ColumnRange>;
 	/** Shown columns after the column window: without the ones outside it, with spacers in their place. */
 	renderedColumns: ComputedRef<readonly RenderedColumn[]>;
 	/** Every declared column in display order, hidden ones included: what a settings panel lists. */

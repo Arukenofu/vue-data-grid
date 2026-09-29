@@ -33,12 +33,15 @@
 /*
  * The scroll container of both axes, the engine's `root`: a column of the header, the body, the states
  * and the footer, none of which shrinks, so that the row of an empty grid can take the height left.
+ * The grid keeps the rows in view in place itself when rows or placeholder rows come in above them;
+ * the browser's own scroll anchoring would move them a second time, and only in some browsers.
  */
 :where([data-dg-part='grid']) {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	overflow: auto;
+	overflow-anchor: none;
 	color: var(--dg-foreground, CanvasText);
 }
 
@@ -77,8 +80,11 @@
 	position: relative;
 }
 
-/* A row is a flex line of cells, at least as wide as the grid, and as wide as its columns beyond. */
-:where([data-dg-part='row']) {
+/*
+ * A row is a flex line of cells, at least as wide as the grid, and as wide as its columns beyond; so is
+ * a row of `GridPlaceholderRows`, laid out as the rows it stands for.
+ */
+:where([data-dg-part='row'], [data-dg-part='placeholder-row']) {
 	position: relative;
 	display: flex;
 	width: max-content;
@@ -94,7 +100,7 @@
  * A body row is opaque: a row that slides over others, as rows do when a group opens or closes under
  * `useGridMotion`, hides them rather than mixing its text with theirs.
  */
-:where([data-dg-part='body'] > [data-dg-part='row']) {
+:where([data-dg-part='body'] > [data-dg-part='row'], [data-dg-part='placeholder-row']) {
 	background: var(--dg-background, Canvas);
 }
 
@@ -103,7 +109,7 @@
  * own, as the columns of a drag or of `useGridMotion` do, leave it whole. It lies over the cells,
  * pinned and inset ones included, and takes no room.
  */
-:where([data-dg-part='row'])::after {
+:where([data-dg-part='row'], [data-dg-part='placeholder-row'])::after {
 	position: absolute;
 	inset-inline: 0;
 	inset-block-end: 0;
@@ -181,7 +187,7 @@
 }
 
 /* Pinned cells are opaque: the cells scrolling under them must not show through. */
-:where([data-dg-part='row'] > [data-dg-pinned]) {
+:where([data-dg-part='row'] > [data-dg-pinned], [data-dg-part='placeholder-row'] > [data-dg-pinned]) {
 	background: var(--dg-pinned-background, var(--dg-background, Canvas));
 }
 

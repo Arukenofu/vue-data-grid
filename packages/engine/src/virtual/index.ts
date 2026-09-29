@@ -1,3 +1,5 @@
+export type { AnchorSnapshot, AnchorTarget } from './anchor';
+export { resolveAnchorShift } from './anchor';
 export type { ColumnRange, ColumnWindow } from './column-window';
 export { resolveColumnWindow } from './column-window';
 export type { ItemMetrics, ItemRange, PageDirection, VirtualItem } from './item-metrics';

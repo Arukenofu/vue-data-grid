@@ -236,8 +236,11 @@ export type DataGridStateSource<TColumns extends GridColumns = GridColumns> =
 
 export interface DataGridBaseOptions<TRow, TColumns extends GridColumns, TFeatures>
 	extends
-	Omit<GridEngineOptions<TRow>, 'columns' | 'rows' | 'root' | 'state' | 'scrollMargin' | 'scrollMarginEnd'>,
-	Pick<GridPropsOptions, 'role' | 'header' | 'footerRows' | 'rowCount' | 'rowLayout'> {
+	Omit<
+		GridEngineOptions<TRow>,
+		'columns' | 'rows' | 'root' | 'state' | 'scrollMargin' | 'scrollMarginEnd' | 'bodyOffset' | 'anchorAtTop'
+	>,
+	Pick<GridPropsOptions, 'role' | 'header' | 'footerRows' | 'rowCount' | 'rowIndexOffset' | 'rowLayout'> {
 	/** Columns from `defineColumns`, as an object by name or an array. */
 	columns: MaybeRefOrGetter<TColumns>;
 	/** The source rows; features group, sort and flatten them before the engine renders them. */
@@ -310,6 +313,8 @@ export interface DataGrid<TRow = unknown, THandles extends object = DataGridHand
 	items: ComputedRef<readonly VirtualItem[]>;
 	/** The height of all body rows, px. */
 	totalSize: ComputedRef<number>;
+	/** The height of every body row, px, when `rowHeight` is one number and rows are not measured; else `null`. */
+	uniformHeight: ComputedRef<number | null>;
 	/** Measures a body row, with `measureRows`: bind it to the row with `:ref`. */
 	measureElement: (element: Element | ComponentPublicInstance | null) => void;
 	/** Whether the column window leaves columns out. */
@@ -325,12 +330,28 @@ export interface DataGrid<TRow = unknown, THandles extends object = DataGridHand
 	 */
 	addBodyRows: (count: number) => () => void;
 	/**
+	 * Counts the height of an element in flow between the header and the body, px, such as
+	 * `GridPlaceholderRows` at the top, into the offset of the body: rows are windowed and scrolled to
+	 * below it, and the rows in view stay in place as it changes. Returns the function that takes back
+	 * exactly this height.
+	 */
+	addBodyOffset: (height: MaybeRefOrGetter<number>) => () => void;
+	/**
+	 * Keeps the rows in view in place when rows come in above them also while the grid is scrolled to
+	 * the very top, until the returned function is called, as loading at the top needs: `useGridEdge`
+	 * with `edge: 'top'` does. Otherwise rows that come in at the top show, as new entries of a feed do.
+	 */
+	holdAnchorAtTop: () => () => void;
+	/**
 	 * Writes geometry layers of your own next to the engine's until the returned function is called:
 	 * styles of exactly the elements a selector finds, such as the cells of a column moved during a
 	 * drag. They reach the elements that mount while they are written too.
 	 */
 	addLayers: (layers: MaybeRefOrGetter<readonly GeometryLayer[]>) => () => void;
-	/** Marks the grid busy, `aria-busy`, until the returned function is called, as `GridLoading` does. */
+	/**
+	 * Marks the grid busy, `aria-busy`, until the returned function is called, as `GridLoading` does;
+	 * `GridEmpty` waits meanwhile.
+	 */
 	markBusy: () => () => void;
 	/** Whether something marked the grid busy. */
 	isBusy: ComputedRef<boolean>;
@@ -356,6 +377,17 @@ function warnIgnoredStateOptions(options: DataGridStateSource) {
 			+ 'state options are ignored. Pass them to `useGridColumnsState` of the state instead.',
 		);
 	}
+}
+
+/** Adds `value` to a list until the returned function is called, which takes back exactly this addition. */
+function add<T>(list: Ref<readonly { value: T }[]>, value: T) {
+	const entry = { value };
+
+	list.value = [...list.value, entry];
+
+	return () => {
+		list.value = list.value.filter(item => item !== entry);
+	};
 }
 
 /** Adds `count` to a counter until the returned function is called, once. */
@@ -426,8 +458,19 @@ export function useDataGrid<
 	const addedFooterRows = shallowRef(0);
 	const addedBodyRows = shallowRef(0);
 	const busy = shallowRef(0);
+	const anchorsAtTop = shallowRef(0);
 	const headHeight = useStickyOffset(head);
 	const footHeight = useStickyOffset(foot);
+	const bodyOffsets = shallowRef<readonly { value: MaybeRefOrGetter<number> }[]>([]);
+	const bodyOffset = computed(() => {
+		let result = 0;
+
+		for (const offset of bodyOffsets.value) {
+			result += toValue(offset.value);
+		}
+
+		return result;
+	});
 
 	const engine = useGridEngine<TRow>({
 		columns: options.columns,
@@ -444,15 +487,17 @@ export function useDataGrid<
 		indexAttribute: options.indexAttribute,
 		scrollMargin: headHeight,
 		scrollMarginEnd: footHeight,
+		bodyOffset,
+		anchorAtTop: () => anchorsAtTop.value > 0,
 		keepRows: options.keepRows,
 		keepColumns: options.keepColumns,
 	});
 
-	const addedLayers = shallowRef<readonly MaybeRefOrGetter<readonly GeometryLayer[]>[]>([]);
+	const addedLayers = shallowRef<readonly { value: MaybeRefOrGetter<readonly GeometryLayer[]> }[]>([]);
 
 	useGridGeometry(root, computed(() => (addedLayers.value.length === 0
 		? engine.layers.value
-		: [...engine.layers.value, ...addedLayers.value.flatMap(layers => toValue(layers))])));
+		: [...engine.layers.value, ...addedLayers.value.flatMap(layers => toValue(layers.value))])));
 
 	const { scope } = engine;
 	const positioned = (options.rowLayout ?? 'positioned') === 'positioned';
@@ -463,6 +508,7 @@ export function useDataGrid<
 		navigation: features.navigation !== undefined,
 		footerRows: () => (toValue(options.footerRows) ?? 0) + addedFooterRows.value,
 		rowCount: () => toValue(options.rowCount) ?? engine.scope.rows.value.length + addedBodyRows.value,
+		rowIndexOffset: options.rowIndexOffset,
 		busy: () => busy.value > 0,
 		rowLayout: options.rowLayout,
 		nodes: tree ? () => tree.nodes.value : undefined,
@@ -489,8 +535,8 @@ export function useDataGrid<
 	}
 
 	/**
-	 * Props of a body row: those of `useGridProps`, and with positioned rows its offset below the header
-	 * and its height. `row` is a `VirtualItem` of `items`.
+	 * Props of a body row: those of `useGridProps`, and with positioned rows its offset in the body and
+	 * its height. `row` is a `VirtualItem` of `items`.
 	 */
 	function getRowProps(row: DataGridRowRef) {
 		const rowProps = props.getRowProps(row);
@@ -507,13 +553,9 @@ export function useDataGrid<
 		indexAttribute: options.indexAttribute ?? DEFAULT_INDEX_ATTRIBUTE,
 		addFooterRows: count => hold(addedFooterRows, count),
 		addBodyRows: count => hold(addedBodyRows, count),
-		addLayers: (layers) => {
-			addedLayers.value = [...addedLayers.value, layers];
-
-			return () => {
-				addedLayers.value = addedLayers.value.filter(item => item !== layers);
-			};
-		},
+		addBodyOffset: height => add(bodyOffsets, height),
+		holdAnchorAtTop: () => hold(anchorsAtTop, 1),
+		addLayers: layers => add(addedLayers, layers),
 		markBusy: () => hold(busy, 1),
 		isBusy: computed(() => busy.value > 0),
 		root,
@@ -530,6 +572,7 @@ export function useDataGrid<
 		getNodeAt: index => tree?.nodes.value[index],
 		items: engine.items,
 		totalSize: engine.totalSize,
+		uniformHeight: engine.uniformHeight,
 		measureElement: engine.measureElement,
 		windowed: engine.windowed,
 		grouping,

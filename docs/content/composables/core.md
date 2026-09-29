@@ -50,6 +50,10 @@ createGridScopeContext(engine.scope);
 useGridGeometry(root, engine.layers);
 ```
 
+The engine keeps the rows in view in place when rows come in or go above them, as `bodyOffset` of
+what stands above the body changes, and, with `anchorAtTop`, at the very top too. Give the root
+`overflow-anchor: none`, or browsers with scroll anchoring move the rows a second time.
+
 <ReturnsTable
 	:data="[
 		{ name: 'scope', type: 'GridScope', description: 'Everything the markup renders from, and what changes the layout.' },
@@ -69,8 +73,8 @@ The scope is the one object the markup reads. The main members:
 
 | Group | Members |
 | --- | --- |
-| Rows | `rows`, `rowKeys`, `getRowKey`, `getRowIndex`, `rowRange`, `visibleRange`, `getRowOffset`, `getPageStep` |
-| Columns | `columns`, `renderedColumns`, `orderedColumns`, `headerGroups`, `offsets`, `getColumn`, `getWidth`, `getPin`, `isColumnHidden`, `getColumnSpan` |
+| Rows | `rows`, `rowKeys`, `getRowKey`, `getRowIndex`, `rowRange`, `visibleRowRange`, `getRowOffset`, `getPageStep` |
+| Columns | `columns`, `visibleColumnRange`, `scrollingColumnRange`, `renderedColumns`, `orderedColumns`, `headerGroups`, `offsets`, `getColumn`, `getWidth`, `getPin`, `isColumnHidden`, `getColumnSpan` |
 | Layout | `toggleColumn`, `pinColumn`, `moveColumnTo`, `moveColumnBefore`, `moveColumnBy`, `canMoveColumnTo`, `batch` |
 | Sort | `sort`, `multiSort`, `getSortDirection`, `getSortIndex`, `toggleSort` |
 | Groups | `isGroupCollapsed`, `toggleGroup` |

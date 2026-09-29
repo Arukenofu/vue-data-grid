@@ -56,6 +56,17 @@ While it is mounted the grid is `aria-busy`, and the announcer says that it is l
 To mark the grid busy without the bar, such as while a spinner of your own turns elsewhere, call
 `grid.markBusy()`; it returns the function that ends it.
 
+For the first page, skeleton rows often say more than a bar: `GridPlaceholderRows` shows `count` rows
+laid out as the columns, as tall as the rows, and marks the grid busy too. The demo shows ten of them
+for the first page, three below the rows for each next one, and the bar only while a new search
+replaces rows already shown.
+
+```vue
+<GridPlaceholderRows v-if="loading && people.length === 0" :count="10" />
+<GridPlaceholderRows v-else-if="loadingMore" :count="3" />
+<GridLoading v-if="loading && !loadingMore && people.length > 0">Loading people…</GridLoading>
+```
+
 ## When there is nothing to show
 
 `GridEmpty` renders only while the grid has no rows: one row with a cell across every column, so the
@@ -63,11 +74,11 @@ grid stays valid for assistive technology. It sticks to the start edge and takes
 header and the footer leave.
 
 ```vue
-<GridEmpty v-if="!loading">No one matches “{{ query }}”</GridEmpty>
+<GridEmpty>No one matches “{{ query }}”</GridEmpty>
 ```
 
-The `v-if` keeps it away while the first page is loading: "no rows" is not true yet. Without a slot it
-shows the `empty` message.
+It waits while the grid is busy, with `GridLoading` or `GridPlaceholderRows` mounted: "no rows" is not
+true until the rows come. Without a slot it shows the `empty` message.
 
 ## Sorting and searching on the server
 
@@ -89,22 +100,27 @@ demo counts its requests and drops any answer that is not the latest one.
 
 ## Loading more as people scroll
 
-`grid.scope.visibleRange` holds the rows in view. When its end comes close to the last row, load the
-next page and append it:
+`useGridEdge` says when the rows in view come within ten rows of the last one. Load the next page
+there and append it:
 
 ```ts
-watch(() => grid.scope.visibleRange.value.end, (end) => {
-	const more = people.value.length < total.value;
-
-	if (more && !loading.value && end >= people.value.length - PREFETCH_ROWS) {
-		void load(people.value.length);
-	}
+useGridEdge(grid, {
+	edge: 'bottom',
+	hasMore: () => people.value.length < total.value,
+	busy: loading,
+	onReach: () => load(people.value.length),
 });
 ```
 
-The appended rows keep the ones already shown as they are: their objects do not change, so they do not
+`onReach` returns the promise of `load`, and the edge waits for it before it calls again. `busy`
+holds it while another load runs, such as the first page of a new search, without counting as a call:
+once that is over, the edge is checked again. `hasMore` stays a fact about the data. The
+appended rows keep the ones already shown as they are: their objects do not change, so they do not
 render again. With [virtualization](/guides/virtualization) on, the grid stays light however many
 pages people load.
+
+Pages loaded at the top, skeleton rows and TanStack Query are in
+[Pages and infinite scrolling](/guides/paging).
 
 ### The size of the whole set
 
@@ -116,8 +132,9 @@ rowCount: () => (total.value > people.value.length ? total.value : undefined),
 ```
 
 Leave it `undefined` once everything is loaded, and `-1` when the size is unknown. For pages that
-replace each other rather than add up, leave `rowCount` out: rows are counted from the first row the
-grid has.
+replace each other rather than add up, pass the size of the whole set as `rowCount` and the rows
+before the page as `rowIndexOffset`, so the first row of the third page of twenty is "row 41": see
+[Pages and infinite scrolling](/guides/paging#pages).
 
 ## Accessibility
 
@@ -132,6 +149,8 @@ grid has.
 
 ## See also
 
-- [Empty and loading](/components/empty-and-loading): both parts and their props.
+- [Empty and loading](/components/empty-and-loading): the parts and their props.
+- [Pages and infinite scrolling](/guides/paging): pages, loading at the top, TanStack Query and Nuxt.
+- [`useGridEdge`](/composables/use-grid-edge)
 - [Sorting](/guides/sorting): the sort as state, and sorting on a server.
 - [Localization](/guides/localization): the `empty` and `loading` messages in other languages.

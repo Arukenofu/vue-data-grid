@@ -98,6 +98,18 @@ export interface GridEngineOptions<TRow = unknown> {
 	 * bottom, as `scrollMargin` does at the top.
 	 */
 	scrollMarginEnd?: MaybeRefOrGetter<number>;
+	/**
+	 * Height of what stands in flow between the sticky top and the body and scrolls away with the rows,
+	 * px, such as placeholder rows loading at the top: the body starts below it too, and the rows in
+	 * view stay in place while it changes. `0` by default.
+	 */
+	bodyOffset?: MaybeRefOrGetter<number>;
+	/**
+	 * Whether rows that come in above keep the rows in view in place also when the grid is scrolled to
+	 * the very top, as loading at the top needs: otherwise they show there, as new entries of a feed do.
+	 * Below the top the rows in view always stay in place. `false` by default.
+	 */
+	anchorAtTop?: MaybeRefOrGetter<boolean>;
 	/** Row indexes that must stay rendered, such as under a drag; see also `scope.keepRendered`. */
 	keepRows?: MaybeRefOrGetter<readonly number[]>;
 	/** Column names that must stay rendered. */
@@ -223,6 +235,9 @@ function createUnknownColumnWarning(getColumns: () => readonly AnyColumn[]) {
  * Everything a grid has apart from markup: the column model, row and column windows, group rows and
  * geometry as CSS variables. Call it in `setup`, pass `scope` to `createGridScopeContext` and `layers` to
  * `useGridGeometry`.
+ *
+ * It keeps the rows in view in place itself when rows come in or go above them: give `root`
+ * `overflow-anchor: none`, or browsers with scroll anchoring move them a second time.
  */
 export function useGridEngine<TRow = unknown>(options: GridEngineOptions<TRow>) {
 	const state = options.state ?? useGridColumnsState();
@@ -373,11 +388,14 @@ export function useGridEngine<TRow = unknown>(options: GridEngineOptions<TRow>) 
 		overscan: () => virtual.value.overscan,
 		scrollMargin: () => toValue(options.scrollMargin) ?? 0,
 		scrollMarginEnd: () => toValue(options.scrollMarginEnd) ?? 0,
+		bodyOffset: () => toValue(options.bodyOffset) ?? 0,
+		anchorAtTop: () => toValue(options.anchorAtTop) ?? false,
 		estimateSize: getRowHeight,
 		uniformSize: () => uniformHeight.value,
 		measured: () => toValue(options.measureRows) ?? false,
 		getItemKey: getRowKey,
 		getItemKeys: () => rowKeys.value,
+		getItemIndex: key => rowIndexes.value.get(key) ?? -1,
 		keep: () => keptRows.value,
 		ssrCount: () => virtual.value.ssrRows,
 		indexAttribute: options.indexAttribute ?? DEFAULT_INDEX_ATTRIBUTE,
@@ -628,10 +646,12 @@ export function useGridEngine<TRow = unknown>(options: GridEngineOptions<TRow>) 
 		getRowKey: getKeyOf,
 		getRowIndex: key => rowIndexes.value.get(key) ?? -1,
 		rowRange,
-		visibleRange: rowWindow.visibleRange,
+		visibleRowRange: rowWindow.visibleRange,
 		getPageStep: rowWindow.getPageStep,
 		getRowOffset: rowWindow.getOffset,
 		columns: columns.columns,
+		visibleColumnRange: columnWindow.visibleRange,
+		scrollingColumnRange: columnWindow.scrollingRange,
 		renderedColumns,
 		orderedColumns: columns.orderedColumns,
 		headerGroups,

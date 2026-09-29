@@ -136,7 +136,7 @@ Adheres to the [Grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) and
 - `aria-rowcount` counts the header, body and footer rows, and `aria-colcount` the shown columns, so a
   screen reader knows the size of the grid even while only part of it is rendered.
 - `aria-multiselectable` is set while more than one row or cell can be selected, and `aria-busy`
-  while a `GridLoading` is shown.
+  while a `GridLoading` or `GridPlaceholderRows` is shown.
 - The announcer tells what `aria-sort` cannot: the full sort in a multi-sort, how many rows are
   selected, and that the grid is loading.
 
