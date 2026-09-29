@@ -53,6 +53,37 @@ The toggle is a `GridTreeToggle`. A leaf gets an empty space of the same width, 
 across levels. The indent is `--dg-tree-indent` per level, `16px` by default. To place the toggle
 yourself, put a `GridTreeToggle` in a `cell` of your own; it finds its row in the `GridRow` it is in.
 
+### Renaming in the tree column
+
+The tree column edits as any column with the [`editing`](/guides/editing) feature: make it `editable`
+and give it `setValue`. The content alone turns into the editor, the indent and the toggle stay where
+they were. In the demo, double-click a name, or press <kbd>Enter</kbd> on it, to rename a person:
+<kbd>Enter</kbd> on a cell that can be edited edits it, and a double click on the toggle only expands
+or collapses the row.
+
+```ts
+const members = shallowRef(org);
+
+const columns = defineColumns({
+	name: treeColumn(column('name', { label: 'Name', editable: true, setValue: (member, name) => ({ ...member, name }) })),
+});
+
+const grid = useDataGrid({
+	columns,
+	rows: members,
+	rowKey: 'id',
+	rowHeight: 44,
+	features: {
+		tree: tree({ parentKey: 'manager' }),
+		editing: editing({ onCommit: commit => (members.value = commit.apply(members.value)) }),
+	},
+});
+```
+
+`commit.apply` replaces the changed rows in a flat list, as the one of a tree by `parentKey`. The rows
+of a tree by `childrenField` lie inside other rows: put the new rows from `commit.rows`, by key, where
+they are in your nesting.
+
 ## Expanding and collapsing
 
 By default every group starts collapsed. `defaultExpanded` opens that many levels from the top, and

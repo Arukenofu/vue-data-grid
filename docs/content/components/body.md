@@ -115,7 +115,7 @@ slot. When they render nothing for a cell, for example because a `v-if` is false
 own content, just as a `<slot>` shows its fallback: the column's
 [`GridCellTemplate`](./column-templates), its `cell` field, else its text through `format`. A
 column's `cellFrame`, such as the indent and the toggle of `treeColumn()`, goes around whichever
-renders. The slots are not typed by the columns here; [`defineGridCells`](#definegridcells) gives
+renders, and around the editor while the cell is edited. The slots are not typed by the columns here; [`defineGridCells`](#definegridcells) gives
 them the types.
 
 <PropsTable

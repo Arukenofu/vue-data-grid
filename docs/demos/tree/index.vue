@@ -2,6 +2,7 @@
 import {
 	defineColumn,
 	defineColumns,
+	editing,
 	GridCellTemplate,
 	navigation,
 	tree,
@@ -22,22 +23,33 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD
 const column = defineColumn<OrgMember>({ sortable: true, sortOrder: ['asc', 'desc'] });
 
 const columns = defineColumns({
-	name: treeColumn(column('name', { label: 'Name', width: 220 })),
+	name: treeColumn(column('name', {
+		label: 'Name',
+		width: 220,
+		editable: true,
+		setValue: (member, name) => ({ ...member, name }),
+	})),
 	title: column('title', { label: 'Title', width: 190 }),
 	reports: column('reports', { label: 'Reports', width: 92, align: 'right' }),
 	cost: column('cost', { label: 'Org cost', width: 104, align: 'right', format: cost => money.format(cost) }),
 });
 
+const members = shallowRef<readonly OrgMember[]>(org);
 const expanded = shallowRef<string[] | undefined>(undefined);
 
 const grid = useDataGrid({
 	columns,
-	rows: org,
+	rows: members,
 	rowKey: 'id',
 	rowHeight: 44,
 	features: {
 		tree: tree({ parentKey: 'manager', expanded, defaultExpanded: 2 }),
 		navigation: navigation(),
+		editing: editing({
+			onCommit: (commit) => {
+				members.value = commit.apply(members.value);
+			},
+		}),
 	},
 });
 
@@ -56,7 +68,7 @@ const shown = grid.rows;
 				Collapse all
 			</UiButton>
 			<span class="ui-spacer" />
-			<UiStat label="Shown" class="shown">{{ shown.length }} of {{ org.length }}</UiStat>
+			<UiStat label="Shown" class="shown">{{ shown.length }} of {{ members.length }}</UiStat>
 		</UiToolbar>
 		<UiDataGrid :grid="grid" label="Organization">
 			<GridCellTemplate v-slot="{ value }" :column="columns.name">

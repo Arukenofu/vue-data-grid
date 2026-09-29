@@ -47,7 +47,7 @@ So a slot of the body overrides the template of the column in that body, and the
 the column's field. A slot or a template whose `v-if` renders nothing passes the cell on to the next;
 to leave a cell empty on purpose, render an empty element. A column's `cellFrame` goes around
 whichever renders: in the column of the tree, from `treeColumn()`, the indent and the toggle come
-before it. An editor follows the same order: a `GridEditorTemplate`, the column's `editor`, the
+before it, and before the editor while the cell is edited. An editor follows the same order: a `GridEditorTemplate`, the column's `editor`, the
 `editor` of the `editing` feature, `textEditor()`.
 
 | Way | In the template | Typed by the column | Where it applies |

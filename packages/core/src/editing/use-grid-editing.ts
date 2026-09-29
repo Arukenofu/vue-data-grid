@@ -32,7 +32,7 @@ import { toElement } from '../components/primitive';
 import { isComposing, isRtl } from '../keyboard/keys';
 import type { BodyCellFocus } from '../navigation/body-cell-focus';
 import { BODY_SECTION, readGridPosition } from '../navigation/grid-attributes';
-import { TEXT_FIELD_SELECTOR } from '../pointer/controls';
+import { CONTROL_SELECTOR } from '../pointer/controls';
 import { textEditor } from './editors';
 
 /** What editing needs of a grid; the grid of `useDataGrid` fits, with its features. */
@@ -592,8 +592,9 @@ export function useGridEditing<TRow = unknown>(grid: EditingGrid<TRow>, options:
 
 	function handleDoubleClick(event: MouseEvent) {
 		const target = event.target instanceof Element ? event.target : null;
-		const inField = target?.closest(TEXT_FIELD_SELECTOR) !== null;
-		const cell = isEnabled() && target && !inField ? readCell(target.closest('[data-dg-column]')) : null;
+		// A control in the cell keeps its double click, such as the toggle of a tree, pressed twice.
+		const inControl = target?.closest(CONTROL_SELECTOR) !== null;
+		const cell = isEnabled() && target && !inControl ? readCell(target.closest('[data-dg-column]')) : null;
 
 		if (cell && canStartEditor(cell)) {
 			start(cell);

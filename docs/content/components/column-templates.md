@@ -88,7 +88,7 @@ that cell to the next one. To leave a cell empty on purpose, render an empty ele
 
 A column's `cellFrame` goes around whichever of these renders: in the column of the tree, from
 `treeColumn()`, the indent and the `GridTreeToggle` come before the content of a slot, a template, a
-`cell` field or the text alike. The column fields stay for text and for columns shared as modules,
+`cell` field or the text alike, and before the editor while the cell is edited. The column fields stay for text and for columns shared as modules,
 such as the service columns and `treeColumn`.
 
 Two templates of one column warn in development, and the first one set up renders; when it goes,

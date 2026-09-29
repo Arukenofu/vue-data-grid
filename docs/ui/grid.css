@@ -218,6 +218,18 @@
 	color: var(--ui-fg-subtle);
 }
 
+/*
+ * A cell of the tree keeps its padding, indent and toggle while its name is edited: the name alone
+ * turns into the editor, where it stood.
+ */
+.ui-grid [data-dg-column][data-dg-state='editing']:has(> [data-dg-part='tree-toggle']) {
+	padding: var(--dg-cell-padding);
+}
+
+.ui-grid [data-dg-part='tree-toggle'] ~ [data-dg-part='editor'] {
+	padding-inline-start: 0;
+}
+
 /* A text area of several lines is a card over the rows below: the ring goes with it. */
 .ui-grid [data-dg-column][data-dg-state='editing']:has(> textarea) {
 	outline: none;

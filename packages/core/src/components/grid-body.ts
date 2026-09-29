@@ -121,7 +121,7 @@ const cellsProps = {
  * default slot. A cell the slots render nothing for, such as one a `v-if` skips, shows its own
  * content, as a `<slot>` shows its fallback: the column's `GridCellTemplate`, its `cell` field, else
  * its text through `format`. The column's `cellFrame`, such as the indent and the toggle of
- * `treeColumn()`, goes around it. A spacer of the column window renders an empty cell. For slots
+ * `treeColumn()`, goes around it, and around the editor of the cell too. A spacer of the column window renders an empty cell. For slots
  * typed by the columns, use `defineGridCells`.
  */
 export const GridCells = defineComponent({
@@ -209,7 +209,12 @@ export const GridCells = defineComponent({
 			}
 
 			if (editor) {
-				return h(props.as, cellProps, [h(GridCellEditor, { context, editor })]);
+				// The frame stays around the editor: the indent and the toggle of a tree keep their place while
+				// the name after them is edited.
+				const { cellFrame } = context.column;
+				const content = h(GridCellEditor, { context, editor });
+
+				return h(props.as, cellProps, [cellFrame ? cellFrame(context, content) : content]);
 			}
 
 			return h(props.as, cellProps, [renderCellContent(context, templates, renderSlots(slots, context))]);

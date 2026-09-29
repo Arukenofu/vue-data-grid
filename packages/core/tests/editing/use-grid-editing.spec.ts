@@ -11,7 +11,8 @@ import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
 import { GridRangeOverlay } from '../../src/components/grid-range-overlay';
 import { GridRoot } from '../../src/components/grid-root';
 import { GridEditorTemplate } from '../../src/components/grid-templates';
-import { clipboard, editing, history, navigation, ranges, sorting } from '../../src/data-grid/factories';
+import { treeColumn } from '../../src/columns/service-columns';
+import { clipboard, editing, history, navigation, ranges, sorting, tree } from '../../src/data-grid/factories';
 import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { checkboxField, dateField, numberField, selectEditor, textEditor } from '../../src/editing/editors';
 import type { GridEditingOptions } from '../../src/editing/use-grid-editing';
@@ -803,6 +804,102 @@ describe('useGridEditing — a control in the cell', () => {
 		expect(contexts.find(context => context.column.name === 'id')?.write).toBeUndefined();
 		expect(contexts.find(context => context.column.name === 'active' && context.key === 'a')?.write).toBeUndefined();
 		expect(contexts.find(context => context.column.name === 'active' && context.key === 'b')?.write).toBeTypeOf('function');
+	});
+});
+
+describe('useGridEditing — the column of a tree', () => {
+	interface Member {
+		id: string;
+		name: string;
+		manager: string | null;
+	}
+
+	const member = defineColumn<Member>();
+
+	const treeColumns = defineColumns({
+		name: treeColumn(member('name', { label: 'Name', editable: true, setValue: (row, name) => ({ ...row, name }) })),
+	});
+
+	function setupTree() {
+		const members = shallowRef<readonly Member[]>([
+			{ id: 'ceo', name: 'Ada', manager: null },
+			{ id: 'cto', name: 'Brian', manager: 'ceo' },
+		]);
+		let grid: DataGrid<Member> | null = null;
+
+		wrapper = mount(defineComponent({
+			setup() {
+				grid = useDataGrid({
+					columns: treeColumns,
+					rows: members,
+					rowKey: 'id',
+					rowHeight: 30,
+					features: {
+						tree: tree({ parentKey: 'manager', defaultExpanded: -1 }),
+						navigation: navigation(),
+						editing: editing({
+							onCommit: (commit) => {
+								members.value = commit.apply(members.value);
+							},
+						}),
+					},
+				}) as unknown as DataGrid<Member>;
+
+				return () => h(GridRoot, { grid: grid as DataGrid }, {
+					default: () => h(GridBody, null, {
+						default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => bodyRows.map(row => h(GridRow, { key: row.key, row }, {
+							default: () => h(GridCells),
+						})),
+					}),
+				});
+			},
+		}), { attachTo: document.body });
+
+		return { members, grid: grid as unknown as DataGrid<Member> };
+	}
+
+	function parts(element: Element) {
+		return [...element.children].map(child => child.getAttribute('data-dg-part'));
+	}
+
+	it('edits the name alone: the indent and the toggle stay before the editor', async () => {
+		const { members } = setupTree();
+
+		cell(1, 'name').dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+		await nextTick();
+
+		expect(parts(cell(1, 'name'))).toEqual(['tree-indent', 'tree-toggle', 'editor']);
+
+		type(editor() as HTMLInputElement, 'Bea');
+		key(editor() as HTMLInputElement, 'Enter');
+		await nextTick();
+
+		expect(members.value[1].name).toBe('Bea');
+		expect(parts(cell(1, 'name'))).toEqual(['tree-indent', 'tree-toggle', 'cell-text']);
+	});
+
+	it('Enter on a group row edits its name rather than collapse it', async () => {
+		const { grid } = setupTree();
+
+		await grid.navigation?.focusCell({ section: 'body', row: 0, cell: 'name' });
+		key(cell(0, 'name'), 'Enter');
+		await nextTick();
+
+		expect(grid.tree?.isExpanded('ceo')).toBe(true);
+		expect(parts(cell(0, 'name'))).toEqual(['tree-toggle', 'editor']);
+	});
+
+	it('a double click on the toggle collapses and expands the row, and opens no editor', async () => {
+		const { grid } = setupTree();
+		const toggle = cell(0, 'name').querySelector('[data-dg-part="tree-toggle"]') as HTMLButtonElement;
+
+		toggle.click();
+		toggle.click();
+		toggle.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+		await nextTick();
+
+		expect(grid.tree?.isExpanded('ceo')).toBe(true);
+		expect(grid.editing?.cell.value).toBeNull();
 	});
 });
 

@@ -59,7 +59,8 @@ export function rowNumberColumn<TRow>(options: ServiceColumnOptions & { rowHeade
  * its `cell`, else its text. The indent and the toggle are the column's `cellFrame`. The indent is
  * `--dg-tree-indent` per level in the structural styles. The toggle finds the tree in the grid it is
  * rendered in, so the grid needs the `tree` feature. The column is marked `tree`, so → and ← of the
- * navigation expand and collapse rows in it.
+ * navigation expand and collapse rows in it. An `editable` tree column edits the content alone: the
+ * indent and the toggle stay before the editor.
  */
 export function treeColumn<
 	TRow,

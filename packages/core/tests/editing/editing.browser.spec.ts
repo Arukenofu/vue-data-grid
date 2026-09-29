@@ -11,7 +11,8 @@ import type { GridBodyRow } from '../../src/components/context';
 import { GridBody, GridCells, GridRow } from '../../src/components/grid-body';
 import { GridRangeOverlay } from '../../src/components/grid-range-overlay';
 import { GridRoot } from '../../src/components/grid-root';
-import { clipboard, editing, history, navigation, ranges } from '../../src/data-grid/factories';
+import { treeColumn } from '../../src/columns/service-columns';
+import { clipboard, editing, history, navigation, ranges, tree } from '../../src/data-grid/factories';
 import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { checkboxField, numberField, selectEditor } from '../../src/editing/editors';
 
@@ -354,5 +355,72 @@ describe('an editor of several elements in the browser', () => {
 
 		expect(grid.editing?.cell.value).toBeNull();
 		expect(rows.value[0].name).toBe('Gamma');
+	});
+});
+
+describe('the column of a tree in the browser', () => {
+	interface Member {
+		id: string;
+		name: string;
+		manager: string | null;
+	}
+
+	const member = defineColumn<Member>();
+
+	const treeColumns = defineColumns({
+		name: treeColumn(member('name', { label: 'Name', width: 200, editable: true, setValue: (row, name) => ({ ...row, name }) })),
+	});
+
+	function setupTree() {
+		const members = shallowRef<readonly Member[]>([
+			{ id: 'ceo', name: 'Ada', manager: null },
+			{ id: 'cto', name: 'Brian', manager: 'ceo' },
+			{ id: 'dev', name: 'Cleo', manager: 'cto' },
+		]);
+
+		wrapper = mount(defineComponent({
+			setup() {
+				const grid = useDataGrid({
+					columns: treeColumns,
+					rows: members,
+					rowKey: 'id',
+					rowHeight: 30,
+					features: {
+						tree: tree({ parentKey: 'manager', defaultExpanded: -1 }),
+						navigation: navigation(),
+						editing: editing({
+							onCommit: (commit) => {
+								members.value = commit.apply(members.value);
+							},
+						}),
+					},
+				});
+
+				return () => h(GridRoot, { grid: grid as unknown as DataGrid, style: { width: '400px', height: '240px', font: '14px sans-serif' } }, {
+					default: () => h(GridBody, null, {
+						default: ({ rows: bodyRows }: { rows: readonly GridBodyRow[] }) => bodyRows.map(row => h(GridRow, { key: row.key, row }, { default: () => h(GridCells), $stable: true })),
+					}),
+				});
+			},
+		}), { attachTo: document.body });
+	}
+
+	it('keeps the indent and the toggle in place while a name is edited, the editor after them', async () => {
+		setupTree();
+		await nextTick();
+
+		const toggle = () => cell(2, 'name').querySelector('[data-dg-part="tree-toggle"]') as HTMLElement;
+		const before = toggle().getBoundingClientRect();
+
+		await userEvent.dblClick(cell(2, 'name').querySelector('[data-dg-part="cell-text"]') as HTMLElement);
+		await nextTick();
+
+		const after = toggle().getBoundingClientRect();
+		const input = editor()?.getBoundingClientRect();
+
+		expect(after.left).toBe(before.left);
+		expect(after.top).toBe(before.top);
+		expect(input?.left).toBeGreaterThanOrEqual(after.right);
+		expect(input?.right).toBeLessThanOrEqual(cell(2, 'name').getBoundingClientRect().right);
 	});
 });

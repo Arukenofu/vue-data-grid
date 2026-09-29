@@ -85,7 +85,9 @@ Turns a data column into the column of the tree: each cell starts with an indent
 `--dg-tree-indent` per level and a [`GridTreeToggle`](/components/tree-toggle), then the content of
 the cell, whichever gives it: a slot of `GridCells`, a `GridCellTemplate`, the column's `cell` or its
 text. The indent and the toggle are the column's `cellFrame`. It stays a data column, and it is
-marked `tree`, so → and ← expand and collapse rows in it.
+marked `tree`, so → and ← expand and collapse rows in it. An `editable` tree column edits the content
+alone: the indent and the toggle stay before the editor, and a double click on the toggle only
+expands or collapses the row.
 
 ```ts
 treeColumn(column: ColumnInput<TRow, TValue>): ColumnInput<TRow, TValue>

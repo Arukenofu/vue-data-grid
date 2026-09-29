@@ -139,8 +139,9 @@ declare module '@vue-data-grid/engine' {
 		cell?: (context: CellContext<TRow, TValue>) => VNodeChild;
 		/**
 		 * What goes around the content of a body cell, whichever gives it: a slot of `GridCells`, the
-		 * column's `GridCellTemplate`, its `cell` or its text. `treeColumn()` puts the indent and the
-		 * toggle of the tree before it. Not around an editor.
+		 * column's `GridCellTemplate`, its `cell` or its text, and around its editor while the cell is
+		 * edited. `treeColumn()` puts the indent and the toggle of the tree before it, so they keep their
+		 * place while a name is edited.
 		 */
 		cellFrame?: (context: CellContext<TRow, TValue>, content: VNodeChild) => VNodeChild;
 		cellClass?: (context: CellContext<TRow, TValue>) => ClassValue;
