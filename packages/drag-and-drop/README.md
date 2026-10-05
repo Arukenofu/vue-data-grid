@@ -196,6 +196,7 @@ the item (`opacity: 0`) so that one of them is seen, not both.
 | `canDrop(key, target)` | whether `key` may go to this place; a rejected place is not shown |
 | `group` | a name shared by lists that take each other's items |
 | `canAccept({ payload, external })` | whether to take an item from the group |
+| `reorder` | whether the list takes its own items at new places; `true` by default, `false` for items that only leave |
 | `getData(key)` | what to attach to the payload for other lists, which know nothing but the key |
 | `preview` | the ghost: `{ render(key, container), placement, exit }` |
 | `scroller` | what to scroll near the edges during a drag; `container` by default |
@@ -313,6 +314,9 @@ subtree. The keyboard offers the same places, in display order.
 Lists with the same `group` take each other's items; the drop event then has `external: true`, and
 the payload carries `data` from the source's `getData`. `useDropTarget(element, { kinds, group,
 canDrop, onDrop })` is an area that takes an item without being a list: a bin, "add to favourites".
+A list with `reorder: false` keeps its order: its items only leave for the lists of its group and
+for drop targets, it still takes the items of the group, and it has no keyboard drag and no
+`stepKeys`, which move an item within its list.
 
 ## Vue 3.6 Vapor
 

@@ -67,8 +67,9 @@ ghost under the pointer.
 	:data="[
 		{ name: 'handle', type: 'boolean', default: 'false', description: 'Drags start only on a `GridDragHandle`, which also drags with the keyboard. Without it the whole row drags, and controls in its cells keep their clicks.' },
 		{ name: 'indicator', type: '\'gap\' | \'line\' | \'mark\'', default: '\'gap\'', description: 'How the place is shown: the rows move apart, a line slides between them, or only attributes mark it.' },
-		{ name: 'enabled', type: 'boolean', description: 'Whether rows can be dragged now; while the rows are not sorted by default, since their order is then the sort\'s.' },
+		{ name: 'enabled', type: 'boolean', description: 'Whether rows can be dragged now. By default a grid that reorders drags while its rows are not sorted, since their order is then the sort\'s; one with `reorder` off always.' },
 		{ name: 'group', type: 'string', description: 'A name shared by grids that take each other\'s rows.' },
+		{ name: 'reorder', type: 'boolean', default: 'true', description: 'Whether the grid takes its own rows at new places. `false` for rows that only leave, for the grids of the `group` and for drop zones: the grid keeps its order, still takes the rows of the group, and has no keyboard drag and no step keys.' },
 		{ name: 'bounds', type: '\'grid\' | \'window\' | HTMLElement', description: 'What neither the pointer nor the ghost leaves: the grid by default, the window in a `group`.' },
 		{ name: 'canDrag', type: '(row, key) => boolean', description: 'Whether a row can be dragged; every row by default.' },
 		{ name: 'canDrop', type: '(target: GridRowDropTarget) => boolean', description: 'Whether a row may be dropped at a place: `{ key, row, parent, index, over, position }`.' },
@@ -173,6 +174,17 @@ other track between them.
 <GridRowDrag :can-drag="(_row, key) => !locked.has(key)" :can-drop="({ index }) => index > 0 && index < rows.length - 1">
 ```
 
+### Rows that only leave
+
+A grid whose order is not the user's, such as a sorted list of files, can still give its rows to
+other grids and to drop zones. With `:reorder="false"` an own row has no place in its grid: a drop
+over it puts the row back. The grid still takes the rows of its `group`, and drags whatever the
+sort:
+
+```vue
+<GridRowDrag group="files" :reorder="false" @drop="receive">
+```
+
 ### Saving on a server
 
 Move the row at once, and move it back if the server refuses: the grid animates both.
@@ -207,6 +219,8 @@ async function drop({ key, index }: GridRowDropEvent<unknown>) {
   rhythm and the reason can be seen.
 - The row being dragged stays rendered under the row window, so focus never lands on a row that is
   not there.
+- With `reorder` off there is no keyboard drag, which moves a row within its grid alone: offer the
+  move to another grid or a zone another way too, such as a menu item on the row.
 
 ### Keyboard interactions
 

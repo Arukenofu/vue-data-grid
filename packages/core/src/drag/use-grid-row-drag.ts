@@ -81,11 +81,20 @@ export interface GridRowDragOptions<TRow> {
 	/** A name shared by grids that take each other's rows; without it the grid takes only its own. */
 	group?: MaybeRefOrGetter<string | null | undefined>;
 	/**
+	 * Whether the grid takes its own rows at new places; `true` by default. `false` for a grid whose
+	 * rows only leave, for the grids of its `group` and for drop zones: it still takes the rows of
+	 * the group. Its rows then drag whatever the sort, and have no keyboard drag and no step keys.
+	 */
+	reorder?: MaybeRefOrGetter<boolean | undefined>;
+	/**
 	 * What neither the pointer nor the ghost leaves: `'grid'` by default, `'window'` in a `group`, so
 	 * that a row can reach another grid.
 	 */
 	bounds?: GridDragBounds;
-	/** Whether rows can be dragged now; while the rows are not sorted by default, as order is then the sort's. */
+	/**
+	 * Whether rows can be dragged now. By default a grid that reorders drags while its rows are not
+	 * sorted, as the order is then the sort's; one with `reorder: false` always.
+	 */
 	enabled?: MaybeRefOrGetter<boolean | undefined>;
 	/**
 	 * Whether a row can be dragged; every row by default. Asked when a drag would start and when a row
@@ -133,9 +142,10 @@ export interface GridRowDragOptions<TRow> {
 	announcements?: MaybeRefOrGetter<Partial<DragAnnouncements> | undefined>;
 	/**
 	 * A row was dropped on the grid: move it in your data, such as with `moveRow`. To save the move on
-	 * a server, move the row at once and move it back if the server refuses.
+	 * a server, move the row at once and move it back if the server refuses. A grid that takes no
+	 * rows, with `reorder: false` outside a group, needs none.
 	 */
-	onDrop: (event: GridRowDropEvent<TRow>) => void;
+	onDrop?: (event: GridRowDropEvent<TRow>) => void;
 }
 
 /** The row drag of a grid, as `useGridRowDrag` returns it and `GridRowDrag` provides it. */
@@ -155,6 +165,8 @@ export interface GridRowDragList<TRow = unknown> extends GridDragContext {
  * within the grid, into and out of the groups of a tree, and between the grids of a `group`. The
  * rows of the body register themselves: call it in the component that renders the grid, or use
  * `GridRowDrag` around the body. The grid does not touch your rows: `onDrop` says where a row goes.
+ * With `reorder: false` the order of the grid stays: its rows only leave for other grids and drop
+ * zones.
  *
  * The dragged row stays rendered under the row window, the grid scrolls near its edges, the
  * keyboard drag goes through a `GridDragHandle`, and Alt+↑ and Alt+↓ on a cell move its row one
@@ -169,8 +181,13 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 		return toValue(options.handle) ?? false;
 	}
 
+	function reorders() {
+		return toValue(options.reorder) ?? true;
+	}
+
+	// Steps move a row within the grid: a grid that does not reorder has none.
 	function hasStepKeys() {
-		return toValue(options.stepKeys) ?? true;
+		return (toValue(options.stepKeys) ?? true) && reorders();
 	}
 
 	function getRow(key: string) {
@@ -192,7 +209,7 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 	}
 
 	function isEnabled() {
-		return toValue(options.enabled) ?? scope.sort.value.length === 0;
+		return toValue(options.enabled) ?? (!reorders() || scope.sort.value.length === 0);
 	}
 
 	function canDrag(key: string, row: unknown = getRow(key)) {
@@ -255,6 +272,7 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 				: { ...own, margin: own?.margin ?? { top: grid.headHeight.value, bottom: grid.footHeight.value } };
 		},
 		group: options.group,
+		reorder: reorders,
 		tree,
 		indicator: () => toValue(options.indicator) ?? 'gap',
 		motion: options.motion,
@@ -297,7 +315,7 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 				return;
 			}
 
-			options.onDrop({ key, row, parent, index, external, source: external && data ? data.grid : grid });
+			options.onDrop?.({ key, row, parent, index, external, source: external && data ? data.grid : grid });
 
 			if (parent !== null) {
 				grid.tree?.setExpanded(parent, true);
@@ -335,8 +353,9 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 		register: list.list.register,
 		getItemProps: (key, row) => getDraggableProps(canDrag(key, row), hasStepKeys()),
 		active: list.active,
+		// A grid that does not reorder has no keyboard drag to describe.
 		get describedBy() {
-			return list.describedBy;
+			return reorders() ? list.describedBy : undefined;
 		},
 		canDrag,
 		getLabel,

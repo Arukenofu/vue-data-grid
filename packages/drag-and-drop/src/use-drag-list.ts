@@ -87,6 +87,12 @@ export interface DragListOptions {
 	group?: MaybeRefOrGetter<string | null | undefined>;
 	/** Whether to accept an item being dragged, own or from the group; any by default. */
 	canAccept?: (offer: DragOffer) => boolean;
+	/**
+	 * Whether the list takes its own items at new places; `true` by default. `false` for a list whose
+	 * items only leave for the lists of its `group` and for drop targets: over the list an own item is
+	 * over its home, and there is no keyboard drag and no `stepKeys`, which move within the list.
+	 */
+	reorder?: MaybeRefOrGetter<boolean | undefined>;
 	/** What to attach to the payload for other lists, which know nothing but the key. */
 	getData?: (key: string) => unknown;
 	/** Nesting of the items; without it the list is flat, with places before and after only. */
@@ -259,8 +265,17 @@ export function useDragList(options: DragListOptions) {
 		return toValue(options.ignore);
 	}
 
+	function reorders() {
+		return toValue(options.reorder) ?? true;
+	}
+
+	// The keyboard drags and steps an item within its own list alone.
 	function isKeyboardOn() {
-		return toValue(options.keyboard) ?? true;
+		return (toValue(options.keyboard) ?? true) && reorders();
+	}
+
+	function hasStepKeys() {
+		return (toValue(options.stepKeys) ?? false) && reorders();
 	}
 
 	function mayDrag(key: string) {
@@ -295,6 +310,13 @@ export function useDragList(options: DragListOptions) {
 
 	function isOwn(payload: DragPayload) {
 		return payload.origin === origin;
+	}
+
+	/** An own item is dragged in a list that does not reorder: it can only leave, so nothing scrolls for it. */
+	function isLeaving() {
+		const payload = dragging.value;
+
+		return payload !== null && isOwn(payload) && !reorders();
 	}
 
 	function findKey(hit: Element, container: HTMLElement) {
@@ -626,6 +648,13 @@ export function useDragList(options: DragListOptions) {
 
 	/** No place under the pointer keeps the last one: a gap does not run home under a pointer that strays. */
 	function handleOver(payload: DragPayload, point: DragPoint, hit: Element) {
+		// A list that does not reorder has no place for its own item but its home.
+		if (isOwn(payload) && !reorders()) {
+			applyMark(null);
+
+			return;
+		}
+
 		const container = toValue(options.container);
 		const next = container ? resolveMark(payload, point, hit, container) : null;
 
@@ -908,7 +937,7 @@ export function useDragList(options: DragListOptions) {
 			return;
 		}
 
-		if (toValue(options.stepKeys) && event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+		if (hasStepKeys() && event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
 			handleStepKey(event, container);
 
 			return;
@@ -999,7 +1028,7 @@ export function useDragList(options: DragListOptions) {
 			axis: options.axis,
 			accepts,
 			scroller: () => toValue(options.scroller) ?? container,
-			autoScroll: () => toValue(options.autoScroll),
+			autoScroll: () => (isLeaving() ? false : toValue(options.autoScroll)),
 			onStart: begin,
 			onEnter: () => {
 				over.value = true;

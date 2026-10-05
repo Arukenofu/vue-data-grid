@@ -68,7 +68,8 @@ trees by a `parentKey` field. The row in the event is `unknown`, since the part 
 type of your rows; looking it up by key, as above, keeps everything typed.
 
 `GridRowDrag` renders no element of its own. Rows are dragged while the grid is not sorted: the
-order of a sorted grid belongs to the sort, not to the rows. `enabled` changes that.
+order of a sorted grid belongs to the sort, not to the rows. `enabled` changes that, and so does
+`reorder`, described [below](#rows-that-only-leave).
 
 ### A handle, and the keyboard
 
@@ -206,6 +207,18 @@ other one. `canAccept(offer)` decides which rows a grid takes from the others.
 `GridDragOverlay` shows a message over a grid while a row it would take is on its way; its
 `data-dg-state` is `ready`, then `over`, or `refused` over a place that is not allowed.
 
+### Rows that only leave
+
+A grid may give its rows away without being reordered itself: a sorted list of files that sends
+them to folders, a catalogue that rows are picked from. With `:reorder="false"` an own row has no
+place in its grid, and a drop over it puts the row back; the rows still go to the other grids of
+the group and to drop zones, whatever the sort. The grid still takes the rows of its group, so two
+grids that both only take rows from each other move rows between them and keep their own order:
+
+```vue
+<GridRowDrag group="tasks" :reorder="false" @drop="event => place('sprint', event)">
+```
+
 ### Drop zones
 
 `GridDropZone` is an area that takes rows, or columns with `accept="columns"`, without being a
@@ -257,6 +270,8 @@ API by default, `false` for none, or an engine of GSAP, Motion or your own, as d
 
 - With `handle`, every row has a real button to drag it with. It is named after the row, "Drag
   Northern Lights" from the grid's `dragRow` message, and described by the keyboard instructions.
+- A keyboard drag moves a row within its grid; a grid with `reorder` off has none. Offer the move
+  to another grid or a zone another way too, such as a menu item on the row.
 - A keyboard drag is announced through a live region: when a row is picked up, every place it passes
   as "position 3 of 10", the drop and a cancel. `announcements` translates them.
 - Without a handle, <kbd>Alt</kbd>+<kbd>↑</kbd> and <kbd>Alt</kbd>+<kbd>↓</kbd> move a row from any

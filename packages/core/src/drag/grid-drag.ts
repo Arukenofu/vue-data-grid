@@ -70,6 +70,8 @@ export const GridRowDrag = defineComponent({
 		stepKeys: { type: Boolean, default: undefined },
 		/** A name shared by grids that take each other's rows. */
 		group: { type: String, default: undefined },
+		/** Whether the grid takes its own rows at new places; `true` by default, `false` for rows that only leave. */
+		reorder: { type: Boolean, default: undefined },
 		/** Whether a row can be dragged. */
 		canDrag: { type: Function as PropType<(row: unknown, key: string) => boolean>, default: undefined },
 		/** Whether a row may be dropped at a place. */
@@ -94,6 +96,7 @@ export const GridRowDrag = defineComponent({
 			handle: () => props.handle,
 			stepKeys: () => props.stepKeys,
 			group: () => props.group,
+			reorder: () => props.reorder,
 			bounds: () => props.bounds,
 			enabled: () => props.enabled,
 			indicator: () => props.indicator,

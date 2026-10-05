@@ -51,10 +51,11 @@ Call it in the component that renders the grid: the rows below register themselv
 <PropsTable
 	label="Option"
 	:data="[
-		{ name: 'onDrop', type: '(event: GridRowDropEvent) => void', required: true, description: 'A row was dropped: `{ key, row, parent, index, external, source }`. `index` is the place among the children of `parent` once the row is taken out, what `moveRow` takes.' },
+		{ name: 'onDrop', type: '(event: GridRowDropEvent) => void', description: 'A row was dropped: `{ key, row, parent, index, external, source }`. `index` is the place among the children of `parent` once the row is taken out, what `moveRow` takes. A grid that takes no rows, with `reorder: false` outside a group, needs none.' },
 		{ name: 'handle', type: 'MaybeRefOrGetter<boolean>', default: 'false', description: 'Drags start only on a `GridDragHandle`, which also drags with the keyboard. Without it the whole row drags with a pointer, and controls in its cells keep their clicks.' },
-		{ name: 'enabled', type: 'MaybeRefOrGetter<boolean>', default: 'while unsorted', description: 'Whether rows can be dragged now. By default only while the grid is not sorted: the order is then the sort\'s.' },
+		{ name: 'enabled', type: 'MaybeRefOrGetter<boolean>', default: 'while unsorted', description: 'Whether rows can be dragged now. By default a grid that reorders drags only while it is not sorted, as the order is then the sort\'s; one with `reorder: false` always.' },
 		{ name: 'group', type: 'MaybeRefOrGetter<string>', description: 'A name shared by grids that take each other\'s rows.' },
+		{ name: 'reorder', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Whether the grid takes its own rows at new places. `false` for rows that only leave, for the grids of the `group` and for drop zones: the grid keeps its order, still takes the rows of the group, and has no keyboard drag and no step keys.' },
 		{ name: 'bounds', type: '\'grid\' | \'window\' | HTMLElement', default: '\'grid\'', description: 'What neither the pointer nor the ghost leaves; `window` by default in a `group`, so a row can reach another grid.' },
 		{ name: 'canDrag', type: '(row: TRow, key: string) => boolean', description: 'Whether a row can be dragged; every row by default.' },
 		{ name: 'canDrop', type: '(target: GridRowDropTarget) => boolean', description: 'Whether a row may be dropped at a place, `{ key, row, parent, index, over, position }`. A place it may not is never shown.' },
@@ -127,6 +128,15 @@ useGridRowDrag(todo, {
 		todo.value = moveRow(todo.value, { key, row, index, parent: null }, { rowKey: 'id' });
 	},
 });
+```
+
+### Rows that only leave
+
+With `reorder: false` the grid keeps its order: its rows go only to other grids of the group and to
+drop zones, and it needs no `onDrop` unless it takes rows from the group.
+
+```ts
+useGridRowDrag(files, { group: 'files', reorder: false });
 ```
 
 ### Saving the order on a server

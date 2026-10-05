@@ -32,7 +32,7 @@ import { GridDropZone, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 
 <template>
 	<GridRoot :grid="grid">
-		<GridRowDrag bounds="window">
+		<GridRowDrag bounds="window" :reorder="false">
 			<GridBody />
 		</GridRowDrag>
 	</GridRoot>
@@ -42,7 +42,8 @@ import { GridDropZone, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 ```
 
 A drag keeps the pointer inside its grid by default. Give it `bounds="window"`, or put the grids in
-a `group`, so that a row can reach a zone outside the grid.
+a `group`, so that a row can reach a zone outside the grid. With `:reorder="false"` the grid keeps
+its order, and its rows only go to zones, as in the demo.
 
 ## API reference
 

@@ -51,6 +51,8 @@ interface Setup {
 	rows?: Task[];
 	handle?: boolean;
 	group?: string;
+	/** `false` for a grid whose rows only leave. */
+	reorder?: boolean;
 	sorted?: boolean;
 	tree?: boolean;
 	canDrag?: (row: Task) => boolean;
@@ -111,6 +113,7 @@ function setup(options: Setup = {}) {
 					h(GridRowDrag, {
 						handle: options.handle ?? false,
 						...(options.group ? { group: options.group } : {}),
+						...(options.reorder === undefined ? {} : { reorder: options.reorder }),
 						...(options.canDrag ? { canDrag: options.canDrag as (row: unknown) => boolean } : {}),
 						...(options.bounds ? { bounds: options.bounds } : {}),
 						...(options.ignore ? { ignore: options.ignore } : {}),
@@ -381,6 +384,24 @@ describe('row drag — the keyboard', () => {
 		expect(drops).toHaveLength(2);
 	});
 
+	it('with `reorder: false` has no keyboard drag and no step keys, which move a row within its grid', async () => {
+		const { drops, row, names } = setup({ handle: true, reorder: false });
+		const handle = row('a').querySelector('[data-dg-part="drag-handle"]') as HTMLElement;
+
+		expect(handle.hasAttribute('aria-describedby')).toBe(false);
+		expect(row('a').getAttribute('data-dg-draggable')).toBe('');
+
+		handle.focus();
+		key(handle, ' ');
+		key(handle, 'ArrowDown');
+		key(handle, ' ');
+		key(row('b').querySelector('[data-dg-column="id"]') as HTMLElement, 'ArrowDown', { altKey: true });
+		await nextTick();
+
+		expect(drops).toEqual([]);
+		expect(names()).toEqual(['a', 'b', 'c', 'd']);
+	});
+
 	it('moves no row with Alt+arrows while the rows are sorted', async () => {
 		const { drops, row } = setup({ sorted: true });
 
@@ -404,6 +425,40 @@ describe('row drag — between grids', () => {
 		expect(second.drops[0].row).toEqual(tasks[1]);
 		expect(second.drops[0].source).toBe(first.grid);
 		expect(second.names()).toEqual(['x', 'b']);
+	});
+
+	it('with `reorder: false` keeps its own order, and gives its rows to another grid of the group', async () => {
+		const first = setup({ group: 'tasks', reorder: false });
+		const second = setup({ group: 'tasks', rows: [{ id: 'x', name: 'Other' }], left: 800 });
+
+		drag(first.row('a'), at(first.row('d'), 0.75));
+		await nextTick();
+
+		expect(first.drops).toEqual([]);
+		expect(first.names()).toEqual(['a', 'b', 'c', 'd']);
+
+		drag(first.row('b'), at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(second.drops).toEqual([expect.objectContaining({ key: 'b', index: 1, external: true })]);
+		expect(second.names()).toEqual(['x', 'b']);
+	});
+
+	it('with `reorder: false` takes the rows of the group, and drags while its rows are sorted', async () => {
+		const first = setup({ group: 'tasks' });
+		const second = setup({ group: 'tasks', reorder: false, sorted: true, rows: [{ id: 'x', name: 'Other' }], left: 800 });
+
+		expect(second.row('x').hasAttribute('data-dg-draggable')).toBe(true);
+
+		drag(first.row('b'), at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(second.drops).toEqual([expect.objectContaining({ key: 'b', external: true })]);
+
+		drag(second.row('x'), at(first.row('a'), 0.25));
+		await nextTick();
+
+		expect(first.drops).toEqual([expect.objectContaining({ key: 'x', index: 0, external: true })]);
 	});
 
 	it('keeps a row of a grid without a group inside it', async () => {

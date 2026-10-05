@@ -11,8 +11,9 @@ const scopes: ReturnType<typeof effectScope>[] = [];
 
 let frames: Frames;
 
-function setup(keys: readonly string[], options: Partial<DragListOptions> = {}) {
-	const list = createList(keys);
+/** A list `left` px right of the origin, so that two lists stand side by side. */
+function setup(keys: readonly string[], options: Partial<DragListOptions> = {}, left = 0) {
+	const list = createList(keys, true, left);
 	const drops: DragDropEvent[] = [];
 	const scope = effectScope();
 	const drag = scope.run(() => useDragList({
@@ -160,6 +161,42 @@ describe('useDragList — the pointer', () => {
 
 		expect(second.drag.dragging.value?.key).toBe('a');
 		expect(lonely.drag.dragging.value).toBeNull();
+	});
+
+	it('with `reorder: false` an own item only leaves: no place in its list, a place in another', () => {
+		const first = setup(['a', 'b', 'c'], { group: 'shared', reorder: false });
+		const second = setup(['x', 'y'], { group: 'shared' }, 400);
+
+		pointer('pointerdown', first.get('a'), at(first.get('a')));
+		pointer('pointermove', window, at(first.get('c'), 0.75));
+		frames.run();
+
+		expect(first.get('a').hasAttribute(DRAG_SOURCE_ATTRIBUTE)).toBe(true);
+		expect(first.get('c').hasAttribute(DROP_TARGET_ATTRIBUTE)).toBe(false);
+		expect(first.drag.target.value).toBeNull();
+
+		pointer('pointerup', window, at(first.get('c'), 0.75));
+
+		expect(first.drops).toEqual([]);
+
+		pointer('pointerdown', first.get('a'), at(first.get('a')));
+		pointer('pointermove', window, at(second.get('y'), 0.75));
+		frames.run();
+		pointer('pointerup', window, at(second.get('y'), 0.75));
+
+		expect(second.drops).toEqual([expect.objectContaining({ key: 'a', index: 2, external: true })]);
+	});
+
+	it('with `reorder: false` a list still takes the items of its group', () => {
+		const first = setup(['a', 'b'], { group: 'shared' });
+		const second = setup(['x', 'y'], { group: 'shared', reorder: false }, 400);
+
+		pointer('pointerdown', first.get('a'), at(first.get('a')));
+		pointer('pointermove', window, at(second.get('x'), 0.25));
+		frames.run();
+		pointer('pointerup', window, at(second.get('x'), 0.25));
+
+		expect(second.drops).toEqual([expect.objectContaining({ key: 'a', index: 0, external: true })]);
 	});
 });
 
@@ -437,6 +474,19 @@ describe('useDragList — the keyboard', () => {
 		key(get('a'), ' ');
 
 		expect(drag.active.value).toBeNull();
+	});
+
+	it('`reorder: false` turns off the keyboard drag and the step keys, which move within the list', () => {
+		const { get, drag, drops } = setup(['a', 'b'], { reorder: false, stepKeys: true });
+
+		key(get('a'), ' ');
+
+		expect(drag.active.value).toBeNull();
+
+		const step = key(get('a'), 'ArrowDown', { altKey: true });
+
+		expect(step.defaultPrevented).toBe(false);
+		expect(drops).toEqual([]);
 	});
 
 	it('a pointer press cancels a keyboard drag', () => {

@@ -10,14 +10,12 @@ import {
 	GridHeaderRow,
 	GridRoot,
 	GridRow,
-	moveRow,
 	useDataGrid,
 } from '@vue-data-grid/core';
 import {
 	GridDragPreview,
 	GridDropZone,
 	type GridDropZoneEvent,
-	type GridRowDropEvent,
 	GridRowDrag,
 } from '@vue-data-grid/core/drag-and-drop';
 import IconFile from '~icons/lucide/file';
@@ -49,14 +47,6 @@ const grid = useDataGrid({
 	rowKey: 'id',
 	rowHeight: 38,
 });
-
-function reorder({ key, index }: GridRowDropEvent<unknown>) {
-	const row = rows.value.find(file => file.id === key);
-
-	if (row) {
-		rows.value = moveRow(rows.value, { key, row, parent: null, index }, { rowKey: 'id' });
-	}
-}
 
 function star({ key }: GridDropZoneEvent) {
 	starred.value = new Set([...starred.value, key]);
@@ -93,7 +83,7 @@ function restore() {
 						<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
 					</GridHeaderRow>
 				</GridHeader>
-				<GridRowDrag bounds="window" @drop="reorder">
+				<GridRowDrag bounds="window" :reorder="false">
 					<GridBody v-slot="{ rows: bodyRows }">
 						<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
 							<GridCells />
