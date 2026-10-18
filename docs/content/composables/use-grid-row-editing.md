@@ -13,7 +13,9 @@ twin of cell editing for rows. A write never touches your rows — you get a com
 <Demo name="api-use-grid-row-editing" />
 
 Focus a row and add a task after it, or remove it; drag a row by its handle. Each is one commit,
-and the line above the grid shows the last one.
+and the line above the grid shows the last one. The grid remembers the focused cell when focus
+leaves it, as a grid does, and Tab comes back to it; the buttons act on its row, which the demo
+marks while focus is elsewhere.
 
 ## Usage
 

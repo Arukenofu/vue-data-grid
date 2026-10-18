@@ -2,6 +2,9 @@
 import {
 	defineColumn,
 	defineColumns,
+	GridBody,
+	GridCells,
+	GridRow,
 	navigation,
 	rowEditing,
 	useDataGrid,
@@ -47,6 +50,14 @@ useGridMotion(grid);
 useGridRowDrag(grid, { handle: true, getLabel: task => task.title });
 
 const focusedKey = computed(() => grid.navigation.cells.focused.value?.key ?? null);
+const focusInside = shallowRef(false);
+const currentKey = computed(() => (focusInside.value ? null : focusedKey.value));
+
+function leave(event: FocusEvent) {
+	const { currentTarget, relatedTarget } = event;
+
+	focusInside.value = currentTarget instanceof Node && relatedTarget instanceof Node && currentTarget.contains(relatedTarget);
+}
 
 function createTask(): Task {
 	added.value += 1;
@@ -98,8 +109,31 @@ const status = computed(() => {
 			<span class="ui-toolbar-text">{{ status }}</span>
 		</UiToolbar>
 
-		<UiDataGrid :grid="grid" label="Tasks" data-size="auto" />
+		<UiDataGrid :grid="grid" label="Tasks" data-size="auto" @focusin="focusInside = true" @focusout="leave">
+			<template #body>
+				<GridBody v-slot="{ rows: bodyRows }">
+					<GridRow
+						v-for="row in bodyRows"
+						:key="row.key"
+						:row="row"
+						:data-current="row.key === currentKey || undefined"
+					>
+						<GridCells />
+					</GridRow>
+				</GridBody>
+			</template>
+		</UiDataGrid>
 
 		<GridDragPreview />
 	</div>
 </template>
+
+<style scoped>
+:deep([data-current] > [data-dg-column]) {
+	background: var(--ui-bg-muted);
+}
+
+:deep([data-current] > [data-dg-column]:first-child) {
+	box-shadow: inset 2px 0 0 var(--ui-border-strong);
+}
+</style>
