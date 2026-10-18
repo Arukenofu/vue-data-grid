@@ -331,6 +331,25 @@ describe('useDragList — the keyboard', () => {
 		expect(drops[1]).toMatchObject({ key: 'a', index: 3 });
 	});
 
+	it('steps back through the place the item stands at, one place each way', () => {
+		const { get, drag, drops } = setup(['a', 'b', 'c', 'd', 'e']);
+		const heard: (string | undefined)[] = [];
+
+		key(get('c'), ' ');
+
+		for (const arrow of ['ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowUp']) {
+			key(get('c'), arrow);
+			heard.push(region());
+		}
+
+		expect(heard).toEqual(['c: position 2 of 5.', 'c: position 3 of 5.', 'c: position 4 of 5.', 'c: position 3 of 5.']);
+		expect(drag.target.value).toBeNull();
+
+		key(get('c'), ' ');
+
+		expect(drops).toEqual([]);
+	});
+
 	it('an arrow at the last place stays there', () => {
 		const { get, drops } = setup(['a', 'b']);
 

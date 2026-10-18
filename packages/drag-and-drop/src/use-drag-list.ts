@@ -168,8 +168,11 @@ interface Mark extends DragListTarget {
 interface KeyboardDrag {
 	payload: DragPayload;
 	slots: readonly (DropSlot & { order: number })[];
+	/** `null` at home, where the item stands. */
 	slot: (DropSlot & { order: number }) | null;
 	order: number;
+	/** The order of home, which no slot stands for: a drop there moves nothing. */
+	home: number;
 }
 
 const EDITABLE = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
@@ -757,12 +760,14 @@ export function useDragList(options: DragListOptions) {
 	function pickUp(key: string) {
 		const keys = toValue(options.keys);
 		const payload = createPayload(key);
+		const home = keys.indexOf(key);
 
 		keyboard = {
 			payload,
 			slots: collectDropSlots(tree, keys, key, slot => options.canDrop?.(key, slot) ?? true),
 			slot: null,
-			order: keys.indexOf(key),
+			order: home,
+			home,
 		};
 
 		begin(payload);
@@ -782,6 +787,35 @@ export function useDragList(options: DragListOptions) {
 		applyMark({ ...slot, element: elements.get(slot.key) ?? null });
 		reveal(slot.key);
 		announce(getAnnouncements().move(describe(key, slot)));
+	}
+
+	function moveHome() {
+		if (!keyboard) {
+			return;
+		}
+
+		const { key } = keyboard.payload;
+
+		keyboard.slot = null;
+		keyboard.order = keyboard.home;
+		applyMark(null);
+		reveal(key);
+		announce(getAnnouncements().move(describe(key, getOwnDestination(tree, key))));
+	}
+
+	/** The next stop of a step: a slot, or home when it stands between the current stop and that slot. */
+	function stepFrom(current: KeyboardDrag, step: number) {
+		const next = step > 0
+			? current.slots.find(slot => slot.order > current.order)
+			: findPrevious(current.slots, current.order);
+		const beyondHome = step > 0 ? current.order < current.home : current.order > current.home;
+		const pastHome = next === undefined || (step > 0 ? next.order > current.home : next.order < current.home);
+
+		if (beyondHome && pastHome) {
+			moveHome();
+		} else {
+			moveTo(next);
+		}
 	}
 
 	function restoreFocus(key: string, handleFocused: boolean) {
@@ -858,9 +892,7 @@ export function useDragList(options: DragListOptions) {
 
 		if (step !== 0) {
 			event.preventDefault();
-			moveTo(step > 0
-				? current.slots.find(slot => slot.order > current.order)
-				: findPrevious(current.slots, current.order));
+			stepFrom(current, step);
 		} else if (event.key === 'Home' || event.key === 'End') {
 			event.preventDefault();
 			moveTo(event.key === 'Home' ? current.slots[0] : current.slots.at(-1));
