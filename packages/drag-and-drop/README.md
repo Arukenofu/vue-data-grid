@@ -199,6 +199,7 @@ the item (`opacity: 0`) so that one of them is seen, not both.
 | `reorder` | whether the list takes its own items at new places; `true` by default, `false` for items that only leave |
 | `getData(key)` | what to attach to the payload for other lists, which know nothing but the key |
 | `preview` | the ghost: `{ render(key, container), placement, exit }` |
+| `area` | where items may be dropped, an element around `container`, so that an empty list without height still takes them; `container` by default |
 | `scroller` | what to scroll near the edges during a drag; `container` by default |
 | `bounds` | an element neither the pointer nor the ghost leaves; the window by default |
 | `touchDelay` | the long press before a touch drag starts, ms; `250` by default |

@@ -62,6 +62,11 @@ export interface DragListOptions {
 	keys: MaybeRefOrGetter<readonly string[]>;
 	/** The list's area: drags begin in it, targets are looked for over it, past the last item is the end. */
 	container: MaybeRefOrGetter<HTMLElement | null>;
+	/**
+	 * Where items may be dropped: an element around `container`, such as the whole scroll area of a
+	 * grid, so that a list without items, and without height, still takes them. `container` by default.
+	 */
+	area?: MaybeRefOrGetter<HTMLElement | null>;
 	/** What to scroll while the pointer is near its edge; `container` by default. */
 	scroller?: MaybeRefOrGetter<HTMLElement | null>;
 	/**
@@ -1026,7 +1031,7 @@ export function useDragList(options: DragListOptions) {
 		};
 	}
 
-	watch(() => toValue(options.container), (container, _previous, onCleanup) => {
+	watch(() => [toValue(options.container), toValue(options.area) ?? null] as const, ([container, area], _previous, onCleanup) => {
 		if (!container) {
 			return;
 		}
@@ -1056,7 +1061,7 @@ export function useDragList(options: DragListOptions) {
 		const unbind = bindDragSource(container, source);
 
 		const unregister = registerDropTarget({
-			element: container,
+			element: area ?? container,
 			axis: options.axis,
 			accepts,
 			scroller: () => toValue(options.scroller) ?? container,
