@@ -13,7 +13,18 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, shallowRef } from 'vue';
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
-import { editing, fill, grouping, history, navigation, ranges, selection, sorting, tree } from '../../src/data-grid/factories';
+import {
+	editing,
+	fill,
+	grouping,
+	history,
+	navigation,
+	ranges,
+	rowEditing,
+	selection,
+	sorting,
+	tree,
+} from '../../src/data-grid/factories';
 import type { GridRowsFeature } from '../../src/data-grid/features';
 import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 
@@ -160,6 +171,86 @@ describe('useDataGrid — the pipeline', () => {
 		expect(grid.selection.selectedKeys.value).toEqual(['c']);
 		expect(grid.getGridProps()).toMatchObject({ role: 'treegrid', 'aria-multiselectable': true });
 		expect(grid.getRowProps({ index: 0, key: 'a' })).toMatchObject({ 'aria-selected': true, 'aria-expanded': true });
+	});
+});
+
+describe('useDataGrid — row editing', () => {
+	it('writes changes into the source rows, by the parent key of the tree', () => {
+		const source = shallowRef<readonly Row[]>(rows);
+		const grid = inSetup(() => useDataGrid({
+			columns,
+			rows: source,
+			rowKey: 'id',
+			rowHeight: 30,
+			features: {
+				sorting: sorting(),
+				tree: tree({ parentKey: 'parent', defaultExpanded: -1 }),
+				rowEditing: rowEditing({
+					onCommit: (commit) => {
+						source.value = commit.apply(source.value);
+					},
+				}),
+			},
+		}));
+
+		grid.rowEditing.write([{ type: 'move', key: 'b', parent: 'a', index: 0 }, { type: 'add', row: { id: 'd', sector: 'tech', cap: 4 }, after: 'a' }], 'move');
+
+		expect(source.value.map(row => row.id)).toEqual(['a', 'b', 'c', 'd']);
+		expect(source.value[1]).toEqual({ id: 'b', sector: 'energy', cap: 1, parent: 'a' });
+		expect(grid.rows.value.map(row => row.id)).toEqual(['a', 'b', 'c', 'd']);
+		expect(grid.rowEditing.lastCommit.value?.source).toBe('move');
+	});
+
+	it('gives a row a new parent through the `setParent` of the tree, for a `parentKey` that is a function', () => {
+		const source = shallowRef<readonly Row[]>(rows);
+		const grid = inSetup(() => useDataGrid({
+			columns,
+			rows: source,
+			rowKey: 'id',
+			rowHeight: 30,
+			features: {
+				tree: tree({
+					parentKey: row => row.parent ?? null,
+					setParent: (row, parent) => ({ ...row, parent: parent ?? undefined }),
+					defaultExpanded: -1,
+				}),
+				rowEditing: rowEditing({
+					onCommit: (commit) => {
+						source.value = commit.rows;
+					},
+				}),
+			},
+		}));
+
+		grid.rowEditing.write([{ type: 'move', key: 'b', parent: 'a', index: 0 }], 'move');
+
+		expect(source.value.find(row => row.id === 'b')?.parent).toBe('a');
+	});
+
+	it('writes flat source rows under grouping, whose tree is of the groups', () => {
+		const source = shallowRef<readonly Row[]>(rows);
+		const grid = inSetup(() => useDataGrid({
+			columns,
+			rows: source,
+			rowKey: 'id',
+			rowHeight: 30,
+			features: {
+				grouping: grouping({
+					by: [columns.sector],
+					createGroup: group => ({ id: group.key, sector: String(group.value), cap: 0, children: [...group.children] }),
+				}),
+				tree: tree({ childrenField: 'children' }),
+				rowEditing: rowEditing({
+					onCommit: (commit) => {
+						source.value = commit.apply(source.value);
+					},
+				}),
+			},
+		}));
+
+		grid.rowEditing.write([{ type: 'remove', key: 'b' }], 'remove');
+
+		expect(source.value).toEqual([rows[0], rows[2]]);
 	});
 });
 
@@ -348,9 +439,32 @@ describe('useDataGrid — types', () => {
 		}));
 
 		expectTypeOf(grid.editing.cell.value?.row).toEqualTypeOf<Row | undefined>();
+		expectTypeOf(grid.rowEditing).toBeUndefined();
 		expectTypeOf(grid.history.steps.value).toEqualTypeOf<readonly ChangeStep[]>();
 		expectTypeOf(grid.fill.fillDown).toBeFunction();
 		expectTypeOf(grid.navigation).toBeUndefined();
+	});
+
+	it('infers the row of `rowEditing` from the grid, and types its changes by it', () => {
+		const source = shallowRef<readonly Row[]>(rows);
+		const grid = inSetup(() => useDataGrid({
+			columns,
+			rows: source,
+			rowKey: 'id',
+			rowHeight: 30,
+			features: {
+				rowEditing: rowEditing({
+					onCommit: (commit) => {
+						expectTypeOf(commit.rows).toEqualTypeOf<readonly Row[]>();
+						source.value = commit.apply(source.value);
+					},
+				}),
+			},
+		}));
+
+		expectTypeOf(grid.rowEditing.lastCommit.value?.rows).toEqualTypeOf<readonly Row[] | undefined>();
+		// @ts-expect-error a row of another type cannot be added
+		grid.rowEditing.write([{ type: 'add', row: { name: 'x' } }], 'add');
 	});
 
 	it('types the aggregates of a group built inline by the columns of the grid', () => {

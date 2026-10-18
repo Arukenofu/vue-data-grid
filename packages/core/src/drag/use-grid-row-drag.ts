@@ -9,7 +9,7 @@ import {
 	useDragList,
 } from '@vue-data-grid/drag-and-drop';
 import type { MotionEngine } from '@vue-data-grid/flip';
-import { getCellText } from '@vue-data-grid/engine';
+import { type AddRowChange, getCellText, type MoveRowChange, type RowPlace } from '@vue-data-grid/engine';
 import { computed, getCurrentInstance, type MaybeRef, type MaybeRefOrGetter, type Ref, toValue, watch } from 'vue';
 
 import { createRowDragContext } from '../components/context';
@@ -54,15 +54,24 @@ export interface GridRowDropTarget<TRow> {
 export interface GridRowDropEvent<TRow> {
 	/** The key of the dropped row. */
 	key: string;
+	/** The row as it is at the drop, in the grid it comes from. */
 	row: TRow;
-	/** The new parent; `null` for the top level, and always in a flat grid. */
+	/** The new parent, as the grid shows it; `null` for the top level, and always in a flat grid. */
 	parent: string | null;
-	/** The place among the children of `parent`, counted once the row is taken out: what `moveRow` takes. */
+	/** The place among the children of `parent`, counted once the row is taken out. */
 	index: number;
 	/** The row comes from another grid of the group. */
 	external: boolean;
 	/** The grid the row comes from: this one, or another of the group. */
 	source: DataGrid<TRow>;
+	/**
+	 * The drop as a change of the rows of this grid, for `applyRowChanges` or `write` of `rowEditing`:
+	 * a `move` of an own row, an `add` of a row from another grid. In a grid with `grouping`, whose
+	 * rows are flat, it puts the row next to the shown row it was dropped by.
+	 */
+	change: AddRowChange<TRow> | MoveRowChange<TRow>;
+	/** Keeps the grid from writing the drop through its `rowEditing` feature: your handler writes it. */
+	preventDefault: () => void;
 }
 
 /** A row of another grid dragged over this one, for `canAccept`. */
@@ -125,8 +134,8 @@ export interface GridRowDragOptions<TRow> {
 	 */
 	motion?: MaybeRef<MotionEngine | false | undefined>;
 	/**
-	 * Alt+↑ and Alt+↓ on a cell move its row one place among its siblings at once, through `onDrop`,
-	 * with a handle or without. `true` by default.
+	 * Alt+↑ and Alt+↓ on a cell move its row one place among its siblings at once, as a drop, with a
+	 * handle or without. `true` by default.
 	 */
 	stepKeys?: MaybeRefOrGetter<boolean | undefined>;
 	/** How long a finger rests on a row before it drags, ms; `250` by default. */
@@ -141,9 +150,11 @@ export interface GridRowDragOptions<TRow> {
 	/** What screen readers hear during a keyboard drag; English by default. */
 	announcements?: MaybeRefOrGetter<Partial<DragAnnouncements> | undefined>;
 	/**
-	 * A row was dropped on the grid: move it in your data, such as with `moveRow`. To save the move on
-	 * a server, move the row at once and move it back if the server refuses. A grid that takes no
-	 * rows, with `reorder: false` outside a group, needs none.
+	 * A row was dropped on the grid. After it, a grid with the `rowEditing` feature writes
+	 * `event.change` through it, and a row from another grid of the group leaves that grid through its
+	 * `rowEditing`, unless the handler calls `event.preventDefault()`. Without `rowEditing`, write the
+	 * change into your data here, such as with `applyRowChanges`. A grid that takes no rows, with
+	 * `reorder: false` outside a group, needs neither.
 	 */
 	onDrop?: (event: GridRowDropEvent<TRow>) => void;
 }
@@ -160,11 +171,31 @@ export interface GridRowDragList<TRow = unknown> extends GridDragContext {
 	readonly handle: boolean;
 }
 
+// Problems warned about: one warning for each says it all.
+const warnedDrops = new Set<string>();
+
+/** Warns once in development that a drop was not written, or not all of it. */
+function warnDrop(problem: string) {
+	if (__DEV__ && !warnedDrops.has(problem)) {
+		warnedDrops.add(problem);
+		// oxlint-disable-next-line no-console
+		console.warn(`[@vue-data-grid/core] useGridRowDrag() ${problem}`);
+	}
+}
+
+/** The shown row of a grid with key `key`. */
+function findShownRow<TRow>(grid: DataGrid<TRow>, key: string) {
+	const index = grid.scope.getRowIndex(key);
+
+	return index === -1 ? undefined : grid.rows.value[index];
+}
+
 /**
  * Dragging the rows of a grid with a pointer, a finger or the keyboard, over `@vue-data-grid/drag-and-drop`:
  * within the grid, into and out of the groups of a tree, and between the grids of a `group`. The
  * rows of the body register themselves: call it in the component that renders the grid, or use
- * `GridRowDrag` around the body. The grid does not touch your rows: `onDrop` says where a row goes.
+ * `GridRowDrag` around the body. The `rowEditing` feature of the grid writes a drop, or `onDrop` in
+ * its place.
  * With `reorder: false` the order of the grid stays: its rows only leave for other grids and drop
  * zones.
  *
@@ -191,18 +222,16 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 	}
 
 	function getRow(key: string) {
-		const index = scope.getRowIndex(key);
-
-		return index === -1 ? undefined : grid.rows.value[index];
+		return findShownRow(grid, key);
 	}
 
-	// The row of a payload: another grid's from what it carries, since keys of two grids may match;
-	// an own row as it is now, since it may have changed since the drag started.
+	// The row of a payload as it is now in the grid it comes from, since it may have changed since the
+	// drag started; keys of two grids may match, so another grid's row is looked up in that grid.
 	function getPayloadRow(payload: DragPayload | null | undefined) {
 		const data = payload?.data as GridRowDragData<TRow> | undefined;
 
-		if (data && data.grid !== grid) {
-			return data.row;
+		if (payload && data && data.grid !== grid) {
+			return findShownRow(data.grid, payload.key);
 		}
 
 		return payload ? getRow(payload.key) : undefined;
@@ -252,6 +281,104 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 	};
 
 	let collapsed: string | null = null;
+
+	// A grid with `grouping` shows groups of flat rows: a place in a group is next to a shown row of it.
+	function getGroupedPlace(key: string, parent: string | null, index: number): RowPlace {
+		const siblings = (grid.tree?.getChildren(parent) ?? []).filter(sibling => sibling !== key);
+		const last = siblings.at(-1);
+
+		if (index < siblings.length) {
+			return { before: siblings[index] };
+		}
+
+		return last === undefined ? { parent, index } : { after: last };
+	}
+
+	function getDropChange(key: string, row: TRow, parent: string | null, index: number, external: boolean) {
+		const place = grid.grouping ? getGroupedPlace(key, parent, index) : { parent, index };
+		const change: AddRowChange<TRow> | MoveRowChange<TRow> = external ? { type: 'add', row, ...place } : { type: 'move', key, ...place };
+
+		return change;
+	}
+
+	/** Why the grid does not write a drop by itself; `null` when it does. */
+	function getUnwritableReason(event: GridRowDropEvent<TRow>) {
+		// The group of a row is a field of it, which the grid cannot write.
+		if (grid.grouping && (event.external || grid.tree?.getNode(event.key)?.parent !== event.parent)) {
+			return 'did not write a drop into another group of a grid with `grouping`: the group of a row is a '
+				+ 'field of it. Write the drop in `onDrop` with `event.preventDefault()`, such as `event.change` and '
+				+ 'an update of that field.';
+		}
+
+		// The rows under it are rows of the other grid that this one would not get.
+		if (event.external && (event.source.tree?.getChildren(event.key).length ?? 0) > 0) {
+			return 'did not write a drop of a row with rows under it from another grid: they would stay behind '
+				+ 'or be lost. Write the drop in `onDrop` with `event.preventDefault()`.';
+		}
+
+		return null;
+	}
+
+	// The drop as changes of the rows of both grids: the row leaves the other grid only once this one
+	// took it, so that it is never lost.
+	function writeDrop(event: GridRowDropEvent<TRow>) {
+		if (!grid.rowEditing) {
+			if (!options.onDrop) {
+				warnDrop('dropped a row on a grid with neither `onDrop` nor the `rowEditing` feature of useDataGrid: '
+					+ 'the row stays where it was.');
+			}
+
+			return;
+		}
+
+		const reason = getUnwritableReason(event);
+
+		if (reason !== null) {
+			warnDrop(reason);
+
+			return;
+		}
+
+		const { commit } = grid.rowEditing.write([event.change], 'drop');
+
+		if (!event.external) {
+			return;
+		}
+
+		if (!commit) {
+			warnDrop('did not add a row from another grid: this grid has a row with its key, or `onBeforeCommit` '
+				+ 'refused it. The row stays in its grid.');
+
+			return;
+		}
+
+		const removal = event.source.rowEditing?.write([{ type: 'remove', key: event.key, expected: event.row }], 'drop');
+
+		if (!removal?.commit) {
+			warnDrop('added a row from another grid that could not leave it: that grid has no `rowEditing` feature, '
+				+ 'or its `onBeforeCommit` refused. The row is in both grids; write the drop in `onDrop` with '
+				+ '`event.preventDefault()` to decide.');
+		}
+	}
+
+	function createDropEvent(key: string, row: TRow, target: { parent: string | null; index: number; external: boolean }, source: DataGrid<TRow>) {
+		const { parent, index, external } = target;
+		const state = { prevented: false };
+		const event: GridRowDropEvent<TRow> = {
+			key,
+			row,
+			parent,
+			index,
+			external,
+			source,
+			change: getDropChange(key, row, parent, index, external),
+			preventDefault: () => {
+				state.prevented = true;
+			},
+		};
+
+		return { event, state };
+	}
 
 	const list = useDragList({
 		kind: GRID_ROW_KIND,
@@ -315,7 +442,13 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 				return;
 			}
 
-			options.onDrop?.({ key, row, parent, index, external, source: external && data ? data.grid : grid });
+			const { event, state } = createDropEvent(key, row, { parent, index, external }, external && data ? data.grid : grid);
+
+			options.onDrop?.(event);
+
+			if (!state.prevented) {
+				writeDrop(event);
+			}
 
 			if (parent !== null) {
 				grid.tree?.setExpanded(parent, true);

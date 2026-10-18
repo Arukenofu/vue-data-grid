@@ -1,6 +1,7 @@
 import { type ClipboardGrid, type ClipboardOptions, useClipboard } from '../clipboard/use-clipboard';
 import { type EditingGrid, type GridEditingOptions, useGridEditing } from '../editing/use-grid-editing';
 import { type GridHistoryOptions, type HistoryGrid, useGridHistory } from '../editing/use-grid-history';
+import { type GridRowEditingOptions, type RowEditingGrid, useGridRowEditing } from '../editing/use-grid-row-editing';
 import { type FillGrid, type GridFillOptions, useGridFill } from '../ranges/use-grid-fill';
 import {
 	type GridColumns,
@@ -43,6 +44,14 @@ export function tree<TRow>(options: GridTreeOptions<TRow> = {}) {
 /** The `selection` feature of `useDataGrid`: `useGridSelection` with these options, such as `selectionMode`. */
 export function selection<TRow>(options: GridSelectionOptions<TRow> = {}) {
 	return (grid: SelectionGrid<TRow>) => useGridSelection(grid, options);
+}
+
+/**
+ * The `rowEditing` feature of `useDataGrid`: `useGridRowEditing` with these options, `onCommit`
+ * among them, which writes a commit of added, removed and moved rows into your rows.
+ */
+export function rowEditing<TRow>(options: GridRowEditingOptions<TRow>) {
+	return (grid: RowEditingGrid<TRow>) => useGridRowEditing(grid, options);
 }
 
 /** The `navigation` feature of `useDataGrid`: `useGridNavigation`, the keys of the grid. */

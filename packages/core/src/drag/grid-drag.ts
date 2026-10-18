@@ -1,7 +1,7 @@
 import type { DragAnnouncements, DragAutoScroll, DragIndicator, DragListTarget } from '@vue-data-grid/drag-and-drop';
 import type { MotionEngine } from '@vue-data-grid/flip';
 import type { RuntimeColumn } from '@vue-data-grid/engine';
-import { defineComponent, type PropType, type SlotsType, toRef, type VNodeChild } from 'vue';
+import { defineComponent, getCurrentInstance, type PropType, type SlotsType, toRef, type VNodeChild } from 'vue';
 
 import { useDataGridContext } from '../components/context';
 import type { GridDragItem } from './shared';
@@ -58,7 +58,9 @@ const sharedProps = {
 /**
  * Dragging the rows of the grid: `useGridRowDrag` as a part. Put it around the `GridBody`, whose
  * rows then drag, and a `GridDragPreview` for the ghost. It renders no element: its default slot is
- * its content. The props are the options of `useGridRowDrag`, and `drop` its `onDrop`.
+ * its content. The props are the options of `useGridRowDrag`, and `drop` its `onDrop`: after the
+ * listeners, a drop moves the row through the grid's `rowEditing` feature, unless one of them calls
+ * `event.preventDefault()`.
  */
 export const GridRowDrag = defineComponent({
 	name: 'GridRowDrag',
@@ -84,12 +86,22 @@ export const GridRowDrag = defineComponent({
 		getLabel: { type: Function as PropType<(row: unknown, key: string) => string>, default: undefined },
 	},
 	emits: {
-		/** A row was dropped on the grid: move it in your data, such as with `moveRow`. */
+		/** A row was dropped on the grid. */
 		drop: (_event: GridRowDropEvent<unknown>) => true,
 	},
 	slots: Object as SlotsType<{ default?: (context: GridRowDragSlotContext) => VNodeChild }>,
 	setup(props, { emit, slots }) {
 		const grid = useDataGridContext();
+		const instance = getCurrentInstance();
+		const emitDrop = (event: GridRowDropEvent<unknown>) => emit('drop', event);
+
+		// A listener is a prop of the vnode: the composable warns about a drop nothing writes only
+		// when there is none.
+		function hasDropListener() {
+			const vnodeProps: Record<string, unknown> | null | undefined = instance?.vnode.props;
+
+			return vnodeProps?.onDrop !== undefined;
+		}
 
 		// Getters, so the composable reads the props as they are when it needs them.
 		const drag = useGridRowDrag(grid, {
@@ -120,7 +132,9 @@ export const GridRowDrag = defineComponent({
 			get getLabel() {
 				return props.getLabel;
 			},
-			onDrop: event => emit('drop', event),
+			get onDrop() {
+				return hasDropListener() ? emitDrop : undefined;
+			},
 		});
 
 		// Read lazily: a slot that shows nothing of the drag does not render again during one.

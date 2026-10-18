@@ -2,10 +2,12 @@ import {
 	type AnyColumn,
 	type CellRanges,
 	type CellRangesOptions,
+	type ChildrenField,
 	type ColumnAggregates,
 	type ColumnsInput,
 	type GridColumnsState,
 	type GridScope,
+	type ParentKey,
 	type RowGroup,
 	type RowGroupLevel,
 	type RowKey,
@@ -119,22 +121,43 @@ export function useGridGrouping<TRow, TColumns extends GridColumns>(
 export interface GridTreeOptions<TRow> extends Omit<RowTreeOptions<TRow>, 'rows' | 'rowKey' | 'sort' | 'columns'> {
 	/** Sort the siblings of every level by the column state's `sort`; `true` by default. */
 	sort?: MaybeRefOrGetter<boolean>;
+	/**
+	 * Gives a row a new parent, for changes of the rows such as those of `rowEditing` and drops: what
+	 * a `parentKey` that is a function needs. By default the parent is written into the `parentKey`
+	 * field of a copy of the row.
+	 */
+	setParent?: (row: TRow, parent: string | null) => TRow;
+}
+
+/**
+ * How a `tree` feature reads and writes the place of a row, which changes of the rows such as
+ * `rowEditing` follow; `useGridTree` gives all of it. Changes take the rows of a tree without it as
+ * flat.
+ */
+export interface GridTreeStructure<TRow> {
+	/** The parent of each row of a flat list. */
+	parentKey?: ParentKey<TRow>;
+	/** The field holding an array of children, for a nested tree. */
+	childrenField?: Readonly<Ref<ChildrenField<TRow> | undefined>>;
+	/** Gives a row a new parent. */
+	setParent?: (row: TRow, parent: string | null) => TRow;
 }
 
 /**
  * The rows as a tree, flattened into the shown rows, each level sorted by the column state. The tree
  * sorts its levels itself: a grid with a tree needs no sorting feature.
  */
-export function useGridTree<TRow>(grid: RowsGrid<TRow>, options: GridTreeOptions<TRow> = {}): RowTree<TRow> {
-	const { sort, ...tree } = options;
-
-	return useRowTree({
+export function useGridTree<TRow>(grid: RowsGrid<TRow>, options: GridTreeOptions<TRow> = {}): RowTree<TRow> & GridTreeStructure<TRow> {
+	const { sort, setParent, ...tree } = options;
+	const rowTree = useRowTree({
 		...tree,
 		rows: grid.rows,
 		rowKey: grid.rowKey,
 		sort: computed(() => ((toValue(sort) ?? true) ? grid.state.sort.value : [])),
 		columns: grid.columns,
 	});
+
+	return { ...rowTree, setParent };
 }
 
 export type GridSelectionOptions<TRow> = Omit<RowSelectionOptions<TRow>, 'rows' | 'rowKey' | 'getChildren'>;

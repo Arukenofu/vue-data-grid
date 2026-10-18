@@ -1,5 +1,5 @@
 import type { DragAutoScroll } from '@vue-data-grid/drag-and-drop';
-import { defineColumn, defineColumns, moveRow } from '@vue-data-grid/engine';
+import { applyRowChanges, defineColumn, defineColumns, type RowCommit } from '@vue-data-grid/engine';
 import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, type ShallowRef, shallowRef, toValue, type VNodeChild } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useDataGridContext } from '../../src/components/context';
 import { GridRoot } from '../../src/components/grid-root';
 import { useGridMotion } from '../../src/motion/use-grid-motion';
-import { sorting, tree } from '../../src/data-grid/factories';
+import { grouping, rowEditing, sorting, tree } from '../../src/data-grid/factories';
 import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { dragHandleColumn } from '../../src/drag/drag-handle-column';
 import { createPreviewHolder } from '../../src/drag/shared';
@@ -28,6 +28,8 @@ interface Task {
 	id: string;
 	name: string;
 	parent?: string | null;
+	kind?: string;
+	children?: Task[];
 }
 
 const column = defineColumn<Task>({ movable: true });
@@ -70,6 +72,27 @@ interface Setup {
 	/** What inside a row never starts a drag. */
 	ignore?: string;
 	autoScroll?: DragAutoScroll | false;
+	/** The grid has the `rowEditing` feature, and the row drag no `onDrop` of the test's own. */
+	rowEditing?: boolean;
+	/** The listener of the row drag in place of the test's own; `false` for none. */
+	onDrop?: ((event: GridRowDropEvent<unknown>) => void) | false;
+	/** The rows are grouped by `kind`. */
+	grouping?: boolean;
+}
+
+function moveDropped(rows: ShallowRef<Task[]>, drops: GridRowDropEvent<unknown>[]) {
+	return (event: GridRowDropEvent<unknown>) => {
+		drops.push(event);
+		rows.value = [...applyRowChanges(rows.value, [(event as GridRowDropEvent<Task>).change], { rowKey: 'id', parentKey: 'parent' }).rows];
+	};
+}
+
+function getDropListener(options: Setup, fallback: (event: GridRowDropEvent<unknown>) => void) {
+	if (options.onDrop !== undefined) {
+		return options.onDrop ? { onDrop: options.onDrop } : {};
+	}
+
+	return options.rowEditing ? {} : { onDrop: fallback };
 }
 
 const wrappers: ReturnType<typeof mount>[] = [];
@@ -79,6 +102,7 @@ let frames: ReturnType<typeof stubFrames>;
 function setup(options: Setup = {}) {
 	const rows: ShallowRef<Task[]> = shallowRef(options.rows ?? tasks);
 	const drops: GridRowDropEvent<unknown>[] = [];
+	const commits: RowCommit<Task>[] = [];
 	const columnDrops: unknown[] = [];
 	let grid: DataGrid | null = null;
 	const host = document.createElement('div');
@@ -95,7 +119,23 @@ function setup(options: Setup = {}) {
 				sort: options.sorted ? [{ name: 'name', direction: 'desc' }] : undefined,
 				features: {
 					sorting: sorting(),
-					tree: options.tree ? tree({ parentKey: 'parent', defaultExpanded: -1 }) : undefined,
+					grouping: options.grouping
+						? grouping({
+							by: [{ name: 'kind', value: task => task.kind }],
+							createGroup: group => ({ id: group.key, name: String(group.value), children: [...group.children] }),
+						})
+						: undefined,
+					tree: options.grouping
+						? tree({ childrenField: 'children', defaultExpanded: -1 })
+						: options.tree ? tree({ parentKey: 'parent', defaultExpanded: -1 }) : undefined,
+					rowEditing: options.rowEditing
+						? rowEditing({
+							onCommit: (commit) => {
+								commits.push(commit);
+								rows.value = [...commit.rows];
+							},
+						})
+						: undefined,
 				},
 			}) as DataGrid;
 
@@ -119,10 +159,7 @@ function setup(options: Setup = {}) {
 						...(options.ignore ? { ignore: options.ignore } : {}),
 						...(options.autoScroll === undefined ? {} : { autoScroll: options.autoScroll }),
 						animation: false,
-						onDrop: (event: GridRowDropEvent<unknown>) => {
-							drops.push(event);
-							rows.value = moveRow(rows.value, event as GridRowDropEvent<Task>, { rowKey: 'id', parentKey: 'parent' });
-						},
+						...getDropListener(options, moveDropped(rows, drops)),
 					}, {
 						default: () => [
 							renderBody(),
@@ -142,11 +179,11 @@ function setup(options: Setup = {}) {
 
 	placeGrid(root, options.left);
 
-	const row = (id: string) => root.querySelector(`[data-dg-part="row"][data-dg-index="${rows.value.findIndex(item => item.id === id)}"]`) as HTMLElement;
+	const row = (id: string) => root.querySelector(`[data-dg-part="row"][data-dg-index="${(grid as DataGrid).scope.getRowIndex(id)}"]`) as HTMLElement;
 	const header = (name: string) => root.querySelector(`[role="columnheader"][data-dg-column="${name}"]`) as HTMLElement;
 	const names = () => rows.value.map(item => item.id);
 
-	return { grid: grid as unknown as DataGrid, rows, drops, columnDrops, root, row, header, names };
+	return { grid: grid as unknown as DataGrid, rows, drops, commits, columnDrops, root, row, header, names };
 }
 
 /** Drags from one element to a point, frame by frame, and releases there. */
@@ -183,6 +220,74 @@ describe('row drag — the pointer', () => {
 		expect(drops[0].row).toEqual(tasks[0]);
 		expect(drops[0].source).toBe(grid);
 		expect(names()).toEqual(['b', 'c', 'a', 'd']);
+	});
+
+	it('without `onDrop` moves the row through the `rowEditing` feature, as a commit from `drop`', async () => {
+		const { commits, row, names } = setup({ rowEditing: true });
+
+		drag(row('a'), at(row('d'), 0.25));
+		await nextTick();
+
+		expect(names()).toEqual(['b', 'c', 'a', 'd']);
+		expect(commits).toHaveLength(1);
+		expect(commits[0].source).toBe('drop');
+		expect(commits[0].changes).toEqual([{ type: 'move', key: 'a', parent: null, index: 2 }]);
+	});
+
+	it('runs `onDrop` before the `rowEditing` write, with the change of the drop', async () => {
+		const changes: unknown[] = [];
+		const { row, names } = setup({ rowEditing: true, onDrop: event => changes.push(event.change) });
+
+		drag(row('a'), at(row('d'), 0.25));
+		await nextTick();
+
+		expect(changes).toEqual([{ type: 'move', key: 'a', parent: null, index: 2 }]);
+		expect(names()).toEqual(['b', 'c', 'a', 'd']);
+	});
+
+	it('writes nothing through `rowEditing` once `onDrop` calls `preventDefault`', async () => {
+		const { commits, row, names } = setup({ rowEditing: true, onDrop: event => event.preventDefault() });
+
+		drag(row('a'), at(row('d'), 0.25));
+		await nextTick();
+
+		expect(commits).toEqual([]);
+		expect(names()).toEqual(['a', 'b', 'c', 'd']);
+	});
+
+	it('warns once in development that a drop goes nowhere without `onDrop` and `rowEditing`', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const { row, names } = setup({ onDrop: false });
+
+		drag(row('a'), at(row('d'), 0.25));
+		await nextTick();
+
+		expect(names()).toEqual(['a', 'b', 'c', 'd']);
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining('neither `onDrop` nor the `rowEditing` feature'));
+	});
+
+	it('in a grid with `grouping` puts the row next to the row it is dropped by, in the flat rows', async () => {
+		const rows = tasks.map((task, index) => ({ ...task, kind: index % 2 === 0 ? 'odd' : 'even' }));
+		const { commits, row, names } = setup({ rowEditing: true, grouping: true, rows });
+
+		drag(row('b'), at(row('d'), 0.75));
+		await nextTick();
+
+		expect(commits[0].changes).toEqual([{ type: 'move', key: 'b', after: 'd' }]);
+		expect(names()).toEqual(['a', 'c', 'd', 'b']);
+	});
+
+	it('in a grid with `grouping` does not write a drop into another group, and warns', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const rows = tasks.map((task, index) => ({ ...task, kind: index % 2 === 0 ? 'odd' : 'even' }));
+		const { commits, row, names } = setup({ rowEditing: true, grouping: true, rows });
+
+		drag(row('b'), at(row('c'), 0.75));
+		await nextTick();
+
+		expect(commits).toEqual([]);
+		expect(names()).toEqual(['a', 'b', 'c', 'd']);
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining('into another group'));
 	});
 
 	it('does not drag while the rows are sorted: the order is the sort’s', () => {
@@ -459,6 +564,84 @@ describe('row drag — between grids', () => {
 		await nextTick();
 
 		expect(first.drops).toEqual([expect.objectContaining({ key: 'x', index: 0, external: true })]);
+	});
+
+	it('without `onDrop` moves the row from the rows of one grid to the other’s through their `rowEditing`', async () => {
+		const first = setup({ group: 'tasks', rowEditing: true });
+		const second = setup({ group: 'tasks', rowEditing: true, rows: [{ id: 'x', name: 'Other' }], left: 800 });
+
+		drag(first.row('b'), at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(second.names()).toEqual(['x', 'b']);
+		expect(first.names()).toEqual(['a', 'c', 'd']);
+		expect(second.commits.map(commit => commit.source)).toEqual(['drop']);
+		expect(first.commits[0].changes).toEqual([{ type: 'remove', key: 'b', expected: tasks[1] }]);
+		expect(second.commits[0].changes).toEqual([{ type: 'add', row: tasks[1], parent: null, index: 1 }]);
+	});
+
+	it('leaves a row from another grid in it when this grid has a row with its key, and warns', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const first = setup({ group: 'tasks', rowEditing: true });
+		const second = setup({ group: 'tasks', rowEditing: true, rows: [{ id: 'b', name: 'Other B' }, { id: 'x', name: 'Other' }], left: 800 });
+
+		drag(first.row('b'), at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(second.rows.value.map(task => task.name)).toEqual(['Other B', 'Other']);
+		expect(first.names()).toEqual(['a', 'b', 'c', 'd']);
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining('did not add a row from another grid'));
+	});
+
+	it('moves a row from another grid as it is at the drop, changed during the drag', async () => {
+		const first = setup({ group: 'tasks', rowEditing: true });
+		const second = setup({ group: 'tasks', rowEditing: true, rows: [{ id: 'x', name: 'Other' }], left: 800 });
+		const start = at(first.row('b'));
+		const edited = { id: 'b', name: 'Beta, edited' };
+
+		pointer('pointerdown', first.row('b'), start);
+		pointer('pointermove', window, { x: start.x, y: start.y + 8 });
+		frames.run();
+		first.rows.value = first.rows.value.map(task => (task.id === 'b' ? edited : task));
+		await nextTick();
+		pointer('pointermove', window, at(second.row('x'), 0.75));
+		frames.run();
+		pointer('pointerup', window, at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(second.rows.value).toEqual([{ id: 'x', name: 'Other' }, edited]);
+		expect(first.names()).toEqual(['a', 'c', 'd']);
+	});
+
+	it('does not write a row with rows under it from another grid, and warns', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const first = setup({
+			group: 'tasks',
+			rowEditing: true,
+			tree: true,
+			rows: [{ id: 'a', name: 'Folder', parent: null }, { id: 'a1', name: 'Child', parent: 'a' }, { id: 'b', name: 'Beta', parent: null }],
+		});
+		const second = setup({ group: 'tasks', rowEditing: true, rows: [{ id: 'x', name: 'Other' }], left: 800 });
+
+		drag(first.row('a'), at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(second.names()).toEqual(['x']);
+		expect(first.names()).toEqual(['a', 'a1', 'b']);
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining('with rows under it'));
+	});
+
+	it('warns that a row is in both grids when the grid it comes from has no `rowEditing`', async () => {
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		const first = setup({ group: 'tasks', onDrop: false });
+		const second = setup({ group: 'tasks', rowEditing: true, rows: [{ id: 'x', name: 'Other' }], left: 800 });
+
+		drag(first.row('b'), at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(second.names()).toEqual(['x', 'b']);
+		expect(first.names()).toEqual(['a', 'b', 'c', 'd']);
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining('could not leave it'));
 	});
 
 	it('keeps a row of a grid without a group inside it', async () => {

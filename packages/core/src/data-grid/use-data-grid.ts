@@ -16,9 +16,13 @@ import {
 	type GridEngineOptions,
 	type GridScope,
 	type GridSort,
+	type RowChange,
+	type RowCommit,
+	type RowEditSource,
 	type RowNode,
 	type RowSelection,
 	type RowTree,
+	type RowWriteResult,
 	type RuntimeColumn,
 	useGridColumnsState,
 	useGridEngine,
@@ -38,6 +42,7 @@ import {
 
 import type { GridClipboard } from '../clipboard/use-clipboard';
 import type { CellContext, CellEditor, EditorContext, EditorMove } from '../columns/column-fields';
+import type { RowEditingGrid } from '../editing/use-grid-row-editing';
 import type { CellNavigation } from '../navigation/use-cell-navigation';
 import {
 	DEFAULT_INDEX_ATTRIBUTE,
@@ -48,7 +53,7 @@ import {
 } from '../props/use-grid-props';
 import type { GridFill } from '../ranges/use-grid-fill';
 import { useStickyOffset } from '../render/use-sticky-offset';
-import type { GridColumns, GridRowsFeature, RowsGrid, SelectionGrid } from './features';
+import type { GridColumns, GridRowsFeature, GridTreeStructure, RowsGrid, SelectionGrid } from './features';
 
 /** What the grid and its parts read of the `tree` feature; `useGridTree` gives it. */
 export type GridTreeFeature<TRow = unknown> = Pick<
@@ -71,6 +76,15 @@ export type GridSelectionFeature = Pick<
 	| 'toggleAll'
 	| 'setAll'
 >;
+
+/**
+ * What the grid and its parts read of the `rowEditing` feature; `useGridRowEditing` gives it. A
+ * method, not a property: its parameters stay bivariant, so the row editing of any rows fits.
+ */
+export interface GridRowEditingFeature<TRow = unknown> {
+	lastCommit: Readonly<Ref<RowCommit<TRow> | null>>;
+	write(changes: readonly RowChange<TRow>[], source: RowEditSource): RowWriteResult<TRow>;
+}
 
 /** What the grid and other features read of the `navigation` feature; `useGridNavigation` gives it. */
 export type GridNavigationFeature = Pick<CellNavigation, 'focused' | 'focusCell' | 'cells'>;
@@ -118,6 +132,7 @@ export interface DataGridHandles<TRow = unknown> {
 	sorting?: GridRowsFeature<TRow>;
 	tree?: GridTreeFeature<TRow>;
 	selection?: GridSelectionFeature;
+	rowEditing?: GridRowEditingFeature<TRow>;
 	navigation?: GridNavigationFeature;
 	ranges?: GridRangesFeature;
 	editing?: GridEditingFeature<TRow>;
@@ -156,16 +171,20 @@ export interface FeatureGrid<TRow = unknown> {
 /**
  * The features of a grid, each a function of the grid that builds it, as the factories give them:
  * `sorting()`, `editing({ onCommit })`. The grid builds them in this order, each on what the ones
- * before give: `grouping`, `sorting` and `tree` change the rows, `selection` selects them, then the
- * engine renders them, and `navigation`, `ranges`, `editing`, `history`, `fill` and `clipboard` work
- * on the rendered grid. A feature is in the bundle only when a grid uses it; a function of your own
- * in place of a factory builds a feature your own way.
+ * before give: `grouping`, `sorting` and `tree` change the rows, `selection` selects them,
+ * `rowEditing` changes the source rows, then the engine renders them, and `navigation`, `ranges`,
+ * `editing`, `history`, `fill` and `clipboard` work on the rendered grid. A feature is in the bundle
+ * only when a grid uses it; a function of your own in place of a factory builds a feature your own
+ * way.
  */
 export interface DataGridFeatures<TRow, TColumns extends GridColumns = GridColumns> {
 	grouping?: (grid: RowsGrid<TRow, TColumns>) => GridRowsFeature<TRow>;
 	sorting?: (grid: RowsGrid<TRow, TColumns>) => GridRowsFeature<TRow>;
-	tree?: (grid: RowsGrid<TRow, TColumns>) => GridTreeFeature<TRow>;
+	// The structure is read once, by `rowEditing`: it stays out of the handle, whose rows would no
+	// longer fit `DataGrid` of any rows.
+	tree?: (grid: RowsGrid<TRow, TColumns>) => GridTreeFeature<TRow> & GridTreeStructure<TRow>;
 	selection?: (grid: SelectionGrid<TRow, TColumns>) => GridSelectionFeature;
+	rowEditing?: (grid: RowEditingGrid<TRow>) => GridRowEditingFeature<TRow>;
 	// Each of these takes the part of `FeatureGrid` it needs, which `DataGridFeatureChecks` holds against
 	// the grid it is built with: any function that gives the handle fits here.
 	navigation?: (grid: never) => GridNavigationFeature;
@@ -359,6 +378,7 @@ export interface DataGrid<TRow = unknown, THandles extends object = DataGridHand
 	sorting: DataGridHandle<TRow, THandles, 'sorting'>;
 	tree: DataGridHandle<TRow, THandles, 'tree'>;
 	selection: DataGridHandle<TRow, THandles, 'selection'>;
+	rowEditing: DataGridHandle<TRow, THandles, 'rowEditing'>;
 	navigation: DataGridHandle<TRow, THandles, 'navigation'>;
 	ranges: DataGridHandle<TRow, THandles, 'ranges'>;
 	editing: DataGridHandle<TRow, THandles, 'editing'>;
@@ -449,6 +469,8 @@ export function useDataGrid<
 	const tree = features.tree?.(rowsGrid(sorted));
 	const shown = tree?.rows ?? sorted;
 	const selection = features.selection?.({ ...rowsGrid(shown), tree });
+	// Grouped rows are built from the source, which is flat: the tree is of the groups, not of it.
+	const rowEditing = features.rowEditing?.({ rows: source, rowKey: options.rowKey, tree: grouping ? undefined : tree });
 
 	const root = shallowRef<HTMLElement | null>(null);
 	const head = shallowRef<HTMLElement | null>(null);
@@ -579,6 +601,7 @@ export function useDataGrid<
 		sorting,
 		tree,
 		selection,
+		rowEditing,
 		navigation,
 		ranges,
 		editing,

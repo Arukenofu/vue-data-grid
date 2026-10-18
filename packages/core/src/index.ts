@@ -56,6 +56,8 @@ export type { EditingGrid, GridEditing, GridEditingOptions } from './editing/use
 export { useGridEditing } from './editing/use-grid-editing';
 export type { GridHistory, GridHistoryOptions, HistoryGrid } from './editing/use-grid-history';
 export { useGridHistory } from './editing/use-grid-history';
+export type { GridRowEditing, GridRowEditingOptions, RowEditingGrid } from './editing/use-grid-row-editing';
+export { useGridRowEditing } from './editing/use-grid-row-editing';
 export type {
 	CellSlotContext,
 	GridCellsComponent,
@@ -139,6 +141,7 @@ export type {
 	GridSelectionOptions,
 	GridSortingOptions,
 	GridTreeOptions,
+	GridTreeStructure,
 	NavigationGrid,
 	RangesGrid,
 	RowsGrid,
@@ -160,6 +163,7 @@ export {
 	history,
 	navigation,
 	ranges,
+	rowEditing,
 	selection,
 	sorting,
 	tree,
@@ -184,6 +188,7 @@ export type {
 	GridHistoryFeature,
 	GridNavigationFeature,
 	GridRangesFeature,
+	GridRowEditingFeature,
 	GridSelectionFeature,
 	GridTreeFeature,
 } from './data-grid/use-data-grid';
