@@ -385,6 +385,8 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 		axis: 'vertical',
 		keys: () => scope.rowKeys.value,
 		container: grid.body,
+		// The body is as tall as its rows: the whole grid takes drops, an empty one too.
+		area: grid.root,
 		scroller: grid.root,
 		bounds: getBounds,
 		handle: () => (isHandle() ? DRAG_HANDLE_SELECTOR : undefined),

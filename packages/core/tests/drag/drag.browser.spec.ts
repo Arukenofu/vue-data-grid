@@ -8,7 +8,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { GridRoot } from '../../src/components/grid-root';
 import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
-import { GridColumnDrag } from '../../src/drag/grid-drag';
+import { rowEditing } from '../../src/data-grid/factories';
+import { GridColumnDrag, GridRowDrag } from '../../src/drag/grid-drag';
 import { useGridMotion } from '../../src/motion/use-grid-motion';
 import { renderBody, renderHeader } from '../support/parts';
 
@@ -106,5 +107,56 @@ describe('column drag in a browser', () => {
 		expect(grid.scope.columns.value.map(item => item.column?.name)).toEqual(['id', 'name', 'note']);
 		// Neither the header nor the body cells of the column jump back to where the drag began.
 		expect(seen.every(left => Math.abs(left - standing.header) < 1)).toBe(true);
+	});
+});
+
+function mountTaskList(initial: Task[], left: number) {
+	const rows = shallowRef<Task[]>(initial);
+	const wrapper = mount(defineComponent({
+		setup() {
+			const grid = useDataGrid({
+				columns,
+				rows,
+				rowKey: 'id',
+				rowHeight: 30,
+				features: { rowEditing: rowEditing({ onCommit: (commit) => { rows.value = [...commit.rows]; } }) },
+			}) as DataGrid;
+			const style = `position: absolute; top: 0; left: ${left}px; width: 180px; height: 200px`;
+
+			return () => h(GridRoot, { grid, label: 'Tasks', style }, {
+				default: () => [renderHeader(), h(GridRowDrag, { group: 'tasks', motion: false }, { default: () => renderBody() })],
+			});
+		},
+	}), { attachTo: document.body });
+
+	wrappers.push(wrapper);
+
+	return { rows, root: wrapper.get('[data-dg-part="grid"]').element as HTMLElement };
+}
+
+describe('row drag in a browser', () => {
+	it('drops a row into an empty grid of the group, whose body has no height', async () => {
+		const first = mountTaskList([{ id: 'a', name: 'Alpha' }, { id: 'b', name: 'Beta' }], 0);
+		const second = mountTaskList([], 200);
+
+		await nextFrame();
+
+		const row = first.root.querySelector('[data-dg-part="body"] [data-dg-part="row"]') as HTMLElement;
+		const start = row.getBoundingClientRect();
+		const body = second.root.querySelector('[data-dg-part="body"]') as HTMLElement;
+		const over = { x: 290, y: 120 };
+
+		expect(body.getBoundingClientRect().height).toBe(0);
+
+		pointer('pointerdown', row, start.left + 20, start.top + 10);
+		pointer('pointermove', window, start.left + 20, start.top + 30);
+		await nextFrame();
+		pointer('pointermove', window, over.x, over.y);
+		await nextFrame();
+		pointer('pointerup', window, over.x, over.y);
+		await nextFrame();
+
+		expect(second.rows.value.map(task => task.id)).toEqual(['a']);
+		expect(first.rows.value.map(task => task.id)).toEqual(['b']);
 	});
 });
