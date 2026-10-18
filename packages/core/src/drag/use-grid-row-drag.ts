@@ -352,7 +352,8 @@ export function useGridRowDrag<TRow>(grid: DataGrid<TRow>, options: GridRowDragO
 			return;
 		}
 
-		const removal = event.source.rowEditing?.write([{ type: 'remove', key: event.key, expected: event.row }], 'drop');
+		// Linked, so that a history the two grids share undoes the drop as one step.
+		const removal = event.source.rowEditing?.write([{ type: 'remove', key: event.key, expected: event.row }], 'drop', { link: commit });
 
 		if (!removal?.commit) {
 			warnDrop('added a row from another grid that could not leave it: that grid has no `rowEditing` feature, '

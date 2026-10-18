@@ -22,6 +22,7 @@ import {
 	type RowNode,
 	type RowSelection,
 	type RowTree,
+	type RowWriteOptions,
 	type RowWriteResult,
 	type RuntimeColumn,
 	useGridColumnsState,
@@ -83,7 +84,7 @@ export type GridSelectionFeature = Pick<
  */
 export interface GridRowEditingFeature<TRow = unknown> {
 	lastCommit: Readonly<Ref<RowCommit<TRow> | null>>;
-	write(changes: readonly RowChange<TRow>[], source: RowEditSource): RowWriteResult<TRow>;
+	write(changes: readonly RowChange<TRow>[], source: RowEditSource, options?: RowWriteOptions): RowWriteResult<TRow>;
 }
 
 /** What the grid and other features read of the `navigation` feature; `useGridNavigation` gives it. */
@@ -164,6 +165,7 @@ export interface FeatureGrid<TRow = unknown> {
 	navigation?: GridNavigationFeature;
 	ranges?: GridRangesFeature;
 	editing?: GridEditingFeature<TRow>;
+	rowEditing?: GridRowEditingFeature<TRow>;
 	history?: GridHistoryFeature<TRow>;
 	fill?: GridFillFeature<TRow>;
 }
@@ -200,7 +202,7 @@ interface FeaturesBefore {
 	navigation: 'tree' | 'selection';
 	ranges: 'tree' | 'selection' | 'navigation';
 	editing: 'tree' | 'selection' | 'navigation' | 'ranges';
-	history: 'tree' | 'selection' | 'navigation' | 'ranges' | 'editing';
+	history: 'tree' | 'selection' | 'rowEditing' | 'navigation' | 'ranges' | 'editing';
 	fill: 'tree' | 'selection' | 'navigation' | 'ranges' | 'editing' | 'history';
 	clipboard: 'tree' | 'selection' | 'navigation' | 'ranges' | 'editing' | 'history' | 'fill';
 }
@@ -544,7 +546,7 @@ export function useDataGrid<
 	const navigation = late.navigation?.({ ...elements, tree, selection });
 	const ranges = late.ranges?.({ ...elements, tree, selection, navigation });
 	const editing = late.editing?.({ ...elements, tree, selection, navigation, ranges });
-	const history = late.history?.({ ...elements, tree, selection, navigation, ranges, editing });
+	const history = late.history?.({ ...elements, tree, selection, rowEditing, navigation, ranges, editing });
 	const fill = late.fill?.({ ...elements, tree, selection, navigation, ranges, editing, history });
 	const clipboard = late.clipboard?.({ ...elements, tree, selection, navigation, ranges, editing, history, fill });
 	const leaves = computed(() => tree?.leaves.value ?? scope.rows.value);

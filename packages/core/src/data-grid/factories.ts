@@ -72,7 +72,10 @@ export function editing<TRow>(options: GridEditingOptions<TRow>) {
 	return (grid: EditingGrid<TRow>) => useGridEditing(grid, options);
 }
 
-/** The `history` feature of `useDataGrid`: `useGridHistory`, undo and redo of the edits. Needs `editing`. */
+/**
+ * The `history` feature of `useDataGrid`: `useGridHistory`, undo and redo of the edits of cells and
+ * the changes of rows. Needs `editing`, `rowEditing` or both.
+ */
 export function history<TRow>(options: GridHistoryOptions = {}) {
 	return (grid: HistoryGrid<TRow>) => useGridHistory(grid, options);
 }

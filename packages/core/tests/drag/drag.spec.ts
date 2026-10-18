@@ -1,7 +1,7 @@
 import type { DragAutoScroll } from '@vue-data-grid/drag-and-drop';
 import { applyRowChanges, defineColumn, defineColumns, type RowCommit } from '@vue-data-grid/engine';
 import { mount } from '@vue/test-utils';
-import { defineComponent, h, nextTick, type ShallowRef, shallowRef, toValue, type VNodeChild } from 'vue';
+import { defineComponent, effectScope, h, nextTick, type ShallowRef, shallowRef, toValue, type VNodeChild } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useDataGridContext } from '../../src/components/context';
@@ -12,6 +12,7 @@ import { type DataGrid, useDataGrid } from '../../src/data-grid/use-data-grid';
 import { dragHandleColumn } from '../../src/drag/drag-handle-column';
 import { createPreviewHolder } from '../../src/drag/shared';
 import { GridColumnDrag, GridRowDrag } from '../../src/drag/grid-drag';
+import { useGridHistory } from '../../src/editing/use-grid-history';
 import {
 	GridDragOverlay,
 	type GridDragOverlayContext,
@@ -578,6 +579,33 @@ describe('row drag — between grids', () => {
 		expect(second.commits.map(commit => commit.source)).toEqual(['drop']);
 		expect(first.commits[0].changes).toEqual([{ type: 'remove', key: 'b', expected: tasks[1] }]);
 		expect(second.commits[0].changes).toEqual([{ type: 'add', row: tasks[1], parent: null, index: 1 }]);
+	});
+
+	it('undoes a drop between grids that share a history as one step, with the keys of either grid', async () => {
+		const first = setup({ group: 'tasks', rowEditing: true });
+		const second = setup({ group: 'tasks', rowEditing: true, rows: [{ id: 'x', name: 'Other' }], left: 800 });
+		const scope = effectScope();
+		// The grids of `setup` are typed loosely: their `rowEditing` is there with `rowEditing: true`.
+		const grids = [first.grid, second.grid].map(grid => ({ root: grid.root, rowEditing: grid.rowEditing! }));
+		const shared = scope.run(() => useGridHistory(grids));
+
+		drag(first.row('b'), at(second.row('x'), 0.75));
+		await nextTick();
+
+		expect(shared?.steps.value).toEqual([expect.objectContaining({ kind: 'rows', source: 'drop' })]);
+
+		key(second.row('x').querySelector('[data-dg-column="name"]') as HTMLElement, 'z', { ctrlKey: true });
+		await nextTick();
+
+		expect(first.names()).toEqual(['a', 'b', 'c', 'd']);
+		expect(second.names()).toEqual(['x']);
+
+		key(first.row('a').querySelector('[data-dg-column="name"]') as HTMLElement, 'y', { ctrlKey: true });
+		await nextTick();
+
+		expect(first.names()).toEqual(['a', 'c', 'd']);
+		expect(second.names()).toEqual(['x', 'b']);
+		scope.stop();
 	});
 
 	it('leaves a row from another grid in it when this grid has a row with its key, and warns', async () => {

@@ -201,6 +201,34 @@ describe('useDataGrid — row editing', () => {
 		expect(grid.rowEditing.lastCommit.value?.source).toBe('move');
 	});
 
+	it('undoes and redoes row changes with the `history` feature, which needs no cell `editing`', () => {
+		const source = shallowRef<readonly Row[]>(rows);
+		const grid = inSetup(() => useDataGrid({
+			columns,
+			rows: source,
+			rowKey: 'id',
+			rowHeight: 30,
+			features: {
+				rowEditing: rowEditing({
+					onCommit: (commit) => {
+						source.value = commit.rows;
+					},
+				}),
+				history: history(),
+			},
+		}));
+
+		grid.rowEditing.write([{ type: 'remove', key: 'b' }], 'remove');
+		grid.history.undo();
+
+		expect(source.value).toEqual(rows);
+		expect(grid.history.canRedo.value).toBe(true);
+
+		grid.history.redo();
+
+		expect(source.value.map(row => row.id)).toEqual(['a', 'c']);
+	});
+
 	it('gives a row a new parent through the `setParent` of the tree, for a `parentKey` that is a function', () => {
 		const source = shallowRef<readonly Row[]>(rows);
 		const grid = inSetup(() => useDataGrid({
@@ -505,7 +533,7 @@ describe('useDataGrid — types', () => {
 			rows,
 			rowKey: 'id',
 			rowHeight: 30,
-			// @ts-expect-error `history` needs `editing`
+			// @ts-expect-error `history` needs `editing` or `rowEditing`
 			features: { history: history() },
 		}))).toThrow('useGridHistory() needs the `editing`');
 		warn.mockRestore();
