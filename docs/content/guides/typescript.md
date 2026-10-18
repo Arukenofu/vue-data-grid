@@ -64,7 +64,7 @@ Do not write `useDataGrid<Person>({ … })`: an explicit type argument fixes the
 their defaults, and every feature handle becomes `undefined`. Type the rows or the columns instead.
 
 A feature that needs another one is a type error without it, at the place you pass it: `fill()`
-without `ranges` and `editing`, `history()` without `editing`.
+without `ranges` and `editing`, `history()` without `editing` or `rowEditing`.
 
 ### Features that take the row
 

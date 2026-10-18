@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	type ChangeStep,
 	clipboard,
 	defineColumn,
 	defineColumns,
@@ -74,11 +75,18 @@ const grid = useDataGrid({
 
 const { canUndo, canRedo } = grid.history;
 
+function describeStep(step: ChangeStep) {
+	const count = step.kind === 'cells' ? step.edits.length : step.changes.length;
+	const noun = step.kind === 'cells' ? 'cell' : 'row';
+
+	return count === 1 ? `1 ${noun}` : `${count} ${noun}s`;
+}
+
 const steps = computed(() => grid.history.steps.value
 	.map((step, index) => ({
 		id: index,
 		source: step.source,
-		cells: step.edits.length === 1 ? '1 cell' : `${step.edits.length} cells`,
+		cells: describeStep(step),
 	}))
 	.reverse());
 </script>

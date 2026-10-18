@@ -13,7 +13,8 @@ twin of cell editing for rows. A write never touches your rows — you get a com
 <Demo name="api-use-grid-row-editing" />
 
 Focus a row and add a task after it, or remove it; drag a row by its handle. Each is one commit,
-and the line above the grid shows the last one. The grid remembers the focused cell when focus
+and the line above the grid shows the last one; undo and redo them with the buttons, or with
+<kbd>Ctrl</kbd>+<kbd>Z</kbd> and <kbd>Ctrl</kbd>+<kbd>Y</kbd> on a cell. The grid remembers the focused cell when focus
 leaves it, as a grid does, and Tab comes back to it; the buttons act on its row, which the demo
 marks while focus is elsewhere.
 
@@ -181,6 +182,20 @@ const grid = useDataGrid({
 		}),
 	},
 });
+```
+
+### Undo and redo
+
+The [`history`](/composables/use-grid-history) feature records the commits of `rowEditing` with those
+of cell `editing`, in one stack: Ctrl+Z on a cell, or `grid.history.undo()`, writes the `undo` of the
+last commit back, as a commit from `'undo'`. Grids that rows move between share one history through
+`useGridHistory([first, second])`, and a drop between them is one step.
+
+```ts
+features: {
+	rowEditing: rowEditing({ onCommit: (commit) => { rows.value = commit.rows; } }),
+	history: history(),
+},
 ```
 
 ### Refusing some changes

@@ -5,6 +5,7 @@ import {
 	GridBody,
 	GridCells,
 	GridRow,
+	history,
 	navigation,
 	rowEditing,
 	useDataGrid,
@@ -12,7 +13,9 @@ import {
 } from '@vue-data-grid/core';
 import { dragHandleColumn, GridDragPreview, useGridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconPlus from '~icons/lucide/plus';
+import IconRedo from '~icons/lucide/redo-2';
 import IconTrash from '~icons/lucide/trash-2';
+import IconUndo from '~icons/lucide/undo-2';
 import { computed, shallowRef } from 'vue';
 
 import { type Task, tasks } from '@/data/tasks';
@@ -42,6 +45,7 @@ const grid = useDataGrid({
 				rows.value = commit.rows;
 			},
 		}),
+		history: history(),
 	},
 });
 
@@ -105,6 +109,14 @@ const status = computed(() => {
 			<UiButton :disabled="focusedKey === null" @click="remove">
 				<IconTrash aria-hidden="true" />
 				Remove task
+			</UiButton>
+			<UiButton :disabled="!grid.history.canUndo.value" @click="grid.history.undo()">
+				<IconUndo aria-hidden="true" />
+				Undo
+			</UiButton>
+			<UiButton :disabled="!grid.history.canRedo.value" @click="grid.history.redo()">
+				<IconRedo aria-hidden="true" />
+				Redo
 			</UiButton>
 			<span class="ui-toolbar-text">{{ status }}</span>
 		</UiToolbar>

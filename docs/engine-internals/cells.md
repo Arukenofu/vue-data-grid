@@ -650,7 +650,7 @@ Checked with Grep:
   `cancel`, `write`, `writeText` (paste and clear), `findEditable` (Tab), `canEdit`, `setDraft`,
   `setText`; the grid's `isEditing`/`getEditingColumn` come from it (`data-grid/use-data-grid.ts`,
   `components/grid-body.ts`).
-- `packages/core/src/editing/use-grid-history.ts`: passes the grid's editing to `useChangeHistory`.
+- `packages/core/src/editing/use-grid-history.ts`: passes the grid's editing to `useChangeHistory` as `cells`.
 - `packages/core/src/ranges/use-grid-fill.ts`: `write(writes, 'fill')`.
 - `packages/core/src/clipboard/use-clipboard.ts`: through the grid's editing, for paste.
 
@@ -658,54 +658,64 @@ Checked with Grep:
 
 ## `use-change-history.ts`
 
-### `useChangeHistory(editing, options?)`
+### `useChangeHistory(options)`
 
 ```ts
-function useChangeHistory<TRow = unknown>(
-	editing: Pick<CellEditing<TRow>, 'lastCommit' | 'write'>,
-	options?: ChangeHistoryOptions,
-): {
+function useChangeHistory<TRow = unknown>(options: ChangeHistoryOptions<TRow>): {
 	canUndo: ComputedRef<boolean>;
 	canRedo: ComputedRef<boolean>;
 	steps: ComputedRef<readonly ChangeStep[]>;
-	undo: () => CellWriteResult<TRow> | null;
-	redo: () => CellWriteResult<TRow> | null;
+	undo: () => ChangeReplay | null;
+	redo: () => ChangeReplay | null;
 	clear: () => void;
 }
 ```
 
 **Problem it solves.** Undo for a grid whose rows belong to the application and may change under it
 (streams, servers). Snapshots of rows would restore stale data; this history stores **values by
-address** and writes them back only where nothing has changed since.
+address** for cells and **guarded changes by key** for rows, and writes them back only where nothing
+has changed since.
 
 #### Options and types
 
+- `cells`: `HistoryCellEditing` (`Pick<CellEditing, 'lastCommit' | 'write'>`) or several.
+- `rows`: `HistoryRowEditing` (`lastCommit` and a `write` method, so the row editing of any rows
+  fits) or several, such as the grids of a drag group.
+- At least one of them; without either it throws.
 - `limit`: `MaybeRefOrGetter<number>`, how many steps undo keeps; `100` by default, `0` keeps none.
-- `ChangeStep`: `{ source, edits }`, one commit.
+- `ChangeStep`: `CellChangeStep` (`{ kind: 'cells', source, edits }`) or `RowChangeStep`
+  (`{ kind: 'rows', source, changes }`).
 - `ChangeStepEdit extends CellAddress`: `{ key, column, before, after }`.
-- `ChangeHistory<TRow>` is `ReturnType<typeof useChangeHistory<TRow>>`.
-
-The first parameter is `Pick<CellEditing, 'lastCommit' | 'write'>`: any object with those two members
-works, not only the one `useCellEditing` returns.
+- `ChangeReplay`: `{ kind: 'cells', step, result }` or `{ kind: 'rows', step, results }`.
+- Steps and replays are of `unknown` rows: a history may span grids, and the `history` feature of a
+  grid has no option to infer its rows from, so a `TRow` in its output would be `unknown` there and
+  break the assignment to the grid's handle. `TRow` types the inputs only.
 
 #### How it works
 
-State: two `shallowRef` arrays, `done` and `undone` (the redo stack), both replaced rather than
-mutated.
+State: two `shallowRef` arrays of entries, `done` and `undone` (the redo stack), both replaced rather
+than mutated. An entry is a step with what replays it: the cell editing for cells, and for rows the
+parts, one per commit, each with its editing, its commit and `next`, the changes the next replay
+writes there.
 
-**Recording.** `watch(editing.lastCommit, ..., { flush: 'sync' })`:
+**Recording cells.** `watch(cells.lastCommit, ..., { flush: 'sync' })` for each cell editing:
 
 1. Ignores `null` and commits whose `source` is `'undo'` or `'redo'`, so replays are not steps.
-2. Turns the commit into a `ChangeStep`: only `key`, `column`, `before` and `after` of each edit. It does
-   **not** keep `row`, so rows are not held in memory.
-3. `done = [...done, step].slice(-limit)` (`limit` is `Math.max(toValue(limit) ?? 100, 0)`, read at
+2. Turns the commit into a `CellChangeStep`: only `key`, `column`, `before` and `after` of each edit.
+   It does **not** keep `row`, so rows are not held in memory.
+3. `done = [...done, entry].slice(-limit)` (`limit` is `Math.max(toValue(limit) ?? 100, 0)`, read at
    commit time; `0` gives `[]`), and `undone` is cleared: a new edit ends the redo branch.
 
-`flush: 'sync'` means the step is recorded inside the write, before the caller sees the result, and a
-second commit in the same tick is never lost to batching. A whole paste or fill is one commit and so
-one step.
+**Recording rows.** The same watch for each row editing. A commit whose `link` is a commit of the
+last step's parts joins that step (`joinLast`): its changes are appended and it becomes another part.
+That is how a drop between grids, an add to one and a removal from the other linked by
+`useGridRowDrag`, is one step. Any other commit is a new step with one part, `next` its `undo`.
 
-**Replaying.** `replay(step, 'undo' | 'redo')` calls `editing.write` with one write per edit:
+`flush: 'sync'` means the step is recorded inside the write, before the caller sees the result, and a
+second commit in the same tick is never lost to batching. A whole paste, fill or drop is one commit
+and so one step.
+
+**Replaying cells.** `editing.write` with one write per edit:
 
 | | `value` | `expected` |
 | --- | --- | --- |
@@ -714,37 +724,45 @@ one step.
 
 `expected` is the guard: the write goes through only if the cell still holds what the step left
 there (by the column's `equals`). A cell changed since (a stream, the server, another edit) or a row
-that is gone is reported in the result's `skipped` instead of being overwritten with an old value. The
-source is `'undo'` or `'redo'`.
+that is gone is reported in the result's `skipped` instead of being overwritten with an old value.
 
-**`undo()`** pops the last step from `done`, pushes it to `undone` and replays. **`redo()`** is the
-mirror. Both return the `CellWriteResult` of the write, or `null` with nothing to undo/redo.
+**Replaying rows.** Each part writes its `next` with the source `'undo'` or `'redo'` (undo goes
+through the parts last first), and keeps the `undo` of that write's commit as its new `next`: the
+redo of an undo is the undo of the undo's commit, with the guards of `applyRowChanges` (`expected`,
+`from`, `subtree`), so a row changed since is skipped, and so is the removal of an added row that
+other rows came under. A part whose write skipped everything has nothing to replay next.
+
+**`undo()`** pops the last entry from `done`, pushes it to `undone` and replays. **`redo()`** is the
+mirror. Both return a `ChangeReplay`, or `null` with nothing to undo/redo.
 
 **`clear()`** empties both stacks (such as after loading another data set).
 
 #### Invariants and edge cases
 
-- The step is **moved before the write**: even if every cell is skipped, or `onBeforeCommit` refuses the
-  replay, the step has left the stack. The result's `skipped` is where the caller sees it.
-- The replay's own commit comes back through `lastCommit` with a source of `'undo'`/`'redo'` and is
-  ignored. That is why the sources are reserved (see `CellEditSource`).
+- The step is **moved before the write**: even if every change is skipped, or `onBeforeCommit` refuses
+  the replay, the step has left the stack. The results' `skipped` is where the caller sees it.
+- The replay's own commits come back through `lastCommit` with a source of `'undo'`/`'redo'` and are
+  ignored. That is why the sources are reserved (see `CellEditSource` and `RowEditSource`).
 - Only commits made *after* the history is created are recorded.
-- A commit has at most one edit per cell (see `toSingleWrites`), so replay order inside a step does not
-  matter.
+- A commit has at most one edit per cell (see `toSingleWrites`), so replay order inside a cell step
+  does not matter; parts of a row step replay in reverse for undo.
+- A linked commit whose editing is not in this history is a step of its own elsewhere: grids that
+  exchange rows share one history, or each undoes only its half of a drop.
 - Lowering `limit` does not trim existing steps until the next commit; the redo stack is not trimmed.
 
 #### Reference stability
 
-`steps` is `computed(() => done.value)`: the stack's own array, replaced on each change, so it is a
-cheap dependency. The edits of a step are fresh objects but never change afterwards.
+`steps` maps the entries of `done` to their steps: a new array only when `done` changes. The steps
+never change afterwards; a joined step is a new object.
 
 #### Where it is used
 
 Checked with Grep:
 
-- `packages/core/src/editing/use-grid-history.ts`: `useChangeHistory(grid.editing, historyOptions)`,
-  with key bindings calling `undo` and `redo`.
-- `packages/engine/tests/cells/use-change-history.spec.ts` (with `useCellEditing`).
+- `packages/core/src/editing/use-grid-history.ts`: `useChangeHistory({ cells, rows })` over the
+  `editing` and `rowEditing` of one grid or several, with key bindings calling `undo` and `redo` on
+  each.
+- `packages/engine/tests/cells/use-change-history.spec.ts` (with `useCellEditing` and `useRowEditing`).
 
 ---
 

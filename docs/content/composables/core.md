@@ -217,7 +217,7 @@ for a grid.
 | `useCellFocus` | The same for a grid of body cells only, addressed by row key and column. |
 | `useCellRanges` | Cell ranges: corners, bounds, rectangles to draw, `aria-selected` per row, the text for the clipboard. |
 | `useCellEditing` | Rights, parsing, validation, immutable writes with a source, `onBeforeCommit`. |
-| `useChangeHistory` | Undo and redo of the commits of an editing. |
+| `useChangeHistory` | Undo and redo of the commits of cell and row editing, in one stack; linked commits of several row editings are one step. |
 | `useCellChanges` | Recent changes of cell values and their direction, for a flash or an arrow. |
 
 And the pure functions: `toCsv`, `parseDelimited`, `resolvePaste`, `resolveFill`, `getFillTarget`,

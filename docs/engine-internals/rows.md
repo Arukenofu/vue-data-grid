@@ -920,7 +920,10 @@ The twin of `useCellEditing` for rows. `options.rows` is read with `toValue` at 
 return other changes (applied again to the same rows, their skips added) or `false`. When the rows
 did not change there is no commit. Otherwise the commit is `{ source, changes, undo, rows, apply }`,
 `onCommit` gets it and `lastCommit` holds it. `undo` is a getter over the result: a batch that took
-the one-pass path works its undo out only when something reads it. `apply(list)` returns the cached `rows` for the very
+the one-pass path works its undo out only when something reads it. `write(changes, source, { link })` puts
+`link` on the commit (`null` without it): the commit it goes with, such as the add of a dropped row
+to the grid it went to for the removal from the grid it left, which `useChangeHistory` makes one
+step. `apply(list)` returns the cached `rows` for the very
 array the commit was made from, and applies the changes again to any other array, such as one a
 stream changed since.
 

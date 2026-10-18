@@ -69,7 +69,7 @@ the engine renders them, and the rest work on the rendered grid:
 | 11 | `clipboard` | ranges, navigation, editing | copy, cut and paste |
 
 A feature that needs another one does not compile without it: `fill()` in a grid without `ranges`
-and `editing` is a type error at the call, and `history()` without `editing` too. Features that only
+and `editing` is a type error at the call, and `history()` without `editing` or `rowEditing` too. Features that only
 use another when it is there, as `ranges` uses the navigation's focus, work alone as well.
 
 ## The factories
@@ -176,7 +176,8 @@ into your rows. The options are those of [useGridEditing](/composables/use-grid-
 
 ### history
 
-Undo and redo of the edits, with Ctrl+Z and Ctrl+Y. Needs `editing`. The options are those of
+Undo and redo of the edits of cells and the changes of rows, with Ctrl+Z and Ctrl+Y. Needs
+`editing`, `rowEditing` or both. The options are those of
 [useGridHistory](/composables/use-grid-history): `limit` and `enabled`.
 
 ### fill

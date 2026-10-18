@@ -217,6 +217,8 @@ already keeps it where it was. A `drop` listener gets the event on the grid the 
 does to share its lists with an archive; with `rowEditing` as well, it calls
 `event.preventDefault()`. A row with rows under it in a tree, or a drop into another group of a grid
 with `grouping`, is left to such a listener: the grid cannot say it as a change of its rows.
+Grids that share their rows share a history too: `useGridHistory([backlog, sprint])` undoes a drop
+between them as one step, with Ctrl+Z on either grid ([useGridHistory](/composables/use-grid-history)).
 
 <Demo name="drag-between-grids" />
 
