@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, type ShallowRef, shallowRef, type VNodeChild } from 'vue';
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
-import type { CellWriteResult, EditingCell as EditingCellOf } from '@vue-data-grid/engine';
+import type { CellWriteResult, ChangeReplay, EditingCell as EditingCellOf } from '@vue-data-grid/engine';
 
 import type { CellContext, CellEditor, CellTyping, EditorContext } from '../../src/columns/column-fields';
 import type { GridBodyRow } from '../../src/components/context';
@@ -1168,7 +1168,7 @@ describe('useGridEditing — the default editor', () => {
 				const grid = createGrid(rows, {});
 
 				expectTypeOf(grid.editing.cell.value).toEqualTypeOf<EditingCellOf<Row> | null>();
-				expectTypeOf(grid.history.undo).returns.toEqualTypeOf<CellWriteResult<Row> | null>();
+				expectTypeOf(grid.history.undo).returns.toEqualTypeOf<ChangeReplay | null>();
 
 				return () => null;
 			},

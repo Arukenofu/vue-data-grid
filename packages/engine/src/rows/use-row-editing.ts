@@ -22,6 +22,12 @@ export interface RowCommit<TRow = unknown> {
 	/** The rows after the commit. */
 	rows: readonly TRow[];
 	/**
+	 * The commit this one goes with, from the `link` of its write, such as the add of a dropped row to
+	 * the grid it went to for its removal from the grid it left: a history makes them one step. `null`
+	 * for none.
+	 */
+	link: RowCommit | null;
+	/**
 	 * Your rows with the commit: `rows` for the array it was made from, and for another one, such as
 	 * one a stream changed since, the changes applied to it.
 	 */
@@ -33,6 +39,12 @@ export interface RowCommit<TRow = unknown> {
 export interface RowCommitRequest<TRow = unknown> {
 	changes: readonly RowChange<TRow>[];
 	source: RowEditSource;
+}
+
+/** How a write commits. */
+export interface RowWriteOptions {
+	/** The commit this one goes with, as one step of a history: see `RowCommit.link`. */
+	link?: RowCommit | null;
 }
 
 /** What a write did. */
@@ -86,9 +98,11 @@ export function useRowEditing<TRow = unknown>(options: RowEditingOptions<TRow>) 
 		result: RowChangeResult<TRow>,
 		source: RowEditSource,
 		changeOptions: RowChangeOptions<TRow>,
+		link: RowCommit | null,
 	): RowCommit<TRow> {
 		return {
 			source,
+			link,
 			changes: result.applied,
 			// Read through, not copied: a commit nothing undoes does not work out its undo.
 			get undo() {
@@ -103,7 +117,7 @@ export function useRowEditing<TRow = unknown>(options: RowEditingOptions<TRow>) 
 	 * Writes changes of rows as one commit from `source`, in order, each on the rows the ones before it
 	 * left. Changes that do not apply are skipped; a write that changes nothing commits nothing.
 	 */
-	function write(changes: readonly RowChange<TRow>[], source: RowEditSource): RowWriteResult<TRow> {
+	function write(changes: readonly RowChange<TRow>[], source: RowEditSource, writeOptions: RowWriteOptions = {}): RowWriteResult<TRow> {
 		const rows = toValue(options.rows);
 		const changeOptions = getChangeOptions();
 		const first = applyRowChanges(rows, changes, changeOptions);
@@ -120,7 +134,7 @@ export function useRowEditing<TRow = unknown>(options: RowEditingOptions<TRow>) 
 			return { source, commit: null, skipped };
 		}
 
-		const commit = createCommit(rows, result, source, changeOptions);
+		const commit = createCommit(rows, result, source, changeOptions, writeOptions.link ?? null);
 
 		options.onCommit(commit);
 		lastCommit.value = commit;

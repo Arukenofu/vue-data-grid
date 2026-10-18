@@ -117,6 +117,7 @@ export type {
 	RowStreamOptions,
 	RowTree,
 	RowTreeOptions,
+	RowWriteOptions,
 	RowWriteResult,
 	SelectionMode,
 	SortedRowsOptions,
@@ -141,6 +142,7 @@ export {
 } from './rows';
 export type {
 	CellAddress,
+	CellChangeStep,
 	CellChange,
 	CellChangeDirection,
 	CellChangesOptions,
@@ -167,6 +169,7 @@ export type {
 	CellWriteResult,
 	ChangeHistory,
 	ChangeHistoryOptions,
+	ChangeReplay,
 	ChangeStep,
 	ChangeStepEdit,
 	CsvColumn,
@@ -181,6 +184,8 @@ export type {
 	GridFocusRequest,
 	GridPosition,
 	GridSection,
+	HistoryCellEditing,
+	HistoryRowEditing,
 	InvalidCellWrite,
 	PasteResult,
 	RangeBounds,
@@ -189,6 +194,7 @@ export type {
 	RangeRect,
 	RangeSelectMode,
 	RangeTextOptions,
+	RowChangeStep,
 	SectionCell,
 } from './cells';
 export {

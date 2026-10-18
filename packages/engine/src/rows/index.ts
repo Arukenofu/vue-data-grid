@@ -37,6 +37,7 @@ export type {
 	RowEditing,
 	RowEditingOptions,
 	RowEditSource,
+	RowWriteOptions,
 	RowWriteResult,
 } from './use-row-editing';
 export { useRowEditing } from './use-row-editing';

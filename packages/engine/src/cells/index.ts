@@ -35,7 +35,17 @@ export type {
 	InvalidCellWrite,
 } from './use-cell-editing';
 export { useCellEditing } from './use-cell-editing';
-export type { ChangeHistory, ChangeHistoryOptions, ChangeStep, ChangeStepEdit } from './use-change-history';
+export type {
+	CellChangeStep,
+	ChangeHistory,
+	ChangeHistoryOptions,
+	ChangeReplay,
+	ChangeStep,
+	ChangeStepEdit,
+	HistoryCellEditing,
+	HistoryRowEditing,
+	RowChangeStep,
+} from './use-change-history';
 export { useChangeHistory } from './use-change-history';
 export type { CellFocus, CellFocusOptions, CellFocusRequest, FocusedCell } from './use-cell-focus';
 export { useCellFocus } from './use-cell-focus';
