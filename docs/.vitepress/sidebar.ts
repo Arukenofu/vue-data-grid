@@ -101,6 +101,7 @@ const composables: DefaultTheme.SidebarItem[] = [
 			{ text: 'useClipboard', link: '/composables/use-clipboard' },
 			{ text: 'useGridEditing', link: '/composables/use-grid-editing' },
 			{ text: 'useGridHistory', link: '/composables/use-grid-history' },
+			{ text: 'useGridRowEditing', link: '/composables/use-grid-row-editing' },
 			{ text: 'useGridFill', link: '/composables/use-grid-fill' },
 			{ text: 'useGridRowDrag', link: '/composables/use-grid-row-drag' },
 			{ text: 'useGridColumnDrag', link: '/composables/use-grid-column-drag' },

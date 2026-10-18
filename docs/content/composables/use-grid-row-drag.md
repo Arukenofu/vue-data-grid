@@ -7,8 +7,8 @@ description: Dragging the rows of a grid with a pointer, a finger or the keyboar
 
 <Description>
 Dragging the rows of a grid with a pointer, a finger or the keyboard: within the grid, into and
-out of the groups of a tree, and between grids of a group. The grid never touches your rows —
-`onDrop` says where a row goes, and you move it.
+out of the groups of a tree, and between grids of a group. A drop is a change of your rows: the
+grid's `rowEditing` feature writes it, or your `onDrop` does.
 </Description>
 
 <Demo name="api-use-grid-row-drag" />
@@ -25,7 +25,7 @@ grid:
 <InstallTabs packages="@vue-data-grid/core @vue-data-grid/drag-and-drop" />
 
 ```ts
-import { moveRow } from '@vue-data-grid/core';
+import { rowEditing } from '@vue-data-grid/core';
 import { dragHandleColumn, useGridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 
 const columns = defineColumns({
@@ -33,25 +33,46 @@ const columns = defineColumns({
 	title: column('title', { label: 'Title' }),
 });
 
-const grid = useDataGrid({ columns, rows, rowKey: 'id', rowHeight: 42 });
-
-useGridRowDrag(grid, {
-	handle: true,
-	onDrop: ({ key, row, parent, index }) => {
-		rows.value = moveRow(rows.value, { key, row, parent, index }, { rowKey: 'id' });
+const grid = useDataGrid({
+	columns,
+	rows,
+	rowKey: 'id',
+	rowHeight: 42,
+	features: {
+		rowEditing: rowEditing({ onCommit: (commit) => { rows.value = commit.rows; } }),
 	},
 });
+
+useGridRowDrag(grid, { handle: true });
 ```
 
 Call it in the component that renders the grid: the rows below register themselves with it. The
 `GridRowDrag` part does the same from the template, with the options as props.
+
+A drop is a change of the rows, `event.change`: a `move` of an own row, an `add` of a row from
+another grid. The grid's [`rowEditing`](/composables/use-grid-row-editing) feature writes it, as a
+commit from `'drop'`, and a row from another grid of the group leaves that grid's rows through its
+`rowEditing` too. `onDrop` runs first: listen there, or call `event.preventDefault()` and write the
+change yourself, such as through `applyRowChanges` in a grid without `rowEditing`:
+
+```ts
+useGridRowDrag(grid, {
+	onDrop: (event) => {
+		rows.value = applyRowChanges(rows.value, [event.change], { rowKey: 'id' }).rows;
+	},
+});
+```
+
+The grid leaves a drop to you, and warns in development, where it cannot say it as a change of its
+rows: a row dropped into another group of a grid with `grouping`, whose group is a field of the
+row, and a row with rows under it from another grid, which would leave them behind.
 
 ## Options
 
 <PropsTable
 	label="Option"
 	:data="[
-		{ name: 'onDrop', type: '(event: GridRowDropEvent) => void', description: 'A row was dropped: `{ key, row, parent, index, external, source }`. `index` is the place among the children of `parent` once the row is taken out, what `moveRow` takes. A grid that takes no rows, with `reorder: false` outside a group, needs none.' },
+		{ name: 'onDrop', type: '(event: GridRowDropEvent) => void', description: 'A row was dropped: `{ key, row, parent, index, external, source, change, preventDefault }`. `row` is the row as it is at the drop, `index` the place among the children of `parent` once the row is taken out, and `change` the drop as a change of `applyRowChanges`. After it the `rowEditing` feature of the grid writes `change`, unless it calls `preventDefault()`. A grid that takes no rows, with `reorder: false` outside a group, needs none.' },
 		{ name: 'handle', type: 'MaybeRefOrGetter<boolean>', default: 'false', description: 'Drags start only on a `GridDragHandle`, which also drags with the keyboard. Without it the whole row drags with a pointer, and controls in its cells keep their clicks.' },
 		{ name: 'enabled', type: 'MaybeRefOrGetter<boolean>', default: 'while unsorted', description: 'Whether rows can be dragged now. By default a grid that reorders drags only while it is not sorted, as the order is then the sort\'s; one with `reorder: false` always.' },
 		{ name: 'group', type: 'MaybeRefOrGetter<string>', description: 'A name shared by grids that take each other\'s rows.' },
@@ -96,17 +117,23 @@ Call it in the component that renders the grid: the rows below register themselv
 
 ### A tree
 
-In a grid with the `tree` feature a row can be dropped before, after or inside another. Move it
-with `moveRow` and its `parentKey`, which gives the row its new parent:
+In a grid with the `tree` feature a row can be dropped before, after or inside another. The
+`rowEditing` feature follows the tree's `parentKey` or `childrenField`, and gives the row its new
+parent:
 
 ```ts
-useGridRowDrag(grid, {
-	handle: true,
-	canNest: file => file.kind === 'folder',
-	onDrop: ({ key, row, parent, index }) => {
-		files.value = moveRow(files.value, { key, row, parent, index }, { rowKey: 'id', parentKey: 'parent' });
+const grid = useDataGrid({
+	columns,
+	rows: files,
+	rowKey: 'id',
+	rowHeight: 40,
+	features: {
+		tree: tree({ parentKey: 'parent' }),
+		rowEditing: rowEditing({ onCommit: (commit) => { files.value = commit.rows; } }),
 	},
 });
+
+useGridRowDrag(grid, { handle: true, canNest: file => file.kind === 'folder' });
 ```
 
 A group being dragged collapses while it moves, so it is one row under the pointer, and opens again
@@ -114,18 +141,21 @@ at its place. A drop into a collapsed group expands it.
 
 ### Between two grids
 
-Give both grids the same `group`. A row dropped on the other grid arrives with `external: true`
-and the grid it came from in `source`:
+Give both grids the same `group`. With the `rowEditing` feature on both, a row dropped on the other
+grid moves from the rows of one to the rows of the other: it is added here first, and leaves the
+other grid only once it is. A key this grid has already keeps the row where it was. Without
+`rowEditing`, the row arrives with `external: true`, the grid it came from in `source`, and
+`change` an `add`:
 
 ```ts
-useGridRowDrag(todo, {
+useGridRowDrag(todoGrid, {
 	group: 'tasks',
-	onDrop: ({ key, row, index, external }) => {
-		if (external) {
-			doing.value = doing.value.filter(task => task.id !== key);
+	onDrop: (event) => {
+		if (event.external) {
+			doingRows.value = doingRows.value.filter(task => task.id !== event.key);
 		}
 
-		todo.value = moveRow(todo.value, { key, row, index, parent: null }, { rowKey: 'id' });
+		todoRows.value = applyRowChanges(todoRows.value, [event.change], { rowKey: 'id' }).rows;
 	},
 });
 ```
@@ -133,7 +163,7 @@ useGridRowDrag(todo, {
 ### Rows that only leave
 
 With `reorder: false` the grid keeps its order: its rows go only to other grids of the group and to
-drop zones, and it needs no `onDrop` unless it takes rows from the group.
+drop zones, and it needs neither `onDrop` nor `rowEditing` unless it takes rows from the group.
 
 ```ts
 useGridRowDrag(files, { group: 'files', reorder: false });
@@ -144,18 +174,23 @@ useGridRowDrag(files, { group: 'files', reorder: false });
 Move the row at once and move it back if the server refuses. `useGridMotion` animates both.
 
 ```ts
-onDrop: async (move) => {
+onDrop: async (event) => {
+	event.preventDefault();
+
 	const before = rows.value;
 
-	rows.value = moveRow(before, move, { rowKey: 'id' });
+	rows.value = applyRowChanges(before, [event.change], { rowKey: 'id' }).rows;
 
 	try {
-		await api.reorder(move.key, move.index);
+		await api.reorder(event.key, event.index);
 	} catch {
 		rows.value = before;
 	}
 },
 ```
+
+With `rowEditing`, save its commits instead: see
+[saving to a server](/composables/use-grid-row-editing#saving-to-a-server).
 
 ## Accessibility
 

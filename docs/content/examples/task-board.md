@@ -43,19 +43,18 @@ const sprint = computed(() => tasks.value.filter(task => task.list === 'sprint')
 const backlog = computed(() => tasks.value.filter(task => task.list === 'backlog'));
 ```
 
-A drop, from either grid and to either grid, is then one move in that array. `moveRow` from the
-core does it: `parentKey` names the field that holds the list, so the row goes `index`-th among the
-tasks of its new list, and gets its new `list` as a new object:
+A drop, from either grid and to either grid, is then one move in that array. `applyRowChanges`
+from the core does it: `parentKey` names the field that holds the list, so the row goes `index`-th
+among the tasks of its new list, and gets its new `list` as a new object:
 
 ```ts
 function move(list: ListName, key: string, index: number) {
-	const task = tasks.value.find(item => item.id === key);
-
-	if (task) {
-		tasks.value = moveRow(tasks.value, { key, row: task, parent: list, index }, { rowKey: 'id', parentKey: 'list' });
-	}
+	tasks.value = applyRowChanges(tasks.value, [{ type: 'move', key, parent: list, index }], { rowKey: 'id', parentKey: 'list' }).rows;
 }
 ```
+
+The children of a parent are the rows that name it, also when no row has its key, as `'sprint'`
+and `'backlog'` here.
 
 The grids never change your data themselves. A drop only tells you where the row should go, and
 the grid shows the result once your rows have it.

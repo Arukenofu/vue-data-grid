@@ -166,6 +166,7 @@ two of them sized by the row window:
 		{ name: 'sorting', type: 'GridRowsFeature | undefined', description: 'The rows after sorting.' },
 		{ name: 'tree', type: 'GridTreeFeature | undefined', description: 'Nodes, expand and collapse.' },
 		{ name: 'selection', type: 'GridSelectionFeature | undefined', description: 'Selected rows and what changes them.' },
+		{ name: 'rowEditing', type: 'GridRowEditingFeature | undefined', description: 'Commits that add, update, remove and move rows: `write` and `lastCommit`.' },
 		{ name: 'navigation', type: 'GridNavigationFeature | undefined', description: 'The focused cell and `focusCell`.' },
 		{ name: 'ranges', type: 'CellRanges | undefined', description: 'Cell ranges.' },
 		{ name: 'editing', type: 'GridEditingFeature | undefined', description: 'The cell being edited, writes, paste.' },

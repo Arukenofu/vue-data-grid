@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { moveRow } from '@vue-data-grid/core';
+import { applyRowChanges } from '@vue-data-grid/core';
 import type { GridRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 import { type ShallowRef, shallowRef } from 'vue';
 
@@ -23,11 +23,8 @@ function drop(lane: Lane, { key, index }: GridRowDropEvent<unknown>) {
 		return;
 	}
 
-	if (source !== target) {
-		source.value = source.value.filter(item => item.id !== key);
-	}
-
-	target.value = moveRow(target.value, { key, row: task, parent: null, index }, { rowKey: 'id' });
+	source.value = source.value.filter(item => item.id !== key);
+	target.value = applyRowChanges(target.value, [{ type: 'add', row: task, index }], { rowKey: 'id' }).rows;
 }
 </script>
 

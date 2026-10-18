@@ -9,14 +9,14 @@ import {
 	GridHeaderRow,
 	GridRoot,
 	GridRow,
-	moveRow,
+	rowEditing,
 	selection,
 	selectionColumn,
 	tree,
 	treeColumn,
 	useDataGrid,
 } from '@vue-data-grid/core';
-import { dragHandleColumn, GridDragPreview, type GridRowDropEvent, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { dragHandleColumn, GridDragPreview, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconGripVertical from '~icons/lucide/grip-vertical';
 import { shallowRef } from 'vue';
 
@@ -55,18 +55,15 @@ const grid = useDataGrid({
 	features: {
 		tree: tree({ parentKey: 'parent', defaultExpanded: -1 }),
 		selection: selection(),
+		rowEditing: rowEditing({
+			onCommit: (commit) => {
+				rows.value = commit.rows;
+			},
+		}),
 	},
 });
 
 const { selectedCount } = grid.selection;
-
-function drop({ key, parent, index }: GridRowDropEvent<unknown>) {
-	const row = rows.value.find(item => item.id === key);
-
-	if (row) {
-		rows.value = moveRow(rows.value, { key, row, parent, index }, { rowKey: 'id', parentKey: 'parent' });
-	}
-}
 </script>
 
 <template>
@@ -81,7 +78,7 @@ function drop({ key, parent, index }: GridRowDropEvent<unknown>) {
 					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
 				</GridHeaderRow>
 			</GridHeader>
-			<GridRowDrag handle @drop="drop">
+			<GridRowDrag handle>
 				<GridBody v-slot="{ rows: bodyRows }">
 					<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
 						<GridCells />

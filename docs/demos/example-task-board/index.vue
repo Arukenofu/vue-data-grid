@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { moveRow } from '@vue-data-grid/core';
+import { applyRowChanges } from '@vue-data-grid/core';
 import { GridDropZone } from '@vue-data-grid/core/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
 import IconArchiveRestore from '~icons/lucide/archive-restore';
@@ -21,11 +21,7 @@ const committed = computed(() => sprint.value.reduce((sum, task) => sum + task.e
 const overCapacity = computed(() => committed.value > SPRINT_CAPACITY);
 
 function move(list: ListName, key: string, index: number) {
-	const task = tasks.value.find(item => item.id === key);
-
-	if (task) {
-		tasks.value = moveRow(tasks.value, { key, row: task, parent: list, index }, { rowKey: 'id', parentKey: 'list' });
-	}
+	tasks.value = applyRowChanges(tasks.value, [{ type: 'move', key, parent: list, index }], { rowKey: 'id', parentKey: 'list' }).rows;
 }
 
 function transfer(key: string, list: ListName) {

@@ -9,15 +9,14 @@ import {
 	GridHeaderRow,
 	GridRoot,
 	GridRow,
-	moveRow,
 	navigation,
+	rowEditing,
 	useDataGrid,
 } from '@vue-data-grid/core';
 import {
 	type DragIndicator,
 	GridDragHandle,
 	GridDragPreview,
-	type GridRowDropEvent,
 	type GridRowDropTarget,
 	GridRowDrag,
 } from '@vue-data-grid/core/drag-and-drop';
@@ -59,7 +58,14 @@ const grid = useDataGrid({
 	rows,
 	rowKey: 'id',
 	rowHeight: 40,
-	features: { navigation: navigation() },
+	features: {
+		navigation: navigation(),
+		rowEditing: rowEditing({
+			onCommit: (commit) => {
+				rows.value = commit.rows;
+			},
+		}),
+	},
 });
 
 const locked = new Set(tracks.filter(track => track.locked).map(track => track.id));
@@ -81,14 +87,6 @@ function canDrag(_row: unknown, key: string) {
 function canDrop({ index }: GridRowDropTarget<unknown>) {
 	return index > 0 && index < rows.value.length - 1;
 }
-
-function drop({ key, index }: GridRowDropEvent<unknown>) {
-	const row = rows.value.find(track => track.id === key);
-
-	if (row) {
-		rows.value = moveRow(rows.value, { key, row, parent: null, index }, { rowKey: 'id' });
-	}
-}
 </script>
 
 <template>
@@ -106,7 +104,7 @@ function drop({ key, index }: GridRowDropEvent<unknown>) {
 					<GridHeaderCell v-for="header in headers" :key="header.key" :column="header" />
 				</GridHeaderRow>
 			</GridHeader>
-			<GridRowDrag :handle="handle" :indicator="indicator" :can-drag="canDrag" :can-drop="canDrop" @drop="drop">
+			<GridRowDrag :handle="handle" :indicator="indicator" :can-drag="canDrag" :can-drop="canDrop">
 				<GridBody v-slot="{ rows: bodyRows }">
 					<GridRow v-for="row in bodyRows" :key="row.key" :row="row">
 						<GridCells v-slot="{ column }">

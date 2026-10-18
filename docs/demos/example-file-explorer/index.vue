@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	applyRowChanges,
 	defineColumn,
 	defineColumns,
 	GridBody,
@@ -7,7 +8,6 @@ import {
 	GridCellTemplate,
 	GridRow,
 	type GridSort,
-	moveRow,
 	navigation,
 	tree,
 	treeColumn,
@@ -71,11 +71,7 @@ useGridRowDrag(grid, {
 	canDrop: ({ row, parent }) => row.parent !== parent,
 	getLabel: file => file.name,
 	onDrop: ({ key, parent, index }) => {
-		const file = files.value.find(entry => entry.id === key);
-
-		if (file) {
-			files.value = moveRow(files.value, { key, row: file, parent, index }, { rowKey: 'id', parentKey: 'parent' });
-		}
+		files.value = applyRowChanges(files.value, [{ type: 'move', key, parent, index }], { rowKey: 'id', parentKey: 'parent' }).rows;
 	},
 });
 

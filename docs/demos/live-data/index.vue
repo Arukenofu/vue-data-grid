@@ -84,13 +84,11 @@ useGridMotion(grid, { when: () => animated.value });
 function update() {
 	const picked = Array.from({ length: STOCKS_PER_UPDATE }, () => random.pick(stocks).id);
 
-	stream.apply({
-		update: picked.flatMap((key) => {
-			const stock = stream.getRow(key);
+	stream.apply(picked.flatMap((key) => {
+		const stock = stream.getRow(key);
 
-			return stock ? [tickStock(stock, random)] : [];
-		}),
-	});
+		return stock ? [{ type: 'update', row: tickStock(stock, random) }] : [];
+	}));
 }
 
 let ticker: ReturnType<typeof setInterval> | undefined;

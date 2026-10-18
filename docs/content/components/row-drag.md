@@ -61,7 +61,8 @@ ghost under the pointer.
 ### GridRowDrag
 
 `useGridRowDrag` as a part. Its props are the options of the composable, and its `drop` event is
-`onDrop`.
+`onDrop`: after the listeners, the grid's [`rowEditing`](/composables/use-grid-row-editing) feature
+moves the row, unless a listener calls `event.preventDefault()`.
 
 <PropsTable
 	:data="[
@@ -87,7 +88,7 @@ ghost under the pointer.
 
 <EmitsTable
 	:data="[
-		{ name: 'drop', payload: 'GridRowDropEvent', description: 'A row was dropped on the grid: `{ key, row, parent, index, external, source }`. Move it in your data, such as with `moveRow`. `index` is the place among the children of `parent`, counted once the row is taken out.' },
+		{ name: 'drop', payload: 'GridRowDropEvent', description: 'A row was dropped on the grid: `{ key, row, parent, index, external, source, change, preventDefault }`. `index` is the place among the children of `parent`, counted once the row is taken out, and `change` the drop as a change of `applyRowChanges`. After the listeners the `rowEditing` feature of the grid writes `change`, unless one calls `preventDefault()`; without `rowEditing`, write it in your data.' },
 	]"
 />
 
@@ -147,23 +148,41 @@ the row drag, with the keyboard too. The row is its `row` prop, else the `GridRo
 
 ### Moving the row in your data
 
-The event says where the row goes; `moveRow` returns your rows with it moved, every other row the
-same object:
+With the `rowEditing` feature the grid moves the row in your data itself, a commit that `onCommit`
+writes into your rows, and `GridRowDrag` needs no `drop` listener:
 
 ```ts
-import { moveRow } from '@vue-data-grid/core';
+const grid = useDataGrid({
+	columns,
+	rows,
+	rowKey: 'id',
+	rowHeight: 44,
+	features: {
+		rowEditing: rowEditing({ onCommit: (commit) => { rows.value = commit.rows; } }),
+	},
+});
+```
+
+```vue
+<GridRowDrag handle>
+```
+
+Without `rowEditing`, a listener of your own moves the row in one line, every other row the same
+object:
+
+```ts
+import { applyRowChanges } from '@vue-data-grid/core';
 import type { GridRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 
-function drop({ key, index }: GridRowDropEvent<unknown>) {
-	const row = rows.value.find(track => track.id === key);
-
-	if (row) {
-		rows.value = moveRow(rows.value, { key, row, parent: null, index }, { rowKey: 'id' });
-	}
+function drop({ key, parent, index }: GridRowDropEvent<unknown>) {
+	rows.value = applyRowChanges(rows.value, [{ type: 'move', key, parent, index }], { rowKey: 'id' }).rows;
 }
 ```
 
-In a tree, pass the `parent` of the event and `parentKey`, and the row moves under its new parent.
+The move takes the row the key holds in `rows`, typed as yours; the `row` and `change` of the event
+are `unknown`, since the part does not know your rows. In a tree, pass `parentKey` or
+`childrenField`, and the row moves under its new parent. With `rowEditing` as well, a listener runs
+first, and `event.preventDefault()` keeps the grid from writing the drop too.
 
 ### Rows that stay put
 
@@ -192,13 +211,8 @@ Move the row at once, and move it back if the server refuses: the grid animates 
 ```ts
 async function drop({ key, index }: GridRowDropEvent<unknown>) {
 	const before = rows.value;
-	const row = before.find(track => track.id === key);
 
-	if (!row) {
-		return;
-	}
-
-	rows.value = moveRow(before, { key, row, parent: null, index }, { rowKey: 'id' });
+	rows.value = applyRowChanges(before, [{ type: 'move', key, index }], { rowKey: 'id' }).rows;
 
 	try {
 		await saveOrder(key, index);

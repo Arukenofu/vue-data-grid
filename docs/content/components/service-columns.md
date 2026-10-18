@@ -183,18 +183,21 @@ const columns = defineColumns({
 
 ### Dragging a tree by its handles
 
-The demo reorders the tree with `moveRow`, which puts the row under its new parent:
+The demo reorders the tree with the `rowEditing` feature, which follows the `parentKey` of the tree
+and puts a dropped row under its new parent; `GridRowDrag` then needs no `drop` listener:
 
 ```ts
-import { moveRow } from '@vue-data-grid/core';
-
-function drop({ key, parent, index }: GridRowDropEvent<unknown>) {
-	const row = rows.value.find(item => item.id === key);
-
-	if (row) {
-		rows.value = moveRow(rows.value, { key, row, parent, index }, { rowKey: 'id', parentKey: 'parent' });
-	}
-}
+const grid = useDataGrid({
+	columns,
+	rows,
+	rowKey: 'id',
+	rowHeight: 40,
+	features: {
+		tree: tree({ parentKey: 'parent', defaultExpanded: -1 }),
+		selection: selection(),
+		rowEditing: rowEditing({ onCommit: (commit) => { rows.value = commit.rows; } }),
+	},
+});
 ```
 
 ## Accessibility

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, GridCellTemplate, moveRow, useDataGrid, useGridMotion } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, GridCellTemplate, applyRowChanges, useDataGrid, useGridMotion } from '@vue-data-grid/core';
 import { GridDropZone, type GridDropZoneEvent, type GridRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
 import IconArchive from '~icons/lucide/archive';
 import { computed, shallowRef } from 'vue';
@@ -52,7 +52,7 @@ function place(list: keyof typeof lists, event: GridRowDropEvent<unknown>) {
 	const task = take(event.key);
 
 	if (task) {
-		lists[list].value = moveRow(lists[list].value, { ...event, row: task }, { rowKey: 'id' });
+		lists[list].value = applyRowChanges(lists[list].value, [{ type: 'add', row: task, index: event.index }], { rowKey: 'id' }).rows;
 	}
 }
 

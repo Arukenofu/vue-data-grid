@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineColumn, defineColumns, moveRow, useDataGrid, useGridMotion } from '@vue-data-grid/core';
+import { defineColumn, defineColumns, rowEditing, useDataGrid, useGridMotion } from '@vue-data-grid/core';
 import { dragHandleColumn, GridDragPreview, useGridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import { computed, shallowRef } from 'vue';
 
@@ -25,6 +25,13 @@ const grid = useDataGrid({
 	rows,
 	rowKey: 'id',
 	rowHeight: 42,
+	features: {
+		rowEditing: rowEditing({
+			onCommit: (commit) => {
+				rows.value = commit.rows;
+			},
+		}),
+	},
 });
 
 useGridMotion(grid);
@@ -32,9 +39,6 @@ useGridMotion(grid);
 const drag = useGridRowDrag(grid, {
 	handle: true,
 	getLabel: song => song.title,
-	onDrop: ({ key, row, index, parent }) => {
-		rows.value = moveRow(rows.value, { key, row, index, parent }, { rowKey: 'id' });
-	},
 });
 
 const status = computed(() => {

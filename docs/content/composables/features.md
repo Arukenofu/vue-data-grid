@@ -50,7 +50,7 @@ name, typed by the feature: `grid.history` exists in this grid and is `undefined
 
 ## The order
 
-Features are built in one order, whatever order you write them in. The first four change the rows,
+Features are built in one order, whatever order you write them in. The first five work on the rows,
 the engine renders them, and the rest work on the rendered grid:
 
 | Step | Feature | Works on | Gives |
@@ -59,13 +59,14 @@ the engine renders them, and the rest work on the rendered grid:
 | 2 | `sorting` | the grouped rows | the rows in the order of the sort |
 | 3 | `tree` | the sorted rows | the expanded tree, flattened, with a node for each row |
 | 4 | `selection` | the shown rows and the tree | selected keys, and `aria-selected` on rows |
+| 5 | `rowEditing` | the source rows and the tree | commits that add, remove and move rows, and drops of dragged rows |
 | — | the engine | the shown rows | row and column windows, geometry, prop-getters |
-| 5 | `navigation` | the rendered grid | the keys of the grid, the focused cell |
-| 6 | `ranges` | the rendered grid, the navigation | cell ranges and their gestures |
-| 7 | `editing` | the rendered grid, navigation, ranges | editors, writes, paste |
-| 8 | `history` | editing | undo and redo |
-| 9 | `fill` | ranges and editing | the fill handle |
-| 10 | `clipboard` | ranges, navigation, editing | copy, cut and paste |
+| 6 | `navigation` | the rendered grid | the keys of the grid, the focused cell |
+| 7 | `ranges` | the rendered grid, the navigation | cell ranges and their gestures |
+| 8 | `editing` | the rendered grid, navigation, ranges | editors, writes, paste |
+| 9 | `history` | editing | undo and redo |
+| 10 | `fill` | ranges and editing | the fill handle |
+| 11 | `clipboard` | ranges, navigation, editing | copy, cut and paste |
 
 A feature that needs another one does not compile without it: `fill()` in a grid without `ranges`
 and `editing` is a type error at the call, and `history()` without `editing` too. Features that only
@@ -110,6 +111,7 @@ with a tree needs no `sorting`: the tree sorts each level itself. Built on `useG
 	:data="[
 		{ name: 'parentKey', type: 'keyof TRow | ((row: TRow) => string | null)', description: 'The parent of each row of a flat list. Takes precedence over `childrenField`. Read once.' },
 		{ name: 'childrenField', type: 'MaybeRefOrGetter<keyof TRow>', description: 'The field that holds an array of children, as group rows of `grouping` do.' },
+		{ name: 'setParent', type: '(row: TRow, parent: string | null) => TRow', description: 'Gives a row a new parent, for `rowEditing` and drops: what a `parentKey` that is a function needs. By default the parent is written into the `parentKey` field of a copy of the row.' },
 		{ name: 'expanded', type: 'Ref<string[] | undefined>', description: 'The keys of expanded rows as a model; `undefined` for the start from `defaultExpanded`.' },
 		{ name: 'defaultExpanded', type: 'MaybeRefOrGetter<number>', default: '0', description: 'How many levels start expanded; a negative number expands everything.' },
 		{ name: 'sort', type: 'MaybeRefOrGetter<boolean>', default: 'true', description: 'Sort the siblings of every level by the column state.' },
@@ -132,6 +134,14 @@ on `useGridSelection`.
 		{ name: 'canSelect', type: '(key: string) => boolean', description: 'Whether a row can be selected. A refused row is never selected, whatever the model holds.' },
 	]"
 />
+
+### rowEditing
+
+Changes of the rows by key, as commits: add, update, remove and move rows, in a flat list or a tree,
+the way the tree reads it. Needs `onCommit`, which writes a commit into your rows. A row drag moves
+its rows through it, unless its `drop` listener calls `event.preventDefault()`. The options are those of
+[useGridRowEditing](/composables/use-grid-row-editing): `onCommit` and `onBeforeCommit`. How a row
+gets a new parent comes from the `tree` feature: its `parentKey` or `childrenField`, and `setParent`.
 
 ### navigation
 

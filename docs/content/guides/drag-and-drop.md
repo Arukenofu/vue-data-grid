@@ -28,30 +28,35 @@ never downloads it. Install it next to the grid:
 ## Reordering rows
 
 Put a `GridRowDrag` around the body. Its rows can then be dragged, and when one is dropped it
-tells you where, as a key, a parent and an index. Moving the row in your data is yours, and
-`moveRow` does it in one line:
+says where, as a key, a parent and an index. The grid never changes your rows itself: the
+[`rowEditing`](/composables/use-grid-row-editing) feature moves the row in a commit, and its
+`onCommit` writes the commit into your rows:
 
 ```vue
 <script setup lang="ts">
-import { moveRow, GridBody, GridCells, GridRoot, GridRow, useDataGrid } from '@vue-data-grid/core';
-import { type GridRowDropEvent, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
+import { GridBody, GridCells, GridRoot, GridRow, rowEditing, useDataGrid } from '@vue-data-grid/core';
+import { GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 
-const playlist = shallowRef(tracks);
+const playlist = shallowRef<readonly Track[]>(tracks);
 
-const grid = useDataGrid({ columns, rows: playlist, rowKey: 'id', rowHeight: 44 });
-
-function reorder(event: GridRowDropEvent<unknown>) {
-	const track = playlist.value.find(item => item.id === event.key);
-
-	if (track) {
-		playlist.value = moveRow(playlist.value, { ...event, row: track }, { rowKey: 'id' });
-	}
-}
+const grid = useDataGrid({
+	columns,
+	rows: playlist,
+	rowKey: 'id',
+	rowHeight: 44,
+	features: {
+		rowEditing: rowEditing({
+			onCommit: (commit) => {
+				playlist.value = commit.rows;
+			},
+		}),
+	},
+});
 </script>
 
 <template>
 	<GridRoot :grid="grid" label="Playlist">
-		<GridRowDrag @drop="reorder">
+		<GridRowDrag>
 			<GridBody v-slot="{ rows }">
 				<GridRow v-for="row in rows" :key="row.key" :row="row">
 					<GridCells />
@@ -63,9 +68,21 @@ function reorder(event: GridRowDropEvent<unknown>) {
 ```
 
 `index` is the place among the siblings **once the row is taken out**: remove the row, then insert
-it at `index`. `moveRow` does exactly that, keeps every other row as the same object, and handles
-trees by a `parentKey` field. The row in the event is `unknown`, since the part does not know the
-type of your rows; looking it up by key, as above, keeps everything typed.
+it at `index`. The commit does exactly that and keeps every other row as the same object. A `drop`
+listener of your own takes over from the feature; the event is a `move` change of
+`applyRowChanges` as it is:
+
+```ts
+import { applyRowChanges } from '@vue-data-grid/core';
+import type { GridRowDropEvent } from '@vue-data-grid/core/drag-and-drop';
+
+function reorder({ key, parent, index }: GridRowDropEvent<unknown>) {
+	playlist.value = applyRowChanges(playlist.value, [{ type: 'move', key, parent, index }], { rowKey: 'id' }).rows;
+}
+```
+
+The row in the event is `unknown`, since the part does not know the type of your rows; the move
+takes the row the key holds in yours, which keeps everything typed.
 
 `GridRowDrag` renders no element of its own. Rows are dragged while the grid is not sorted: the
 order of a sorted grid belongs to the sort, not to the rows. `enabled` changes that, and so does
@@ -87,7 +104,7 @@ const columns = defineColumns({
 ```
 
 ```vue
-<GridRowDrag handle @drop="reorder">
+<GridRowDrag handle>
 ```
 
 Without a handle, <kbd>Alt</kbd>+<kbd>↑</kbd> and <kbd>Alt</kbd>+<kbd>↓</kbd> on any cell move its row
@@ -103,7 +120,6 @@ not allowed is simply never shown:
 	:can-drag="(row, key) => key !== 'pinned-note'"
 	:can-drop="target => target.index > 0"
 	:can-nest="row => isFolder(row)"
-	@drop="reorder"
 >
 ```
 
@@ -115,17 +131,21 @@ not allowed is simply never shown:
 ### Trees
 
 With the `tree` feature, a row can go between rows at any level or inside a group. The event's
-`parent` is the new parent, `null` for the top level, and `moveRow` writes it into the field you
-name:
+`parent` is the new parent, `null` for the top level. The `rowEditing` feature follows the tree: with
+a `parentKey` it writes the new parent into that field, and with a `childrenField` it moves the row
+from one children array to another, copying only the rows above:
 
 ```ts
-function reorder(event: GridRowDropEvent<unknown>) {
-	const file = files.value.find(item => item.id === event.key);
-
-	if (file) {
-		files.value = moveRow(files.value, { ...event, row: file }, { rowKey: 'id', parentKey: 'parent' });
-	}
-}
+const grid = useDataGrid({
+	columns,
+	rows: files,
+	rowKey: 'id',
+	rowHeight: 36,
+	features: {
+		tree: tree({ parentKey: 'parent' }),
+		rowEditing: rowEditing({ onCommit: (commit) => { files.value = commit.rows; } }),
+	},
+});
 ```
 
 A group closes while it is dragged, so it moves as one row, and opens again where it lands. A group
@@ -190,8 +210,13 @@ It stands `placement` from the pointer, `'outside'` it by default, `'center'` un
 
 ## Between grids
 
-Grids that share a `group` take each other's rows. The drop reaches the grid the row lands on,
-with `external: true` and the `source` grid, so you move the row between your lists:
+Grids that share a `group` take each other's rows. With the `rowEditing` feature on both, the row
+joins the rows of the grid it lands on, and then leaves the rows of the other; a key the grid has
+already keeps it where it was. A `drop` listener gets the event on the grid the row lands on, with
+`external: true` and the `source` grid, to move the row between your lists yourself, as the demo
+does to share its lists with an archive; with `rowEditing` as well, it calls
+`event.preventDefault()`. A row with rows under it in a tree, or a drop into another group of a grid
+with `grouping`, is left to such a listener: the grid cannot say it as a change of its rows.
 
 <Demo name="drag-between-grids" />
 
@@ -238,18 +263,13 @@ server that may refuse, move the row at once and move it back if the request fai
 `useGridMotion`, both moves animate:
 
 ```ts
-async function reorder(event: GridRowDropEvent<unknown>) {
+async function reorder({ key, parent, index }: GridRowDropEvent<unknown>) {
 	const before = playlist.value;
-	const track = before.find(item => item.id === event.key);
 
-	if (!track) {
-		return;
-	}
-
-	playlist.value = moveRow(before, { ...event, row: track }, { rowKey: 'id' });
+	playlist.value = applyRowChanges(before, [{ type: 'move', key, parent, index }], { rowKey: 'id' }).rows;
 
 	try {
-		await api.moveTrack(track.id, event.index);
+		await api.moveTrack(key, index);
 	} catch {
 		playlist.value = before;
 	}
@@ -263,7 +283,7 @@ API by default, `false` for none, or an engine of GSAP, Motion or your own, as d
 [Animation](/guides/animation). A user who prefers reduced motion gets none.
 
 ```vue
-<GridRowDrag :motion="gsapEngine" @drop="reorder">
+<GridRowDrag :motion="gsapEngine">
 ```
 
 ## Accessibility

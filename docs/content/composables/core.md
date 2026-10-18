@@ -139,9 +139,10 @@ them, in this order.
 | `useRowTree` | A tree from `parentKey` or `childrenField`, flattened into the shown rows, with a node per row. |
 | `useRowSelection` | Selection by key, with ranges, `single` mode, `canSelect`, and the "all selected" mode. |
 | `useRowStream` | Rows updated by a stream, applied in one batch per frame. |
+| `useRowEditing` | Changes of rows as commits with a source, `onBeforeCommit` and the changes that undo them. |
 
 And the pure functions under them: `sortRows`, `groupRows`, `aggregateColumn`, `aggregateRows`,
-`compareValues`, `isEmptyValue`, `moveRow`, `createRowKeyResolver`, `getRowChildren`.
+`compareValues`, `isEmptyValue`, `applyRowChanges`, `createRowKeyResolver`, `getRowChildren`.
 
 ### Streaming rows
 
@@ -155,8 +156,8 @@ import { useRowStream } from '@vue-data-grid/core';
 const stream = useRowStream({ rows: initial, rowKey: 'id' });
 
 socket.on('quote', quote => stream.patch(quote.id, { price: quote.price }));
-socket.on('listing', row => stream.apply({ add: [row] }));
-socket.on('delisting', id => stream.apply({ remove: [id] }));
+socket.on('listing', row => stream.apply([{ type: 'add', row }]));
+socket.on('delisting', id => stream.apply([{ type: 'remove', key: id }]));
 
 const grid = useDataGrid({
 	columns,
@@ -167,11 +168,46 @@ const grid = useDataGrid({
 });
 ```
 
-### Moving rows
+Changes are those of `applyRowChanges`, below. Updates, removals and adds without a place fold into
+one change per key, as they would apply in order: an update after a removal is skipped, and an add
+of a key that is there too, unless it says `existing: 'replace'`. A move or an add at a place keeps
+its order among them. With `parentKey` or `childrenField` the stream changes a tree.
 
-`moveRow(rows, move, options)` returns the rows with one row taken out and put at `index` among the
-children of `parent`: exactly what a drop of `useGridRowDrag` gives. Every other row keeps its
-reference.
+### Changing rows
+
+`applyRowChanges(rows, changes, options)` applies changes of rows by key, in order, and returns the
+new rows with what it applied, what it skipped, and the changes that undo it. Every row it did not
+touch keeps its reference; in a nested tree only the rows above a change are copied.
+
+```ts
+import { applyRowChanges } from '@vue-data-grid/core';
+
+const { rows: next, skipped, undo } = applyRowChanges(rows, [
+	{ type: 'add', row: blank, after: 'task-3' },
+	{ type: 'update', row: { ...task, done: true }, expected: task },
+	{ type: 'move', key: 'task-7', parent: 'sprint-2', index: 0 },
+	{ type: 'remove', key: 'task-9' },
+], { rowKey: 'id', parentKey: 'sprint' });
+```
+
+| Change | Does |
+| --- | --- |
+| `{ type: 'add', row, ...place, existing? }` | Adds a row at a place, the last at the top level by default; a known key skips it, unless `existing` is `'replace'`, which replaces that row where it stands. |
+| `{ type: 'update', row, expected? }` | Replaces the row with the same key, in place. |
+| `{ type: 'remove', key, expected?, subtree? }` | Removes a row, and the rows under it in a tree. |
+| `{ type: 'move', key, row?, expected?, from?, ...place }` | Moves a row with the rows under it; `row` puts another object for it. |
+
+A place is `{ before: key }` or `{ after: key }`, next to a row under its parent, where a neighbour
+that is `null` counts as none; or `{ parent, index }`, the `index`-th child of `parent` once the row
+is taken out, what a drop of `useGridRowDrag` says: its `event.change` is the change of the drop. A
+change is skipped, and left in `skipped`, when its key, neighbour or nested parent is unknown, when
+an add finds its key there already, when the row is no longer `expected`, under `from` or over
+`subtree`, or when it would move a row into its own subtree. A `parentKey` that is a function needs
+`setParent` to give a row a new parent.
+
+`useRowEditing({ rows, rowKey, onCommit })` writes changes as commits, the twin of
+`useCellEditing` for rows; the [`rowEditing` feature](/composables/use-grid-row-editing) builds it
+for a grid.
 
 ## Cells
 

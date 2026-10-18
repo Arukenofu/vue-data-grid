@@ -82,7 +82,44 @@ const grid = useDataGrid({
 
 `commit.apply` replaces the changed rows in a flat list, as the one of a tree by `parentKey`. The rows
 of a tree by `childrenField` lie inside other rows: put the new rows from `commit.rows`, by key, where
-they are in your nesting.
+they are in your nesting, or write them as updates through the `rowEditing` feature below, which
+copies the rows above each one:
+
+```ts
+editing: editing({
+	onCommit: (commit) => {
+		grid.rowEditing.write([...commit.rows.values()].map(row => ({ type: 'update', row })), 'edit');
+	},
+}),
+```
+
+### Adding, removing and moving rows
+
+The [`rowEditing`](/composables/use-grid-row-editing) feature changes the source rows the way the
+tree reads them. With `parentKey` a row given a new parent gets it in that field; with
+`childrenField` a row moves from one children array to another, and only the rows above a change
+become new objects. Removing a row removes the rows under it too, and a move into a row's own
+subtree is skipped:
+
+```ts
+const grid = useDataGrid({
+	columns,
+	rows: members,
+	rowKey: 'id',
+	rowHeight: 44,
+	features: {
+		tree: tree({ parentKey: 'manager' }),
+		rowEditing: rowEditing({ onCommit: (commit) => { members.value = commit.rows; } }),
+	},
+});
+
+grid.rowEditing.write([{ type: 'add', row: hire, parent: 'cto', index: 0 }], 'add');
+grid.rowEditing.write([{ type: 'move', key: 'ana', parent: 'cfo' }], 'move');
+grid.rowEditing.write([{ type: 'remove', key: 'ops' }], 'remove');
+```
+
+A drop of a dragged row goes through the same feature, as [Drag and drop](/guides/drag-and-drop#trees)
+shows.
 
 ## Expanding and collapsing
 

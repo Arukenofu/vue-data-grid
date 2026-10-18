@@ -44,7 +44,7 @@ const stream = useRowStream<Stock>({ rows: createStocks(), rowKey: 'id' });
 function tick() {
 	const quotes = Array.from({ length: QUOTES_PER_TICK }, () => random.pick(stream.rows.value));
 
-	stream.apply({ update: quotes.map(stock => tickStock(stock, random)) });
+	stream.apply(quotes.map(stock => ({ type: 'update', row: tickStock(stock, random) })));
 }
 ```
 

@@ -116,11 +116,7 @@ useGridRowDrag(grid, {
 	canNest: file => file.kind === 'folder',
 	canDrop: ({ row, parent }) => row.parent !== parent,
 	onDrop: ({ key, parent, index }) => {
-		const file = files.value.find(entry => entry.id === key);
-
-		if (file) {
-			files.value = moveRow(files.value, { key, row: file, parent, index }, { rowKey: 'id', parentKey: 'parent' });
-		}
+		files.value = applyRowChanges(files.value, [{ type: 'move', key, parent, index }], { rowKey: 'id', parentKey: 'parent' }).rows;
 	},
 });
 ```
@@ -130,7 +126,9 @@ useGridRowDrag(grid, {
   place among its own files would change nothing.
 - Row drag turns itself off while the rows are sorted, because the order is then the sort's. Here a
   drop only changes the folder, so `enabled: true` keeps it on.
-- `moveRow` gives the moved file its new `parent`, and the totals and the order follow from there.
+- The grid shows rows computed from `files`, with totals and in order, so the drop is written into
+  `files` itself: `applyRowChanges` gives the moved file its new `parent`, and the totals and the
+  order follow from there.
 
 ### The details of a file
 

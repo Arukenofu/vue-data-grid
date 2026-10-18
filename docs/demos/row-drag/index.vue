@@ -5,17 +5,11 @@ import {
 	GridBody,
 	GridCells,
 	GridRow,
-	moveRow,
 	navigation,
+	rowEditing,
 	useDataGrid,
 } from '@vue-data-grid/core';
-import {
-	dragHandleColumn,
-	type DragIndicator,
-	GridDragPreview,
-	type GridRowDropEvent,
-	GridRowDrag,
-} from '@vue-data-grid/core/drag-and-drop';
+import { dragHandleColumn, type DragIndicator, GridDragPreview, GridRowDrag } from '@vue-data-grid/core/drag-and-drop';
 import IconMusic from '~icons/lucide/music';
 import { computed, shallowRef } from 'vue';
 
@@ -43,7 +37,7 @@ const columns = defineColumns({
 	time: column('seconds', { label: 'Time', width: 72, align: 'right', format: formatTime }),
 });
 
-const playlist = shallowRef(tracks);
+const playlist = shallowRef<readonly Track[]>(tracks);
 const indicator = shallowRef<DragIndicator>('gap');
 
 const grid = useDataGrid({
@@ -51,18 +45,17 @@ const grid = useDataGrid({
 	rows: playlist,
 	rowKey: 'id',
 	rowHeight: 44,
-	features: { navigation: navigation() },
+	features: {
+		navigation: navigation(),
+		rowEditing: rowEditing({
+			onCommit: (commit) => {
+				playlist.value = commit.rows;
+			},
+		}),
+	},
 });
 
 const length = computed(() => formatTime(playlist.value.reduce((total, track) => total + track.seconds, 0)));
-
-function reorder(event: GridRowDropEvent<unknown>) {
-	const track = playlist.value.find(item => item.id === event.key);
-
-	if (track) {
-		playlist.value = moveRow(playlist.value, { ...event, row: track }, { rowKey: 'id' });
-	}
-}
 </script>
 
 <template>
@@ -77,7 +70,7 @@ function reorder(event: GridRowDropEvent<unknown>) {
 
 		<UiDataGrid :grid="grid" label="Playlist">
 			<template #body>
-				<GridRowDrag handle :indicator="indicator" @drop="reorder">
+				<GridRowDrag handle :indicator="indicator">
 					<GridBody v-slot="{ rows }">
 						<GridRow v-for="row in rows" :key="row.key" :row="row">
 							<GridCells />

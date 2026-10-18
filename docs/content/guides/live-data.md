@@ -57,7 +57,7 @@ socket.on('quote', (quote) => {
 <ReturnsTable
 	:data="[
 		{ name: 'rows', type: 'ComputedRef<readonly TRow[]>', description: 'The rows with every batch applied: a new array only when a batch changed something, and every untouched row the same object.' },
-		{ name: 'apply(transaction)', type: 'void', description: 'Queues `{ add, update, remove }`: rows to add or replace by key, rows to replace, and keys to remove. The last change of a key wins.' },
+		{ name: 'apply(changes)', type: 'void', description: 'Queues changes of rows, those of `applyRowChanges`: `add`, `update`, `remove` and `move` by key. Updates, removals and adds without a place fold into one change per key, as they apply in order: an update after a removal is skipped, and so is an add of a key that is there, unless it says `existing: \'replace\'`. A move or an add at a place keeps its order among them.' },
 		{ name: 'patch(key, fields)', type: 'boolean', description: 'Queues the row as `{ ...row, ...fields }`, for plain-object rows; `false` when there is no row with that key.' },
 		{ name: 'getRow(key)', type: 'TRow | undefined', description: 'The row with the changes still waiting for the batch, to build the next update from.' },
 		{ name: 'flush()', type: 'void', description: 'Applies the waiting changes now instead of at the next frame.' },
@@ -65,9 +65,17 @@ socket.on('quote', (quote) => {
 	]"
 />
 
+A listing that arrives at its place, or a row that moves, is a change like the others:
+
+```ts
+socket.on('listing', ({ stock, after }) => {
+	stream.apply([{ type: 'add', row: stock, after }]);
+});
+```
+
 `wait: 250` collects for a quarter of a second instead of a frame, for a calmer grid. A tab in the
-background has no frames at all: its changes collect, one per key, until it is visible again, so a
-hidden grid costs nothing.
+background has no frames at all: its changes collect until it is visible again, changes by key one
+per key, so a hidden grid of quotes costs nothing; moves and adds at a place are kept one by one.
 
 ## Sorting a moving target
 
