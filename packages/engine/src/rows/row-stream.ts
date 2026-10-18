@@ -1,82 +1,181 @@
-export interface RowTransaction<TRow> {
-	/** Rows with a new key are appended; a row with a known key replaces the old one in place. */
-	add?: readonly TRow[];
-	/** Rows that replace the ones with the same key; unknown keys are skipped. */
-	update?: readonly TRow[];
-	/** Keys of the rows to remove. */
-	remove?: readonly string[];
-}
+import { isUnplaced } from './row-batch';
+import type { AddRowChange, RemoveRowChange, RowChange, UpdateRowChange } from './row-changes';
+import { type ChildrenField, getRowChildren } from './row-tree';
 
-/** All pending changes to one key: what the row becomes, and whether it may be added. */
+/**
+ * All pending changes to one key in a run of changes by key, folded into what they make of it: of a
+ * key that has a row when they apply, and of one that has none. Updates and removals reach only a
+ * row that is there, and an add only a key that has none, so the two can differ.
+ */
 export interface QueuedRow<TRow> {
-	/** `null` when the row is removed. */
-	row: TRow | null;
-	/** The row came through `add`, so its key may be new. */
-	add: boolean;
+	/** What a key with a row ends with: `undefined` for the row it has, `null` for none. */
+	present: TRow | null | undefined;
+	/** What a key without a row ends with; `null` for none. */
+	absent: TRow | null;
+	/** A removal is among the changes: in a tree it takes the rows under the key too. */
+	removes: boolean;
 }
 
-export type RowQueue<TRow> = Map<string, QueuedRow<TRow>>;
+/**
+ * Pending changes in order. A run of changes by key, updates, removals and adds without a place or a
+ * guard, is one map that folds the changes of each key; a change with a place or a guard, a move or
+ * an add at a place, stands alone, and the changes after it start a new run.
+ */
+export type RowQueue<TRow> = (Map<string, QueuedRow<TRow>> | RowChange<TRow>)[];
 
-/** Queues a transaction on top of earlier changes to the same keys; the last change wins. */
-export function queueTransaction<TRow>(
+type KeyedChange<TRow> = AddRowChange<TRow> | UpdateRowChange<TRow> | RemoveRowChange<TRow>;
+
+/** Whether a change joins a run by key: it says only what the row becomes, not where it goes or what it expects. */
+function isKeyed<TRow>(change: RowChange<TRow>): change is KeyedChange<TRow> {
+	switch (change.type) {
+		case 'update':
+			return change.expected === undefined;
+		case 'remove':
+			return change.expected === undefined && change.subtree === undefined;
+		case 'add':
+			return isUnplaced(change);
+		case 'move':
+			return false;
+		default: {
+			const unknown: never = change;
+
+			throw new Error(`[@vue-data-grid/engine] Unknown row change: ${String(unknown)}`);
+		}
+	}
+}
+
+/** What a change makes of the pending changes of its key. */
+function foldChange<TRow>(queued: QueuedRow<TRow>, change: KeyedChange<TRow>): QueuedRow<TRow> {
+	switch (change.type) {
+		case 'update':
+			return {
+				present: queued.present === null ? null : change.row,
+				absent: queued.absent === null ? null : change.row,
+				removes: queued.removes,
+			};
+		case 'remove':
+			return { present: null, absent: null, removes: true };
+		case 'add':
+			if (change.existing === 'replace') {
+				return { present: change.row, absent: change.row, removes: queued.removes };
+			}
+
+			return {
+				present: queued.present === null ? change.row : queued.present,
+				absent: queued.absent ?? change.row,
+				removes: queued.removes,
+			};
+		default: {
+			const unknown: never = change;
+
+			throw new Error(`[@vue-data-grid/engine] Unknown row change: ${String(unknown)}`);
+		}
+	}
+}
+
+function getChangeKey<TRow>(change: KeyedChange<TRow>, getRowKey: (row: TRow) => string) {
+	return change.type === 'remove' ? change.key : getRowKey(change.row);
+}
+
+/** Queues changes after the pending ones; changes by key fold into the last run. */
+export function queueRowChanges<TRow>(
 	queue: RowQueue<TRow>,
-	transaction: RowTransaction<TRow>,
+	changes: readonly RowChange<TRow>[],
 	getRowKey: (row: TRow) => string,
 ) {
-	for (const row of transaction.add ?? []) {
-		queue.set(getRowKey(row), { row, add: true });
-	}
+	for (const change of changes) {
+		if (!isKeyed(change)) {
+			queue.push(change);
+			continue;
+		}
 
-	for (const row of transaction.update ?? []) {
-		const key = getRowKey(row);
+		const last = queue.at(-1);
+		const run = last instanceof Map ? last : new Map<string, QueuedRow<TRow>>();
 
-		queue.set(key, { row, add: queue.get(key)?.add ?? false });
-	}
+		if (run !== last) {
+			queue.push(run);
+		}
 
-	for (const key of transaction.remove ?? []) {
-		queue.set(key, { row: null, add: false });
+		const key = getChangeKey(change, getRowKey);
+
+		run.set(key, foldChange(run.get(key) ?? { present: undefined, absent: null, removes: false }, change));
 	}
 }
 
 /**
- * Rows after the queue. Untouched rows stay the same objects in the same places, and without any
- * change `rows` comes back as is.
+ * The changes that make what a queued key ends with, in order: one change in most cases, and an
+ * update then an add when a row that is there and a new one end differently.
  */
-export function applyRowQueue<TRow>(rows: readonly TRow[], queue: RowQueue<TRow>, getRowKey: (row: TRow) => string) {
-	if (queue.size === 0) {
-		return rows;
+function getKeyChanges<TRow>(key: string, queued: QueuedRow<TRow>): RowChange<TRow>[] {
+	const { present, absent } = queued;
+
+	// A removal leaves both without a row, and only an add brings one back, to both.
+	if (present === null) {
+		return [{ type: 'remove', key }];
 	}
 
-	const result: TRow[] = [];
-	const seen = new Set<string>();
-	let changed = false;
+	if (present === undefined) {
+		return absent === null ? [] : [{ type: 'add', row: absent }];
+	}
 
-	for (const row of rows) {
-		const key = getRowKey(row);
-		const queued = queue.get(key);
+	if (absent === null) {
+		return [{ type: 'update', row: present }];
+	}
 
-		if (!queued) {
-			result.push(row);
+	if (absent === present) {
+		return [{ type: 'add', row: present, existing: 'replace' }];
+	}
+
+	return [{ type: 'update', row: present }, { type: 'add', row: absent }];
+}
+
+/** The changes of a queue in order, for `applyRowChanges`. */
+export function getQueuedChanges<TRow>(queue: RowQueue<TRow>) {
+	const changes: RowChange<TRow>[] = [];
+
+	for (const item of queue) {
+		if (!(item instanceof Map)) {
+			changes.push(item);
 			continue;
 		}
 
-		seen.add(key);
+		for (const [key, queued] of item) {
+			// A removal then an add takes the rows under the key in a tree: it stays in the batch.
+			if (queued.removes && queued.present !== null) {
+				changes.push({ type: 'remove', key });
+			}
 
-		if (queued.row === null) {
-			changed = true;
-			continue;
-		}
-
-		changed ||= queued.row !== row;
-		result.push(queued.row);
-	}
-
-	for (const [key, queued] of queue) {
-		if (queued.add && queued.row !== null && !seen.has(key)) {
-			result.push(queued.row);
-			changed = true;
+			changes.push(...getKeyChanges(key, queued));
 		}
 	}
 
-	return changed ? result : rows;
+	return changes;
+}
+
+/** A row of an index of rows by key, with the key of the row it is under in a nested tree. */
+export interface IndexedRow<TRow> {
+	row: TRow;
+	/** The key of the row it is under in a nested tree; `null` at the top level and outside one. */
+	parent: string | null;
+}
+
+/** Every row by key, the children of a nested tree included. */
+export function indexRows<TRow>(rows: readonly TRow[], getRowKey: (row: TRow) => string, childrenField?: ChildrenField<TRow>) {
+	const index = new Map<string, IndexedRow<TRow>>();
+
+	function visit(list: readonly TRow[], parent: string | null) {
+		for (const row of list) {
+			const key = getRowKey(row);
+
+			if (!index.has(key)) {
+				index.set(key, { row, parent });
+			}
+
+			visit(getRowChildren(row, childrenField) ?? [], key);
+		}
+	}
+
+	visit(rows, null);
+
+	return index;
 }

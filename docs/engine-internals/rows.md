@@ -1,8 +1,8 @@
 # `src/rows`
 
 The row pipeline: everything that turns the rows the application hands over into the rows the grid
-shows. Sorting, grouping with aggregates, trees, a stream of live changes, row moves and row
-selection. Row identity (the key) is the one idea that runs through all of it.
+shows. Sorting, grouping with aggregates, trees, changes of rows by key, a stream of live changes,
+row editing and row selection. Row identity (the key) is the one idea that runs through all of it.
 
 The folder sits on the `columns` layer: it reads `RuntimeColumn.value`, `compare` and `aggregate`,
 and takes the sort model from `columns/sort`. It imports `shared/stable-computed` and nothing above
@@ -17,12 +17,15 @@ rows/
   sort-rows.ts           pure sorting: full sort and incremental "delta" re-sort
   row-groups.ts          pure grouping by value, with a cache of group rows
   row-tree.ts            tree types (RowNode) and children / parent-key helpers
-  row-stream.ts          pure queue of row changes and its application
-  move-row.ts            pure "move one row" (flat list or tree)
+  row-changes.ts         pure changes of rows by key (add, update, remove, move) with their undo
+  row-batch.ts           pure one-pass application of updates, removals and adds without a place
+  row-list.ts            the rows a batch of changes works on: positions, siblings, splices
+  row-stream.ts          pure queue of row changes for the stream
   use-sorted-rows.ts     composable over sort-rows
   use-grouped-rows.ts    composable over row-groups
   use-row-tree.ts        composable: flat or nested rows to shown rows and nodes
   use-row-stream.ts      composable: batched live changes
+  use-row-editing.ts     composable: changes of rows as commits
   use-row-selection.ts   composable: selection by key, ranges, "select all", trees
 ```
 
@@ -33,9 +36,9 @@ run without Vue; the `use-*.ts` files only wire reactivity around them.
 
 | Where | Exports |
 | --- | --- |
-| root (`src/index.ts`) | functions `aggregateColumn`, `aggregateRows`, `compareValues`, `isEmptyValue`, `createRowKeyResolver`, `getRowChildren`, `groupRows`, `moveRow`, `sortRows`, `useGroupedRows`, `useRowSelection`, `useRowStream`, `useRowTree`, `useSortedRows`; types `ChildrenField`, `GroupedRowsOptions`, `GroupColumns`, `GroupRowsOptions`, `MoveRowOptions`, `ParentKey`, `RowGroup`, `RowGroupLevel`, `RowKey`, `RowMove`, `RowNode`, `RowSelection`, `RowSelectionOptions`, `RowStreamOptions`, `RowTransaction`, `RowTree`, `RowTreeOptions`, `SelectionMode`, `SortedRowsOptions` |
-| `internals.ts` | functions `applyRowQueue`, `buildRowGroups`, `queueTransaction`, `resolveSortedRows`; types `AggregatePart`, `AggregateParts`, `GroupCacheEntry`, `QueuedRow`, `RowGroupCache`, `RowQueue`, `SortFrame`, `SortKey` |
-| neither | `createParentKeyResolver`, `readAggregateParts`, `mergeAggregateParts`, `finishAggregates` (exported from their files for the folder's own use, not from `rows/index.ts`) |
+| root (`src/index.ts`) | functions `aggregateColumn`, `aggregateRows`, `applyRowChanges`, `compareValues`, `isEmptyValue`, `createRowKeyResolver`, `getRowChildren`, `groupRows`, `sortRows`, `useGroupedRows`, `useRowEditing`, `useRowSelection`, `useRowStream`, `useRowTree`, `useSortedRows`; types `AddRowChange`, `ChildrenField`, `GroupedRowsOptions`, `GroupColumns`, `GroupRowsOptions`, `MoveRowChange`, `ParentKey`, `RemoveRowChange`, `RowChange`, `RowChangeOptions`, `RowChangeResult`, `RowCommit`, `RowCommitRequest`, `RowEditing`, `RowEditingOptions`, `RowEditSource`, `RowGroup`, `RowGroupLevel`, `RowKey`, `RowNode`, `RowPlace`, `RowSelection`, `RowSelectionOptions`, `RowStreamOptions`, `RowTree`, `RowTreeOptions`, `RowWriteResult`, `SelectionMode`, `SortedRowsOptions`, `UpdateRowChange` |
+| `internals.ts` | functions `buildRowGroups`, `getQueuedChanges`, `indexRows`, `queueRowChanges`, `resolveSortedRows`; types `AggregatePart`, `AggregateParts`, `GroupCacheEntry`, `QueuedRow`, `RowGroupCache`, `RowQueue`, `SortFrame`, `SortKey` |
+| neither | `createParentKeyResolver`, `readAggregateParts`, `mergeAggregateParts`, `finishAggregates`, `applyKeyedChanges`, `isUnplaced` and the working list of `row-list.ts` (exported from their files for the folder's own use, not from `rows/index.ts`) |
 
 The rule of thumb: the root has what an application calls; `internals` has the building blocks that
 carry the incremental state (frames, caches, queues) and are meant for someone assembling a custom
@@ -110,7 +113,7 @@ A function `rowKey` is returned as it is (same reference). A field name becomes
 `string`. The check is `typeof rowKey === 'function'`, so a field that holds a function would never be
 confused with a getter: only the option itself is tested.
 
-Used in: `use-row-tree.ts`, `use-row-stream.ts`, `use-row-selection.ts`, `move-row.ts`, and
+Used in: `use-row-tree.ts`, `use-row-stream.ts`, `use-row-selection.ts`, `row-list.ts`, `row-batch.ts`, and
 `engine/use-grid-engine.ts` (its `getKeyOf`).
 
 ---
@@ -467,99 +470,194 @@ value does not count. Root API.
 
 Same pattern as `createRowKeyResolver`: reads the field or calls the function, and maps `null`,
 `undefined` and `''` to `null`, everything else to `String(value)`. Not exported from the folder's
-`index.ts`; used by `use-row-tree.ts` and `move-row.ts`.
+`index.ts`; used by `use-row-tree.ts` and `row-changes.ts`.
+
+---
+
+## `row-changes.ts`
+
+One model of changes of rows by key, for the stream, drops of dragged rows, buttons that add and
+remove rows, and undo.
+
+### Types
+
+- `RowPlace`: `{ before?, after?, parent?, index? }`, one interface. `before` wins over `after`, and a
+  neighbour over `parent` and `index`; a neighbour that is `null` is not given, so
+  `{ after: focusedKey }` needs no ternary when nothing is focused (`getNeighbour` in `row-batch.ts`).
+- `AddRowChange`, `UpdateRowChange`, `RemoveRowChange`, `MoveRowChange`, and their union `RowChange`.
+  `expected` is `NoInfer<TRow>`, so the row type is inferred from `row` alone. An add of a known key
+  is skipped unless `existing: 'replace'`; a removal may carry `subtree`, the keys that must be under
+  the row for it to apply (the undo of an add sets it).
+- `RowChangeOptions`: `rowKey`, `parentKey`, `setParent`, `childrenField`. `parentKey` wins over
+  `childrenField`, as in the tree.
+- `RowChangeResult`: `rows` (the same array when nothing changed), `applied`, `skipped`, `undo`.
+
+### State: `row-list.ts`
+
+`applyRowChanges` works on a `RowList`: every row of the tree in three parallel arrays in data
+order, the row, its key, and the parent it names (`parentKey`), sits under (nested) or `null`
+(flat). A nested tree is flattened into them first (`pushRow`); where a child stands in the arrays
+does not matter, only the order of siblings among each other. The file is not exported from the
+folder's `index.ts`.
+
+What keeps a positioned batch from costing more than it must:
+
+- **Named keys.** The batch first collects the keys its changes name (rows, keys, neighbours,
+  parents), and the position index (`Map` key -> position) holds only those, built lazily. A key
+  outside them, such as an ancestor during a move, switches the index to every key once.
+- **Removal in place.** A removed row is marked in `removed` and leaves the index, so other positions
+  stay valid; the arrays are compacted in one pass before the next splice (an add at a place, a
+  move) and at the end. The undo index of a removed row of a flat list is its position minus the
+  removed rows before it, without a scan.
+- **Untouched lists.** `changed` is set by every write; without one the input comes back at once.
+
+- **Child index.** `children` maps each parent to the positions of its children in order, built
+  lazily (`getChildIndex`) and dropped by a splice, a compaction or a parent that changes; removed
+  rows stay in it and are skipped on read, so removals in a row do not rebuild it, and an append
+  extends it (except in a tree by `parentKey`, where the appended row may be the parent of rows that
+  named it before). Siblings, the index among siblings, descendants and the subtree a nested row
+  carries back are read from it: O(siblings) or O(subtree), not O(n).
+
+The first row with a repeated key wins, as in the tree; a repeated key that a change names warns
+once in development (`warnDuplicateKey`, also from the batch pass).
+
+### The batch of a stream: `row-batch.ts`
+
+A batch that holds only updates, removals and adds without a place, in a flat list or a tree by
+`parentKey`, never goes through the working list: `applyKeyedChanges` gives the same `rows`,
+`applied` and `skipped` in one pass, and `applyRowChanges` returns them with `undo` as a getter that
+runs the working list on the first read (a stream never reads it; a commit of `useRowEditing` does,
+for a few changes). A nested tree and any batch with a move or an add at a place take the working
+list.
+
+- **By key** (a flat list, or a tree by `parentKey` without removals): changes of different keys do
+  not touch each other, so the indexes of the changes are grouped by key, each key folds its own
+  changes in order (`step`) when the walk over the rows reaches its row, and keys the rows do not
+  have fold after it. One `getKey` and one `Map` lookup per row, as the old queue. A removed key that
+  is added again goes last, in the order of the adds, as in order.
+- **With subtrees** (a tree by `parentKey` with removals): the changes go in order over the states
+  of their keys; the first removal builds one index of the rows by parent (positions of the rows of
+  the list, keys of added rows), which later changes of a parent extend. An entry counts only while
+  its row still names that parent, and a removed row is taken before its children are visited, so
+  cycles end.
+
+`row-batch.spec.ts` checks the pass against the working list over random batches (a skipped move to
+a missing key forces the working list on the same changes).
+
+Measured in a temporary Vitest spec over 10 000 and 100 000 rows (100 runs after 20 warm-up runs,
+Node 24 on the author's machine), against the queue of the previous version (`applyRowQueue`), in
+ms:
+
+| Batch | 10 000 rows | 100 000 rows | before, 10 000 | before, 100 000 |
+| --- | --- | --- | --- | --- |
+| 200 updates, flat | 0.6 | 5.6 | 0.5 | 5.9 |
+| 200 updates, `parentKey` | 0.6 | 6.2 | 0.5 | 5.9 |
+| 20 removals, flat | 0.5 | 5.8 | 0.4 | 5.9 |
+| 20 removals with subtrees, `parentKey` | 2.1 | 26 | — | — |
+
+After the review of 2026-10-18 (`output/reviews/2026-10-18-row-changes.md`), the same kind of spec
+(median of 15 runs after 5 warm-up runs), before and after the child index, the stream's base and
+the lazy undo of a commit, in ms:
+
+| Case | before | after |
+| --- | --- | --- |
+| stream, 10 000 flat rows: 50 × (move + `patch`) and a flush | 581 | 69 |
+| stream, 100 000 rows by `parentKey`: 50 `patch` and a flush | 25.4 | 3.9 |
+| nested tree of 10 000 rows: 100 removals | 62 | 3.4 |
+| `useRowEditing`, 10 000 rows by `parentKey`: 1000 removals, rows and undo | 185 | 4.0 |
+| 100 000 flat rows: 1000 updates | 5.8 | 5.2 |
+
+Runs differ by about 10 %: the flat batches are as fast as the old queue. The old queue had no
+subtrees, so a removal from a tree has nothing to compare with; its cost is the index of children,
+one pass and one push per row with a parent. Before `row-batch.ts` the same batches went through the
+working list: 200 updates 0.8 and 9.2 ms, 20 removals 1.2 and 17 ms.
+
+Three kinds of trees, from the options: `flat` (every row a sibling of every other, `parent` of a
+place ignored), `parents` (a field names the parent; **raw** values are compared, so a parent no row
+has is a bucket, as the task board example splits one array into lists by a field), `nested`
+(structure; a parent must be a row). In `parents` a row that names a parent no row has, or itself,
+is **also** a child of the top level, where the tree shows it (`isUnder`): a drop at the top level
+counts it among its siblings, and `withParent` leaves its field as it is when it goes to the top
+level.
+
+### Placement
+
+`listPosition` turns `{ parent, index }` into a position in the arrays, with the moved row excluded:
+before the `index`-th sibling; past the end, right after the last sibling **and its subtree**; with
+no siblings, right after the parent, or at the end for an unknown parent or the top level. Rows that
+are in tree order stay in tree order. `before` / `after` resolve to the neighbour's parent and its index among its
+siblings (+1 for `after`), counted with the moved row taken out.
+
+### Changes
+
+- **add**: a known key is skipped, or with `existing: 'replace'` replaces its row in place; a new key
+  is inserted at the place. Without any place it is appended, which is last among its parent's children
+  in every kind of tree, without a scan. With `parentKey`, a row placed under another parent gets it
+  written in (`withParent`: `setParent`, else `{ ...row, [parentKey]: parent }`; a function
+  `parentKey` without `setParent` throws when a write is needed).
+- **update**: the key must be there and hold `expected`; the row replaces the old one in place.
+- **remove**: the key must be there, hold `expected` and, with `subtree`, have exactly those keys
+  under it; the row is removed with its subtree.
+- **move**: an unknown key is skipped (a row from another grid is an add); the key must hold
+  `expected`, and `from` must be a parent the row is under; a target parent inside the row's own
+  subtree (walk up from the target, bounded by the row count against cycles) is skipped. `row`
+  replaces the row the key holds.
+
+`isSameRow` compares `expected` by reference, and in a nested tree apart from the children field
+(shallowly by own keys): the final rebuild gives rows whose children changed new objects, and an
+undo step must still recognise them.
+
+### Undo
+
+Each applied change gives its inverse group; groups are reversed, each kept in its own order:
+
+- add (new key) -> `remove` with `expected` of the stored row and `subtree`: the children it brought
+  in a nested tree, none by `parentKey`, so it never takes rows that came under it since (rows it
+  adopted by their parent field in the same commit make it skip too, and stay);
+- update, or an add with `existing: 'replace'` -> `update` back with `expected`; by `parentKey` a row
+  that names another parent moved, so its undo is a `move` back to its index among its old siblings,
+  with `row`, `expected` and `from`;
+- remove -> `add` at `{ parent, index }`; with `parentKey` the subtree comes
+  back row by row, parents first, each at its index among its siblings; a nested row comes back as
+  one row with its subtree built at the time;
+- move -> `move` back with `expected` and `from` set to the new row and parent, and `row` with the old
+  object when the move wrote a new parent;
+- a nested parent that was a leaf before a row went into it also gets an `update` back to the leaf
+  object, or it would stay a group with an empty children array.
+
+### Finishing
+
+Flat and `parents`: the rows array, or the input itself when every element is the same. Nested:
+`buildRow` rebuilds bottom-up from the parents; a row whose built children equal its children array
+element by element (or that has none and gets none) is kept as is, every other one becomes
+`{ ...row, [field]: children }`.
+
+Cost on the working list: after the O(n) set-up, an update, an add without a place and a removal
+from a flat list are O(1); a removal from a tree is O(subtree + siblings) on the child index; an add
+at a place and a move are O(n) each (splices, the indexes rebuilt after a splice).
 
 ---
 
 ## `row-stream.ts`
 
-Pure part of live updates: a queue of changes keyed by row key, and its application.
+The pure queue of `useRowStream`.
 
-### Types
-
-- `RowTransaction<TRow>`: `add`, `update`, `remove` (keys). `add` appends rows with new keys and
-  replaces rows with known keys in place; `update` replaces and **skips unknown keys**; `remove` takes keys.
-- `QueuedRow<TRow>`: `{ row: TRow | null; add: boolean }`. `row: null` is a removal. `add` says the row
-  came through `add`, so its key may be new.
-- `RowQueue<TRow> = Map<string, QueuedRow<TRow>>`.
-
-### `queueTransaction(queue, transaction, getRowKey)`
-
-Mutates `queue` (a map of pending changes) so that **the last change per key wins**:
-
-1. each `add` row: `{ row, add: true }`;
-2. each `update` row: `{ row, add: <existing add flag> ?? false }`. Keeping the flag matters: an update
-   after an add of the same key must still be allowed to append;
-3. each `remove` key: `{ row: null, add: false }`.
-
-Order inside one transaction is therefore add, then update, then remove. Because entries are
-overwritten per key, several changes to a hot row within a frame collapse into one.
-
-### `applyRowQueue(rows, queue, getRowKey)`
-
-```ts
-function applyRowQueue<TRow>(rows: readonly TRow[], queue: RowQueue<TRow>, getRowKey): readonly TRow[]
-```
-
-Returns the same `rows` reference when nothing changed. Otherwise:
-
-1. empty queue -> `rows` right away;
-2. walk the rows: no queued entry -> keep the row (same object, same place); queued removal -> drop and
-   mark changed; queued replacement -> push the new row in the old place (changed only when it is not
-   `===` the old one: "replacing with the same object changes nothing"). Every queued key found is
-   put in `seen`;
-3. then walk the queue: `add` entries with a non-null row whose key was not `seen` are appended in
-   queue (insertion) order;
-4. `changed ? result : rows`.
-
-An `update` for a key that is not in the rows is not appended, since its `add` flag is `false`. An
-update after a removal of a present row brings the row back in place (the flag stays `false`, but the
-row was `seen`; see the matching test in `use-row-stream.spec.ts`).
-
-Exported from `internals` (as are `queueTransaction`, `RowQueue`, `QueuedRow`); `RowTransaction` goes
-to the root. Used by `use-row-stream.ts`.
-
----
-
-## `move-row.ts`
-
-### `RowMove<TRow>` and `MoveRowOptions<TRow>`
-
-```ts
-interface RowMove<TRow> { key: string; row: TRow; parent: string | null; index: number }
-interface MoveRowOptions<TRow> { rowKey: RowKey<TRow>; parentKey?: keyof TRow }
-```
-
-`key` is the moved row, `row` the row itself (it can come from another grid, so it need not be in
-`rows`), `parent` the key of the new parent (`null` for the top level; **ignored without `parentKey`**),
-`index` the position among the siblings **after the row is taken out**. `parentKey` is only a field
-name here, since the function has to **write** the new parent.
-
-### `moveRow(rows, move, options)`
-
-```ts
-function moveRow<TRow>(rows: readonly TRow[], move: RowMove<TRow>, options: MoveRowOptions<TRow>): TRow[]
-```
-
-Returns a new array; never mutates `rows`. Steps:
-
-1. `rest` = `rows` without the row whose key is `move.key` (if it is there).
-2. In a flat list (`parentKey` missing) the effective parent is `null` and the siblings are `rest`
-   itself. In a tree the siblings are `rest.filter(row => getParent(row) === parent)`.
-3. If a tree and the row's current parent differs from the target, the moved row becomes a **new
-   object** `{ ...move.row, [parentKey]: parent }`; otherwise it is `move.row` as it is. All other rows
-   keep their references.
-4. `anchor = siblings[move.index]`. If it exists, the position is `rest.indexOf(anchor)`: the row goes
-   before the sibling that stands there. If not (index past the end, or no siblings), the position is
-   after the last sibling, or at the end of `rest` when there are no siblings.
-5. `rest.splice(position, 0, moved)`.
-
-Notes: when the index is past the end, the row goes right after the last sibling, not at the end of the array. The function does not update `count`/`setSize`
-or the children field; it is for the flat parent-key form (test "puts the first child of an empty
-parent at the end").
-
-Root API. In `core/src` it is only referenced in doc comments for the drag events
-(`drag/grid-drag.ts`, `drag/use-grid-row-drag.ts`) as the function to use in the application's drop handler.
+- `QueuedRow<TRow>`: `{ present, absent, removes }`, all pending changes of one key in a run folded
+  into what they make of a key that has a row when they apply (`undefined` keeps it, `null` removes
+  it) and of one that has none, since an update and a removal reach only a row that is there and an
+  add only a key that is free. `removes` says a removal is among them, which in a tree takes the
+  subtree even when an add brings the key back.
+- `RowQueue<TRow>`: an ordered array of runs (`Map` key -> `QueuedRow`) and single changes.
+- `queueRowChanges(queue, changes, getRowKey)`: an update, a removal or an add without a place and
+  without a guard folds into the last run, if the last item is a run, else into a new one
+  (`foldChange`). Every other change (a move, an add at a place, a guarded change) is pushed as it
+  is, and the changes after it start a new run, so order is kept around it.
+- `getQueuedChanges(queue)`: the queue as `RowChange[]` in order, in the order keys were first
+  queued: per key a `remove`, an `update`, an `add`, an `add` with `existing: 'replace'` when both
+  cases end with the same row, or an `update` then an `add` when they differ; a removal followed by
+  an add keeps the `remove` first.
+- `indexRows(rows, getRowKey, childrenField?)`: every row by key with the key of the row it is under
+  in a nested tree (`IndexedRow`), nested children included.
 
 ---
 
@@ -716,6 +814,7 @@ totals.
 | Member | Behaviour |
 | --- | --- |
 | `enabled` | `true` with a `parentKey`, or when `childrenField` is set; without both the rows are flat |
+| `parentKey`, `childrenField` | the options as given (`childrenField` as a `computed`), for changes of the rows that follow the tree, such as the `rowEditing` feature of `core` |
 | `rows`, `nodes` | the shown rows and their nodes at the same index |
 | `leaves` | all leaves |
 | `hasGroups` | `leaves.length < entries.size`, i.e. some row has children |
@@ -752,7 +851,7 @@ parts of the navigation and props against the tree's shape (`use-cell-navigation
 ```ts
 function useRowStream<TRow>(options: RowStreamOptions<TRow>): {
 	rows: ComputedRef<readonly TRow[]>;
-	apply(transaction: RowTransaction<TRow>): void;
+	apply(changes: readonly RowChange<TRow>[]): void;
 	patch(key: string, fields: Partial<TRow>): boolean;
 	flush(): void;
 	reset(next: readonly TRow[]): void;
@@ -762,42 +861,71 @@ function useRowStream<TRow>(options: RowStreamOptions<TRow>): {
 
 **Problem.** A feed (a websocket, a ticker) can deliver hundreds of row changes per second. Applying
 each one would copy the array and re-render the grid each time. The stream **collects** changes in a
-queue and applies them in a batch, once per animation frame by default.
+queue and applies them in a batch, once per animation frame by default, through `applyRowChanges`.
+`RowStreamOptions` extends `RowChangeOptions`, so a stream changes a tree by `parentKey` or
+`childrenField` too.
 
-State: `rows` (`shallowRef`), `queue` (`RowQueue`), `byKey` (a lazily built `Map` key -> row) and
-`cancel` (the function that cancels the scheduled flush).
+State: `rows` (`shallowRef`), `queue` (`RowQueue`), `base` with `baseCount` (the rows after the
+first `baseCount` items of the queue, which no later change alters), `index` (a lazily built index
+of `base`) and `cancel`. `rowKey`, `parentKey`, `setParent` and `childrenField` are read once.
 
-- **`apply(transaction)`**: `queueTransaction` into the queue, then `schedule()`.
+- **`apply(changes)`**: `queueRowChanges`, then `schedule()`.
+- **`settle()`**: applies the items of the queue before its last run that are not in `base` yet, each
+  once, and syncs the index: a move costs one pass when it is settled, not one per `getRow`.
 - **`schedule()`**: if a flush is already scheduled, does nothing. Otherwise, `wait` (via `toValue`)
   `undefined` and `requestAnimationFrame` available -> a frame; else `setTimeout(flush, wait ?? 0)`.
-  The cancel function is kept. The check `typeof requestAnimationFrame === 'function'` keeps it safe
-  in SSR and in environments without frames. A hidden tab has no frames, so the changes keep collecting
-  in the queue (one per key) until it is visible again, as the option JSDoc says.
-- **`flush()`**: cancels any pending timer or frame, runs `applyRowQueue`, calls `syncIndex()`, clears the
-  queue, and assigns `rows.value` **only if the array reference changed**.
-- **`syncIndex()`**: keeps `byKey` in step with the applied queue without rebuilding it (removal deletes;
-  an add or a replacement of a known key sets). It does nothing if the index was never built.
-- **`getIndex()`**: builds `byKey` lazily with `??=`. A stream that never calls `getRow`/`patch` never pays
-  for the map.
-- **`getRow(key)`**: the row **including pending changes**. No queued entry -> from the index; queued
-  removal -> `undefined`; a queued row counts only if it was added or the key is known (an `update` for
-  an unknown key has no row because the next batch drops it).
-- **`patch(key, fields)`**: `getRow`, and if there is a row queues `{ ...base, ...fields }` (keeping the
-  `add` flag), schedules, returns `true`; `false` otherwise and **no frame is requested**. It is for
-  plain-object rows. Patches on top of pending patches compose, since `getRow` sees the queue.
-- **`reset(next)`**: cancels the flush, clears the queue, drops `byKey`, sets the rows. Used when a new
-  snapshot arrives.
-- **Snapshot watcher**: if `options.rows` is given, `watch(() => toValue(options.rows) ?? [], reset)`.
-  A new snapshot restarts the stream and drops pending changes, which were made against the old one.
-  The initial value comes from `toValue(options.rows) ?? []`.
-- **Dispose**: `onScopeDispose(() => cancel?.())` cancels a pending frame or timer.
+  The check `typeof requestAnimationFrame === 'function'` keeps it safe in SSR. A hidden tab has no
+  frames, so changes keep collecting, one per key in a run, until it is visible again.
+- **`flush()`**: cancels a pending frame or timer, takes the queue (so a batch that throws is not
+  tried again every frame), applies what `base` does not have yet to it, syncs the index, and assigns
+  `rows.value` **only if the array reference changed**.
+- **`syncIndex(applied)`**: keeps `index` in step with the applied changes (a removal deletes, a row
+  sets) in a flat list, and by `parentKey` while the batch neither removes nor moves; otherwise drops
+  it, since a removal takes a subtree, a move may write a copy, and a nested change copies the rows
+  above it.
+- **`getRow(key)`**: the row **including pending changes**: `settle()`, the row of the key in `base`,
+  then the last run (`present` for a key with a row, `absent` without). In a tree, a row under one
+  the last run removes is `undefined` (a walk up the parents, bounded against cycles). So a patch
+  after a pending move sees the parent the move writes.
+- **`patch(key, fields)`**: `getRow`, and if there is a row queues the update `{ ...base, ...fields }`;
+  `false` otherwise and **no frame is requested**. For plain-object rows.
+- **`reset(next)`**: cancels the flush, clears the queue, `base` and the index, sets the rows. Used when a
+  new snapshot arrives through the `rows` option (`watch`).
+- **Dispose**: `onScopeDispose(() => cancel?.())`.
 
 **Stability.** `rows` is a `computed` over the ref; the array changes only when a batch really changed
 something, and rows no change touched stay the same objects. `useSortedRows` with `delta` depends on
 this.
 
-Used in: I found no caller of `useRowStream` in `packages/engine/src` or `packages/core/src` outside this
-folder; it is a root export for applications, and it is covered by `use-row-stream.spec.ts`.
+Used in: no caller in `packages/engine/src` or `packages/core/src`; it is a root export for
+applications, covered by `use-row-stream.spec.ts` and `row-stream.spec.ts`.
+
+---
+
+## `use-row-editing.ts`
+
+### `useRowEditing(options)`
+
+```ts
+function useRowEditing<TRow>(options: RowEditingOptions<TRow>): {
+	lastCommit: Readonly<ShallowRef<RowCommit<TRow> | null>>;
+	write(changes: readonly RowChange<TRow>[], source: RowEditSource): RowWriteResult<TRow>;
+}
+```
+
+The twin of `useCellEditing` for rows. `options.rows` is read with `toValue` at every write, and
+`childrenField` may be a ref or a getter (the tree's `childrenField` is a `computed`).
+
+`write` applies the changes to the rows; with applied changes it asks `onBeforeCommit`, which may
+return other changes (applied again to the same rows, their skips added) or `false`. When the rows
+did not change there is no commit. Otherwise the commit is `{ source, changes, undo, rows, apply }`,
+`onCommit` gets it and `lastCommit` holds it. `undo` is a getter over the result: a batch that took
+the one-pass path works its undo out only when something reads it. `apply(list)` returns the cached `rows` for the very
+array the commit was made from, and applies the changes again to any other array, such as one a
+stream changed since.
+
+Used in: `core/src/editing/use-grid-row-editing.ts` (`useGridRowEditing`, the `rowEditing` feature),
+with the grid's source rows, `rowKey`, and the tree's `parentKey` and `childrenField`.
 
 ---
 

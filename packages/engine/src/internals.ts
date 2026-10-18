@@ -65,13 +65,14 @@ export type {
 	AggregatePart,
 	AggregateParts,
 	GroupCacheEntry,
+	IndexedRow,
 	QueuedRow,
 	RowGroupCache,
 	RowQueue,
 	SortFrame,
 	SortKey,
 } from './rows';
-export { applyRowQueue, buildRowGroups, queueTransaction, resolveSortedRows } from './rows';
+export { buildRowGroups, getQueuedChanges, indexRows, queueRowChanges, resolveSortedRows } from './rows';
 export {
 	applyCellEdits,
 	containsRangeBounds,

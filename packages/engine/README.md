@@ -3,9 +3,9 @@
 Headless grid core for Vue 3. It models columns (declaration, groups, order, widths, pinning,
 hiding, group collapse and sort state), keeps that state in a store of your choice, and turns it into
 geometry: `flex`, `position: sticky` and CSS custom properties. It also windows rows and columns, and
-ships optional composables for work on rows and cells: sorting, streaming updates, grouping with
-aggregates, trees, selection, cell focus, cell ranges, editing with undo, paste and fill, recent
-cell changes and CSV.
+ships optional composables for work on rows and cells: sorting, changes of rows by key, streaming
+updates, grouping with aggregates, trees, selection, cell focus, cell ranges, editing with undo,
+paste and fill, recent cell changes and CSV.
 
 There is no markup here: no components, no templates, no `h()` calls, no render types. The engine
 gives you a `GridScope`, and your own markup renders the grid from it. It is the low-level layer:
@@ -115,7 +115,7 @@ has a `key` for `v-for`.
 | keeping the rows in view in place when rows come in above them (`bodyOffset`, `anchorAtTop`) | `overflow-anchor: none` on the root, so that the browser does not move them a second time |
 | service columns (`kind: 'service'`) and row headers | what service cells show: checkboxes, numbers, actions |
 | geometry as CSS variables, the layer of pinned cells (`--dg-pinned-z-index`), widths in one write, fit to viewport | styling, ARIA roles and attributes: the core gives the numbers |
-| stable references for memoization; a row moved in the data, `moveRow` | dragging rows and columns, as in `@vue-data-grid/core/drag-and-drop` |
+| stable references for memoization; changes of rows by key in flat lists and trees, `applyRowChanges` and `useRowEditing`: add, update, remove and move, with the changes that undo them | dragging rows and columns, as in `@vue-data-grid/core/drag-and-drop`; buttons that add and remove rows |
 | sorting, streaming, grouping, trees, selection as separate composables | filtering, loading data, selection gestures, checkboxes |
 | cell focus and ranges: addresses by row key (`{ key, column }`) and by row index (`{ index, column }`), moves, adding ranges and taking cells out, reactivity per row, range rectangles, clipboard text | key bindings, `tabindex`, `element.focus()`, drawing ranges, clipboard writes |
 | editing: rights, parsing, validation, immutable writes with a source, `onBeforeCommit`, undo and redo | editors, their keys, showing errors, saving rows |
@@ -142,7 +142,7 @@ src/
 	engine/         useGridEngine and GridScope; column reconciliation, fit, resize
 	virtual/        row and column windows, scrolling, viewport
 	render/         what markup uses: CSS variables, cell styles
-	rows/           row pipeline: sorting, streaming, grouping with aggregates, trees, selection, row keys
+	rows/           row pipeline: sorting, changes of rows, streaming, grouping with aggregates, trees, selection, row keys
 	cells/          cell addresses, focus, ranges, editing, history, paste, fill, cell changes, CSV
 	shared/         stableComputed, the model ref, the row token
 ```

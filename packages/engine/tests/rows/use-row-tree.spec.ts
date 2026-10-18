@@ -81,6 +81,13 @@ describe('useRowTree — parent keys', () => {
 		expect(tree.getNode('b')?.group).toBe(false);
 	});
 
+	it('gives the parent key and the children field it was built with, for changes of the rows', () => {
+		const tree = useRowTree({ rows: flat, rowKey: 'id', parentKey: 'parentId' });
+
+		expect(tree.parentKey).toBe('parentId');
+		expect(tree.childrenField.value).toBeUndefined();
+	});
+
 	it('a row whose parent is missing goes to the top level', () => {
 		const tree = useRowTree({
 			rows: [{ id: 'x', parentId: 'nobody', cap: 0 }],

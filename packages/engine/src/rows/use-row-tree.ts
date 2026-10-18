@@ -335,6 +335,10 @@ export function useRowTree<TRow>(options: RowTreeOptions<TRow>) {
 
 	return {
 		enabled,
+		/** The parent of each row of a flat list, as given: what changes of the rows, such as `applyRowChanges`, take. */
+		parentKey: options.parentKey,
+		/** The field holding an array of children, as given: what changes of the rows take. */
+		childrenField: computed(() => toValue(options.childrenField)),
 		/** The shown rows: the expanded tree in traversal order. */
 		rows,
 		/** The node of each shown row, at the same index. */
